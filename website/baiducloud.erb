@@ -1,0 +1,198 @@
+
+<% wrap_layout :inner do %>
+    <% content_for :sidebar do %>
+        <div class="docs-sidebar hidden-print affix-top" role="complementary">
+            <ul class="nav docs-sidenav">
+                <li<%= sidebar_current("docs-home") %>>
+                    <a href="/docs/providers/index.html">All Providers</a>
+                </li>
+                <li<%= sidebar_current("docs-baiducloud-index") %>>
+                    <a href="/docs/providers/baiducloud/index.html">BaiduCloud Provider</a>
+                </li>
+                
+                <li<%= sidebar_current("docs-baiducloud-datasource") %>>
+                    <a href="#">Data Sources</a>
+                    <ul class="nav nav-visible">
+                        
+                        <li<%= sidebar_current("docs-baiducloud-datasource-vpcs") %>>
+                            <a href="/docs/providers/baiducloud/d/vpcs.html">baiducloud_vpcs</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-subnets") %>>
+                            <a href="/docs/providers/baiducloud/d/subnets.html">baiducloud_subnets</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-route_rules") %>>
+                            <a href="/docs/providers/baiducloud/d/route_rules.html">baiducloud_route_rules</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-acls") %>>
+                            <a href="/docs/providers/baiducloud/d/acls.html">baiducloud_acls</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-nat_gateways") %>>
+                            <a href="/docs/providers/baiducloud/d/nat_gateways.html">baiducloud_nat_gateways</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-peer_conns") %>>
+                            <a href="/docs/providers/baiducloud/d/peer_conns.html">baiducloud_peer_conns</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-bos_buckets") %>>
+                            <a href="/docs/providers/baiducloud/d/bos_buckets.html">baiducloud_bos_buckets</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-bos_bucket_objects") %>>
+                            <a href="/docs/providers/baiducloud/d/bos_bucket_objects.html">baiducloud_bos_bucket_objects</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-appblb") %>>
+                            <a href="/docs/providers/baiducloud/d/appblb.html">baiducloud_appblb</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-appblb_listeners") %>>
+                            <a href="/docs/providers/baiducloud/d/appblb_listeners.html">baiducloud_appblb_listeners</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-appblb_server_groups") %>>
+                            <a href="/docs/providers/baiducloud/d/appblb_server_groups.html">baiducloud_appblb_server_groups</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-eips") %>>
+                            <a href="/docs/providers/baiducloud/d/eips.html">baiducloud_eips</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-instances") %>>
+                            <a href="/docs/providers/baiducloud/d/instances.html">baiducloud_instances</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-cdss") %>>
+                            <a href="/docs/providers/baiducloud/d/cdss.html">baiducloud_cdss</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-security_groups") %>>
+                            <a href="/docs/providers/baiducloud/d/security_groups.html">baiducloud_security_groups</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-security_group_rules") %>>
+                            <a href="/docs/providers/baiducloud/d/security_group_rules.html">baiducloud_security_group_rules</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-snapshots") %>>
+                            <a href="/docs/providers/baiducloud/d/snapshots.html">baiducloud_snapshots</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-auto_snapshot_policies") %>>
+                            <a href="/docs/providers/baiducloud/d/auto_snapshot_policies.html">baiducloud_auto_snapshot_policies</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-zones") %>>
+                            <a href="/docs/providers/baiducloud/d/zones.html">baiducloud_zones</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-specs") %>>
+                            <a href="/docs/providers/baiducloud/d/specs.html">baiducloud_specs</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-images") %>>
+                            <a href="/docs/providers/baiducloud/d/images.html">baiducloud_images</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-datasource-certs") %>>
+                            <a href="/docs/providers/baiducloud/d/certs.html">baiducloud_certs</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li<%= sidebar_current("docs-baiducloud-resource-cert") %>>
+                    <a href="#">CERT Resources</a>
+                    <ul class="nav nav-visible">
+                        
+                        <li<%= sidebar_current("docs-baiducloud-resource-cert") %>>
+                            <a href="/docs/providers/baiducloud/r/cert.html">baiducloud_cert</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li<%= sidebar_current("docs-baiducloud-resource-eip") %>>
+                    <a href="#">EIP Resources</a>
+                    <ul class="nav nav-visible">
+                        
+                        <li<%= sidebar_current("docs-baiducloud-resource-eip") %>>
+                            <a href="/docs/providers/baiducloud/r/eip.html">baiducloud_eip</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-eip_association") %>>
+                            <a href="/docs/providers/baiducloud/r/eip_association.html">baiducloud_eip_association</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li<%= sidebar_current("docs-baiducloud-resource-appblb") %>>
+                    <a href="#">APPBLB Resources</a>
+                    <ul class="nav nav-visible">
+                        
+                        <li<%= sidebar_current("docs-baiducloud-resource-appblb") %>>
+                            <a href="/docs/providers/baiducloud/r/appblb.html">baiducloud_appblb</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-appblb_server_group") %>>
+                            <a href="/docs/providers/baiducloud/r/appblb_server_group.html">baiducloud_appblb_server_group</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-appblb_listener") %>>
+                            <a href="/docs/providers/baiducloud/r/appblb_listener.html">baiducloud_appblb_listener</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li<%= sidebar_current("docs-baiducloud-resource-bcc") %>>
+                    <a href="#">BCC Resources</a>
+                    <ul class="nav nav-visible">
+                        
+                        <li<%= sidebar_current("docs-baiducloud-resource-instance") %>>
+                            <a href="/docs/providers/baiducloud/r/instance.html">baiducloud_instance</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-security_group") %>>
+                            <a href="/docs/providers/baiducloud/r/security_group.html">baiducloud_security_group</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-security_group_rule") %>>
+                            <a href="/docs/providers/baiducloud/r/security_group_rule.html">baiducloud_security_group_rule</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-cds") %>>
+                            <a href="/docs/providers/baiducloud/r/cds.html">baiducloud_cds</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-cds_attachment") %>>
+                            <a href="/docs/providers/baiducloud/r/cds_attachment.html">baiducloud_cds_attachment</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-snapshot") %>>
+                            <a href="/docs/providers/baiducloud/r/snapshot.html">baiducloud_snapshot</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-auto_snapshot_policy") %>>
+                            <a href="/docs/providers/baiducloud/r/auto_snapshot_policy.html">baiducloud_auto_snapshot_policy</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li<%= sidebar_current("docs-baiducloud-resource-vpc") %>>
+                    <a href="#">VPC Resources</a>
+                    <ul class="nav nav-visible">
+                        
+                        <li<%= sidebar_current("docs-baiducloud-resource-vpc") %>>
+                            <a href="/docs/providers/baiducloud/r/vpc.html">baiducloud_vpc</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-subnet") %>>
+                            <a href="/docs/providers/baiducloud/r/subnet.html">baiducloud_subnet</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-route_rule") %>>
+                            <a href="/docs/providers/baiducloud/r/route_rule.html">baiducloud_route_rule</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-acl") %>>
+                            <a href="/docs/providers/baiducloud/r/acl.html">baiducloud_acl</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-nat_gateway") %>>
+                            <a href="/docs/providers/baiducloud/r/nat_gateway.html">baiducloud_nat_gateway</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-peer_conn") %>>
+                            <a href="/docs/providers/baiducloud/r/peer_conn.html">baiducloud_peer_conn</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-peer_conn_acceptor") %>>
+                            <a href="/docs/providers/baiducloud/r/peer_conn_acceptor.html">baiducloud_peer_conn_acceptor</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li<%= sidebar_current("docs-baiducloud-resource-bos") %>>
+                    <a href="#">BOS Resources</a>
+                    <ul class="nav nav-visible">
+                        
+                        <li<%= sidebar_current("docs-baiducloud-resource-bos_bucket") %>>
+                            <a href="/docs/providers/baiducloud/r/bos_bucket.html">baiducloud_bos_bucket</a>
+                        </li>
+                        <li<%= sidebar_current("docs-baiducloud-resource-bos_bucket_object") %>>
+                            <a href="/docs/providers/baiducloud/r/bos_bucket_object.html">baiducloud_bos_bucket_object</a>
+                        </li>
+                    </ul>
+                </li>
+                
+            </ul>
+        </div>
+    <% end %>
+    <%= yield %>
+<% end %>
