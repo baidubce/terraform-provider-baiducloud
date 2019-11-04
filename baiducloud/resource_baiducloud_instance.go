@@ -304,7 +304,7 @@ func resourceBaiduCloudInstance() *schema.Resource {
 			"description": {
 				Type:        schema.TypeString,
 				Description: "Description of the instance.",
-				Computed:    true,
+				Optional:    true,
 			},
 			"status": {
 				Type:        schema.TypeString,
@@ -429,6 +429,11 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 		}
 	}
 
+	// set instance description
+	if err := updateInstanceDescription(d, meta, d.Id()); err != nil {
+		return err
+	}
+
 	return resourceBaiduCloudInstanceRead(d, meta)
 }
 
@@ -536,6 +541,11 @@ func resourceBaiduCloudInstanceUpdate(d *schema.ResourceData, meta interface{}) 
 
 	// update instance attribute
 	if err := updateInstanceAttribute(d, meta, instanceID); err != nil {
+		return err
+	}
+
+	// update instance description
+	if err := updateInstanceDescription(d, meta, instanceID); err != nil {
 		return err
 	}
 
@@ -791,6 +801,42 @@ func updateInstanceAttribute(d *schema.ResourceData, meta interface{}, instanceI
 		}
 
 		d.SetPartial("name")
+	}
+
+	return nil
+}
+
+func updateInstanceDescription(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	action := "Update Instance Description " + instanceID
+	client := meta.(*connectivity.BaiduClient)
+
+	if d.HasChange("description") {
+		modifyInstanceDescArgs := &api.ModifyInstanceDescArgs{}
+		modifyInstanceDescArgs.Description = d.Get("description").(string)
+
+		err := resource.Retry(d.Timeout(schema.TimeoutUpdate), func() *resource.RetryError {
+			_, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
+				return nil, bccClient.ModifyInstanceDesc(instanceID, modifyInstanceDescArgs)
+			})
+			if err != nil {
+				if IsExceptedErrors(err, []string{OperationDenied, bce.EINTERNAL_ERROR}) {
+					return resource.RetryableError(err)
+				}
+				return resource.NonRetryableError(err)
+			}
+			addDebug(action, modifyInstanceDescArgs)
+			return nil
+		})
+
+		if err != nil {
+			if NotFoundError(err) {
+				d.SetId("")
+				return nil
+			}
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+		}
+
+		d.SetPartial("description")
 	}
 
 	return nil

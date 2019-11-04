@@ -161,7 +161,6 @@ func resourceBaiduCloudAutoSnapshotPolicyCreate(d *schema.ResourceData, meta int
 
 func resourceBaiduCloudAutoSnapshotPolicyRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
-	bccService := BccService{client}
 
 	id := d.Id()
 	action := "Query Auto Snapshot Policy " + id
@@ -179,9 +178,7 @@ func resourceBaiduCloudAutoSnapshotPolicyRead(d *schema.ResourceData, meta inter
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_auto_snapshot_policy", action, BCESDKGoERROR)
 	}
 
-	// TODO:  api.AutoSnapshotPolicyModel2 may be wrong, it should has same structure with api.AutoSnapshotPolicyModel,
-	//  remove it when this wrong which in sdk be fixed in the future
-	policy := bccService.TransAutoSnapshotPolicyModel2ToAutoSnapshotPolicyModel(&raw.(*api.GetASPDetailResult).AutoSnapshotPolicy)
+	policy := &raw.(*api.GetASPDetailResult).AutoSnapshotPolicy
 	d.Set("status", policy.Status)
 	d.Set("created_time", policy.CreatedTime)
 	d.Set("updated_time", policy.UpdatedTime)

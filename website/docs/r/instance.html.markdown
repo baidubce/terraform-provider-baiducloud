@@ -44,6 +44,7 @@ The following arguments are supported:
 * `cds_disks` - (Optional) CDS disks of the instance.
 * `dedicate_host_id` - (Optional, ForceNew) The ID of dedicated host.
 * `delete_cds_snapshot_flag` - (Optional, ForceNew) Whether to release the cds disk snapshots, default to false. It is effective only when the related_release_flag is true.
+* `description` - (Optional) Description of the instance.
 * `ephemeral_disks` - (Optional) Ephemeral disks of the instance.
 * `fpga_card` - (Optional, ForceNew) FPGA card of the instance.
 * `gpu_card` - (Optional, ForceNew) GPU card of the instance.
@@ -89,7 +90,6 @@ In addition to all arguments above, the following attributes are exported:
 
 * `auto_renew` - Whether to automatically renew.
 * `create_time` - Create time of the instance.
-* `description` - Description of the instance.
 * `expire_time` - Expire time of the instance.
 * `internal_ip` - Internal IP assigned to the instance.
 * `keypair_id` - Key pair id of the instance.
