@@ -207,3 +207,11 @@ In addition to all arguments above, the following attributes are exported:
 * `owner_name` - Owner name of the BOS bucket.
 
 
+## Import
+
+BOS bucket can be imported, e.g.
+
+```hcl
+$ terraform import baiducloud_bos_bucket.default bucket_id
+```
+

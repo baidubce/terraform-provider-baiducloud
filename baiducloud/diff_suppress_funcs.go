@@ -61,3 +61,16 @@ func appBlbProtocolTCPUDPHTTPSuppressFunc(k, old, new string, d *schema.Resource
 
 	return true
 }
+
+func cfcTriggerSourceTypeSuppressFunc(sourceType []string) schema.SchemaDiffSuppressFunc {
+	return func(k, old, new string, d *schema.ResourceData) bool {
+		sType := d.Get("source_type").(string)
+		for _, t := range sourceType {
+			if sType == t {
+				return false
+			}
+		}
+
+		return true
+	}
+}

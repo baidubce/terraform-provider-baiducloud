@@ -18,6 +18,7 @@ const (
 	APPBLBCode = ServiceCode("APPBLB")
 	BOSCode    = ServiceCode("BOS")
 	CERTCode   = ServiceCode("CERT")
+	CFCCode    = ServiceCode("CFC")
 )
 
 const (
@@ -25,16 +26,19 @@ const (
 	DefaultBJRegionEipEndPoint = "eip.bj.baidubce.com"
 	DefaultBJRegionBlbEndPoint = "blb.bj.baidubce.com"
 	DefaultBJRegionBosEndPoint = "bj.bcebos.com"
+	DefaultBJRegionCfcEndPoint = "cfc.bj.baidubce.com"
 
 	DefaultGZRegionBccEndPoint = "bcc.gz.baidubce.com"
 	DefaultGZRegionEipEndPoint = "eip.gz.baidubce.com"
 	DefaultGZRegionBlbEndPoint = "blb.gz.baidubce.com"
 	DefaultGZRegionBosEndPoint = "gz.bcebos.com"
+	DefaultGZRegionCfcEndPoint = "cfc.gz.baidubce.com"
 
 	DefaultSURegionBccEndPoint = "bcc.su.baidubce.com"
 	DefaultSURegionEipEndPoint = "eip.su.baidubce.com"
 	DefaultSURegionBlbEndPoint = "blb.su.baidubce.com"
 	DefaultSURegionBosEndPoint = "su.bcebos.com"
+	DefaultSURegionCfcEndPoint = "cfc.su.baidubce.com"
 
 	DefaultCERTEndPoint = "certificate.baidubce.com"
 )
@@ -55,6 +59,7 @@ var (
 		APPBLBCode: DefaultBJRegionBlbEndPoint,
 		BOSCode:    DefaultBJRegionBosEndPoint,
 		CERTCode:   DefaultCERTEndPoint,
+		CFCCode:    DefaultBJRegionCfcEndPoint,
 	}
 
 	// Region GZ Service Endpoints
@@ -65,6 +70,7 @@ var (
 		APPBLBCode: DefaultGZRegionBlbEndPoint,
 		BOSCode:    DefaultGZRegionBosEndPoint,
 		CERTCode:   DefaultCERTEndPoint,
+		CFCCode:    DefaultGZRegionCfcEndPoint,
 	}
 
 	// Region SU Service Endpoints
@@ -75,6 +81,7 @@ var (
 		APPBLBCode: DefaultSURegionBlbEndPoint,
 		BOSCode:    DefaultSURegionBosEndPoint,
 		CERTCode:   DefaultCERTEndPoint,
+		CFCCode:    DefaultSURegionCfcEndPoint,
 	}
 )
 

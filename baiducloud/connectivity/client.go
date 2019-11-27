@@ -7,6 +7,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/bcc"
 	"github.com/baidubce/bce-sdk-go/services/bos"
 	"github.com/baidubce/bce-sdk-go/services/cert"
+	"github.com/baidubce/bce-sdk-go/services/cfc"
 	"github.com/baidubce/bce-sdk-go/services/eip"
 	"github.com/baidubce/bce-sdk-go/services/vpc"
 	"github.com/baidubce/bce-sdk-go/util/log"
@@ -26,6 +27,7 @@ type BaiduClient struct {
 	appBlbConn *appblb.Client
 	bosConn    *bos.Client
 	certConn   *cert.Client
+	cfcConn    *cfc.Client
 }
 
 type ApiVersion string
@@ -80,7 +82,11 @@ func (client *BaiduClient) WithBccClient(do func(*bcc.Client) (interface{}, erro
 	// Initialize the BCC client if necessary
 	if client.bccConn == nil {
 		client.WithCommonClient(BCCCode)
-		bccClient, _ := bcc.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		bccClient, err := bcc.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+
 		client.bccConn = bccClient
 	}
 
@@ -94,7 +100,11 @@ func (client *BaiduClient) WithVpcClient(do func(*vpc.Client) (interface{}, erro
 	// Initialize the VPC client if necessary
 	if client.vpcConn == nil {
 		client.WithCommonClient(VPCCode)
-		vpcClient, _ := vpc.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		vpcClient, err := vpc.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+
 		client.vpcConn = vpcClient
 	}
 
@@ -108,7 +118,11 @@ func (client *BaiduClient) WithEipClient(do func(*eip.Client) (interface{}, erro
 	// Initialize the EIP client if necessary
 	if client.eipConn == nil {
 		client.WithCommonClient(EIPCode)
-		eipClient, _ := eip.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		eipClient, err := eip.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+
 		client.eipConn = eipClient
 	}
 
@@ -122,7 +136,11 @@ func (client *BaiduClient) WithAppBLBClient(do func(*appblb.Client) (interface{}
 	// Initialize the APPBLB client if necessary
 	if client.appBlbConn == nil {
 		client.WithCommonClient(APPBLBCode)
-		appBlbClient, _ := appblb.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		appBlbClient, err := appblb.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+
 		client.appBlbConn = appBlbClient
 	}
 
@@ -136,7 +154,11 @@ func (client *BaiduClient) WithBosClient(do func(*bos.Client) (interface{}, erro
 	// Initialize the BOS client if necessary
 	if client.bosConn == nil {
 		client.WithCommonClient(BOSCode)
-		bosClient, _ := bos.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		bosClient, err := bos.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+
 		client.bosConn = bosClient
 	}
 
@@ -150,9 +172,31 @@ func (client *BaiduClient) WithCertClient(do func(*cert.Client) (interface{}, er
 	// Initialize the CERT client if necessary
 	if client.certConn == nil {
 		client.WithCommonClient(CERTCode)
-		certClient, _ := cert.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		certClient, err := cert.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+
 		client.certConn = certClient
 	}
 
 	return do(client.certConn)
+}
+
+func (client *BaiduClient) WithCFCClient(do func(*cfc.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the CFC client if necessary
+	if client.cfcConn == nil {
+		client.WithCommonClient(CFCCode)
+		cfcClient, err := cfc.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+
+		client.cfcConn = cfcClient
+	}
+
+	return do(client.cfcConn)
 }

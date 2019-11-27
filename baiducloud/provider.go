@@ -42,6 +42,7 @@ Data Sources
   baiducloud_specs
   baiducloud_images
   baiducloud_certs
+  baiducloud_cfc_function
 
 CERT Resources
   baiducloud_cert
@@ -76,6 +77,12 @@ VPC Resources
 BOS Resources
   baiducloud_bos_bucket
   baiducloud_bos_bucket_object
+
+CFC Resources
+  baiducloud_cfc_function
+  baiducloud_cfc_alias
+  baiducloud_cfc_trigger
+  baiducloud_cfc_version
 */
 package baiducloud
 
@@ -147,6 +154,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_zones":                  dataSourceBaiduCloudZones(),
 			"baiducloud_specs":                  dataSourceBaiduCloudSpecs(),
 			"baiducloud_images":                 dataSourceBaiduCloudImages(),
+			"baiducloud_cfc_function":           dataSourceBaiduCloudCFCFunction(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -172,6 +180,10 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_bos_bucket":           resourceBaiduCloudBosBucket(),
 			"baiducloud_bos_bucket_object":    resourceBaiduCloudBucketObject(),
 			"baiducloud_cert":                 resourceBaiduCloudCert(),
+			"baiducloud_cfc_function":         resourceBaiduCloudCFCFunction(),
+			"baiducloud_cfc_alias":            resourceBaiduCloudCFCAlias(),
+			"baiducloud_cfc_version":          resourceBaiduCloudCFCVersion(),
+			"baiducloud_cfc_trigger":          resourceBaiduCloudCFCTrigger(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -197,6 +209,8 @@ func init() {
 		"appblb_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BLB endpoints.",
 
 		"bos_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BOS endpoints.",
+
+		"cfc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CFC endpoints.",
 	}
 }
 
@@ -236,6 +250,12 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["bos_endpoint"],
 				},
+				"cfc": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["cfc_endpoint"],
+				},
 			},
 		},
 		Set: endpointsToHash,
@@ -250,6 +270,7 @@ func endpointsToHash(v interface{}) int {
 	buf.WriteString(fmt.Sprintf("%s-", m["eip"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["appblb"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["bos"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["cfc"].(string)))
 	return hashcode.String(buf.String())
 }
 
@@ -282,6 +303,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints[connectivity.EIPCode] = strings.TrimSpace(endpoints["eip"].(string))
 		config.ConfigEndpoints[connectivity.APPBLBCode] = strings.TrimSpace(endpoints["appblb"].(string))
 		config.ConfigEndpoints[connectivity.BOSCode] = strings.TrimSpace(endpoints["bos"].(string))
+		config.ConfigEndpoints[connectivity.BOSCode] = strings.TrimSpace(endpoints["cfc"].(string))
 	}
 
 	client, err := config.Client()

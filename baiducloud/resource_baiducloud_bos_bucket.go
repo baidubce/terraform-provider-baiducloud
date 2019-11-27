@@ -109,6 +109,14 @@ resource "baiducloud_bos_bucket" "default" {
   }
 }
 ```
+
+Import
+
+BOS bucket can be imported, e.g.
+
+```hcl
+$ terraform import baiducloud_bos_bucket.default bucket_id
+```
 */
 package baiducloud
 
@@ -137,6 +145,10 @@ func resourceBaiduCloudBosBucket() *schema.Resource {
 			Create: schema.DefaultTimeout(10 * time.Minute),
 			Update: schema.DefaultTimeout(10 * time.Minute),
 			Delete: schema.DefaultTimeout(20 * time.Minute),
+		},
+
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -497,6 +509,9 @@ func resourceBaiduCloudBosBucketRead(d *schema.ResourceData, meta interface{}) e
 
 	bucket := d.Id()
 	action := "Query Bucket " + bucket
+
+	// set bucket field first
+	d.Set("bucket", bucket)
 
 	// read bucket detail with ListBuckets api
 	raw, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {

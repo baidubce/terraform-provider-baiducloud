@@ -1,18 +1,23 @@
 package baiducloud
 
 import (
+	"archive/zip"
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/user"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/mitchellh/go-homedir"
 )
 
 // timeout for common product, bcc e.g.
@@ -119,4 +124,64 @@ func stringEqualWithDefault(s1, s2 string, defaultStr []string) bool {
 	}
 
 	return true
+}
+
+func loadFileContent(v string) ([]byte, error) {
+	filename, err := homedir.Expand(v)
+	if err != nil {
+		return nil, err
+	}
+	fileContent, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	return fileContent, nil
+}
+
+func zipFileDir(path string) ([]byte, error) {
+	fileDir, err := homedir.Expand(path)
+	if err != nil {
+		return nil, err
+	}
+
+	zipFileBuffer := new(bytes.Buffer)
+	zipWriter := zip.NewWriter(zipFileBuffer)
+
+	err = filepath.Walk(fileDir, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+
+		zipFile, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer zipFile.Close()
+
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return err
+		}
+
+		header.Name = strings.Replace(path, fileDir, "./", -1)
+		header.Method = zip.Deflate
+
+		writer, err := zipWriter.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+
+		if _, err := io.Copy(writer, zipFile); err != nil {
+			return err
+		}
+		return zipWriter.Flush()
+	})
+	if err != nil {
+		zipWriter.Close()
+		return nil, err
+	}
+
+	// Close() will write some final data to buffer, so zipWriter should be closed before read zip file from buffer
+	zipWriter.Close()
+	return zipFileBuffer.Bytes(), err
 }

@@ -28,7 +28,8 @@ type ErrorSource string
 
 const (
 	// common error
-	ResourceNotFound = "ResourceNotfound"
+	ResourceNotFound          = "ResourceNotfound"
+	ResourceNotFoundException = "ResourceNotFoundException"
 
 	// bcc error
 	OperationDenied      = "OperationDenied"
@@ -63,7 +64,7 @@ var (
 	ReplicationConfigurationNotFound = []string{"NoReplicationConfiguration"}
 )
 
-var NotFoundErrorList = []string{ResourceNotFound, InstanceNotFound, "NoSuchObject", "NoSuchNat", EipNotFound}
+var NotFoundErrorList = []string{ResourceNotFoundException, ResourceNotFound, InstanceNotFound, "NoSuchObject", "NoSuchNat", EipNotFound}
 
 // An Error to wrap the different erros
 type WrapErrorOld struct {

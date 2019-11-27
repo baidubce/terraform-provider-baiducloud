@@ -144,3 +144,17 @@ func validateBOSObjectContentDisposition() schema.SchemaValidateFunc {
 		BOS_BUCKET_OBJECT_CONTENT_DISPOSITION_ATTACHMENT,
 	}, false)
 }
+
+func validateCFCMemorySize(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(int)
+
+	if value%128 != 0 {
+		errors = append(errors, fmt.Errorf("%q is not an integer multiple of 128", k))
+	}
+
+	if value > 1024 || value < 128 {
+		errors = append(errors, fmt.Errorf("expected %s to be in the range (%d - %d), got %d", k, 128, 1024, value))
+	}
+
+	return
+}

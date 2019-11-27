@@ -115,6 +115,11 @@ func TestAccBaiduCloudBosBucket(t *testing.T) {
 				),
 			},
 			{
+				ResourceName:            testAccBosBucketResourceName,
+				ImportState:             true,
+				ImportStateVerifyIgnore: []string{"force_destroy"},
+			},
+			{
 				Config: testAccBosBucketConfigUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccBosBucketResourceName),
