@@ -4,7 +4,11 @@ data "baiducloud_specs" "default" {}
 
 data "baiducloud_zones" "default" {}
 
-data "baiducloud_images" "default" {}
+data "baiducloud_images" "default" {
+  image_type = "System"
+  name_regex = "7.5.*"
+  os_name    = "CentOS"
+}
 
 resource "baiducloud_eip" "default" {
   name              = "${var.eip_name}"
