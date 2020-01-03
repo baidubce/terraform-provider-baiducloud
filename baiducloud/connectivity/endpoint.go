@@ -40,15 +40,22 @@ const (
 	DefaultSURegionBosEndPoint = "su.bcebos.com"
 	DefaultSURegionCfcEndPoint = "cfc.su.baidubce.com"
 
+	DefaultFWHRegionBccEndPoint = "bcc.fwh.baidubce.com"
+	DefaultFWHRegionEipEndPoint = "eip.fwh.baidubce.com"
+	DefaultFWHRegionBlbEndPoint = "blb.fwh.baidubce.com"
+	DefaultFWHRegionBosEndPoint = "fwh.bcebos.com"
+	DefaultFWHRegionCfcEndPoint = "cfc.fwh.baidubce.com"
+
 	DefaultCERTEndPoint = "certificate.baidubce.com"
 )
 
 var (
 	// Default Region Endpoints
 	DefaultRegionEndpoints = map[Region]map[ServiceCode]string{
-		RegionHuaBei:  RegionBJEndpoints,
-		RegionHuaNan:  RegionGZEndpoints,
-		RegionHuaDong: RegionSUEndpoints,
+		RegionBeiJing:   RegionBJEndpoints,
+		RegionGuangZhou: RegionGZEndpoints,
+		RegionSuZhou:    RegionSUEndpoints,
+		RegionWuHan:     RegionFWHEndpoints,
 	}
 
 	// Region BJ Service Endpoints
@@ -82,6 +89,17 @@ var (
 		BOSCode:    DefaultSURegionBosEndPoint,
 		CERTCode:   DefaultCERTEndPoint,
 		CFCCode:    DefaultSURegionCfcEndPoint,
+	}
+
+	// Region FWH Service Endpoints
+	RegionFWHEndpoints = map[ServiceCode]string{
+		BCCCode:    DefaultFWHRegionBccEndPoint,
+		VPCCode:    DefaultFWHRegionBccEndPoint,
+		EIPCode:    DefaultFWHRegionEipEndPoint,
+		APPBLBCode: DefaultFWHRegionBlbEndPoint,
+		BOSCode:    DefaultFWHRegionBosEndPoint,
+		CERTCode:   DefaultCERTEndPoint,
+		CFCCode:    DefaultFWHRegionCfcEndPoint,
 	}
 )
 

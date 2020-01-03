@@ -6,10 +6,11 @@ type Region string
 // Constants of region definition
 const (
 	// Default Region
-	DefaultRegion = RegionHuaBei
+	DefaultRegion = RegionBeiJing
 
 	// Regions
-	RegionHuaBei  = Region("bj")
-	RegionHuaDong = Region("su")
-	RegionHuaNan  = Region("gz")
+	RegionBeiJing   = Region("bj")
+	RegionSuZhou    = Region("su")
+	RegionGuangZhou = Region("gz")
+	RegionWuHan     = Region("fwh")
 )
