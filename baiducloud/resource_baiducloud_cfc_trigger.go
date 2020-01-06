@@ -8,7 +8,7 @@ resource "baiducloud_cfc_trigger" "http-trigger" {
   source_type   = "cfc-http-trigger/v1/CFCAPI"
   target        = "function_brn"
   resource_path = "/aaabbs"
-  method        = "GET,PUT"
+  method        = ["GET","PUT"]
   auth_type     = "iam"
 }
 ```
@@ -141,7 +141,6 @@ func resourceBaiduCloudCFCTrigger() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "CFC Function Trigger resource path if source_type is http",
 				Optional:    true,
-				ForceNew:    true,
 				ValidateFunc: func(i interface{}, s string) (strings []string, errors []error) {
 					path := i.(string)
 					if path[0] != '/' {
@@ -153,17 +152,18 @@ func resourceBaiduCloudCFCTrigger() *schema.Resource {
 				DiffSuppressFunc: cfcTriggerSourceTypeSuppressFunc([]string{"http"}),
 			},
 			"method": {
-				Type:             schema.TypeString,
+				Type:             schema.TypeSet,
 				Description:      "CFC Function Trigger method if source_type is http",
 				Optional:         true,
-				ForceNew:         true,
+				Elem: &schema.Schema{
+					Type:         schema.TypeString,
+				},
 				DiffSuppressFunc: cfcTriggerSourceTypeSuppressFunc([]string{"http"}),
 			},
 			"auth_type": {
 				Type:             schema.TypeString,
 				Description:      "CFC Function Trigger auth type if source_type is http, support anonymous or iam",
 				Optional:         true,
-				ForceNew:         true,
 				ValidateFunc:     validation.StringInSlice([]string{"anonymous", "iam"}, false),
 				DiffSuppressFunc: cfcTriggerSourceTypeSuppressFunc([]string{"http"}),
 			},
@@ -266,8 +266,11 @@ func resourceBaiduCloudCFCTriggerRead(d *schema.ResourceData, meta interface{}) 
 		d.Set("bucket", string(functionRelation.Source)[4:])
 		d.Set("source_type", "bos")
 	case api.SourceTypeHTTP:
+		methods := strings.Split(data["Method"].(string), ",")
+		if err := d.Set("method", methods); err != nil {
+			return err
+		}
 		d.Set("resource_path", data["ResourcePath"].(string))
-		d.Set("method", data["Method"].(string))
 		d.Set("auth_type", data["AuthType"].(string))
 		d.Set("source_type", "http")
 	case api.SourceTypeCDN:
@@ -322,8 +325,11 @@ func resourceBaiduCloudCFCTriggerUpdate(d *schema.ResourceData, meta interface{}
 			}
 			return resource.NonRetryableError(err)
 		}
-
 		addDebug(action, raw)
+
+		response, _ := raw.(*api.UpdateTriggerResult)
+		d.Set("relation_id", response.Relation.RelationId)
+
 		return nil
 	})
 
@@ -467,7 +473,11 @@ func buildBaiduCloudCreateCFCTriggerData(d *schema.ResourceData, sourceType stri
 		}
 
 		if value, ok := d.GetOk("method"); ok {
-			data.Method = value.(string)
+			methods := make([]string, 0)
+			for _, m := range value.(*schema.Set).List() {
+				methods = append(methods,  m.(string))
+			}
+			data.Method = strings.Join(methods, ",")
 		} else {
 			return nil, triggerDataRequiredError("method", sourceType)
 		}

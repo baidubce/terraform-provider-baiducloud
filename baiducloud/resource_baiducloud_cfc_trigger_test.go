@@ -32,9 +32,20 @@ func TestAccBaiduCloudCFCHttpTrigger(t *testing.T) {
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "source_type", "http"),
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "resource_path", "/test"),
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "auth_type", "iam"),
+					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "method.#", "2"),
 					resource.TestCheckResourceAttrSet(testAccCFCTriggerResourceName, "relation_id"),
 					resource.TestCheckResourceAttrSet(testAccCFCTriggerResourceName, "target"),
-					resource.TestCheckResourceAttrSet(testAccCFCTriggerResourceName, "method"),
+				),
+			},
+			{
+				Config: testAccCfcHttpTriggerConfigUpdate(),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "source_type", "http"),
+					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "resource_path", "/test2"),
+					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "auth_type", "iam"),
+					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "method.#", "3"),
+					resource.TestCheckResourceAttrSet(testAccCFCTriggerResourceName, "relation_id"),
+					resource.TestCheckResourceAttrSet(testAccCFCTriggerResourceName, "target"),
 				),
 			},
 		},
@@ -217,7 +228,30 @@ resource "%s" "%s" {
   source_type   = "http"
   target        = "${baiducloud_cfc_function.default.function_brn}"
   resource_path = "/test"
-  method        = "GET,PUT"
+  method        = ["GET","PUT"]
+  auth_type     = "iam"
+}
+`, BaiduCloudTestResourceAttrNamePrefix+"CFC",
+		testAccCFCTriggerResourceType, BaiduCloudTestResourceName)
+}
+
+func testAccCfcHttpTriggerConfigUpdate() string {
+	return fmt.Sprintf(`
+resource "baiducloud_cfc_function" "default" {
+  function_name = "%s"
+  description   = "terraform create"
+  handler       = "index.handler"
+  memory_size   = 128
+  runtime       = "nodejs8.5"
+  time_out      = 3
+  code_file_name = "testFiles/cfcTestCode.zip"
+}
+
+resource "%s" "%s" {
+  source_type   = "http"
+  target        = "${baiducloud_cfc_function.default.function_brn}"
+  resource_path = "/test2"
+  method        = ["GET","PUT","POST"]
   auth_type     = "iam"
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"CFC",

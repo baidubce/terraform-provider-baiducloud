@@ -66,7 +66,7 @@ resource "baiducloud_cfc_trigger" "http-trigger" {
   source_type   = "http"
   target        = "${baiducloud_cfc_version.default.function_brn}"
   resource_path = "/aaabbs"
-  method        = "GET,PUT"
+  method        = ["GET","PUT"]
   auth_type     = "iam"
 }
 
