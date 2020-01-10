@@ -169,7 +169,7 @@ resource "baiducloud_vpc" "default" {
 
 resource "baiducloud_subnet" "default" {
   name      = "%s"
-  zone_name = data.baiducloud_zones.default.zones.1.zone_name
+  zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.1.0/24"
   vpc_id    = baiducloud_vpc.default.id
 }
@@ -184,7 +184,7 @@ resource "baiducloud_instance" "default" {
   image_id              = data.baiducloud_images.default.images.0.id
   name                  = "%s"
   description           = "terraform test instance"
-  availability_zone     = data.baiducloud_zones.default.zones.1.zone_name
+  availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
   cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
   memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
   billing = {
@@ -234,7 +234,7 @@ resource "baiducloud_vpc" "default" {
 
 resource "baiducloud_subnet" "default" {
   name      = "%s"
-  zone_name = data.baiducloud_zones.default.zones.1.zone_name
+  zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.1.0/24"
   vpc_id    = baiducloud_vpc.default.id
 }
@@ -247,7 +247,7 @@ resource "baiducloud_security_group" "default" {
 
 resource "baiducloud_subnet" "default02" {
   name      = "%s"
-  zone_name = data.baiducloud_zones.default.zones.1.zone_name
+  zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.2.0/24"
   vpc_id    = baiducloud_vpc.default.id
 }
@@ -259,12 +259,12 @@ resource "baiducloud_security_group" "default02" {
 }
 
 resource "baiducloud_instance" "default" {
-  image_id              = data.baiducloud_images.default.images.1.id
+  image_id              = data.baiducloud_images.default.images.0.id
   name                  = "%s"
   description           = "terraform test update instance"
-  availability_zone     = data.baiducloud_zones.default.zones.1.zone_name
-  cpu_count             = data.baiducloud_specs.default.specs.1.cpu_count
-  memory_capacity_in_gb = data.baiducloud_specs.default.specs.1.memory_size_in_gb
+  availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
+  cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
+  memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
   billing = {
     payment_timing = "Postpaid"
   }

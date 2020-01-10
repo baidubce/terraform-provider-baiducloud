@@ -113,7 +113,7 @@ resource "baiducloud_instance" "default" {
   billing = {
     payment_timing = "Postpaid"
   }
-  availability_zone = data.baiducloud_zones.default.zones.1.zone_name
+  availability_zone = data.baiducloud_zones.default.zones.0.zone_name
   subnet_id         = baiducloud_subnet.default.id
   security_groups   = [data.baiducloud_security_groups.default.security_groups.0.id]
 }

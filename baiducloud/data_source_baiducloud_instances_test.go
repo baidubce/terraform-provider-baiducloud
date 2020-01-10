@@ -57,7 +57,7 @@ data "baiducloud_images" "default" {}
 resource "baiducloud_instance" "default" {
   image_id              = data.baiducloud_images.default.images.0.id
   name                  = "%s"
-  availability_zone     = data.baiducloud_zones.default.zones.1.zone_name
+  availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
   cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
   memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
   billing = {
