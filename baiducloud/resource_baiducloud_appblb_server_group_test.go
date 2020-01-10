@@ -133,6 +133,26 @@ func testAccAppBLBServerGroupConfig() string {
 	return fmt.Sprintf(`
 data "baiducloud_zones" "default" {}
 
+data "baiducloud_specs" "default" {}
+
+data "baiducloud_images" "default" {
+  image_type = "System"
+}
+
+resource "baiducloud_instance" "default" {
+  name                  = "%s"
+  image_id              = data.baiducloud_images.default.images.0.id
+  availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
+  cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
+  memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
+  subnet_id             = baiducloud_subnet.default.id
+  security_groups       = [baiducloud_security_group.default.id]
+
+  billing = {
+    payment_timing = "Postpaid"
+  }
+}
+
 resource "baiducloud_vpc" "default" {
   name        = "%s"
   description = "test"
@@ -141,31 +161,41 @@ resource "baiducloud_vpc" "default" {
 
 resource "baiducloud_subnet" "default" {
   name        = "%s"
-  zone_name   = "${data.baiducloud_zones.default.zones.0.zone_name}"
+  zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.0.0/24"
-  vpc_id      = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
   description = "test description"
 }
 
+resource "baiducloud_security_group" "default" {
+  name        = "%s"
+  description = "Baidu acceptance test"
+  vpc_id      = baiducloud_vpc.default.id
+}
+
 resource "baiducloud_appblb" "default" {
+  depends_on  = [baiducloud_instance.default]
   name        = "%s"
   description = ""
-  vpc_id      = "${baiducloud_vpc.default.id}"
-  subnet_id   = "${baiducloud_subnet.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
+  subnet_id   = baiducloud_subnet.default.id
 }
 
 resource "%s" "%s" {
   name        = "%s"
   description = "acceptance test"
-  blb_id      = "${baiducloud_appblb.default.id}"
+  blb_id      = baiducloud_appblb.default.id
 
   port_list {
     port = 66
     type = "TCP"
+    health_check = "TCP"
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC",
+`, BaiduCloudTestResourceAttrNamePrefix+"Instance",
+		BaiduCloudTestResourceAttrNamePrefix+"VPC",
 		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
+		BaiduCloudTestResourceAttrNamePrefix+"SecurityGroup",
 		BaiduCloudTestResourceAttrNamePrefix+"APPBLB",
 		testAccAppBLBServerGroupResourceType,
 		BaiduCloudTestResourceName,
@@ -190,26 +220,26 @@ resource "baiducloud_vpc" "default" {
 
 resource "baiducloud_subnet" "default" {
   name        = "%s"
-  zone_name   = "${data.baiducloud_zones.default.zones.0.zone_name}"
+  zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.0.0/24"
-  vpc_id      = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
   description = "test description"
 }
 
 resource "baiducloud_security_group" "default" {
   name        = "%s"
   description = "Baidu acceptance test"
-  vpc_id      = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_instance" "default" {
   name                  = "%s"
-  image_id              = "${data.baiducloud_images.default.images.0.id}"
-  availability_zone     = "${data.baiducloud_zones.default.zones.0.zone_name}"
-  cpu_count             = "${data.baiducloud_specs.default.specs.0.cpu_count}"
-  memory_capacity_in_gb = "${data.baiducloud_specs.default.specs.0.memory_size_in_gb}"
-  subnet_id             = "${baiducloud_subnet.default.id}"
-  security_groups       = ["${baiducloud_security_group.default.id}"]
+  image_id              = data.baiducloud_images.default.images.0.id
+  availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
+  cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
+  memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
+  subnet_id             = baiducloud_subnet.default.id
+  security_groups       = [baiducloud_security_group.default.id]
 
   billing = {
     payment_timing = "Postpaid"
@@ -217,30 +247,33 @@ resource "baiducloud_instance" "default" {
 }
 
 resource "baiducloud_appblb" "default" {
+  depends_on  = [baiducloud_instance.default]
   name        = "%s"
   description = ""
-  vpc_id      = "${baiducloud_vpc.default.id}"
-  subnet_id   = "${baiducloud_subnet.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
+  subnet_id   = baiducloud_subnet.default.id
 }
 
 resource "%s" "%s" {
   name        = "%s"
   description = "acceptance test"
-  blb_id      = "${baiducloud_appblb.default.id}"
+  blb_id      = baiducloud_appblb.default.id
 
   backend_server_list {
-    instance_id = "${baiducloud_instance.default.id}"
-    weight = 50
+    instance_id = baiducloud_instance.default.id
+    weight      = 50
   }
 
   port_list {
     port = 66
     type = "TCP"
+    health_check = "TCP"
   }
 
   port_list {
-    port = 77
-    type = "UDP"
+    port         = 77
+    type         = "UDP"
+    health_check = "UDP"
     udp_health_check_string = "baidu.com"
   }
 }
@@ -272,26 +305,26 @@ resource "baiducloud_vpc" "default" {
 
 resource "baiducloud_subnet" "default" {
   name        = "%s"
-  zone_name   = "${data.baiducloud_zones.default.zones.0.zone_name}"
+  zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.0.0/24"
-  vpc_id      = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
   description = "test description"
 }
 
 resource "baiducloud_security_group" "default" {
   name        = "%s"
   description = "Baidu acceptance test"
-  vpc_id      = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_instance" "default" {
   name                  = "%s"
-  image_id              = "${data.baiducloud_images.default.images.0.id}"
-  availability_zone     = "${data.baiducloud_zones.default.zones.0.zone_name}"
-  cpu_count             = "${data.baiducloud_specs.default.specs.0.cpu_count}"
-  memory_capacity_in_gb = "${data.baiducloud_specs.default.specs.0.memory_size_in_gb}"
-  subnet_id             = "${baiducloud_subnet.default.id}"
-  security_groups       = ["${baiducloud_security_group.default.id}"]
+  image_id              = data.baiducloud_images.default.images.0.id
+  availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
+  cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
+  memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
+  subnet_id             = baiducloud_subnet.default.id
+  security_groups       = [baiducloud_security_group.default.id]
 
   billing = {
     payment_timing = "Postpaid"
@@ -299,25 +332,27 @@ resource "baiducloud_instance" "default" {
 }
 
 resource "baiducloud_appblb" "default" {
+  depends_on  = [baiducloud_instance.default]
   name        = "%s"
   description = ""
-  vpc_id      = "${baiducloud_vpc.default.id}"
-  subnet_id   = "${baiducloud_subnet.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
+  subnet_id   = baiducloud_subnet.default.id
 }
 
 resource "%s" "%s" {
   name        = "%s"
   description = "acceptance test"
-  blb_id      = "${baiducloud_appblb.default.id}"
+  blb_id      = baiducloud_appblb.default.id
 
   backend_server_list {
-    instance_id = "${baiducloud_instance.default.id}"
+    instance_id = baiducloud_instance.default.id
     weight      = 60
   }
 
   port_list {
     port                    = 77
     type                    = "UDP"
+    health_check            = "UDP"
     udp_health_check_string = "baidunew.com"
   }
 }
@@ -349,26 +384,26 @@ resource "baiducloud_vpc" "default" {
 
 resource "baiducloud_subnet" "default" {
   name        = "%s"
-  zone_name   = "${data.baiducloud_zones.default.zones.0.zone_name}"
+  zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.0.0/24"
-  vpc_id      = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
   description = "test description"
 }
 
 resource "baiducloud_security_group" "default" {
   name        = "%s"
   description = "Baidu acceptance test"
-  vpc_id      = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_instance" "default" {
   name                  = "%s"
-  image_id              = "${data.baiducloud_images.default.images.0.id}"
-  availability_zone     = "${data.baiducloud_zones.default.zones.0.zone_name}"
-  cpu_count             = "${data.baiducloud_specs.default.specs.0.cpu_count}"
-  memory_capacity_in_gb = "${data.baiducloud_specs.default.specs.0.memory_size_in_gb}"
-  subnet_id             = "${baiducloud_subnet.default.id}"
-  security_groups       = ["${baiducloud_security_group.default.id}"]
+  image_id              = data.baiducloud_images.default.images.0.id
+  availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
+  cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
+  memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
+  subnet_id             = baiducloud_subnet.default.id
+  security_groups       = [baiducloud_security_group.default.id]
 
   billing = {
     payment_timing = "Postpaid"
@@ -376,20 +411,22 @@ resource "baiducloud_instance" "default" {
 }
 
 resource "baiducloud_appblb" "default" {
+  depends_on  = [baiducloud_instance.default]
   name        = "%s"
   description = ""
-  vpc_id      = "${baiducloud_vpc.default.id}"
-  subnet_id   = "${baiducloud_subnet.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
+  subnet_id   = baiducloud_subnet.default.id
 }
 
 resource "%s" "%s" {
   name        = "%s"
   description = "acceptance test"
-  blb_id      = "${baiducloud_appblb.default.id}"
+  blb_id      = baiducloud_appblb.default.id
 
   port_list {
     port                    = 77
     type                    = "UDP"
+    health_check            = "UDP"
     udp_health_check_string = "baidunew.com"
   }
 }

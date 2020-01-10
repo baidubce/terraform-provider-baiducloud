@@ -35,7 +35,7 @@ func TestAccBaiduCloudSubnet(t *testing.T) {
 					resource.TestCheckResourceAttr(testAccSubnetResourceName, "subnet_type", "BCC"),
 					resource.TestCheckResourceAttrSet(testAccSubnetResourceName, "vpc_id"),
 					resource.TestCheckResourceAttrSet(testAccSubnetResourceName, "zone_name"),
-					resource.TestCheckResourceAttr(testAccSubnetResourceName, "tags.#", "1"),
+					resource.TestCheckResourceAttr(testAccSubnetResourceName, "tags.%", "1"),
 				),
 			},
 			{
@@ -53,7 +53,7 @@ func TestAccBaiduCloudSubnet(t *testing.T) {
 					resource.TestCheckResourceAttr(testAccSubnetResourceName, "subnet_type", "BCC"),
 					resource.TestCheckResourceAttrSet(testAccSubnetResourceName, "vpc_id"),
 					resource.TestCheckResourceAttrSet(testAccSubnetResourceName, "zone_name"),
-					resource.TestCheckResourceAttr(testAccSubnetResourceName, "tags.#", "1"),
+					resource.TestCheckResourceAttr(testAccSubnetResourceName, "tags.%", "1"),
 				),
 			},
 		},
@@ -92,15 +92,14 @@ resource "baiducloud_vpc" "default" {
 }
 
 resource "%s" "%s" {
-  name = "%s"
-  zone_name = "${data.baiducloud_zones.default.zones.0.zone_name}"
-  cidr = "192.168.3.0/24"
+  name        = "%s"
+  zone_name   = data.baiducloud_zones.default.zones.0.zone_name
+  cidr        = "192.168.3.0/24"
   description = "test"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
   subnet_type = "BCC"
-  tags {
-    tag_key = "tagA"
-	tag_value = "tagA"
+  tags = {
+    "tagKey" = "tagValue"
   }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC", testAccSubnetResourceType,
@@ -117,15 +116,14 @@ resource "baiducloud_vpc" "default" {
 }
 
 resource "%s" "%s" {
-  name = "%s"
-  zone_name = "${data.baiducloud_zones.default.zones.0.zone_name}"
-  cidr = "192.168.3.0/24"
+  name        = "%s"
+  zone_name   = data.baiducloud_zones.default.zones.0.zone_name
+  cidr        = "192.168.3.0/24"
   description = "test update"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
   subnet_type = "BCC"
-  tags {
-    tag_key = "tagA"
-	tag_value = "tagA"
+  tags = {
+    "tagKey" = "tagValue"
   }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC", testAccSubnetResourceType,

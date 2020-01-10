@@ -54,8 +54,6 @@ In addition to all arguments above, the following attributes are exported:
   * `subnet_id` - The subnet ID to which the LoadBalance instance belongs
   * `subnet_name` - The subnet name to which the LoadBalance instance belongs
   * `tags` - Tags
-    * `tag_key` - Tag's key
-    * `tag_value` - Tag's value
   * `vpc_id` - The VPC short ID to which the LoadBalance instance belongs
   * `vpc_name` - The VPC name to which the LoadBalance instance belongs
 

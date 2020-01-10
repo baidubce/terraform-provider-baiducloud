@@ -152,11 +152,11 @@ func resourceBaiduCloudCFCTrigger() *schema.Resource {
 				DiffSuppressFunc: cfcTriggerSourceTypeSuppressFunc([]string{"http"}),
 			},
 			"method": {
-				Type:             schema.TypeSet,
-				Description:      "CFC Function Trigger method if source_type is http",
-				Optional:         true,
+				Type:        schema.TypeSet,
+				Description: "CFC Function Trigger method if source_type is http",
+				Optional:    true,
 				Elem: &schema.Schema{
-					Type:         schema.TypeString,
+					Type: schema.TypeString,
 				},
 				DiffSuppressFunc: cfcTriggerSourceTypeSuppressFunc([]string{"http"}),
 			},
@@ -475,7 +475,7 @@ func buildBaiduCloudCreateCFCTriggerData(d *schema.ResourceData, sourceType stri
 		if value, ok := d.GetOk("method"); ok {
 			methods := make([]string, 0)
 			for _, m := range value.(*schema.Set).List() {
-				methods = append(methods,  m.(string))
+				methods = append(methods, m.(string))
 			}
 			data.Method = strings.Join(methods, ",")
 		} else {

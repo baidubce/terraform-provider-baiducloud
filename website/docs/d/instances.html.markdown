@@ -63,8 +63,6 @@ In addition to all arguments above, the following attributes are exported:
   * `status` - The status of the instance.
   * `subnet_id` - The subnet ID of the instance.
   * `tags` - Tags
-    * `tag_key` - Tag's key
-    * `tag_value` - Tag's value
   * `vpc_id` - The VPC ID of the instance.
   * `zone_name` - The zone name of the instance.
 

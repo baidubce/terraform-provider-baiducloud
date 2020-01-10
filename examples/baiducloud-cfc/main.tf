@@ -31,11 +31,11 @@ resource "baiducloud_cfc_function" "default" {
     "aaa" : "bbb"
     "ccc" : "ddd"
   }
-  handler                        = "index.handler"
-  memory_size                    = 256
-  runtime                        = "nodejs8.5"
-  time_out                       = 20
-  code_file_name                 = "../../baiducloud/testFiles/cfcTestCode.zip"
+  handler        = "index.handler"
+  memory_size    = 256
+  runtime        = "nodejs8.5"
+  time_out       = 20
+  code_file_name = "../../baiducloud/testFiles/cfcTestCode.zip"
   //code_file_dir                  = "../../baiducloud/testFiles/cfcTestCode"
   //code_bos_bucket                = "testBucket"
   //code_bos_object                = "cfcTestCode.zip"
@@ -66,7 +66,7 @@ resource "baiducloud_cfc_trigger" "http-trigger" {
   source_type   = "http"
   target        = "${baiducloud_cfc_version.default.function_brn}"
   resource_path = "/aaabbs"
-  method        = ["GET","PUT"]
+  method        = ["GET", "PUT"]
   auth_type     = "iam"
 }
 

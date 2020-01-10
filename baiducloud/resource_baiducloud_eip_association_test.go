@@ -110,7 +110,24 @@ func testAccEIPAssociateDestory(s *terraform.State) error {
 
 func testAccEipAssociateConfig() string {
 	return fmt.Sprintf(`
+data "baiducloud_specs" "default" {}
+
 data "baiducloud_zones" "default" {}
+
+data "baiducloud_images" "default" {
+  image_type = "System"
+}
+
+resource "baiducloud_instance" "default" {
+  name                  = "%s"
+  image_id              = data.baiducloud_images.default.images.0.id
+  availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
+  cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
+  memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
+  billing = {
+    payment_timing = "Postpaid"
+  }
+}
 
 resource "baiducloud_vpc" "default" {
   name        = "%s"
@@ -120,9 +137,9 @@ resource "baiducloud_vpc" "default" {
 
 resource "baiducloud_subnet" "default" {
   name        = "%s"
-  zone_name   = "${data.baiducloud_zones.default.zones.0.zone_name}"
+  zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.0.0/24"
-  vpc_id      = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
   description = "test description"
 }
 
@@ -134,18 +151,20 @@ resource "baiducloud_eip" "default" {
 }
 
 resource "baiducloud_appblb" "default" {
+  depends_on  = [baiducloud_instance.default]
   name        = "%s"
   description = "test update"
-  vpc_id      = "${baiducloud_vpc.default.id}"
-  subnet_id   = "${baiducloud_subnet.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
+  subnet_id   = baiducloud_subnet.default.id
 }
 
 resource "baiducloud_eip_association" "default" {
-  eip           = "${baiducloud_eip.default.id}"
+  eip           = baiducloud_eip.default.id
   instance_type = "BLB"
-  instance_id   = "${baiducloud_appblb.default.id}"
+  instance_id   = baiducloud_appblb.default.id
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC",
+`, BaiduCloudTestResourceAttrNamePrefix+"BCC",
+		BaiduCloudTestResourceAttrNamePrefix+"VPC",
 		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
 		BaiduCloudTestResourceAttrNamePrefix+"EIP",
 		BaiduCloudTestResourceAttrNamePrefix+"APPBLB")

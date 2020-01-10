@@ -14,6 +14,9 @@ output "spec" {
 package baiducloud
 
 import (
+	"regexp"
+	"strings"
+
 	"github.com/baidubce/bce-sdk-go/services/bcc"
 	"github.com/baidubce/bce-sdk-go/services/bcc/api"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -27,13 +30,37 @@ func dataSourceBaiduCloudSpecs() *schema.Resource {
 		Read: dataSourceBaiduCloudSpecsRead,
 
 		Schema: map[string]*schema.Schema{
+			"instance_type": {
+				Type:        schema.TypeString,
+				Description: "Instance type of the search spec",
+				Optional:    true,
+				ForceNew:    true,
+			},
+			"name_regex": {
+				Type:         schema.TypeString,
+				Description:  "Regex pattern of the search spec name",
+				Optional:     true,
+				ForceNew:     true,
+				ValidateFunc: validateNameRegex,
+			},
+			"cpu_count": {
+				Type:        schema.TypeInt,
+				Description: "Useful cpu count of the search spec",
+				Optional:    true,
+				ForceNew:    true,
+			},
+			"memory_size_in_gb": {
+				Type:        schema.TypeInt,
+				Description: "Useful memory size in GB of the search spec",
+				Optional:    true,
+				ForceNew:    true,
+			},
 			"output_file": {
 				Type:        schema.TypeString,
 				Description: "Output file for saving result.",
 				Optional:    true,
 				ForceNew:    true,
 			},
-
 			// Attributes used for result
 			"specs": {
 				Type:        schema.TypeList,
@@ -56,7 +83,6 @@ func dataSourceBaiduCloudSpecs() *schema.Resource {
 							Description: "Useful cpu count",
 							Computed:    true,
 						},
-
 						"memory_size_in_gb": {
 							Type:        schema.TypeInt,
 							Description: "Useful memory size in GB",
@@ -86,9 +112,50 @@ func dataSourceBaiduCloudSpecsRead(d *schema.ResourceData, meta interface{}) err
 	}
 	addDebug(action, raw)
 
+	var specName, instanceType string
+	var cpuCount, memorySizeInGb int
+	var specNameRegex *regexp.Regexp
+
+	if value, ok := d.GetOk("spec_name"); ok {
+		specName = value.(string)
+		if len(specName) > 0 {
+			specNameRegex = regexp.MustCompile(specName)
+		}
+	}
+
+	if value, ok := d.GetOk("instance_type"); ok {
+		instanceType = strings.TrimSpace(value.(string))
+	}
+
+	if value, ok := d.GetOk("cpu_count"); ok {
+		cpuCount = value.(int)
+	}
+
+	if value, ok := d.GetOk("memory_size_in_gb"); ok {
+		memorySizeInGb = value.(int)
+	}
+
 	response := raw.(*api.ListSpecResult)
 	specMap := make([]map[string]interface{}, 0, len(response.InstanceTypes))
 	for _, spec := range response.InstanceTypes {
+		if len(specName) > 0 && specNameRegex != nil {
+			if !specNameRegex.MatchString(spec.Name) {
+				continue
+			}
+		}
+
+		if len(instanceType) > 0 && spec.Type != instanceType {
+			continue
+		}
+
+		if cpuCount > 0 && spec.CpuCount != cpuCount {
+			continue
+		}
+
+		if memorySizeInGb > 0 && spec.MemorySizeInGB != memorySizeInGb {
+			continue
+		}
+
 		specMap = append(specMap, map[string]interface{}{
 			"name":                  spec.Name,
 			"instance_type":         spec.Type,

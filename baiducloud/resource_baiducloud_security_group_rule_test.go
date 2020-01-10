@@ -89,11 +89,11 @@ resource "baiducloud_vpc" "default" {
 resource "baiducloud_security_group" "default" {
   name        = "%s"
   description = "Baidu acceptance test"
-  vpc_id      = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
 }
 
 resource "%s" "%s" {
-  security_group_id = "${baiducloud_security_group.default.id}"
+  security_group_id = baiducloud_security_group.default.id
   remark            = "remark"
   protocol          = "udp"
   port_range        = "1-65523"

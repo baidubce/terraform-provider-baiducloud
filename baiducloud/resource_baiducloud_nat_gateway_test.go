@@ -88,16 +88,16 @@ resource "baiducloud_vpc" "default" {
 data "baiducloud_zones" "default" {}
 
 resource "baiducloud_subnet" "default" {
-  name = "%s"
-  zone_name = "${data.baiducloud_zones.default.zones.0.zone_name}"
-  cidr = "192.168.1.0/24"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  name      = "%s"
+  zone_name = data.baiducloud_zones.default.zones.0.zone_name
+  cidr      = "192.168.1.0/24"
+  vpc_id    = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_nat_gateway" "default" {
-  name = "%s"
-  vpc_id = "${baiducloud_vpc.default.id}"
-  spec = "medium"
+  name   = "%s"
+  vpc_id = baiducloud_vpc.default.id
+  spec   = "medium"
   billing = {
     payment_timing = "Postpaid"
   }
@@ -118,10 +118,10 @@ resource "baiducloud_vpc" "default" {
 data "baiducloud_zones" "default" {}
 
 resource "baiducloud_subnet" "default" {
-  name = "%s"
-  zone_name = "${data.baiducloud_zones.default.zones.0.zone_name}"
-  cidr = "192.168.1.0/24"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  name      = "%s"
+  zone_name = data.baiducloud_zones.default.zones.0.zone_name
+  cidr      = "192.168.1.0/24"
+  vpc_id    = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_eip" "default" {
@@ -132,9 +132,9 @@ resource "baiducloud_eip" "default" {
 }
 
 resource "baiducloud_nat_gateway" "default" {
-  name = "%s"
-  vpc_id = "${baiducloud_vpc.default.id}"
-  spec = "medium"
+  name   = "%s"
+  vpc_id = baiducloud_vpc.default.id
+  spec   = "medium"
   billing = {
     payment_timing = "Postpaid"
   }
@@ -142,9 +142,9 @@ resource "baiducloud_nat_gateway" "default" {
 }
 
 resource "baiducloud_eip_association" "default" {
-  eip           = "${baiducloud_eip.default.id}"
+  eip           = baiducloud_eip.default.id
   instance_type = "NAT"
-  instance_id   = "${baiducloud_nat_gateway.default.id}"
+  instance_id   = baiducloud_nat_gateway.default.id
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC",
 		BaiduCloudTestResourceAttrNamePrefix+"Subnet",

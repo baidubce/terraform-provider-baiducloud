@@ -65,19 +65,19 @@ func testAccBosBucketsDataSourceConfig() string {
 	return fmt.Sprintf(`
 resource "baiducloud_bos_bucket" "my-bucket" {
   bucket = "%s"
-  acl = "public-read-write"
+  acl    = "public-read-write"
 }
 
 resource "baiducloud_bos_bucket" "default" {
   bucket = "%s"
-  acl = "public-read-write"
+  acl    = "public-read-write"
 
   replication_configuration {
-    id = "test-rc"
-    status = "enabled"
+    id       = "test-rc"
+    status   = "enabled"
     resource = ["%s"]
     destination {
-      bucket = "${baiducloud_bos_bucket.my-bucket.bucket}"
+      bucket = baiducloud_bos_bucket.my-bucket.bucket
     }
     replicate_deletes = "disabled"
   }
@@ -90,8 +90,8 @@ resource "baiducloud_bos_bucket" "default" {
   }
 
   lifecycle_rule {
-    id = "test-lr"
-    status =  "enabled"
+    id       = "test-lr"
+    status   =  "enabled"
     resource = ["%s"]
     condition {
       time {

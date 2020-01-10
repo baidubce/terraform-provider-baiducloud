@@ -7,9 +7,8 @@ Example Usage
 resource "baiducloud_security_group" "default" {
   name        = "testSecurityGroup"
   description = "default"
-  tags {
-    tag_key   = "testKey"
-    tag_value = "testValue"
+  tags = {
+    "testKey" = "testValue"
   }
 }
 ```
@@ -201,7 +200,7 @@ func buildBaiduCloudSecurityGroupArgs(d *schema.ResourceData, meta interface{}) 
 	}
 
 	if v, ok := d.GetOk("tags"); ok {
-		request.Tags = tranceTagMapToModel(v.(*schema.Set).List())
+		request.Tags = tranceTagMapToModel(v.(map[string]interface{}))
 	}
 
 	return request

@@ -24,9 +24,9 @@ output "cdss" {
 
 The following arguments are supported:
 
-* `instance_id` - (Optional) CDS volume bind instance ID
+* `instance_id` - (Optional, ForceNew) CDS volume bind instance ID
 * `output_file` - (Optional, ForceNew) CDS volume search result output file
-* `zone_name` - (Optional) CDS volume zone name
+* `zone_name` - (Optional, ForceNew) CDS volume zone name
 
 ## Attributes Reference
 
@@ -64,8 +64,6 @@ In addition to all arguments above, the following attributes are exported:
   * `status` - CDS volume status
   * `storage_type` - CDS dist storage type, support hp1 and std1, default hp1
   * `tags` - Tags
-    * `tag_key` - Tag's key
-    * `tag_value` - Tag's value
   * `type` - CDS disk type
   * `zone_name` - Zone name
 

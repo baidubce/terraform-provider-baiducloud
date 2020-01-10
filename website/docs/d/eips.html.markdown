@@ -24,11 +24,11 @@ output "eips" {
 
 The following arguments are supported:
 
-* `eip` - (Optional) Eip address
-* `instance_id` - (Optional) Eip bind instance id
-* `instance_type` - (Optional) Eip bind instance type
+* `eip` - (Optional, ForceNew) Eip address
+* `instance_id` - (Optional, ForceNew) Eip bind instance id
+* `instance_type` - (Optional, ForceNew) Eip bind instance type
 * `output_file` - (Optional, ForceNew) Eips search result output file
-* `status` - (Optional) Eip status
+* `status` - (Optional, ForceNew) Eip status
 
 ## Attributes Reference
 
@@ -46,7 +46,5 @@ In addition to all arguments above, the following attributes are exported:
   * `share_group_id` - Eip share group id
   * `status` - Eip status
   * `tags` - Tags
-    * `tag_key` - Tag's key
-    * `tag_value` - Tag's value
 
 

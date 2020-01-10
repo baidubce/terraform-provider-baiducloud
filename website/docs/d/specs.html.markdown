@@ -24,6 +24,10 @@ output "spec" {
 
 The following arguments are supported:
 
+* `cpu_count` - (Optional, ForceNew) Useful cpu count of the search spec
+* `instance_type` - (Optional, ForceNew) instance type of the search spec
+* `memory_size_in_gb` - (Optional, ForceNew) Useful memory size in GB of the search spec
+* `name_regex` - (Optional, ForceNew) Regex pattern of the search spec name
 * `output_file` - (Optional, ForceNew) Output file for saving result.
 
 ## Attributes Reference

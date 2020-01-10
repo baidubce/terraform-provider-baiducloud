@@ -30,11 +30,13 @@ func dataSourceBaiduCloudCDSs() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "CDS volume bind instance ID",
 				Optional:    true,
+				ForceNew:    true,
 			},
 			"zone_name": {
 				Type:        schema.TypeString,
 				Description: "CDS volume zone name",
 				Optional:    true,
+				ForceNew:    true,
 			},
 			"output_file": {
 				Type:        schema.TypeString,

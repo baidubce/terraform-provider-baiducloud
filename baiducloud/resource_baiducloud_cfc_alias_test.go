@@ -95,18 +95,18 @@ resource "baiducloud_cfc_function" "default" {
     "aaa": "bbb"
     "ccc": "ddd"
   }
-  handler       = "index.handler"
-  memory_size   = 128
-  runtime       = "nodejs8.5"
-  time_out      = 3
+  handler        = "index.handler"
+  memory_size    = 128
+  runtime        = "nodejs8.5"
+  time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
 resource "%s" "%s" {
-  function_name = "${baiducloud_cfc_function.default.function_name}"
-  function_version = "${baiducloud_cfc_function.default.version}"
-  alias_name = "%s"
-  description = "terraform create alias"
+  function_name    = baiducloud_cfc_function.default.function_name
+  function_version = baiducloud_cfc_function.default.version
+  alias_name       = "%s"
+  description      = "terraform create alias"
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"CFC",
 		testAccCFCAliasResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"Alias")
@@ -115,24 +115,24 @@ resource "%s" "%s" {
 func testAccCfcAliasConfigUpdate() string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
-  function_name     = "%s"
-  description       = "terraform create"
+  function_name = "%s"
+  description   = "terraform create"
   environment = {
     "aaa": "bbb"
     "ccc": "ddd"
   }
-  handler       = "index.handler"
-  memory_size   = 128
-  runtime       = "nodejs8.5"
-  time_out      = 3
+  handler        = "index.handler"
+  memory_size    = 128
+  runtime        = "nodejs8.5"
+  time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
 resource "%s" "%s" {
-  function_name = "${baiducloud_cfc_function.default.function_name}"
-  function_version = "${baiducloud_cfc_function.default.version}"
-  alias_name = "%s"
-  description = "terraform update alias"
+  function_name    = baiducloud_cfc_function.default.function_name
+  function_version = baiducloud_cfc_function.default.version
+  alias_name       = "%s"
+  description      = "terraform update alias"
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"CFC",
 		testAccCFCAliasResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"Alias")

@@ -44,8 +44,6 @@ In addition to all arguments above, the following attributes are exported:
   * `subnet_id` - ID of the subnet.
   * `subnet_type` - Type of the subnet.
   * `tags` - Tags
-    * `tag_key` - Tag's key
-    * `tag_value` - Tag's value
   * `vpc_id` - VPC ID of the subnet.
   * `zone_name` - Zone name of the subnet.
 

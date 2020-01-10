@@ -14,6 +14,8 @@ output "zone" {
 package baiducloud
 
 import (
+	"regexp"
+
 	"github.com/baidubce/bce-sdk-go/services/bcc"
 	"github.com/baidubce/bce-sdk-go/services/bcc/api"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -27,6 +29,13 @@ func dataSourceBaiduCloudZones() *schema.Resource {
 		Read: dataSourceBaiduCloudZonesRead,
 
 		Schema: map[string]*schema.Schema{
+			"name_regex": {
+				Type:         schema.TypeString,
+				Description:  "Regex pattern of the search zone name",
+				Optional:     true,
+				ForceNew:     true,
+				ValidateFunc: validateNameRegex,
+			},
 			"output_file": {
 				Type:        schema.TypeString,
 				Description: "Output file for saving result.",
@@ -65,9 +74,24 @@ func dataSourceBaiduCloudZonesRead(d *schema.ResourceData, meta interface{}) err
 	}
 	addDebug(action, raw)
 
+	var zoneName string
+	var zoneNameRegex *regexp.Regexp
+
+	if value, ok := d.GetOk("zone_name"); ok {
+		zoneName = value.(string)
+		if len(zoneName) > 0 {
+			zoneNameRegex = regexp.MustCompile(zoneName)
+		}
+	}
+
 	response := raw.(*api.ListZoneResult)
 	zoneMap := make([]map[string]interface{}, 0, len(response.Zones))
 	for _, zone := range response.Zones {
+		if len(zoneName) > 0 && zoneNameRegex != nil {
+			if !zoneNameRegex.MatchString(zone.ZoneName) {
+				continue
+			}
+		}
 		zoneMap = append(zoneMap, map[string]interface{}{
 			"zone_name": zone.ZoneName,
 		})

@@ -156,16 +156,16 @@ resource "baiducloud_vpc" "default" {
 }
 
 resource "baiducloud_subnet" "default" {
-  name = "%s"
-  zone_name = "${data.baiducloud_zones.default.zones.0.zone_name}"
-  cidr = "192.168.3.0/24"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  name        = "%s"
+  zone_name   = data.baiducloud_zones.default.zones.0.zone_name
+  cidr        = "192.168.3.0/24"
+  vpc_id      = baiducloud_vpc.default.id
   subnet_type = "BCC"
 }
 
 resource "baiducloud_security_group" "default" {
-  name = "%s"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  name   = "%s"
+  vpc_id = baiducloud_vpc.default.id
 }
 
 resource "%s" "%s" {
@@ -182,8 +182,8 @@ resource "%s" "%s" {
   code_file_name = "testFiles/cfcTestCode.zip"
   reserved_concurrent_executions = 10
   vpc_config {
-    subnet_ids    = ["${baiducloud_subnet.default.id}"]
-    security_group_ids = ["${baiducloud_security_group.default.id}"]
+    subnet_ids         = [baiducloud_subnet.default.id]
+    security_group_ids = [baiducloud_security_group.default.id]
   }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC",

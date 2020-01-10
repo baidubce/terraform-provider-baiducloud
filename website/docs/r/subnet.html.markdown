@@ -36,12 +36,7 @@ The following arguments are supported:
 * `zone_name` - (Required, ForceNew) The availability zone name within which the subnet should be created.
 * `description` - (Optional) Description of the subnet, and the value must be no more than 200 characters.
 * `subnet_type` - (Optional, ForceNew) Type of the subnet, valid values are BCC, BCC_NAT and BBC. Default to BCC.
-* `tags` - (Optional, ForceNew) Tags
-
-The `tags` object supports the following:
-
-* `tag_key` - (Required) Tag's key
-* `tag_value` - (Required) Tag's value
+* `tags` - (Optional, ForceNew) Tags, do not support modify
 
 
 ## Import

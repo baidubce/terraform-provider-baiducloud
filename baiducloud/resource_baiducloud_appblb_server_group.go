@@ -174,10 +174,10 @@ func resourceBaiduCloudAppBlbServerGroup() *schema.Resource {
 							Computed:    true,
 						},
 						"health_check": {
-							Type:         schema.TypeString,
-							Description:  "Server Group port health check protocol, support TCP/UDP/HTTP, default same as port protocol type",
-							Computed:     true,
-							Optional:     true,
+							Type:        schema.TypeString,
+							Description: "Server Group port health check protocol, support TCP/UDP/HTTP, default same as port protocol type",
+							// should be optional, but may cause bug, so set Required
+							Required:     true,
 							ValidateFunc: validation.StringInSlice([]string{TCP, UDP, HTTP}, false),
 						},
 						"health_check_port": {
@@ -710,17 +710,23 @@ func buildCreateAppServerGroupPortArgs(list []interface{}) ([]appblb.CreateAppSe
 
 		if value, ok := addValue["health_check"]; ok {
 			addArgs.HealthCheck = value.(string)
+		}
 
-			switch addArgs.Type {
-			case TCP:
-				addArgs.HealthCheck = TCP
-			case UDP:
-				addArgs.HealthCheck = UDP
-			case HTTP:
-				if addArgs.HealthCheck == "" {
-					addArgs.HealthCheck = HTTP
-				}
+		if addArgs.HealthCheck == "" {
+			addArgs.HealthCheck = addArgs.Type
+		}
+
+		switch addArgs.Type {
+		case TCP, UDP:
+			if addArgs.HealthCheck != addArgs.Type {
+				return nil, fmt.Errorf("%s port type should set %s healthcheck, but now is %s", addArgs.Type, addArgs.Type, addArgs.HealthCheck)
 			}
+		case HTTP:
+			if !stringInSlice([]string{HTTP, TCP}, addArgs.HealthCheck) {
+				return nil, fmt.Errorf("HTTP port type should set HTTP/TCP healthcheck, but now is %s", addArgs.HealthCheck)
+			}
+		default:
+			return nil, fmt.Errorf("unsupport port type %s", addArgs.Type)
 		}
 
 		if value, ok := addValue["health_check_port"]; ok {
@@ -751,7 +757,7 @@ func buildCreateAppServerGroupPortArgs(list []interface{}) ([]appblb.CreateAppSe
 			addArgs.HealthCheckNormalStatus = value.(string)
 		}
 
-		if addArgs.Type == UDP {
+		if addArgs.HealthCheck == UDP {
 			if value, ok := addValue["udp_health_check_string"]; ok && value.(string) != "" {
 				addArgs.UdpHealthCheckString = value.(string)
 			} else {
@@ -778,17 +784,19 @@ func buildUpdateAppServerGroupPortArgs(list []interface{}) ([]appblb.UpdateAppSe
 
 		if value, ok := updateValue["health_check"]; ok {
 			updateArgs.HealthCheck = value.(string)
+		}
 
-			switch updateType {
-			case TCP:
-				updateArgs.HealthCheck = TCP
-			case UDP:
-				updateArgs.HealthCheck = UDP
-			case HTTP:
-				if updateArgs.HealthCheck == "" {
-					updateArgs.HealthCheck = HTTP
-				}
+		switch updateType {
+		case TCP, UDP:
+			if updateArgs.HealthCheck != updateType {
+				return nil, fmt.Errorf("%s port type should set %s healthcheck, but now is %s", updateType, updateType, updateArgs.HealthCheck)
 			}
+		case HTTP:
+			if !stringInSlice([]string{HTTP, TCP}, updateArgs.HealthCheck) {
+				return nil, fmt.Errorf("HTTP port type should set HTTP/TCP healthcheck, but now is %s", updateArgs.HealthCheck)
+			}
+		default:
+			return nil, fmt.Errorf("unsupport port type %s", updateType)
 		}
 
 		if value, ok := updateValue["health_check_port"]; ok {
@@ -819,7 +827,7 @@ func buildUpdateAppServerGroupPortArgs(list []interface{}) ([]appblb.UpdateAppSe
 			updateArgs.HealthCheckNormalStatus = value.(string)
 		}
 
-		if updateType == UDP {
+		if updateArgs.HealthCheck == UDP {
 			if value, ok := updateValue["udp_health_check_string"]; ok && value.(string) != "" {
 				updateArgs.UdpHealthCheckString = value.(string)
 			} else {

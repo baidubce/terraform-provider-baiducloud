@@ -24,6 +24,7 @@ output "zone" {
 
 The following arguments are supported:
 
+* `name_regex` - (Optional, ForceNew) Regex pattern of the search zone name
 * `output_file` - (Optional, ForceNew) Output file for saving result.
 
 ## Attributes Reference

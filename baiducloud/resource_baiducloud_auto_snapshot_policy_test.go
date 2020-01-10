@@ -162,25 +162,26 @@ data "baiducloud_images" "default" {
 
 resource "baiducloud_instance" "default" {
   name                  = "%s"
-  image_id              = "${data.baiducloud_images.default.images.0.id}"
-  availability_zone     = "${data.baiducloud_zones.default.zones.0.zone_name}"
-  cpu_count             = "${data.baiducloud_specs.default.specs.0.cpu_count}"
-  memory_capacity_in_gb = "${data.baiducloud_specs.default.specs.0.memory_size_in_gb}"
+  image_id              = data.baiducloud_images.default.images.0.id
+  availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
+  cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
+  memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
   billing = {
     payment_timing = "Postpaid"
   }
 }
 
 resource "baiducloud_cds" "default" {
-  name                   = "%s"
-  description            = ""
-  disk_size_in_gb        = 5
-  payment_timing         = "Postpaid"
+  depends_on      = [baiducloud_instance.default]
+  name            = "%s"
+  description     = ""
+  disk_size_in_gb = 5
+  payment_timing  = "Postpaid"
 }
 
 resource "baiducloud_cds_attachment" "default" {
-  cds_id      = "${baiducloud_cds.default.id}"
-  instance_id = "${baiducloud_instance.default.id}"
+  cds_id      = baiducloud_cds.default.id
+  instance_id = baiducloud_instance.default.id
 }
 
 resource "%s" "%s" {
@@ -188,7 +189,7 @@ resource "%s" "%s" {
   time_points     = [0, 20, 22]
   repeat_weekdays = [0]
   retention_days  = 2
-  volume_ids      = ["${baiducloud_cds_attachment.default.id}"]
+  volume_ids      = [baiducloud_cds_attachment.default.id]
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"BCC", BaiduCloudTestResourceAttrNamePrefix+"CDS",
 		testAccAutoSnapshotPolicyResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"ASP")

@@ -37,8 +37,6 @@ In addition to all arguments above, the following attributes are exported:
   * `id` - Security Group ID
   * `name` - Security Group name
   * `tags` - Tags
-    * `tag_key` - Tag's key
-    * `tag_value` - Tag's value
   * `vpc_id` - Security Group vpc id
 
 

@@ -45,9 +45,8 @@ func (c *Config) Client() (*BaiduClient, error) {
 }
 
 func (client *BaiduClient) WithCommonClient(serviceCode ServiceCode) *BaiduClient {
-	// TODO: log set
 	log.SetLogLevel(log.DEBUG)
-	log.SetLogHandler(log.FILE)
+	log.SetLogHandler(log.NONE)
 	log.SetLogDir(LogDir)
 
 	accessKey := client.config.AccessKey

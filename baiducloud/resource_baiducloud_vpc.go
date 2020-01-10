@@ -228,7 +228,7 @@ func buildBaiduCloudVpcArgs(d *schema.ResourceData, meta interface{}) *vpc.Creat
 	}
 
 	if v, ok := d.GetOk("tags"); ok {
-		request.Tags = tranceTagMapToModel(v.(*schema.Set).List())
+		request.Tags = tranceTagMapToModel(v.(map[string]interface{}))
 	}
 
 	return request

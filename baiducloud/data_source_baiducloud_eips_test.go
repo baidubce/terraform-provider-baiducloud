@@ -24,9 +24,7 @@ func TestAccBaiduCloudEipsDataSource(t *testing.T) {
 					testAccCheckBaiduCloudDataSourceId(testAccEipsDataSourceName),
 					resource.TestCheckResourceAttrSet(testAccEipsDataSourceName, testAccEipsDataSourceAttrKeyPrefix+"eip"),
 					resource.TestCheckResourceAttr(testAccEipsDataSourceName, testAccEipsDataSourceAttrKeyPrefix+"bandwidth_in_mbps", "100"),
-					resource.TestCheckResourceAttr(testAccEipsDataSourceName, testAccEipsDataSourceAttrKeyPrefix+"tags.#", "1"),
-					resource.TestCheckResourceAttr(testAccEipsDataSourceName, testAccEipsDataSourceAttrKeyPrefix+"tags.0.tag_key", "testKey"),
-					resource.TestCheckResourceAttr(testAccEipsDataSourceName, testAccEipsDataSourceAttrKeyPrefix+"tags.0.tag_value", "testValue"),
+					resource.TestCheckResourceAttr(testAccEipsDataSourceName, testAccEipsDataSourceAttrKeyPrefix+"tags.testKey", "testValue"),
 				),
 			},
 		},
@@ -40,13 +38,12 @@ resource "baiducloud_eip" "my-eip" {
   payment_timing    = "Postpaid"
   billing_method    = "ByTraffic"
 
-  tags {
-    tag_key   = "testKey"
-    tag_value = "testValue"
+  tags = {
+    "testKey" = "testValue"
   }
 }
 
 data "baiducloud_eips" "default" {
-  eip = "${baiducloud_eip.my-eip.id}"
+  eip = baiducloud_eip.my-eip.id
 }
 `

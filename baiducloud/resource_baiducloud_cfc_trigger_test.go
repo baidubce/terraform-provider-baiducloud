@@ -215,18 +215,18 @@ func testAccCFCTriggerDestory(s *terraform.State) error {
 func testAccCfcHttpTriggerConfig() string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
-  function_name = "%s"
-  description   = "terraform create"
-  handler       = "index.handler"
-  memory_size   = 128
-  runtime       = "nodejs8.5"
-  time_out      = 3
+  function_name  = "%s"
+  description    = "terraform create"
+  handler        = "index.handler"
+  memory_size    = 128
+  runtime        = "nodejs8.5"
+  time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
 resource "%s" "%s" {
   source_type   = "http"
-  target        = "${baiducloud_cfc_function.default.function_brn}"
+  target        = baiducloud_cfc_function.default.function_brn
   resource_path = "/test"
   method        = ["GET","PUT"]
   auth_type     = "iam"
@@ -238,18 +238,18 @@ resource "%s" "%s" {
 func testAccCfcHttpTriggerConfigUpdate() string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
-  function_name = "%s"
-  description   = "terraform create"
-  handler       = "index.handler"
-  memory_size   = 128
-  runtime       = "nodejs8.5"
-  time_out      = 3
+  function_name  = "%s"
+  description    = "terraform create"
+  handler        = "index.handler"
+  memory_size    = 128
+  runtime        = "nodejs8.5"
+  time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
 resource "%s" "%s" {
   source_type   = "http"
-  target        = "${baiducloud_cfc_function.default.function_brn}"
+  target        = baiducloud_cfc_function.default.function_brn
   resource_path = "/test2"
   method        = ["GET","PUT","POST"]
   auth_type     = "iam"
@@ -261,18 +261,18 @@ resource "%s" "%s" {
 func testAccCfcCDNTriggerConfig() string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
-  function_name = "%s"
-  description   = "terraform create"
-  handler       = "index.handler"
-  memory_size   = 128
-  runtime       = "nodejs8.5"
-  time_out      = 3
+  function_name  = "%s"
+  description    = "terraform create"
+  handler        = "index.handler"
+  memory_size    = 128
+  runtime        = "nodejs8.5"
+  time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
 resource "%s" "%s" {
   source_type    = "cdn"
-  target         = "${baiducloud_cfc_function.default.function_brn}"
+  target         = baiducloud_cfc_function.default.function_brn
   cdn_event_type = "CachedObjectsBlocked"
   status         = "disabled"
 }
@@ -283,18 +283,18 @@ resource "%s" "%s" {
 func testAccCfcCDNTriggerConfigUpdate() string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
-  function_name = "%s"
-  description   = "terraform create"
-  handler       = "index.handler"
-  memory_size   = 128
-  runtime       = "nodejs8.5"
-  time_out      = 3
+  function_name  = "%s"
+  description    = "terraform create"
+  handler        = "index.handler"
+  memory_size    = 128
+  runtime        = "nodejs8.5"
+  time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
 resource "%s" "%s" {
   source_type    = "cdn"
-  target         = "${baiducloud_cfc_function.default.function_brn}"
+  target         = baiducloud_cfc_function.default.function_brn
   cdn_event_type = "CachedObjectsPushed"
   status         = "enabled"
 }
@@ -310,19 +310,19 @@ resource "baiducloud_bos_bucket" "default" {
 }
 
 resource "baiducloud_cfc_function" "default" {
-  function_name = "%s"
-  description   = "terraform create"
-  handler       = "index.handler"
-  memory_size   = 128
-  runtime       = "nodejs8.5"
-  time_out      = 3
+  function_name  = "%s"
+  description    = "terraform create"
+  handler        = "index.handler"
+  memory_size    = 128
+  runtime        = "nodejs8.5"
+  time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
 resource "%s" "%s" {
   source_type    = "bos"
-  bucket         = "${baiducloud_bos_bucket.default.bucket}"
-  target         = "${baiducloud_cfc_function.default.function_brn}"
+  bucket         = baiducloud_bos_bucket.default.bucket
+  target         = baiducloud_cfc_function.default.function_brn
   name           = "hehehehe"
   status         = "disabled"
   bos_event_type = ["PutObject", "PostObject"]
@@ -341,19 +341,19 @@ resource "baiducloud_bos_bucket" "default" {
 }
 
 resource "baiducloud_cfc_function" "default" {
-  function_name = "%s"
-  description   = "terraform create"
-  handler       = "index.handler"
-  memory_size   = 128
-  runtime       = "nodejs8.5"
-  time_out      = 3
+  function_name  = "%s"
+  description    = "terraform create"
+  handler        = "index.handler"
+  memory_size    = 128
+  runtime        = "nodejs8.5"
+  time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
 resource "%s" "%s" {
   source_type    = "bos"
-  bucket         = "${baiducloud_bos_bucket.default.bucket}"
-  target         = "${baiducloud_cfc_function.default.function_brn}"
+  bucket         = baiducloud_bos_bucket.default.bucket
+  target         = baiducloud_cfc_function.default.function_brn
   name           = "hehehehe"
   status         = "enabled"
   bos_event_type = ["PostObject"]
@@ -367,18 +367,18 @@ resource "%s" "%s" {
 func testAccCfcDuerOSTriggerConfig() string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
-  function_name = "%s"
-  description   = "terraform create"
-  handler       = "index.handler"
-  memory_size   = 128
-  runtime       = "nodejs8.5"
-  time_out      = 3
+  function_name  = "%s"
+  description    = "terraform create"
+  handler        = "index.handler"
+  memory_size    = 128
+  runtime        = "nodejs8.5"
+  time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
 resource "%s" "%s" {
   source_type = "dueros"
-  target      = "${baiducloud_cfc_function.default.function_brn}"
+  target      = baiducloud_cfc_function.default.function_brn
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"CFC",
 		testAccCFCTriggerResourceType, BaiduCloudTestResourceName)
@@ -387,18 +387,18 @@ resource "%s" "%s" {
 func testAccCfcCrontabTriggerConfig() string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
-  function_name = "%s"
-  description   = "terraform create"
-  handler       = "index.handler"
-  memory_size   = 128
-  runtime       = "nodejs8.5"
-  time_out      = 3
+  function_name  = "%s"
+  description    = "terraform create"
+  handler        = "index.handler"
+  memory_size    = 128
+  runtime        = "nodejs8.5"
+  time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
 resource "%s" "%s" {
   source_type         = "crontab"
-  target              = "${baiducloud_cfc_function.default.function_brn}"
+  target              = baiducloud_cfc_function.default.function_brn
   name                = "hahahaha"
   enabled             = "Disabled"
   schedule_expression = "cron(* * * * *)"
@@ -410,18 +410,18 @@ resource "%s" "%s" {
 func testAccCfcCrontabTriggerConfigUpdate() string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
-  function_name = "%s"
-  description   = "terraform create"
-  handler       = "index.handler"
-  memory_size   = 128
-  runtime       = "nodejs8.5"
-  time_out      = 3
+  function_name  = "%s"
+  description    = "terraform create"
+  handler        = "index.handler"
+  memory_size    = 128
+  runtime        = "nodejs8.5"
+  time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
 resource "%s" "%s" {
   source_type         = "crontab"
-  target              = "${baiducloud_cfc_function.default.function_brn}"
+  target              = baiducloud_cfc_function.default.function_brn
   name                = "hahahaha"
   enabled             = "Enabled"
   schedule_expression = "cron(0 10 * * ?)"

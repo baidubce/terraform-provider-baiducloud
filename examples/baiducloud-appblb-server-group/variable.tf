@@ -6,8 +6,16 @@ variable "subnet_name" {
   default = "terraform-subnet"
 }
 
+variable "sg_name" {
+  default = "terraform-sg"
+}
+
 variable "appblb_name" {
   default = "terraform-appblb"
+}
+
+variable "bcc_name" {
+  default = "terraform-bcc"
 }
 
 variable "servergroup_name" {

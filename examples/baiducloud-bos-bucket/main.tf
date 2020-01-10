@@ -1,20 +1,20 @@
 provider "baiducloud" {}
 
 resource "baiducloud_bos_bucket" "my-bucket" {
-  bucket = "${var.my_bucket}"
-  acl = "${var.acl}"
+  bucket = var.my_bucket
+  acl    = var.acl
 }
 
 resource "baiducloud_bos_bucket" "default" {
-  bucket = "${var.bucket}"
-  acl = "${var.acl}"
+  bucket = var.bucket
+  acl    = var.acl
 
   replication_configuration {
-    id = "${var.rc_id}"
-    status = "enabled"
-    resource = ["${var.resource}"]
+    id       = var.rc_id
+    status   = "enabled"
+    resource = [var.resource]
     destination {
-      bucket = "${baiducloud_bos_bucket.my-bucket.bucket}"
+      bucket = baiducloud_bos_bucket.my-bucket.bucket
     }
     replicate_deletes = "disabled"
   }
@@ -22,44 +22,43 @@ resource "baiducloud_bos_bucket" "default" {
   force_destroy = true
 
   logging {
-    target_bucket = "${var.bucket}"
-    target_prefix = "${var.logging_prefix}"
+    target_bucket = var.bucket
+    target_prefix = var.logging_prefix
   }
 
   lifecycle_rule {
-    id = "${var.lr_id}"
-    status =  "enabled"
-    resource = ["${var.resource}"]
+    id       = var.lr_id
+    status   = "enabled"
+    resource = [var.resource]
     condition {
       time {
-        date_greater_than = "${var.date_greater_than_date}"
+        date_greater_than = var.date_greater_than_date
       }
     }
     action {
-      name = "${var.action}"
+      name = var.action
     }
   }
 
-  storage_class = "${var.storage_class}"
+  storage_class               = var.storage_class
+  server_side_encryption_rule = var.server_side_encryption_rule
 
-  server_side_encryption_rule = "${var.server_side_encryption_rule}"
-
-  website{
-    index_document = "${var.index}"
-    error_document = "${var.err}"
+  website {
+    index_document = var.index
+    error_document = var.err
   }
 
   cors_rule {
-    allowed_origins = ["${var.allowed_origins}"]
-    allowed_methods = ["${var.allowed_methods}"]
+    allowed_origins = [var.allowed_origins]
+    allowed_methods = [var.allowed_methods]
     max_age_seconds = 1800
   }
 
   copyright_protection {
-    resource = ["${var.resource}"]
+    resource = [var.resource]
   }
 }
 
 data "baiducloud_bos_buckets" "default" {
-  bucket = "${baiducloud_bos_bucket.default.bucket}"
+  bucket = baiducloud_bos_bucket.default.bucket
 }

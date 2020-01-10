@@ -30,5 +30,7 @@ func TestAccBaiduCloudZonesDataSource(t *testing.T) {
 }
 
 const testAccZonesDataSourceConfig = `
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+    name_regex = ".*a$"
+}
 `

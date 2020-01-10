@@ -1,3 +1,11 @@
+variable "bcc_name" {
+  default = "terraform-bcc"
+}
+
+variable "eip_name" {
+  default = "terraform-eip"
+}
+
 variable "vpc_name" {
   default = "terraform-vpc"
 }

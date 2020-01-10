@@ -31,24 +31,28 @@ func dataSourceBaiduCloudEips() *schema.Resource {
 				Type:         schema.TypeString,
 				Description:  "Eip address",
 				Optional:     true,
+				ForceNew:     true,
 				ValidateFunc: validation.SingleIP(),
 			},
 			"status": {
 				Type:         schema.TypeString,
 				Description:  "Eip status",
 				Optional:     true,
+				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{"available", "binded", "paused"}, false),
 			},
 			"instance_type": {
 				Type:         schema.TypeString,
 				Description:  "Eip bind instance type",
 				Optional:     true,
+				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{"BCC", "BLB", "VPN", "NAT"}, false),
 			},
 			"instance_id": {
 				Type:        schema.TypeString,
 				Description: "Eip bind instance id",
 				Optional:    true,
+				ForceNew:    true,
 			},
 			"output_file": {
 				Type:        schema.TypeString,

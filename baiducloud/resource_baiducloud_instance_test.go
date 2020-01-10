@@ -95,7 +95,7 @@ func TestAccBaiduCloudInstance(t *testing.T) {
 					resource.TestCheckResourceAttr(testAccInstanceResourceName, "cds_disks.#", "1"),
 					resource.TestCheckResourceAttr(testAccInstanceResourceName, "cds_disks.0.cds_size_in_gb", "50"),
 					resource.TestCheckResourceAttr(testAccInstanceResourceName, "cds_disks.0.storage_type", "cloud_hp1"),
-					resource.TestCheckResourceAttr(testAccInstanceResourceName, "tags.#", "1"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "tags.%", "1"),
 				),
 			},
 			{
@@ -125,7 +125,7 @@ func TestAccBaiduCloudInstance(t *testing.T) {
 					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "vpc_id"),
 					resource.TestCheckResourceAttr(testAccInstanceResourceName, "cds_disks.0.cds_size_in_gb", "50"),
 					resource.TestCheckResourceAttr(testAccInstanceResourceName, "cds_disks.0.storage_type", "cloud_hp1"),
-					resource.TestCheckResourceAttr(testAccInstanceResourceName, "tags.#", "1"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "tags.%", "1"),
 				),
 			},
 		},
@@ -168,43 +168,42 @@ resource "baiducloud_vpc" "default" {
 }
 
 resource "baiducloud_subnet" "default" {
-  name = "%s"
-  zone_name = "${data.baiducloud_zones.default.zones.1.zone_name}"
-  cidr = "192.168.1.0/24"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  name      = "%s"
+  zone_name = data.baiducloud_zones.default.zones.1.zone_name
+  cidr      = "192.168.1.0/24"
+  vpc_id    = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_security_group" "default" {
-  name = "%s"
+  name        = "%s"
   description = "security group created by terraform"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_instance" "default" {
-  image_id              = "${data.baiducloud_images.default.images.0.id}"
+  image_id              = data.baiducloud_images.default.images.0.id
   name                  = "%s"
   description           = "terraform test instance"
-  availability_zone     = "${data.baiducloud_zones.default.zones.1.zone_name}"
-  cpu_count             = "${data.baiducloud_specs.default.specs.0.cpu_count}"
-  memory_capacity_in_gb = "${data.baiducloud_specs.default.specs.0.memory_size_in_gb}"
+  availability_zone     = data.baiducloud_zones.default.zones.1.zone_name
+  cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
+  memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
   billing = {
     payment_timing = "Postpaid"
   }
 
-  subnet_id = "${baiducloud_subnet.default.id}"
-  security_groups = ["${baiducloud_security_group.default.id}"]
+  subnet_id       = baiducloud_subnet.default.id
+  security_groups = [baiducloud_security_group.default.id]
 
-  related_release_flag = true
+  related_release_flag     = true
   delete_cds_snapshot_flag = true
 
   cds_disks {
     cds_size_in_gb = 50
-    storage_type = "cloud_hp1"
+    storage_type   = "cloud_hp1"
   }
 
-  tags {
-    tag_key   = "testKey"
-    tag_value = "testValue"
+  tags = {
+    "testKey" = "testValue"
   }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC",
@@ -234,67 +233,65 @@ resource "baiducloud_vpc" "default" {
 }
 
 resource "baiducloud_subnet" "default" {
-  name = "%s"
-  zone_name = "${data.baiducloud_zones.default.zones.1.zone_name}"
-  cidr = "192.168.1.0/24"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  name      = "%s"
+  zone_name = data.baiducloud_zones.default.zones.1.zone_name
+  cidr      = "192.168.1.0/24"
+  vpc_id    = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_security_group" "default" {
-  name = "%s"
+  name        = "%s"
   description = "security group created by terraform"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_subnet" "default02" {
-  name = "%s"
-  zone_name = "${data.baiducloud_zones.default.zones.1.zone_name}"
-  cidr = "192.168.2.0/24"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  name      = "%s"
+  zone_name = data.baiducloud_zones.default.zones.1.zone_name
+  cidr      = "192.168.2.0/24"
+  vpc_id    = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_security_group" "default02" {
-  name = "%s"
+  name        = "%s"
   description = "security group created by terraform"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_instance" "default" {
-  image_id              = "${data.baiducloud_images.default.images.1.id}"
+  image_id              = data.baiducloud_images.default.images.1.id
   name                  = "%s"
   description           = "terraform test update instance"
-  availability_zone     = "${data.baiducloud_zones.default.zones.1.zone_name}"
-  cpu_count             = "${data.baiducloud_specs.default.specs.1.cpu_count}"
-  memory_capacity_in_gb = "${data.baiducloud_specs.default.specs.1.memory_size_in_gb}"
+  availability_zone     = data.baiducloud_zones.default.zones.1.zone_name
+  cpu_count             = data.baiducloud_specs.default.specs.1.cpu_count
+  memory_capacity_in_gb = data.baiducloud_specs.default.specs.1.memory_size_in_gb
   billing = {
     payment_timing = "Postpaid"
   }
   admin_pass = "terraform@123"
 
-  subnet_id = "${baiducloud_subnet.default02.id}"
-  security_groups = ["${baiducloud_security_group.default02.id}"]
+  subnet_id       = baiducloud_subnet.default02.id
+  security_groups = [baiducloud_security_group.default02.id]
 
-  related_release_flag = true
+  related_release_flag     = true
   delete_cds_snapshot_flag = true
 
   cds_disks {
     cds_size_in_gb = 50
-    storage_type = "cloud_hp1"
+    storage_type   = "cloud_hp1"
   }
 
-  tags {
-    tag_key   = "testKey"
-    tag_value = "testValue"
+  tags = {
+    "testKey" = "testValue"
   }
 }
 
 resource "baiducloud_eip_association" "default" {
-  eip           = "${baiducloud_eip.default.id}"
+  eip           = baiducloud_eip.default.id
   instance_type = "BCC"
-  instance_id   = "${baiducloud_instance.default.id}"
+  instance_id   = baiducloud_instance.default.id
 }
-`,
-		BaiduCloudTestResourceAttrNamePrefix+"EIP",
+`, BaiduCloudTestResourceAttrNamePrefix+"EIP",
 		BaiduCloudTestResourceAttrNamePrefix+"VPC",
 		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
 		BaiduCloudTestResourceAttrNamePrefix+"SG",

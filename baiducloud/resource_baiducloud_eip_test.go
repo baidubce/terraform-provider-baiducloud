@@ -82,7 +82,7 @@ func TestAccBaiduCloudEip(t *testing.T) {
 					resource.TestCheckResourceAttr(testAccEipResourceName, "bandwidth_in_mbps", "1"),
 					resource.TestCheckResourceAttr(testAccEipResourceName, "billing_method", "ByTraffic"),
 					resource.TestCheckResourceAttr(testAccEipResourceName, "payment_timing", "Postpaid"),
-					resource.TestCheckResourceAttr(testAccEipResourceName, "tags.#", "1"),
+					resource.TestCheckResourceAttr(testAccEipResourceName, "tags.%", "1"),
 					resource.TestCheckNoResourceAttr(testAccEipResourceName, "reservation_length"),
 				),
 			},
@@ -99,7 +99,7 @@ func TestAccBaiduCloudEip(t *testing.T) {
 					resource.TestCheckResourceAttr(testAccEipResourceName, "bandwidth_in_mbps", "2"),
 					resource.TestCheckResourceAttr(testAccEipResourceName, "billing_method", "ByTraffic"),
 					resource.TestCheckResourceAttr(testAccEipResourceName, "payment_timing", "Postpaid"),
-					resource.TestCheckResourceAttr(testAccEipResourceName, "tags.#", "1"),
+					resource.TestCheckResourceAttr(testAccEipResourceName, "tags.%", "1"),
 					resource.TestCheckNoResourceAttr(testAccEipResourceName, "reservation_length"),
 				),
 			},
@@ -132,15 +132,14 @@ func testAccEIPDestory(s *terraform.State) error {
 func testAccEipConfig() string {
 	return fmt.Sprintf(`
 resource "%s" "%s" {
-  name              = "%s"
-  bandwidth_in_mbps = 1
-  payment_timing    = "Postpaid"
-  billing_method    = "ByTraffic"
+  name               = "%s"
+  bandwidth_in_mbps  = 1
+  payment_timing     = "Postpaid"
+  billing_method     = "ByTraffic"
   reservation_length = 1
 
-  tags {
-    tag_key   = "testKey"
-    tag_value = "testValue"
+  tags = {
+    "testKey" = "testValue"
   }
 }
 `, testAccEipResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"EIP")
@@ -154,9 +153,8 @@ resource "%s" "%s" {
   payment_timing    = "Postpaid"
   billing_method    = "ByTraffic"
 
-  tags {
-    tag_key   = "testKey"
-    tag_value = "testValue"
+  tags = {
+    "testKey" = "testValue"
   }
 }
 `, testAccEipResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"EIP")

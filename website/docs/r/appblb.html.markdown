@@ -19,14 +19,9 @@ resource "baiducloud_appblb" "default" {
   vpc_id      = "vpc-gxaava4knqr1"
   subnet_id   = "sbn-m4x3f2i6c901"
 
-  tags {
-    tag_key   = "tagAKey"
-    tag_value = "tagAValue"
-  }
-
-  tags {
-    tag_key   = "tagBKey"
-    tag_value = "tagBValue"
+  tags = {
+    "tagAKey" = "tagAValue"
+    "tagBKey" = "tagBValue"
   }
 }
 ```
@@ -39,12 +34,7 @@ The following arguments are supported:
 * `vpc_id` - (Required, ForceNew) The VPC short ID to which the LoadBalance instance belongs
 * `description` - (Optional) LoadBalance's description, length must be between 0 and 450 bytes, and support Chinese
 * `name` - (Optional) LoadBalance instance's name, length must be between 1 and 65 bytes, and will be automatically generated if not set
-* `tags` - (Optional, ForceNew) Tags
-
-The `tags` object supports the following:
-
-* `tag_key` - (Required) Tag's key
-* `tag_value` - (Required) Tag's value
+* `tags` - (Optional, ForceNew) Tags, do not support modify
 
 ## Attributes Reference
 

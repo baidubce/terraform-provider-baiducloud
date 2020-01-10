@@ -47,12 +47,12 @@ resource "baiducloud_cert" "default2" {
 
 resource "baiducloud_cert" "default" {
   cert_name         = "%s"
-  cert_server_data  = "${baiducloud_cert.default2.cert_server_data}"
-  cert_private_data = "${baiducloud_cert.default2.cert_private_data}"
+  cert_server_data  = baiducloud_cert.default2.cert_server_data
+  cert_private_data = baiducloud_cert.default2.cert_private_data
 }
 
 data "baiducloud_certs" "default" {
-  cert_name = "${baiducloud_cert.default.cert_name}"
+  cert_name = baiducloud_cert.default.cert_name
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"CertTest",
 		BaiduCloudTestResourceAttrNamePrefix+"Cert")

@@ -273,7 +273,7 @@ func buildBaiduCloudCreateEipArgs(d *schema.ResourceData) *eip.CreateEipArgs {
 	}
 
 	if v, ok := d.GetOk("tags"); ok {
-		request.Tags = tranceTagMapToModel(v.(*schema.Set).List())
+		request.Tags = tranceTagMapToModel(v.(map[string]interface{}))
 	}
 	request.Billing = &eip.Billing{
 		PaymentTiming: d.Get("payment_timing").(string),

@@ -16,9 +16,8 @@ Provide a resource to create a security group.
 resource "baiducloud_security_group" "default" {
   name        = "testSecurityGroup"
   description = "default"
-  tags {
-    tag_key   = "testKey"
-    tag_value = "testValue"
+  tags = {
+    "testKey" = "testValue"
   }
 }
 ```
@@ -29,13 +28,8 @@ The following arguments are supported:
 
 * `name` - (Required, ForceNew) SecurityGroup name
 * `description` - (Optional, ForceNew) SecurityGroup description
-* `tags` - (Optional, ForceNew) Tags
+* `tags` - (Optional, ForceNew) Tags, do not support modify
 * `vpc_id` - (Optional, ForceNew) SecurityGroup binded VPC id
-
-The `tags` object supports the following:
-
-* `tag_key` - (Required) Tag's key
-* `tag_value` - (Required) Tag's value
 
 
 ## Import

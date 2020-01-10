@@ -13,7 +13,7 @@ func postPaidDiffSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
 func appServerGroupPortHealthCheckHTTPSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
 	strs := strings.Split(k, ".")
 	if len(strs) == 3 {
-		key := "port_list." + strs[1] + ".healthCheck"
+		key := "port_list." + strs[1] + ".health_check"
 		value := ""
 		if v, ok := d.GetOk(key); ok {
 			value = v.(string)
@@ -31,7 +31,7 @@ func appServerGroupPortHealthCheckHTTPSuppressFunc(k, old, new string, d *schema
 func appServerGroupPortHealthCheckUDPSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
 	strs := strings.Split(k, ".")
 	if len(strs) == 3 {
-		key := "port_list." + strs[1] + ".healthCheck"
+		key := "port_list." + strs[1] + ".health_check"
 		value := ""
 		if v, ok := d.GetOk(key); ok {
 			value = v.(string)

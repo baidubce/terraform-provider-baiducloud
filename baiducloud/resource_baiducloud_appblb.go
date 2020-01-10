@@ -10,14 +10,9 @@ resource "baiducloud_appblb" "default" {
   vpc_id      = "vpc-gxaava4knqr1"
   subnet_id   = "sbn-m4x3f2i6c901"
 
-  tags {
-    tag_key   = "tagAKey"
-    tag_value = "tagAValue"
-  }
-
-  tags {
-    tag_key   = "tagBKey"
-    tag_value = "tagBValue"
+  tags = {
+    "tagAKey" = "tagAValue"
+    "tagBKey" = "tagBValue"
   }
 }
 ```
@@ -339,7 +334,7 @@ func buildBaiduCloudCreateAppBlbArgs(d *schema.ResourceData) *appblb.CreateLoadB
 	}
 
 	if v, ok := d.GetOk("tags"); ok {
-		result.Tags = tranceTagMapToModel(v.(*schema.Set).List())
+		result.Tags = tranceTagMapToModel(v.(map[string]interface{}))
 	}
 
 	return result

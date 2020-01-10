@@ -35,6 +35,7 @@ func dataSourceBaiduCloudImages() *schema.Resource {
 				Type:         schema.TypeString,
 				Description:  "Image type of the images to be queried, support ALL/System/Custom/Integration/Sharing/GpuBccSystem/GpuBccCustom/FpgaBccSystem/FpgaBccCustom",
 				Optional:     true,
+				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{"ALL", "System", "Custom", "Integration", "Sharing", "GpuBccSystem", "GpuBccCustom", "FpgaBccSystem", "FpgaBccCustom"}, false),
 			},
 			"name_regex": {

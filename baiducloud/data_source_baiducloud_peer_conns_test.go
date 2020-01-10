@@ -82,18 +82,18 @@ resource "baiducloud_vpc" "peer-vpc" {
 
 resource "baiducloud_peer_conn" "default" {
   bandwidth_in_mbps = 20
-  local_vpc_id = "${baiducloud_vpc.local-vpc.id}"
-  peer_vpc_id = "${baiducloud_vpc.peer-vpc.id}"
-  peer_region = "%s"
-  description = "test peer conn"
-  local_if_name = "local-interface"
+  local_vpc_id      = baiducloud_vpc.local-vpc.id
+  peer_vpc_id       = baiducloud_vpc.peer-vpc.id
+  peer_region       = "%s"
+  description       = "test peer conn"
+  local_if_name     = "local-interface"
   billing = {
     payment_timing = "Postpaid"
   }
 }
 
 data "baiducloud_peer_conns" "default" {
-  peer_conn_id = "${baiducloud_peer_conn.default.id}"
+  peer_conn_id = baiducloud_peer_conn.default.id
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"VPC", region)
 }
@@ -113,18 +113,18 @@ resource "baiducloud_vpc" "peer-vpc" {
 
 resource "baiducloud_peer_conn" "default" {
   bandwidth_in_mbps = 20
-  local_vpc_id = "${baiducloud_vpc.local-vpc.id}"
-  peer_vpc_id = "${baiducloud_vpc.peer-vpc.id}"
-  peer_region = "%s"
-  description = "test peer conn"
-  local_if_name = "local-interface"
+  local_vpc_id      = baiducloud_vpc.local-vpc.id
+  peer_vpc_id       = baiducloud_vpc.peer-vpc.id
+  peer_region       = "%s"
+  description       = "test peer conn"
+  local_if_name     = "local-interface"
   billing = {
     payment_timing = "Postpaid"
   }
 }
 
 data "baiducloud_peer_conns" "default" {
-  vpc_id = "${baiducloud_vpc.local-vpc.id}"
+  vpc_id = baiducloud_vpc.local-vpc.id
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"VPC", region)
 }

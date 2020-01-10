@@ -30,7 +30,7 @@ func TestAccBaiduCloudSecurityGroup(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccSecurityGroupResourceName),
 					resource.TestCheckResourceAttr(testAccSecurityGroupResourceName, "name", BaiduCloudTestResourceAttrNamePrefix+"SecurityGroup"),
-					resource.TestCheckResourceAttr(testAccSecurityGroupResourceName, "tags.#", "1"),
+					resource.TestCheckResourceAttr(testAccSecurityGroupResourceName, "tags.%", "1"),
 					resource.TestCheckResourceAttrSet(testAccSecurityGroupResourceName, "vpc_id"),
 				),
 			},
@@ -78,9 +78,8 @@ func testAccSecurityGroupConfig() string {
 resource "%s" "%s" {
   name        = "%s"
   description = "Baidu acceptance test"
-  tags {
-    tag_key   = "testKey"
-    tag_value = "testValue"
+  tags = {
+    "testKey" = "testValue"
   }
 }
 `, testAccSecurityGroupResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"SecurityGroup")

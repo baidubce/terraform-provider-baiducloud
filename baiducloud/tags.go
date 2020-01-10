@@ -7,68 +7,42 @@ import (
 
 func tagsSchema() *schema.Schema {
 	return &schema.Schema{
-		Type:        schema.TypeSet,
-		Description: "Tags",
+		Type:        schema.TypeMap,
+		Description: "Tags, do not support modify",
 		Optional:    true,
 		ForceNew:    true,
-		Elem: &schema.Resource{
-			Schema: map[string]*schema.Schema{
-				"tag_key": {
-					Type:        schema.TypeString,
-					Description: "Tag's key",
-					Required:    true,
-				},
-				"tag_value": {
-					Type:        schema.TypeString,
-					Description: "Tag's value",
-					Required:    true,
-				},
-			},
+		Elem: &schema.Schema{
+			Type: schema.TypeString,
 		},
 	}
 }
 
 func tagsComputedSchema() *schema.Schema {
 	return &schema.Schema{
-		Type:        schema.TypeList,
+		Type:        schema.TypeMap,
 		Description: "Tags",
 		Computed:    true,
-		Elem: &schema.Resource{
-			Schema: map[string]*schema.Schema{
-				"tag_key": {
-					Type:        schema.TypeString,
-					Description: "Tag's key",
-					Computed:    true,
-				},
-				"tag_value": {
-					Type:        schema.TypeString,
-					Description: "Tag's value",
-					Computed:    true,
-				},
-			},
+		Elem: &schema.Schema{
+			Type: schema.TypeString,
 		},
 	}
 }
 
-func flattenTagsToMap(tags []model.TagModel) []map[string]string {
-	tagMap := make([]map[string]string, 0, len(tags))
+func flattenTagsToMap(tags []model.TagModel) map[string]string {
+	tagMap := make(map[string]string)
 	for _, tag := range tags {
-		tagMap = append(tagMap, map[string]string{
-			"tag_key":   tag.TagKey,
-			"tag_value": tag.TagValue,
-		})
+		tagMap[tag.TagKey] = tag.TagValue
 	}
 
 	return tagMap
 }
 
-func tranceTagMapToModel(tagMaps []interface{}) []model.TagModel {
+func tranceTagMapToModel(tagMaps map[string]interface{}) []model.TagModel {
 	tags := make([]model.TagModel, 0, len(tagMaps))
-	for _, t := range tagMaps {
-		tag := t.(map[string]interface{})
+	for k, v := range tagMaps {
 		tags = append(tags, model.TagModel{
-			TagKey:   tag["tag_key"].(string),
-			TagValue: tag["tag_value"].(string),
+			TagKey:   k,
+			TagValue: v.(string),
 		})
 	}
 

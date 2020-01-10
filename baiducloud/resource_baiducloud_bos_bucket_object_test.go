@@ -142,13 +142,13 @@ resource "baiducloud_bos_bucket" "default" {
 }
 
 resource "baiducloud_bos_bucket_object" "default" {
-  bucket = "${baiducloud_bos_bucket.default.bucket}"
-  key = "%s"
-  content = "hello world"
-  acl = "public-read"
-  cache_control = "no-cache"
+  bucket              = baiducloud_bos_bucket.default.bucket
+  key                 = "%s"
+  content             = "hello world"
+  acl                 = "public-read"
+  cache_control       = "no-cache"
   content_disposition = "inline"
-  storage_class = "COLD"
+  storage_class       = "COLD"
   user_meta = {
     Metaa = "metaA"
     Metab = "metaB"
@@ -164,13 +164,13 @@ resource "baiducloud_bos_bucket" "default" {
 }
 
 resource "baiducloud_bos_bucket_object" "default" {
-  bucket = "${baiducloud_bos_bucket.default.bucket}"
-  key = "%s"
-  content = "hello world"
-  acl = "private"
-  cache_control = "max-age"
+  bucket              = baiducloud_bos_bucket.default.bucket
+  key                 = "%s"
+  content             = "hello world"
+  acl                 = "private"
+  cache_control       = "max-age"
   content_disposition = "attachment"
-  storage_class = "STANDARD_IA"
+  storage_class       = "STANDARD_IA"
   user_meta = {
     metaa = "metaA"
     metab = "metaB"

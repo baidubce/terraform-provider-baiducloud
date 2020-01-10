@@ -66,6 +66,7 @@ The `port_list` object supports the following:
 
 The `port_list` object supports the following:
 
+* `health_check` - (Required) Server Group port health check protocol, support TCP/UDP/HTTP, default same as port protocol type
 * `port` - (Required) App Server Group port, range from 1-65535
 * `type` - (Required) Server Group port protocol type, support TCP/UDP/HTTP
 * `health_check_down_retry` - (Optional) Server Group health check down retry time, support in [2, 5], default 3
@@ -75,7 +76,6 @@ The `port_list` object supports the following:
 * `health_check_timeout_in_second` - (Optional) Server Group health check timeout(second), support in [1, 60], default 3
 * `health_check_up_retry` - (Optional) Server Group health check up retry time, support in [2, 5], default 3
 * `health_check_url_path` - (Optional) Server Group health check url path, only useful when health_check is HTTP
-* `health_check` - (Optional) Server Group port health check protocol, support TCP/UDP/HTTP, default same as port protocol type
 * `udp_health_check_string` - (Optional) Server Group udp health check string, if type is UDP, this parameter is required
 * `id` - Server Group port id
 * `status` - Server Group port status

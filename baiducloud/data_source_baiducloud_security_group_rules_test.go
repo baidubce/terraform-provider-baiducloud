@@ -48,11 +48,11 @@ resource "baiducloud_vpc" "default" {
 resource "baiducloud_security_group" "default" {
   name        = "%s"
   description = "Baidu acceptance test"
-  vpc_id      = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_security_group_rule" "default" {
-  security_group_id = "${baiducloud_security_group.default.id}"
+  security_group_id = baiducloud_security_group.default.id
   remark            = "remark"
   protocol          = "udp"
   port_range        = "1-65523"
@@ -60,8 +60,8 @@ resource "baiducloud_security_group_rule" "default" {
 }
 
 data "baiducloud_security_group_rules" "default" {
-  security_group_id = "${baiducloud_security_group_rule.default.security_group_id}"
-  vpc_id = "${baiducloud_security_group.default.vpc_id}"
+  security_group_id = baiducloud_security_group_rule.default.security_group_id
+  vpc_id            = baiducloud_security_group.default.vpc_id
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC",
 		BaiduCloudTestResourceAttrNamePrefix+"SecurityGroup")

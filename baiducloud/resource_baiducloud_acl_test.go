@@ -107,23 +107,23 @@ resource "baiducloud_vpc" "default" {
 }
 
 resource "baiducloud_subnet" "default" {
-  name = "%s"
-  zone_name = "${data.baiducloud_zones.default.zones.0.zone_name}"
-  cidr = "192.168.1.0/24"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  name      = "%s"
+  zone_name = data.baiducloud_zones.default.zones.0.zone_name
+  cidr      = "192.168.1.0/24"
+  vpc_id    = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_acl" "default" {
-  subnet_id = "${baiducloud_subnet.default.id}"
-  protocol = "tcp"
-  source_ip_address = "192.168.0.0/24"
+  subnet_id              = baiducloud_subnet.default.id
+  protocol               = "tcp"
+  source_ip_address      = "192.168.0.0/24"
   destination_ip_address = "192.168.1.0/24"
-  source_port = "8888"
-  destination_port = "9999"
-  position = 20
-  direction = "ingress"
-  action = "allow"
-  description = "created by terraform"
+  source_port            = "8888"
+  destination_port       = "9999"
+  position               = 20
+  direction              = "ingress"
+  action                 = "allow"
+  description            = "created by terraform"
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"Subnet")
 }
@@ -139,22 +139,22 @@ resource "baiducloud_vpc" "default" {
 
 resource "baiducloud_subnet" "default" {
   name = "%s"
-  zone_name = "${data.baiducloud_zones.default.zones.0.zone_name}"
-  cidr = "192.168.1.0/24"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  zone_name = data.baiducloud_zones.default.zones.0.zone_name
+  cidr      = "192.168.1.0/24"
+  vpc_id    = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_acl" "default" {
-  subnet_id = "${baiducloud_subnet.default.id}"
-  protocol = "udp"
-  source_ip_address = "192.168.2.0/24"
+  subnet_id              = baiducloud_subnet.default.id
+  protocol               = "udp"
+  source_ip_address      = "192.168.2.0/24"
   destination_ip_address = "192.168.1.0/24"
-  source_port = "6666"
-  destination_port = "7777"
-  position = 30
-  direction = "ingress"
-  action = "allow"
-  description = "updated by terraform"
+  source_port            = "6666"
+  destination_port       = "7777"
+  position               = 30
+  direction              = "ingress"
+  action                 = "allow"
+  description            = "updated by terraform"
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"Subnet")
 }

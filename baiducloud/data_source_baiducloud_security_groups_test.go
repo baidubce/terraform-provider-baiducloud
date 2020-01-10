@@ -25,9 +25,8 @@ func TestAccBaiduCloudSecurityGroupsDataSource(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccSecurityGroupsDataSourceName),
 					resource.TestCheckResourceAttr(testAccSecurityGroupsDataSourceName, "security_groups.#", "2"),
-					resource.TestCheckResourceAttr(testAccSecurityGroupsDataSourceName, testAccSecurityGroupsDataSourceAttrKeyPrefix+"tags.#", "1"),
-					resource.TestCheckResourceAttr(testAccSecurityGroupsDataSourceName, testAccSecurityGroupsDataSourceAttrKeyPrefix+"tags.0.tag_key", "testKey"),
-					resource.TestCheckResourceAttr(testAccSecurityGroupsDataSourceName, testAccSecurityGroupsDataSourceAttrKeyPrefix+"tags.0.tag_value", "testValue"),
+					resource.TestCheckResourceAttr(testAccSecurityGroupsDataSourceName, testAccSecurityGroupsDataSourceAttrKeyPrefix+"tags.%", "1"),
+					resource.TestCheckResourceAttr(testAccSecurityGroupsDataSourceName, testAccSecurityGroupsDataSourceAttrKeyPrefix+"tags.testKey", "testValue"),
 				),
 			},
 		},
@@ -37,24 +36,23 @@ func TestAccBaiduCloudSecurityGroupsDataSource(t *testing.T) {
 func testAccSecurityGroupsDataSourceConfig() string {
 	return fmt.Sprintf(`
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name        = "%s"
   description = "test"
-  cidr = "192.168.0.0/24"
+  cidr        = "192.168.0.0/24"
 }
 
 resource "baiducloud_security_group" "default" {
   name        = "%s"
   description = "Baidu acceptance test"
-  vpc_id      = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
 
-  tags {
-    tag_key   = "testKey"
-    tag_value = "testValue"
+  tags = {
+    "testKey" = "testValue"
   }
 }
 
 data "baiducloud_security_groups" "default" {
-  vpc_id = "${baiducloud_security_group.default.vpc_id}"
+  vpc_id = baiducloud_security_group.default.vpc_id
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC",
 		BaiduCloudTestResourceAttrNamePrefix+"SecurityGroup")

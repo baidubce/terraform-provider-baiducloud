@@ -1,3 +1,7 @@
+variable "vpc-name" {
+  default = "terraform-vpc"
+}
+
 variable "name" {
   default = "terraform-securityGroup"
 }

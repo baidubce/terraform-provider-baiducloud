@@ -56,26 +56,26 @@ resource "baiducloud_vpc" "default" {
 
 resource "baiducloud_subnet" "default" {
   name        = "%s"
-  zone_name   = "${data.baiducloud_zones.default.zones.0.zone_name}"
+  zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.0.0/24"
-  vpc_id      = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
   description = "test description"
 }
 
 resource "baiducloud_security_group" "default" {
   name        = "%s"
   description = "Baidu acceptance test"
-  vpc_id      = "${baiducloud_vpc.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_instance" "default" {
   name                  = "%s"
-  image_id              = "${data.baiducloud_images.default.images.0.id}"
-  availability_zone     = "${data.baiducloud_zones.default.zones.0.zone_name}"
-  cpu_count             = "${data.baiducloud_specs.default.specs.0.cpu_count}"
-  memory_capacity_in_gb = "${data.baiducloud_specs.default.specs.0.memory_size_in_gb}"
-  subnet_id             = "${baiducloud_subnet.default.id}"
-  security_groups       = ["${baiducloud_security_group.default.id}"]
+  image_id              = data.baiducloud_images.default.images.0.id
+  availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
+  cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
+  memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
+  subnet_id             = baiducloud_subnet.default.id
+  security_groups       = [baiducloud_security_group.default.id]
 
   billing = {
     payment_timing = "Postpaid"
@@ -83,31 +83,32 @@ resource "baiducloud_instance" "default" {
 }
 
 resource "baiducloud_appblb" "default" {
+  depends_on  = [baiducloud_instance.default]
   name        = "%s"
-  description = ""
-  vpc_id      = "${baiducloud_vpc.default.id}"
-  subnet_id   = "${baiducloud_subnet.default.id}"
+  vpc_id      = baiducloud_vpc.default.id
+  subnet_id   = baiducloud_subnet.default.id
 }
 
 resource "baiducloud_appblb_server_group" "default" {
   name        = "%s"
   description = "acceptance test"
-  blb_id      = "${baiducloud_appblb.default.id}"
+  blb_id      = baiducloud_appblb.default.id
 
   backend_server_list {
-    instance_id = "${baiducloud_instance.default.id}"
+    instance_id = baiducloud_instance.default.id
     weight      = 50
   }
 
   port_list {
     port = 66
     type = "TCP"
+    health_check = "TCP"
   }
 }
 
 data "baiducloud_appblb_server_groups" "default" {
-  blb_id = "${baiducloud_appblb.default.id}"
-  name   = "${baiducloud_appblb_server_group.default.name}"
+  blb_id = baiducloud_appblb.default.id
+  name   = baiducloud_appblb_server_group.default.name
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC",
 		BaiduCloudTestResourceAttrNamePrefix+"Subnet",

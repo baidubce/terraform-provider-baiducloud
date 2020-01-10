@@ -160,12 +160,12 @@ resource "baiducloud_vpc" "peer-vpc" {
 
 resource "baiducloud_peer_conn" "default" {
   bandwidth_in_mbps = 20
-  local_vpc_id = "${baiducloud_vpc.local-vpc.id}"
-  peer_vpc_id = "${baiducloud_vpc.peer-vpc.id}"
-  peer_region = "%s"
-  peer_if_name = "peer-interface"
-  description = "%s"
-  local_if_name = "local-interface"
+  local_vpc_id      = baiducloud_vpc.local-vpc.id
+  peer_vpc_id       = baiducloud_vpc.peer-vpc.id
+  peer_region       = "%s"
+  peer_if_name      = "peer-interface"
+  description       = "%s"
+  local_if_name     = "local-interface"
   dns_sync = true
   billing = {
     payment_timing = "Postpaid"
@@ -191,13 +191,13 @@ resource "baiducloud_vpc" "peer-vpc" {
 
 resource "baiducloud_peer_conn" "default" {
   bandwidth_in_mbps = 30
-  local_vpc_id = "${baiducloud_vpc.local-vpc.id}"
-  peer_vpc_id = "${baiducloud_vpc.peer-vpc.id}"
-  peer_region = "%s"
-  peer_if_name = "peer-interface"
-  description = "%s"
-  local_if_name = "local-interface-update"
-  dns_sync = false
+  local_vpc_id      = baiducloud_vpc.local-vpc.id
+  peer_vpc_id       = baiducloud_vpc.peer-vpc.id
+  peer_region       = "%s"
+  peer_if_name      = "peer-interface"
+  description       = "%s"
+  local_if_name     = "local-interface-update"
+  dns_sync          = false
   billing = {
     payment_timing = "Postpaid"
   }

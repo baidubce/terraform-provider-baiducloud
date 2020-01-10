@@ -22,10 +22,10 @@ func TestAccBaiduCloudSpecsDataSource(t *testing.T) {
 				Config: testAccSpecsDataSourceConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccSpecsDataSourceName),
-					resource.TestCheckResourceAttrSet(testAccSpecsDataSourceName, testAccSpecsDataSourceAttrKeyPrefix+"name"),
-					resource.TestCheckResourceAttrSet(testAccSpecsDataSourceName, testAccSpecsDataSourceAttrKeyPrefix+"instance_type"),
-					resource.TestCheckResourceAttrSet(testAccSpecsDataSourceName, testAccSpecsDataSourceAttrKeyPrefix+"cpu_count"),
-					resource.TestCheckResourceAttrSet(testAccSpecsDataSourceName, testAccSpecsDataSourceAttrKeyPrefix+"memory_size_in_gb"),
+					resource.TestCheckResourceAttr(testAccSpecsDataSourceName, testAccSpecsDataSourceAttrKeyPrefix+"name", "bcc.g1.tiny"),
+					resource.TestCheckResourceAttr(testAccSpecsDataSourceName, testAccSpecsDataSourceAttrKeyPrefix+"instance_type", "General"),
+					resource.TestCheckResourceAttr(testAccSpecsDataSourceName, testAccSpecsDataSourceAttrKeyPrefix+"cpu_count", "1"),
+					resource.TestCheckResourceAttr(testAccSpecsDataSourceName, testAccSpecsDataSourceAttrKeyPrefix+"memory_size_in_gb", "2"),
 					resource.TestCheckResourceAttrSet(testAccSpecsDataSourceName, testAccSpecsDataSourceAttrKeyPrefix+"local_disk_size_in_gb"),
 				),
 			},
@@ -34,5 +34,10 @@ func TestAccBaiduCloudSpecsDataSource(t *testing.T) {
 }
 
 const testAccSpecsDataSourceConfig = `
-data "baiducloud_specs" "default" {}
+data "baiducloud_specs" "default" {
+    name_regex        = "bcc.g1.tiny"
+    instance_type     = "General"
+    cpu_count         = 1
+    memory_size_in_gb = 2
+}
 `

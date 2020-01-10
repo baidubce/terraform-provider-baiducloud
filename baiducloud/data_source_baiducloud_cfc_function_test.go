@@ -52,39 +52,39 @@ resource "baiducloud_vpc" "default" {
 }
 
 resource "baiducloud_subnet" "default" {
-  name = "%s"
-  zone_name = "${data.baiducloud_zones.default.zones.0.zone_name}"
-  cidr = "192.168.3.0/24"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  name        = "%s"
+  zone_name   = data.baiducloud_zones.default.zones.0.zone_name
+  cidr        = "192.168.3.0/24"
+  vpc_id      = baiducloud_vpc.default.id
   subnet_type = "BCC"
 }
 
 resource "baiducloud_security_group" "default" {
-  name = "%s"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  name   = "%s"
+  vpc_id = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_cfc_function" "default" {
-  function_name     = "%s"
-  description       = "terraform create"
+  function_name = "%s"
+  description   = "terraform create"
   environment = {
     "aaa": "bbb"
     "ccc": "ddd"
   }
-  handler        = "index.handler"
-  memory_size    = 128
-  runtime        = "nodejs8.5"
-  time_out       = 3
-  code_file_name = "testFiles/cfcTestCode.zip"
+  handler                        = "index.handler"
+  memory_size                    = 128
+  runtime                        = "nodejs8.5"
+  time_out                       = 3
+  code_file_name                 = "testFiles/cfcTestCode.zip"
   reserved_concurrent_executions = 10
   vpc_config {
-    subnet_ids    = ["${baiducloud_subnet.default.id}"]
-    security_group_ids = ["${baiducloud_security_group.default.id}"]
+    subnet_ids         = [baiducloud_subnet.default.id]
+    security_group_ids = [baiducloud_security_group.default.id]
   }
 }
 
 data "baiducloud_cfc_function" "default" {
-  function_name = "${baiducloud_cfc_function.default.function_name}"
+  function_name = baiducloud_cfc_function.default.function_name
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC",
 		BaiduCloudTestResourceAttrNamePrefix+"Subnet",

@@ -191,7 +191,7 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Description: "CDS disks of the instance.",
 				Optional:    true,
 				MinItems:    1,
-				MaxItems:    15,
+				MaxItems:    5,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"cds_size_in_gb": {
@@ -764,7 +764,7 @@ func buildBaiduCloudInstanceArgs(d *schema.ResourceData, meta interface{}) (*api
 	}
 
 	if v, ok := d.GetOk("tags"); ok {
-		request.Tags = tranceTagMapToModel(v.(*schema.Set).List())
+		request.Tags = tranceTagMapToModel(v.(map[string]interface{}))
 	}
 
 	return request, nil

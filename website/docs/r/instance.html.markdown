@@ -56,7 +56,7 @@ The following arguments are supported:
 * `root_disk_storage_type` - (Optional, ForceNew) System disk storage type of the instance. Available values are std1, hp1, cloud_hp1, local, sata, ssd. Default to cloud_hp1.
 * `security_groups` - (Optional) Security groups of the instance.
 * `subnet_id` - (Optional) The subnet ID of VPC. The default subnet will be used when it is empty. The instance will restart after changing the subnet.
-* `tags` - (Optional, ForceNew) Tags
+* `tags` - (Optional, ForceNew) Tags, do not support modify
 
 The `billing` object supports the following:
 
@@ -78,11 +78,6 @@ The `ephemeral_disks` object supports the following:
 
 * `size_in_gb` - (Optional, ForceNew) Size(GB) of the ephemeral disk.
 * `storage_type` - (Optional, ForceNew) Storage type of the ephemeral disk. Available values are std1, hp1, cloud_hp1, local, sata, ssd. Default to cloud_hp1.
-
-The `tags` object supports the following:
-
-* `tag_key` - (Required) Tag's key
-* `tag_value` - (Required) Tag's value
 
 ## Attributes Reference
 

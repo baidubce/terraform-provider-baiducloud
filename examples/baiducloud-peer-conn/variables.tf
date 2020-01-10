@@ -21,3 +21,11 @@ variable "peer_subnet_name" {
 variable "peer_subnet_cidr" {
   default = "172.17.1.0/24"
 }
+
+variable "region" {
+  default = "su"
+}
+
+variable "description" {
+  default = "terraform create"
+}

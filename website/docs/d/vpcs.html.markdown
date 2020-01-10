@@ -42,8 +42,6 @@ In addition to all arguments above, the following attributes are exported:
   * `route_table_id` - Route table ID of the VPC.
   * `secondary_cidrs` - The secondary cidr list of the VPC. They will not be repeated.
   * `tags` - Tags
-    * `tag_key` - Tag's key
-    * `tag_value` - Tag's value
   * `vpc_id` - ID of the VPC.
 
 

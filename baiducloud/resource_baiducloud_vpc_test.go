@@ -100,7 +100,7 @@ func TestAccBaiduCloudVPC(t *testing.T) {
 					resource.TestCheckResourceAttr(testAccVPCResourceName, "name", testAccVPCResourceAttrName),
 					resource.TestCheckResourceAttr(testAccVPCResourceName, "description", "vpc create"),
 					resource.TestCheckResourceAttr(testAccVPCResourceName, "cidr", "192.168.0.0/24"),
-					resource.TestCheckResourceAttr(testAccVPCResourceName, "tags.#", "1"),
+					resource.TestCheckResourceAttr(testAccVPCResourceName, "tags.%", "1"),
 					resource.TestCheckResourceAttrSet(testAccVPCResourceName, "route_table_id"),
 					resource.TestCheckResourceAttr(testAccVPCResourceName, "secondary_cidrs.#", "0"),
 				),
@@ -117,7 +117,7 @@ func TestAccBaiduCloudVPC(t *testing.T) {
 					resource.TestCheckResourceAttr(testAccVPCResourceName, "name", testAccVPCResourceAttrName+"Update"),
 					resource.TestCheckResourceAttr(testAccVPCResourceName, "description", "vpc update"),
 					resource.TestCheckResourceAttr(testAccVPCResourceName, "cidr", "192.168.0.0/24"),
-					resource.TestCheckResourceAttr(testAccVPCResourceName, "tags.#", "1"),
+					resource.TestCheckResourceAttr(testAccVPCResourceName, "tags.%", "1"),
 					resource.TestCheckResourceAttrSet(testAccVPCResourceName, "route_table_id"),
 					resource.TestCheckResourceAttr(testAccVPCResourceName, "secondary_cidrs.#", "0"),
 				),
@@ -151,12 +151,11 @@ func testAccVPCDestroy(s *terraform.State) error {
 func testAccVPCConfig() string {
 	return fmt.Sprintf(`
 resource "%s" "%s" {
-  name = "%s"
+  name        = "%s"
   description = "vpc create"
-  cidr = "192.168.0.0/24"
-  tags {
-	tag_key = "tagA"
-    tag_value = "tagA"
+  cidr        = "192.168.0.0/24"
+  tags = {
+	"tagKey" = "tagValue"
   }
 }`, testAccVPCResourceType, BaiduCloudTestResourceName, testAccVPCResourceAttrName)
 }
@@ -164,12 +163,11 @@ resource "%s" "%s" {
 func testAccVPCConfigUpdate() string {
 	return fmt.Sprintf(`
 resource "%s" "%s" {
-  name = "%s"
+  name        = "%s"
   description = "vpc update"
-  cidr = "192.168.0.0/24"
-  tags {
-	tag_key = "tagA"
-    tag_value = "tagA"
+  cidr        = "192.168.0.0/24"
+  tags = {
+	"tagKey" = "tagValue"
   }
 }`, testAccVPCResourceType, BaiduCloudTestResourceName, testAccVPCResourceAttrName+"Update")
 }

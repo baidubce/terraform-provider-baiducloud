@@ -27,12 +27,7 @@ The following arguments are supported:
 * `cidr` - (Required, ForceNew) CIDR block for the VPC.
 * `name` - (Required) Name of the VPC, which cannot take the value "default", the length is no more than 65 characters, and the value can be composed of numbers, characters and underscores.
 * `description` - (Optional) Description of the VPC. The value is no more than 200 characters.
-* `tags` - (Optional, ForceNew) Tags
-
-The `tags` object supports the following:
-
-* `tag_key` - (Required) Tag's key
-* `tag_value` - (Required) Tag's value
+* `tags` - (Optional, ForceNew) Tags, do not support modify
 
 ## Attributes Reference
 

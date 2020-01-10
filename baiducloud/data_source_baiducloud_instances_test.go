@@ -24,9 +24,8 @@ func TestAccBaiduCloudInstancesDataSource(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccInstancesDataSourceName),
 					resource.TestCheckResourceAttr(testAccInstancesDataSourceName, testAccInstancesDataSourceAttrKeyPrefix+"name", BaiduCloudTestResourceAttrNamePrefix+"BCC"),
-					resource.TestCheckResourceAttr(testAccInstancesDataSourceName, testAccInstancesDataSourceAttrKeyPrefix+"tags.#", "1"),
-					resource.TestCheckResourceAttr(testAccInstancesDataSourceName, testAccInstancesDataSourceAttrKeyPrefix+"tags.0.tag_key", "testKey"),
-					resource.TestCheckResourceAttr(testAccInstancesDataSourceName, testAccInstancesDataSourceAttrKeyPrefix+"tags.0.tag_value", "testValue"),
+					resource.TestCheckResourceAttr(testAccInstancesDataSourceName, testAccInstancesDataSourceAttrKeyPrefix+"tags.%", "1"),
+					resource.TestCheckResourceAttr(testAccInstancesDataSourceName, testAccInstancesDataSourceAttrKeyPrefix+"tags.testKey", "testValue"),
 					resource.TestCheckResourceAttrSet(testAccInstancesDataSourceName, testAccInstancesDataSourceAttrKeyPrefix+"image_id"),
 					resource.TestCheckResourceAttrSet(testAccInstancesDataSourceName, testAccInstancesDataSourceAttrKeyPrefix+"zone_name"),
 					resource.TestCheckResourceAttrSet(testAccInstancesDataSourceName, testAccInstancesDataSourceAttrKeyPrefix+"cpu_count"),
@@ -56,24 +55,23 @@ data "baiducloud_zones" "default" {}
 data "baiducloud_images" "default" {}
 
 resource "baiducloud_instance" "default" {
-  image_id              = "${data.baiducloud_images.default.images.0.id}"
+  image_id              = data.baiducloud_images.default.images.0.id
   name                  = "%s"
-  availability_zone     = "${data.baiducloud_zones.default.zones.1.zone_name}"
-  cpu_count             = "${data.baiducloud_specs.default.specs.0.cpu_count}"
-  memory_capacity_in_gb = "${data.baiducloud_specs.default.specs.0.memory_size_in_gb}"
+  availability_zone     = data.baiducloud_zones.default.zones.1.zone_name
+  cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
+  memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
   billing = {
     payment_timing = "Postpaid"
   }
 
-  tags {
-    tag_key   = "testKey"
-    tag_value = "testValue"
+  tags = {
+    "testKey" = "testValue"
   }
 }
 
 data "baiducloud_instances" "default" {
-  internal_ip = "${baiducloud_instance.default.internal_ip}"
-  zone_name = "${baiducloud_instance.default.availability_zone}"
+  internal_ip = baiducloud_instance.default.internal_ip
+  zone_name   = baiducloud_instance.default.availability_zone
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"BCC")
 }
