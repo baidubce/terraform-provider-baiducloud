@@ -25,8 +25,6 @@ func TestAccBaiduCloudSecurityGroupsDataSource(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccSecurityGroupsDataSourceName),
 					resource.TestCheckResourceAttr(testAccSecurityGroupsDataSourceName, "security_groups.#", "2"),
-					resource.TestCheckResourceAttr(testAccSecurityGroupsDataSourceName, testAccSecurityGroupsDataSourceAttrKeyPrefix+"tags.%", "1"),
-					resource.TestCheckResourceAttr(testAccSecurityGroupsDataSourceName, testAccSecurityGroupsDataSourceAttrKeyPrefix+"tags.testKey", "testValue"),
 				),
 			},
 		},

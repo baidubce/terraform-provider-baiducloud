@@ -15,9 +15,13 @@ resource "baiducloud_security_group" "my-sg" {
 resource "baiducloud_security_group_rule" "default" {
   security_group_id = baiducloud_security_group.my-sg.id
   remark            = "remark"
+  # support all/tcp/udp/icmp
   protocol          = "udp"
   port_range        = "1-65523"
+  # support ingress/egress
   direction         = "ingress"
+  # support IPv4/IPv6
+  #ether_type        = "IPv4"
 }
 
 resource "baiducloud_security_group_rule" "default2" {

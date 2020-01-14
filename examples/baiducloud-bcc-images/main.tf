@@ -1,8 +1,11 @@
 provider "baiducloud" {}
 
 data "baiducloud_specs" "default" {
-  #name_regex        = "bcc.g1.tiny"
+  # for more detailed conf, please refer to https://cloud.baidu.com/doc/BCC/s/6jwvyo0q2#%E5%8C%BA%E5%9F%9F%E6%9C%BA%E5%9E%8B%E4%BB%A5%E5%8F%8A%E5%8F%AF%E9%80%89%E9%85%8D%E7%BD%AE
+
+  # support General/memory/cpu
   #instance_type     = "General"
+  #name_regex        = "bcc.g1.tiny"
   cpu_count         = 1
   memory_size_in_gb = 4
 }

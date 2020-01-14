@@ -211,7 +211,7 @@ func resourceBaiduCloudPeerConnCreate(d *schema.ResourceData, meta interface{}) 
 	}
 
 	stateConf := buildStateConf(
-		[]string{string(vpc.PEERCONN_STATUS_CREATING)},
+		[]string{string(vpc.PEERCONN_STATUS_CREATING), string(vpc.PEERCONN_STATUS_STARTING)},
 		[]string{string(vpc.PEERCONN_STATUS_ACTIVE), string(vpc.PEERCONN_STATUS_CONSULTING)},
 		d.Timeout(schema.TimeoutCreate),
 		vpcService.PeerConnStateRefresh(d.Id(), vpc.PEERCONN_ROLE_INITIATOR))
@@ -263,6 +263,7 @@ func resourceBaiduCloudPeerConnRead(d *schema.ResourceData, meta interface{}) er
 
 func resourceBaiduCloudPeerConnUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
+	vpcService := VpcService{client}
 
 	peerConnId := d.Id()
 	action := "Update Peer Conn " + peerConnId
@@ -287,6 +288,16 @@ func resourceBaiduCloudPeerConnUpdate(d *schema.ResourceData, meta interface{}) 
 		if err != nil {
 			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_peer_conn", action, BCESDKGoERROR)
 		}
+
+		stateConf := buildStateConf(
+			[]string{string(vpc.PEERCONN_STATUS_UPDATING)},
+			[]string{string(vpc.PEERCONN_STATUS_ACTIVE), string(vpc.PEERCONN_STATUS_CONSULTING)},
+			d.Timeout(schema.TimeoutUpdate),
+			vpcService.PeerConnStateRefresh(d.Id(), vpc.PEERCONN_ROLE_INITIATOR))
+		if _, err := stateConf.WaitForState(); err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_peer_conn", action, BCESDKGoERROR)
+		}
+
 		d.SetPartial("local_if_name")
 		d.SetPartial("description")
 	}
@@ -307,6 +318,16 @@ func resourceBaiduCloudPeerConnUpdate(d *schema.ResourceData, meta interface{}) 
 			}
 			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_peer_conn", action, BCESDKGoERROR)
 		}
+
+		stateConf := buildStateConf(
+			[]string{string(vpc.PEERCONN_STATUS_UPDATING)},
+			[]string{string(vpc.PEERCONN_STATUS_ACTIVE), string(vpc.PEERCONN_STATUS_CONSULTING)},
+			d.Timeout(schema.TimeoutUpdate),
+			vpcService.PeerConnStateRefresh(d.Id(), vpc.PEERCONN_ROLE_INITIATOR))
+		if _, err := stateConf.WaitForState(); err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_peer_conn", action, BCESDKGoERROR)
+		}
+
 		d.SetPartial("bandwidth_in_mbps")
 	}
 

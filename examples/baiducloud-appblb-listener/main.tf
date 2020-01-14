@@ -88,10 +88,12 @@ resource "baiducloud_appblb_server_group" "default" {
   }
 }
 
+# for more detailed config, please refer to https://cloud.baidu.com/doc/BLB/s/ujwvxnyux
 resource "baiducloud_appblb_listener" "default_UDP" {
   blb_id        = baiducloud_appblb.default.id
   listener_port = 125
   protocol      = "UDP"
+  # support RoundRobin/LeastConnection/Hash
   scheduler     = "RoundRobin"
 
   policies {
@@ -113,6 +115,7 @@ resource "baiducloud_appblb_listener" "default_TCP" {
   blb_id              = baiducloud_appblb.default.id
   listener_port       = 124
   protocol            = "TCP"
+  # support RoundRobin/LeastConnection/Hash
   scheduler           = "LeastConnection"
   tcp_session_timeout = 1000
 
@@ -135,8 +138,24 @@ resource "baiducloud_appblb_listener" "default_HTTP" {
   blb_id        = baiducloud_appblb.default.id
   listener_port = 129
   protocol      = "HTTP"
+  # support RoundRobin/LeastConnection
   scheduler     = "RoundRobin"
-  keep_session  = true
+
+  # optional
+  # keep_session  = true
+
+  # support insert/rewrite
+  # keep_session_type = "insert"
+
+  # keep_session_timeout = 3600
+
+  # only useful when keep_session_type is rewrite
+  # keep_session_cookie_name = "aaa"
+
+  # x_forwarded_for = false
+  # server_timeout = 30
+  # redirect_port = 80
+
 
   policies {
     description         = "acceptance test"
@@ -156,11 +175,35 @@ resource "baiducloud_appblb_listener" "default_HTTPS" {
   blb_id               = baiducloud_appblb.default.id
   listener_port        = 130
   protocol             = "HTTPS"
+  # support RoundRobin/LeastConnection
   scheduler            = "LeastConnection"
-  keep_session         = true
+
   cert_ids             = [baiducloud_cert.default.id]
+  # support sslv3/tlsv10/tlsv11/tlsv12
   encryption_protocols = ["sslv3", "tlsv10", "tlsv11"]
-  encryption_type      = "userDefind"
+
+
+  # optional
+  # keep_session = true
+
+  # support insert/rewrite
+  # keep_session_type = "insert"
+
+  # keep_session_timeout = 3600
+
+  # only useful when keep_session_type is rewrite
+  # keep_session_cookie_name = "aaa"
+
+  # x_forwarded_for = false
+  # server_timeout = 30
+  # redirect_port = 80
+
+  # support compatibleIE/incompatibleIE/userDefind
+  # encryption_type = "userDefind"
+
+  # dual_auth = false
+  # client_cert_ids = [baiducloud_cert.default.id]
+  # ie6_compatible = false
 
   policies {
     description         = "acceptance test"
@@ -180,10 +223,20 @@ resource "baiducloud_appblb_listener" "default_SSL" {
   blb_id               = baiducloud_appblb.default.id
   listener_port        = 131
   protocol             = "SSL"
+  # support RoundRobin/LeastConnection/Hash
   scheduler            = "RoundRobin"
   cert_ids             = [baiducloud_cert.default.id]
+
+  # optional
+  # support sslv3/tlsv10/tlsv11/tlsv12
   encryption_protocols = ["tlsv10", "tlsv11", "tlsv12"]
-  encryption_type      = "userDefind"
+
+  # support compatibleIE/incompatibleIE/userDefind
+  # encryption_type = "userDefind"
+
+  # dual_auth = false
+  # client_cert_ids = [baiducloud_cert.default.id]
+  # ie6_compatible = false
 
   policies {
     description         = "acceptance test"

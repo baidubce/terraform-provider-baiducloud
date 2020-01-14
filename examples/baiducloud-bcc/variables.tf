@@ -26,8 +26,16 @@ variable "security_group_name" {
   default = "terraform-sg"
 }
 
-variable "instance_name" {
-  default = "terraform-bcc"
+variable "instance_role" {
+  default = "terraform"
+}
+
+variable "instance_short_name" {
+  default = "short"
+}
+
+variable "instance_format" {
+  default = "%02d"
 }
 
 variable "payment_timing" {

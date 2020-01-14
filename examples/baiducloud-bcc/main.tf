@@ -1,8 +1,11 @@
 provider "baiducloud" {}
 
 data "baiducloud_specs" "default" {
-  #name_regex        = "bcc.g1.tiny"
+  # for more detailed conf, please refer to https://cloud.baidu.com/doc/BCC/s/6jwvyo0q2#%E5%8C%BA%E5%9F%9F%E6%9C%BA%E5%9E%8B%E4%BB%A5%E5%8F%8A%E5%8F%AF%E9%80%89%E9%85%8D%E7%BD%AE
+
+  # support General/memory/cpu
   #instance_type     = "General"
+  #name_regex        = "bcc.g1.tiny"
   cpu_count         = 1
   memory_size_in_gb = 4
 }
@@ -73,7 +76,7 @@ resource "baiducloud_cds" "default" {
 resource "baiducloud_instance" "my-server" {
   count                 = var.number
   image_id              = data.baiducloud_images.default.images.0.id
-  name                  = var.instance_name
+  name                  = "${var.instance_short_name}-${var.instance_role}-${format(var.instance_format, count.index + 1)}"
   availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
   cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
   memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb

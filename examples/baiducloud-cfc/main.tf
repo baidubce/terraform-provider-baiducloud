@@ -14,19 +14,20 @@ resource "baiducloud_vpc" "default" {
 
 resource "baiducloud_subnet" "default" {
   name      = "terraform-subnet"
-  zone_name = "${data.baiducloud_zones.default.zones.0.zone_name}"
+  zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.1.0/24"
-  vpc_id    = "${baiducloud_vpc.default.id}"
+  vpc_id    = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_security_group" "default" {
   name   = "terraform-sg"
-  vpc_id = "${baiducloud_vpc.default.id}"
+  vpc_id = baiducloud_vpc.default.id
 }
 
+# more detail config, pelease refer https://cloud.baidu.com/doc/CFC/s/xjwvz450q
 resource "baiducloud_cfc_function" "default" {
-  function_name = "${var.name}"
-  description   = "${var.description}"
+  function_name = var.name
+  description   = var.description
   environment = {
     "aaa" : "bbb"
     "ccc" : "ddd"
@@ -41,30 +42,30 @@ resource "baiducloud_cfc_function" "default" {
   //code_bos_object                = "cfcTestCode.zip"
   reserved_concurrent_executions = 20
   vpc_config {
-    subnet_ids         = ["${baiducloud_subnet.default.id}"]
-    security_group_ids = ["${baiducloud_security_group.default.id}"]
+    subnet_ids         = [baiducloud_subnet.default.id]
+    security_group_ids = [baiducloud_security_group.default.id]
   }
   log_type    = "bos"
-  log_bos_dir = "${baiducloud_bos_bucket.default.bucket}"
+  log_bos_dir = baiducloud_bos_bucket.default.bucket
 }
 
 resource "baiducloud_cfc_version" "default" {
-  function_name       = "${baiducloud_cfc_function.default.function_name}"
+  function_name       = baiducloud_cfc_function.default.function_name
   version_description = "terraformVersion"
-  code_sha256         = "${baiducloud_cfc_function.default.code_sha256}"
+  code_sha256         = baiducloud_cfc_function.default.code_sha256
   log_type            = "none"
 }
 
 resource "baiducloud_cfc_alias" "default" {
-  function_name    = "${baiducloud_cfc_version.default.function_name}"
-  function_version = "${baiducloud_cfc_version.default.version}"
+  function_name    = baiducloud_cfc_version.default.function_name
+  function_version = baiducloud_cfc_version.default.version
   alias_name       = "terraformAlias"
   description      = "terraform create alias"
 }
 
 resource "baiducloud_cfc_trigger" "http-trigger" {
   source_type   = "http"
-  target        = "${baiducloud_cfc_version.default.function_brn}"
+  target        = baiducloud_cfc_version.default.function_brn
   resource_path = "/aaabbs"
   method        = ["GET", "PUT"]
   auth_type     = "iam"
@@ -72,8 +73,8 @@ resource "baiducloud_cfc_trigger" "http-trigger" {
 
 resource "baiducloud_cfc_trigger" "bos-trigger" {
   source_type    = "bos"
-  bucket         = "${baiducloud_bos_bucket.default.bucket}"
-  target         = "${baiducloud_cfc_version.default.function_brn}"
+  bucket         = baiducloud_bos_bucket.default.bucket
+  target         = baiducloud_cfc_version.default.function_brn
   name           = "hehehehe"
   status         = "enabled"
   bos_event_type = ["PutObject", "PostObject"]
@@ -82,7 +83,7 @@ resource "baiducloud_cfc_trigger" "bos-trigger" {
 
 resource "baiducloud_cfc_trigger" "crontab-trigger" {
   source_type         = "crontab"
-  target              = "${baiducloud_cfc_version.default.function_brn}"
+  target              = baiducloud_cfc_version.default.function_brn
   name                = "hahahaha"
   enabled             = "Enabled"
   schedule_expression = "cron(* * * * *)"
@@ -90,22 +91,22 @@ resource "baiducloud_cfc_trigger" "crontab-trigger" {
 
 resource "baiducloud_cfc_trigger" "dueros-trigger" {
   source_type = "dueros"
-  target      = "${baiducloud_cfc_version.default.function_brn}"
+  target      = baiducloud_cfc_version.default.function_brn
 }
 
 resource "baiducloud_cfc_trigger" "duedge-trigger" {
   source_type = "duedge"
-  target      = "${baiducloud_cfc_version.default.function_brn}"
+  target      = baiducloud_cfc_version.default.function_brn
 }
 
 resource "baiducloud_cfc_trigger" "cdn-trigger" {
   source_type    = "cdn"
-  target         = "${baiducloud_cfc_version.default.function_brn}"
+  target         = baiducloud_cfc_version.default.function_brn
   cdn_event_type = "CachedObjectsBlocked"
   status         = "enabled"
 }
 
 data "baiducloud_cfc_function" "default" {
-  function_name = "${baiducloud_cfc_function.default.function_name}"
-  qualifier     = "${baiducloud_cfc_version.default.version}"
+  function_name = baiducloud_cfc_function.default.function_name
+  qualifier     = baiducloud_cfc_version.default.version
 }
