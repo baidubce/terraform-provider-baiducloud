@@ -143,7 +143,11 @@ func genIdx(fpath string) {
 		return
 	}
 
-	defer fd.Close()
+	defer func() {
+		if e := fd.Close(); e != nil {
+			log.Printf("[FAIL!]close file %s failed: %s", fname, e)
+		}
+	}()
 	t := template.Must(template.New("t").Parse(idxTPL))
 	err = t.Execute(fd, data)
 	if err != nil {
@@ -261,7 +265,11 @@ func genDoc(dtype, fpath, name string, resource *schema.Resource) {
 		return
 	}
 
-	defer fd.Close()
+	defer func() {
+		if e := fd.Close(); e != nil {
+			log.Printf("[FAIL!]close file %s failed: %s", fname, e)
+		}
+	}()
 	t := template.Must(template.New("t").Parse(docTPL))
 	err = t.Execute(fd, data)
 	if err != nil {

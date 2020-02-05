@@ -28,7 +28,7 @@ Data Sources
   baiducloud_peer_conns
   baiducloud_bos_buckets
   baiducloud_bos_bucket_objects
-  baiducloud_appblb
+  baiducloud_appblbs
   baiducloud_appblb_listeners
   baiducloud_appblb_server_groups
   baiducloud_eips

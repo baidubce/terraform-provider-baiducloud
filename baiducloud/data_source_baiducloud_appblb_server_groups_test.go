@@ -12,6 +12,7 @@ const (
 	testAccAppBLBServerGroupsDataSourceAttrKeyPrefix = "server_groups.0."
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudAppBLBServerGroupsDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

@@ -11,6 +11,7 @@ const (
 	testAccSpecsDataSourceAttrKeyPrefix = "specs.0."
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudSpecsDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

@@ -488,13 +488,13 @@ func buildAppServerGroupRsWriteOpArgs(addList, removeList []interface{}) (add, u
 	}
 
 	// some add, some remove, other update
-	addMap := make(map[string]interface{}, 0)
+	addMap := make(map[string]interface{})
 	for _, v := range addList {
 		value := v.(map[string]interface{})
 
 		addMap[value["instance_id"].(string)] = v
 	}
-	removeMap := make(map[string]interface{}, 0)
+	removeMap := make(map[string]interface{})
 	for _, v := range removeList {
 		value := v.(map[string]interface{})
 
@@ -588,33 +588,29 @@ func updateAppServerGroupPortList(d *schema.ResourceData, meta interface{}) erro
 		}
 	}
 
-	if addArgs != nil {
-		for _, args := range addArgs {
-			args.SgId = id
-			args.ClientToken = buildClientToken()
+	for _, args := range addArgs {
+		args.SgId = id
+		args.ClientToken = buildClientToken()
 
-			if err := appblbService.CreateAppServerGroupPort(blbId, &args); err != nil {
-				return WrapError(err)
-			}
+		if err := appblbService.CreateAppServerGroupPort(blbId, &args); err != nil {
+			return WrapError(err)
+		}
 
-			if err := appblbService.WaitForServerGroupUpdateFinish(d); err != nil {
-				return WrapError(err)
-			}
+		if err := appblbService.WaitForServerGroupUpdateFinish(d); err != nil {
+			return WrapError(err)
 		}
 	}
 
-	if updateArgs != nil {
-		for _, args := range updateArgs {
-			args.SgId = id
-			args.ClientToken = buildClientToken()
+	for _, args := range updateArgs {
+		args.SgId = id
+		args.ClientToken = buildClientToken()
 
-			if err := appblbService.UpdateAppServerGroupPort(blbId, &args); err != nil {
-				return WrapError(err)
-			}
+		if err := appblbService.UpdateAppServerGroupPort(blbId, &args); err != nil {
+			return WrapError(err)
+		}
 
-			if err := appblbService.WaitForServerGroupUpdateFinish(d); err != nil {
-				return WrapError(err)
-			}
+		if err := appblbService.WaitForServerGroupUpdateFinish(d); err != nil {
+			return WrapError(err)
 		}
 	}
 
@@ -642,14 +638,14 @@ func buildBaiduCloudCreateAppBlbAppServerGroupPortArgs(addList, removeList []int
 	}
 
 	// some add, some remove, other update
-	addMap := make(map[string]interface{}, 0)
+	addMap := make(map[string]interface{})
 	for _, v := range addList {
 		value := v.(map[string]interface{})
 		key := fmt.Sprintf("%d.%s", value["port"].(int), value["type"].(string))
 
 		addMap[key] = v
 	}
-	removeMap := make(map[string]interface{}, 0)
+	removeMap := make(map[string]interface{})
 	for _, v := range removeList {
 		value := v.(map[string]interface{})
 		key := fmt.Sprintf("%d.%s", value["port"].(int), value["type"].(string))

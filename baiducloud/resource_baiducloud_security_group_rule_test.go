@@ -16,6 +16,7 @@ const (
 	testAccSecurityGroupRuleResourceName = testAccSecurityGroupRuleResourceType + "." + BaiduCloudTestResourceName
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudSecurityRuleGroup(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

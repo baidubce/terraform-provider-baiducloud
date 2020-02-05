@@ -13,6 +13,7 @@ const (
 	testAccPeerConnsDataSourceAttrKeyPrefix = "peer_conns.0."
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudPeerConnsDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

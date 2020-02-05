@@ -12,6 +12,7 @@ const (
 	testAccSnapshotsDataSourceAttrKeyPrefix = "snapshots.0."
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudSnapshotsDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

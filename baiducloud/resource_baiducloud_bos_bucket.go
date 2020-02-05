@@ -771,7 +771,7 @@ func flattenBaiduCloudBucketReplicationConfiguration(getBucketReplicationResult 
 	m["resource"] = getBucketReplicationResult.Resource
 
 	if getBucketReplicationResult.Destination != nil {
-		des := make(map[string]interface{}, 0)
+		des := make(map[string]interface{})
 		des["bucket"] = getBucketReplicationResult.Destination.Bucket
 		des["storage_class"] = getBucketReplicationResult.Destination.StorageClass
 
@@ -779,7 +779,7 @@ func flattenBaiduCloudBucketReplicationConfiguration(getBucketReplicationResult 
 	}
 
 	if getBucketReplicationResult.ReplicateHistory != nil {
-		rh := make(map[string]interface{}, 0)
+		rh := make(map[string]interface{})
 		rh["bucket"] = getBucketReplicationResult.ReplicateHistory.Bucket
 		rh["storage_class"] = getBucketReplicationResult.ReplicateHistory.StorageClass
 
@@ -924,7 +924,7 @@ func resourceBaiduCloudBosBucketLifecycleUpdate(d *schema.ResourceData, client *
 	bucket := d.Get("bucket").(string)
 
 	lifecycleRules := d.Get("lifecycle_rule").([]interface{})
-	if lifecycleRules == nil || len(lifecycleRules) == 0 {
+	if len(lifecycleRules) == 0 {
 		// delete directly
 		_, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
 			return nil, bosClient.DeleteBucketLifecycle(bucket)

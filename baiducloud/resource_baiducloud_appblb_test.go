@@ -60,6 +60,7 @@ func testSweepAppBLBs(region string) error {
 	return nil
 }
 
+//lintignore:AT003
 func TestAccBaiduCloudAppBLB(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

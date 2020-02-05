@@ -12,6 +12,7 @@ const (
 	testAccSecurityGroupRulesDataSourceAttrKeyPrefix = "rules.0."
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudSecurityGroupRulesDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

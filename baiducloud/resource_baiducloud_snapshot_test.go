@@ -56,6 +56,7 @@ func testSweepSnapshots(region string) error {
 	return nil
 }
 
+//lintignore:AT003
 func TestAccBaiduCloudSnapshot(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

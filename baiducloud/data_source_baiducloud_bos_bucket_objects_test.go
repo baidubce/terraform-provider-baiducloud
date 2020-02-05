@@ -12,6 +12,7 @@ const (
 	testAccBosBucketObjectsDataSourceAttrKeyPrefix = "objects.0."
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudBosBucketObjectsDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

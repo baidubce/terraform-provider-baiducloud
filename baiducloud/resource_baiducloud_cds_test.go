@@ -71,6 +71,7 @@ func testSweepCds(region string) error {
 	return nil
 }
 
+//lintignore:AT003
 func TestAccBaiduCloudCds(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

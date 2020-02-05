@@ -11,6 +11,7 @@ const (
 	testAccVPCsDataSourceAttrKeyPrefix = "vpcs.0."
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudVPCsDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

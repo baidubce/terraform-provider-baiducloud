@@ -12,6 +12,7 @@ const (
 	testAccACLsDataSourceAttrKeyPrefix = "acls.0."
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudACLsDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

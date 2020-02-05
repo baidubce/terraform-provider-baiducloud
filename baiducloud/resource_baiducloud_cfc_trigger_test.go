@@ -17,7 +17,7 @@ const (
 	testAccCFCTriggerResourceName = testAccCFCTriggerResourceType + "." + BaiduCloudTestResourceName
 )
 
-func TestAccBaiduCloudCFCHttpTrigger(t *testing.T) {
+func TestAccBaiduCloudCFCTrigger_HttpTrigger(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -52,7 +52,7 @@ func TestAccBaiduCloudCFCHttpTrigger(t *testing.T) {
 	})
 }
 
-func TestAccBaiduCloudCFCCDNTrigger(t *testing.T) {
+func TestAccBaiduCloudCFCTrigger_CDNTrigger(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -85,7 +85,7 @@ func TestAccBaiduCloudCFCCDNTrigger(t *testing.T) {
 	})
 }
 
-func TestAccBaiduCloudCFCBOSTrigger(t *testing.T) {
+func TestAccBaiduCloudCFCTrigger_BOSTrigger(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -120,7 +120,7 @@ func TestAccBaiduCloudCFCBOSTrigger(t *testing.T) {
 	})
 }
 
-func TestAccBaiduCloudCFCDuerOSTrigger(t *testing.T) {
+func TestAccBaiduCloudCFCTrigger_DuerOSTrigger(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -141,7 +141,7 @@ func TestAccBaiduCloudCFCDuerOSTrigger(t *testing.T) {
 	})
 }
 
-func TestAccBaiduCloudCFCCrontabTrigger(t *testing.T) {
+func TestAccBaiduCloudCFCTrigger_CrontabTrigger(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)

@@ -13,6 +13,7 @@ const (
 	testAccCDSsDataSourceAttrKeyPrefix = "cdss.0."
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudCdsDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

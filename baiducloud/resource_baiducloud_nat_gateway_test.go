@@ -16,6 +16,7 @@ const (
 	testAccNatGatewayResourceAttrName = BaiduCloudTestResourceAttrNamePrefix + "NatGateway"
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudNatGateway(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

@@ -54,7 +54,7 @@ func TestAccBaiduCloudAppBLBListener_Basic(t *testing.T) {
 	})
 }
 
-func TestAccBaiduCloudAppBLBTCPListener(t *testing.T) {
+func TestAccBaiduCloudAppBLBListener_TCPListener(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -88,7 +88,7 @@ func TestAccBaiduCloudAppBLBTCPListener(t *testing.T) {
 	})
 }
 
-func TestAccBaiduCloudAppBLBUDPListener(t *testing.T) {
+func TestAccBaiduCloudAppBLBListener_UDPListener(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -120,7 +120,7 @@ func TestAccBaiduCloudAppBLBUDPListener(t *testing.T) {
 	})
 }
 
-func TestAccBaiduCloudAppBLBHTTPListener(t *testing.T) {
+func TestAccBaiduCloudAppBLBListener_HTTPListener(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -158,7 +158,7 @@ func TestAccBaiduCloudAppBLBHTTPListener(t *testing.T) {
 	})
 }
 
-func TestAccBaiduCloudAppBLBHTTPSListener(t *testing.T) {
+func TestAccBaiduCloudAppBLBListener_HTTPSListener(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -202,7 +202,7 @@ func TestAccBaiduCloudAppBLBHTTPSListener(t *testing.T) {
 	})
 }
 
-func TestAccBaiduCloudAppBLBSSLListener(t *testing.T) {
+func TestAccBaiduCloudAppBLBListener_SSLListener(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)

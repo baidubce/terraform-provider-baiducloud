@@ -11,6 +11,7 @@ const (
 	testAccEipsDataSourceAttrKeyPrefix = "eips.0."
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudEipsDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

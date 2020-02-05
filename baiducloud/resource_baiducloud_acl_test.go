@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	testAccACLResourceType     = "baiducloud_acl"
-	testAccACLResourceName     = testAccACLResourceType + "." + BaiduCloudTestResourceName
-	testAccACLResourceAttrName = BaiduCloudTestResourceAttrNamePrefix + "ACL"
+	testAccACLResourceType = "baiducloud_acl"
+	testAccACLResourceName = testAccACLResourceType + "." + BaiduCloudTestResourceName
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudACL(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

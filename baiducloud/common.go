@@ -147,7 +147,7 @@ func zipFileDir(path string) ([]byte, error) {
 	zipFileBuffer := new(bytes.Buffer)
 	zipWriter := zip.NewWriter(zipFileBuffer)
 
-	err = filepath.Walk(fileDir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(fileDir, func(path string, info os.FileInfo, errs error) error {
 		if info.IsDir() {
 			return nil
 		}
@@ -156,7 +156,9 @@ func zipFileDir(path string) ([]byte, error) {
 		if err != nil {
 			return err
 		}
-		defer zipFile.Close()
+		defer func() {
+			_ = zipFile.Close()
+		}()
 
 		header, err := zip.FileInfoHeader(info)
 		if err != nil {
@@ -177,11 +179,13 @@ func zipFileDir(path string) ([]byte, error) {
 		return zipWriter.Flush()
 	})
 	if err != nil {
-		zipWriter.Close()
+		_ = zipWriter.Close()
 		return nil, err
 	}
 
 	// Close() will write some final data to buffer, so zipWriter should be closed before read zip file from buffer
-	zipWriter.Close()
+	if err := zipWriter.Close(); err != nil {
+		return nil, err
+	}
 	return zipFileBuffer.Bytes(), err
 }

@@ -16,6 +16,7 @@ const (
 	testAccSubnetResourceAttrName = BaiduCloudTestResourceAttrNamePrefix + "Subnet"
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudSubnet(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

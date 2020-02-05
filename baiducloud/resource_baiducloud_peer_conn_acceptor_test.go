@@ -9,11 +9,11 @@ import (
 )
 
 const (
-	testAccPeerConnAcceptorResourceType     = "baiducloud_peer_conn_acceptor"
-	testAccPeerConnAcceptorResourceName     = testAccPeerConnAcceptorResourceType + "." + BaiduCloudTestResourceName
-	testAccPeerConnAcceptorResourceAttrName = BaiduCloudTestResourceAttrNamePrefix + "PeerConnAcceptor"
+	testAccPeerConnAcceptorResourceType = "baiducloud_peer_conn_acceptor"
+	testAccPeerConnAcceptorResourceName = testAccPeerConnAcceptorResourceType + "." + BaiduCloudTestResourceName
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudPeerConnAcceptor(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -69,30 +69,17 @@ func TestAccBaiduCloudPeerConnAcceptor(t *testing.T) {
 func testAccPeerConnAcceptorConfig() string {
 	region := os.Getenv("BAIDUCLOUD_REGION")
 	return fmt.Sprintf(`
-provider "baiducloud" {
-  alias = "local"
-  // credential
-}
-
-provider "baiducloud" {
-  alias = "peer"
-  // credential
-}
-
 resource "baiducloud_vpc" "local-vpc" {
-  provider = "baiducloud.local"
   name     = "%s"
   cidr     = "172.17.0.0/16"
 }
 
 resource "baiducloud_vpc" "peer-vpc" {
-  provider = "baiducloud.peer"
   name     = "%s"
   cidr     = "172.18.0.0/16"
 }
 
 resource "baiducloud_peer_conn" "default" {
-  provider          = "baiducloud.local"
   bandwidth_in_mbps = 20
   local_vpc_id      = baiducloud_vpc.local-vpc.id
   peer_vpc_id       = baiducloud_vpc.peer-vpc.id
@@ -105,7 +92,6 @@ resource "baiducloud_peer_conn" "default" {
 }
 
 resource "baiducloud_peer_conn_acceptor" "default" {
-  provider     = "baiducloud.peer"
   peer_conn_id = baiducloud_peer_conn.default.id
   auto_accept  = true
   dns_sync     = false
@@ -117,30 +103,17 @@ resource "baiducloud_peer_conn_acceptor" "default" {
 func testAccPeerConnAcceptorConfigUpdate() string {
 	region := os.Getenv("BAIDUCLOUD_REGION")
 	return fmt.Sprintf(`
-provider "baiducloud" {
-  alias = "local"
-  // credential
-}
-
-provider "baiducloud" {
-  alias = "peer"
-  // credential
-}
-
 resource "baiducloud_vpc" "local-vpc" {
-  provider = "baiducloud.local"
   name     = "%s"
   cidr     = "172.17.0.0/16"
 }
 
 resource "baiducloud_vpc" "peer-vpc" {
-  provider = "baiducloud.peer"
   name     = "%s"
   cidr     = "172.18.0.0/16"
 }
 
 resource "baiducloud_peer_conn" "default" {
-  provider          = "baiducloud.local"
   bandwidth_in_mbps = 20
   local_vpc_id      = baiducloud_vpc.local-vpc.id
   peer_vpc_id       = baiducloud_vpc.peer-vpc.id
@@ -153,7 +126,6 @@ resource "baiducloud_peer_conn" "default" {
 }
 
 resource "baiducloud_peer_conn_acceptor" "default" {
-  provider     = "baiducloud.peer"
   peer_conn_id = baiducloud_peer_conn.default.id
   auto_accept  = true
   dns_sync     = true

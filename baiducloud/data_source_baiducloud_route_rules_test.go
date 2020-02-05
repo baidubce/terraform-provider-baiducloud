@@ -12,6 +12,7 @@ const (
 	testAccRouteRulesDataSourceAttrKeyPrefix = "route_rules.0."
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudRouteRulesDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

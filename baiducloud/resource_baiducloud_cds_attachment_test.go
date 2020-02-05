@@ -58,6 +58,7 @@ func testSweepCdsAttachment(region string) error {
 	return nil
 }
 
+//lintignore:AT003
 func TestAccBaiduCloudCdsAttachment(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

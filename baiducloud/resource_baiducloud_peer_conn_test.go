@@ -15,9 +15,8 @@ import (
 )
 
 const (
-	testAccPeerConnResourceType     = "baiducloud_peer_conn"
-	testAccPeerConnResourceName     = testAccPeerConnResourceType + "." + BaiduCloudTestResourceName
-	testAccPeerConnResourceAttrName = BaiduCloudTestResourceAttrNamePrefix + "PeerConn"
+	testAccPeerConnResourceType = "baiducloud_peer_conn"
+	testAccPeerConnResourceName = testAccPeerConnResourceType + "." + BaiduCloudTestResourceName
 )
 
 func init() {
@@ -63,6 +62,7 @@ func testSweepPeerConns(region string) error {
 	return nil
 }
 
+//lintignore:AT003
 func TestAccBaiduCloudPeerConn(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

@@ -17,6 +17,7 @@ const (
 	testAccCFCAliasResourceName = testAccCFCAliasResourceType + "." + BaiduCloudTestResourceName
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudCFCAlias(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

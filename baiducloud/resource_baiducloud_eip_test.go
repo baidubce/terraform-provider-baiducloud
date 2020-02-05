@@ -65,6 +65,7 @@ func testSweepEips(region string) error {
 	return nil
 }
 
+//lintignore:AT003
 func TestAccBaiduCloudEip(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

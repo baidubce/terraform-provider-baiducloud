@@ -3,7 +3,6 @@ package baiducloud
 import (
 	"fmt"
 	"regexp"
-	"time"
 
 	"github.com/baidubce/bce-sdk-go/services/bos/api"
 	"github.com/baidubce/bce-sdk-go/services/vpc"
@@ -25,18 +24,6 @@ func validatePaymentTiming() schema.SchemaValidateFunc {
 
 func validatePort() schema.SchemaValidateFunc {
 	return validation.IntBetween(1, 65535)
-}
-
-// todo: the date_greater_than can indicate date or days in different situations.
-func validateBosBucketLifecycleTimestamp(v interface{}, k string) (ws []string, errors []error) {
-	value := v.(string)
-	_, err := time.Parse(time.RFC3339, fmt.Sprintf("%sT00:00:00Z", value))
-	if err != nil {
-		errors = append(errors, fmt.Errorf(
-			"%q cannot be parsed as RFC3339 Timestamp Format", value))
-	}
-
-	return
 }
 
 func validateHttpMethod() schema.SchemaValidateFunc {

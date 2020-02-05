@@ -186,7 +186,6 @@ func dataSourceBaiduCloudAclsRead(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	d.Set("acls", aclsResult)
-
 	d.SetId(resource.UniqueId())
 
 	if outputFile != "" {

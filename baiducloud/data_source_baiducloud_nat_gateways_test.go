@@ -12,6 +12,7 @@ const (
 	testAccNatGatewaysDataSourceAttrKeyPrefix = "nat_gateways.0."
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudNatGatewaysDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

@@ -15,6 +15,7 @@ const (
 	testAccCFCVersionResourceName = testAccCFCVersionResourceType + "." + BaiduCloudTestResourceName
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudCFCVersion(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

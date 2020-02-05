@@ -12,6 +12,7 @@ const (
 	testAccAutoSnapshotPoliciesDataSourceAttrKeyPrefix = "auto_snapshot_policies.0."
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudAutoSnapshotPoliciesDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

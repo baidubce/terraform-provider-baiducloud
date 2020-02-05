@@ -66,6 +66,7 @@ func testSweepBosBuckets(region string) error {
 	return nil
 }
 
+//lintignore:AT003
 func TestAccBaiduCloudBosBucket(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	testAccSecurityGroupsDataSourceName          = "data.baiducloud_security_groups.default"
-	testAccSecurityGroupsDataSourceAttrKeyPrefix = "security_groups.0."
+	testAccSecurityGroupsDataSourceName = "data.baiducloud_security_groups.default"
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudSecurityGroupsDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

@@ -12,6 +12,7 @@ const (
 	testAccAppBLBListenersDataSourceAttrKeyPrefix = "listeners.0."
 )
 
+//lintignore:AT003
 func TestAccBaiduCloudAppBLBListenersDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

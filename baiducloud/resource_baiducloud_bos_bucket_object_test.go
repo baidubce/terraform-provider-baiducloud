@@ -37,6 +37,11 @@ func testSweepBosBucketObjects(region string) error {
 
 	bosService := &BosService{client}
 	objectList, err := bosService.ListAllObjects(testAccBosBucketResourceAttrName, "")
+	if err != nil {
+		log.Printf("[ERROR] Failed to list object %v", err)
+		return fmt.Errorf("get %s object list error: %s", testAccBosBucketResourceAttrName, err)
+	}
+
 	for _, obj := range objectList {
 		if !strings.HasPrefix(obj.Key, testAccBosBucketObjectResourceAttrName) {
 			log.Printf("[INFO] Skipping Object: %s", obj.Key)
@@ -55,6 +60,7 @@ func testSweepBosBucketObjects(region string) error {
 	return nil
 }
 
+//lintignore:AT003
 func TestAccBaiduCloudBosBucketObject(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

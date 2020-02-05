@@ -17,7 +17,7 @@ const (
 	testAccAppBLBServerGroupResourceAttrName = BaiduCloudTestResourceAttrNamePrefix + "APPBLBServerGroup"
 )
 
-func TestAccBaiduCloudAppBLBServerGroup(t *testing.T) {
+func TestAccBaiduCloudAppBLBServerGroup_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -62,7 +62,7 @@ func TestAccBaiduCloudAppBLBServerGroup(t *testing.T) {
 	})
 }
 
-func TestAccBaiduCloudAppBLBServerGroupRs(t *testing.T) {
+func TestAccBaiduCloudAppBLBServerGroup_Rs(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
