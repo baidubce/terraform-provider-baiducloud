@@ -74,20 +74,20 @@ func dataSourceBaiduCloudZonesRead(d *schema.ResourceData, meta interface{}) err
 	}
 	addDebug(action, raw)
 
-	var zoneName string
+	var nameRegexStr string
 	var zoneNameRegex *regexp.Regexp
 
-	if value, ok := d.GetOk("zone_name"); ok {
-		zoneName = value.(string)
-		if len(zoneName) > 0 {
-			zoneNameRegex = regexp.MustCompile(zoneName)
+	if value, ok := d.GetOk("name_regex"); ok {
+		nameRegexStr = value.(string)
+		if len(nameRegexStr) > 0 {
+			zoneNameRegex = regexp.MustCompile(nameRegexStr)
 		}
 	}
 
 	response := raw.(*api.ListZoneResult)
 	zoneMap := make([]map[string]interface{}, 0, len(response.Zones))
 	for _, zone := range response.Zones {
-		if len(zoneName) > 0 && zoneNameRegex != nil {
+		if len(nameRegexStr) > 0 && zoneNameRegex != nil {
 			if !zoneNameRegex.MatchString(zone.ZoneName) {
 				continue
 			}
