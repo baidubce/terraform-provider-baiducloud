@@ -112,14 +112,14 @@ func dataSourceBaiduCloudSpecsRead(d *schema.ResourceData, meta interface{}) err
 	}
 	addDebug(action, raw)
 
-	var specName, instanceType string
+	var nameRegex, instanceType string
 	var cpuCount, memorySizeInGb int
 	var specNameRegex *regexp.Regexp
 
-	if value, ok := d.GetOk("spec_name"); ok {
-		specName = value.(string)
-		if len(specName) > 0 {
-			specNameRegex = regexp.MustCompile(specName)
+	if value, ok := d.GetOk("name_regex"); ok {
+		nameRegex = value.(string)
+		if len(nameRegex) > 0 {
+			specNameRegex = regexp.MustCompile(nameRegex)
 		}
 	}
 
@@ -138,7 +138,7 @@ func dataSourceBaiduCloudSpecsRead(d *schema.ResourceData, meta interface{}) err
 	response := raw.(*api.ListSpecResult)
 	specMap := make([]map[string]interface{}, 0, len(response.InstanceTypes))
 	for _, spec := range response.InstanceTypes {
-		if len(specName) > 0 && specNameRegex != nil {
+		if len(nameRegex) > 0 && specNameRegex != nil {
 			if !specNameRegex.MatchString(spec.Name) {
 				continue
 			}

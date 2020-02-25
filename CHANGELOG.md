@@ -1,4 +1,9 @@
 ## 1.0.1 (Unreleased)
+
+BUG FIXES:
+- datasource/baiducloud_zones: Fix the problems of unavailable parameter "name_regex" ([#1](https://github.com/terraform-providers/terraform-provider-baiducloud/issues/1))
+- datasource/baiducloud_specs: Fix the problems of unavailable parameter "name_regex" ([#1](https://github.com/terraform-providers/terraform-provider-baiducloud/issues/1))
+
 ## 1.0.0 (February 19, 2020)
 
 FEATURES:
