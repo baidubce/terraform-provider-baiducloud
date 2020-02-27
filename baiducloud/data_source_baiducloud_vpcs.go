@@ -141,7 +141,7 @@ func dataSourceBaiduCloudVpcsRead(d *schema.ResourceData, meta interface{}) erro
 		vpcMap["secondary_cidrs"] = vpc.SecondaryCidr
 		vpcMap["tags"] = flattenTagsToMap(vpc.Tags)
 
-		res, err := vpcService.GetRouteTableDetail("", vpcId)
+		res, err := vpcService.GetRouteTableDetail("", vpc.VPCID)
 		if err != nil {
 			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_vpc", action, BCESDKGoERROR)
 		}
