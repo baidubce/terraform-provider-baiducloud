@@ -44,6 +44,7 @@ func dataSourceBaiduCloudCDSs() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
 
 			"cdss": {
 				Type:        schema.TypeList,
@@ -248,6 +249,9 @@ func dataSourceBaiduCloudCDSsRead(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	cdsMap := bccService.FlattenCDSVolumeModelToMap(cdsList)
+
+	FilterDataSourceResult(d, &cdsMap)
+
 	if err := d.Set("cdss", cdsMap); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_cdss", action, BCESDKGoERROR)
 	}

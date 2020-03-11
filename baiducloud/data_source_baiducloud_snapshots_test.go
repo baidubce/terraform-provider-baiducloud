@@ -74,6 +74,11 @@ resource "baiducloud_snapshot" "default" {
 
 data "baiducloud_snapshots" "default" {
   volume_id = baiducloud_snapshot.default.volume_id
+
+  filter {
+    name = "name"
+    values = ["test-BaiduAcc*"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"BCC",
 		BaiduCloudTestResourceAttrNamePrefix+"CDS",

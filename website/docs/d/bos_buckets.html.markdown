@@ -25,7 +25,13 @@ output "buckets" {
 The following arguments are supported:
 
 * `bucket` - (Optional) Name of the bucket to retrieve.
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `output_file` - (Optional, ForceNew) Output file for saving result.
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

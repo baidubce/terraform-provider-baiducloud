@@ -91,6 +91,11 @@ resource "baiducloud_acl" "default" {
 data "baiducloud_acls" "default" {
   acl_id = "${baiducloud_acl.default.id}"
   subnet_id = "${baiducloud_subnet.default.id}"
+
+  filter {
+    name = "direction"
+    values = ["ingress"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"Subnet")
 }
@@ -127,6 +132,11 @@ resource "baiducloud_acl" "default" {
 data "baiducloud_acls" "default" {
   acl_id = "${baiducloud_acl.default.id}"
   vpc_id = "${baiducloud_vpc.default.id}"
+
+  filter {
+    name = "action"
+    values = ["allow"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"Subnet")
 }

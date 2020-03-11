@@ -56,6 +56,7 @@ func dataSourceBaiduCloudAppBLBServerGroups() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
 
 			// Attributes used for result
 			"server_groups": {
@@ -256,6 +257,8 @@ func dataSourceBaiduCloudAppBLBServerGroupsRead(d *schema.ResourceData, meta int
 	if err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_appblb_server_groups", action, BCESDKGoERROR)
 	}
+
+	FilterDataSourceResult(d, &serverGroupList)
 
 	if err := d.Set("server_groups", serverGroupList); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_appblb_server_groups", action, BCESDKGoERROR)

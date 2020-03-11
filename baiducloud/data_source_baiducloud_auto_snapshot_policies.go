@@ -42,6 +42,8 @@ func dataSourceBaiduCloudAutoSnapshotPolicies() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
+
 			"auto_snapshot_policies": {
 				Type:        schema.TypeList,
 				Description: "The automatic snapshot policies search result list.",
@@ -131,6 +133,9 @@ func dataSourceBaiduCloudAutoSnapshotPoliciesRead(d *schema.ResourceData, meta i
 	}
 
 	aspMap := bccService.FlattenAutoSnapshotPolicyModelToMap(aspList)
+
+	FilterDataSourceResult(d, &aspMap)
+
 	if err := d.Set("auto_snapshot_policies", aspMap); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_auto_snapshot_policies", action, BCESDKGoERROR)
 	}

@@ -24,9 +24,15 @@ output "security_groups" {
 
 The following arguments are supported:
 
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `instance_id` - (Optional) Security Group attached instance ID
 * `output_file` - (Optional, ForceNew) Security Group search result output file
 * `vpc_id` - (Optional) Security Group attached vpc id
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

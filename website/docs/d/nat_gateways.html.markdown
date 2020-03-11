@@ -26,11 +26,17 @@ output "nat_gateways" {
 
 The following arguments are supported:
 
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `ip` - (Optional) Specify the EIP binded by the NAT gateway to retrieve.
 * `name` - (Optional) Name of the NAT gateway.
 * `nat_id` - (Optional) ID of the NAT gateway to retrieve.
 * `output_file` - (Optional, ForceNew) Output file for saving result.
 * `vpc_id` - (Optional) VPC ID where the NAT gateways located.
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

@@ -27,7 +27,13 @@ output "certs" {
 The following arguments are supported:
 
 * `cert_name` - (Optional, ForceNew) Name of the Cert to be queried
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `output_file` - (Optional, ForceNew) Certs search result output file
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

@@ -33,7 +33,6 @@ The following arguments are supported:
 
 In addition to all arguments above, the following attributes are exported:
 
-* `code_id` - CFC Function code id
 * `code_sha256` - Function code sha256
 * `code_size` - Function code size
 * `code_storage` - CFC Code storage information

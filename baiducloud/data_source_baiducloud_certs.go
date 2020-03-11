@@ -39,6 +39,7 @@ func dataSourceBaiduCloudCerts() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
 
 			"certs": {
 				Type:        schema.TypeList,
@@ -110,7 +111,7 @@ func dataSourceBaiduCloudCertsRead(d *schema.ResourceData, meta interface{}) err
 	if v, ok := d.GetOk("cert_name"); ok && v.(string) != "" {
 		certName = v.(string)
 	}
-	certList := make([]interface{}, 0, len(response.Certs))
+	certList := make([]map[string]interface{}, 0, len(response.Certs))
 	for _, c := range response.Certs {
 		if certName != "" && certName != c.CertName {
 			continue
@@ -127,6 +128,8 @@ func dataSourceBaiduCloudCertsRead(d *schema.ResourceData, meta interface{}) err
 			"cert_update_time": c.CertUpdateTime,
 		})
 	}
+
+	FilterDataSourceResult(d, &certList)
 
 	if err := d.Set("certs", certList); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_certs", action, BCESDKGoERROR)

@@ -38,6 +38,7 @@ func dataSourceBaiduCloudBosBuckets() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
 
 			// Attributes used for result
 			"buckets": {
@@ -359,7 +360,7 @@ func dataSourceBaiduCloudBosBucketsRead(d *schema.ResourceData, meta interface{}
 	}
 
 	result, _ := raw.(*api.ListBucketsResult)
-	bucketsResult := make([]interface{}, 0)
+	bucketsResult := make([]map[string]interface{}, 0)
 	for _, buc := range result.Buckets {
 		if bucket != "" && bucket != buc.Name {
 			continue
@@ -378,6 +379,8 @@ func dataSourceBaiduCloudBosBucketsRead(d *schema.ResourceData, meta interface{}
 
 		bucketsResult = append(bucketsResult, bucMap)
 	}
+
+	FilterDataSourceResult(d, &bucketsResult)
 
 	d.Set("buckets", bucketsResult)
 	d.SetId(resource.UniqueId())

@@ -32,6 +32,11 @@ func TestAccBaiduCloudZonesDataSource(t *testing.T) {
 
 const testAccZonesDataSourceConfig = `
 data "baiducloud_zones" "default" {
-    name_regex = ".*a$"
+  name_regex = ".*a$"
+
+  filter {
+    name = "zone_name"
+    values = ["cn-*"]
+  }
 }
 `

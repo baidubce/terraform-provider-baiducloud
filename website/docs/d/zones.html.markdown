@@ -24,8 +24,14 @@ output "zone" {
 
 The following arguments are supported:
 
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `name_regex` - (Optional, ForceNew) Regex pattern of the search zone name
 * `output_file` - (Optional, ForceNew) Output file for saving result.
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

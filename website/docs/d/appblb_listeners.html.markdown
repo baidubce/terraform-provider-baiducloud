@@ -27,9 +27,15 @@ output "listeners" {
 The following arguments are supported:
 
 * `blb_id` - (Required, ForceNew) ID of the Application LoadBalance instance
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `listener_port` - (Optional, ForceNew) The port of the Listener to be queried
 * `output_file` - (Optional, ForceNew) Query result output file path
 * `protocol` - (Optional, ForceNew) Protocol of the Listener to be queried
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

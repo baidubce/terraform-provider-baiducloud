@@ -56,6 +56,7 @@ func dataSourceBaiduCloudNatGateways() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
 
 			// Attributes used for result
 			"nat_gateways": {
@@ -148,7 +149,7 @@ func dataSourceBaiduCloudNatGatewaysRead(d *schema.ResourceData, meta interface{
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_nat_gateways", action, BCESDKGoERROR)
 	}
 
-	natsResult := make([]interface{}, 0)
+	natsResult := make([]map[string]interface{}, 0)
 	if vpcID != "" {
 		args := &vpc.ListNatGatewayArgs{
 			VpcId: vpcID,
@@ -177,6 +178,7 @@ func dataSourceBaiduCloudNatGatewaysRead(d *schema.ResourceData, meta interface{
 		natsResult = append(natsResult, natMap)
 	}
 
+	FilterDataSourceResult(d, &natsResult)
 	d.Set("nat_gateways", natsResult)
 
 	d.SetId(resource.UniqueId())

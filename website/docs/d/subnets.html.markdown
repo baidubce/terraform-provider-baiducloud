@@ -26,11 +26,17 @@ output "subnets" {
 
 The following arguments are supported:
 
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `output_file` - (Optional, ForceNew) Output file for saving result.
 * `subnet_id` - (Optional, ForceNew) ID of the subnet.
 * `subnet_type` - (Optional, ForceNew) Specify the subnet type for subnets.
 * `vpc_id` - (Optional, ForceNew) VPC ID for subnets to retrieve.
 * `zone_name` - (Optional, ForceNew) Specify the zone name for subnets.
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

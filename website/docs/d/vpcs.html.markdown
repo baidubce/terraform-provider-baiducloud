@@ -26,9 +26,15 @@ output "cidr" {
 
 The following arguments are supported:
 
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `name` - (Optional, ForceNew) Name of the specific VPC to retrieve.
 * `output_file` - (Optional, ForceNew) Output file for saving result.
 * `vpc_id` - (Optional, ForceNew) ID of the specific VPC to retrieve.
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

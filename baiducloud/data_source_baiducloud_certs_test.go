@@ -54,6 +54,11 @@ resource "baiducloud_cert" "default" {
 
 data "baiducloud_certs" "default" {
   cert_name = baiducloud_cert.default.cert_name
+
+  filter {
+    name = "cert_name"
+    values = ["test-BaiduAcc*"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"CertTest",
 		BaiduCloudTestResourceAttrNamePrefix+"Cert")

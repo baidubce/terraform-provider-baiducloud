@@ -25,10 +25,16 @@ output "spec" {
 The following arguments are supported:
 
 * `cpu_count` - (Optional, ForceNew) Useful cpu count of the search spec
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `instance_type` - (Optional, ForceNew) Instance type of the search spec
 * `memory_size_in_gb` - (Optional, ForceNew) Useful memory size in GB of the search spec
 * `name_regex` - (Optional, ForceNew) Regex pattern of the search spec name
 * `output_file` - (Optional, ForceNew) Output file for saving result.
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

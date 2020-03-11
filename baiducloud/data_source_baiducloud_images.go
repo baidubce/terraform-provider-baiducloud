@@ -57,6 +57,8 @@ func dataSourceBaiduCloudImages() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
+
 			"images": {
 				Type:        schema.TypeList,
 				Description: "Image list",
@@ -183,6 +185,8 @@ func dataSourceBaiduCloudImagesRead(d *schema.ResourceData, meta interface{}) er
 	}
 
 	imageMap := bccService.FlattenImageModelToMap(imageList)
+	FilterDataSourceResult(d, &imageMap)
+
 	if err := d.Set("images", imageMap); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_images", action, BCESDKGoERROR)
 	}

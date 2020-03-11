@@ -126,6 +126,11 @@ resource "baiducloud_bos_bucket" "default" {
 
 data "baiducloud_bos_buckets" "default" {
   bucket = baiducloud_bos_bucket.default.bucket
+
+  filter {
+    name = "acl"
+    values = ["public-read-write"]
+  }
 }
 `, BaiduCloudTestBucketResourceAttrNamePrefix+"bucket-peer", testAccBosBucketResourceAttrName,
 		testAccBosBucketResourceAttrName+"/*", testAccBosBucketResourceAttrName,

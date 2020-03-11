@@ -24,9 +24,15 @@ output "cdss" {
 
 The following arguments are supported:
 
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `instance_id` - (Optional, ForceNew) CDS volume bind instance ID
 * `output_file` - (Optional, ForceNew) CDS volume search result output file
 * `zone_name` - (Optional, ForceNew) CDS volume zone name
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

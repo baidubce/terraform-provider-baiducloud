@@ -70,6 +70,15 @@ resource "baiducloud_bos_bucket_object" "default" {
 data "baiducloud_bos_bucket_objects" "default" {
   bucket = "%s"
   prefix = baiducloud_bos_bucket_object.default.key
+
+  filter {
+    name = "acl"
+    values = ["public-read"]
+  }
+  filter {
+    name = "storage_class"
+    values = ["COLD"]
+  }
 }
 `, testAccBosBucketResourceAttrName, testAccBosBucketObjectResourceAttrName,
 		testAccBosBucketResourceAttrName)

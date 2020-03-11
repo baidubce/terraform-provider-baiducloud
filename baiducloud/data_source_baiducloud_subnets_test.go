@@ -62,5 +62,15 @@ resource "baiducloud_subnet" "default" {
 
 data "baiducloud_subnets" "default" {
   subnet_id = baiducloud_subnet.default.id
+
+  filter {
+    name = "name"
+    values = ["test-filter", "test-BaiduAcc*"]
+  }
+
+  filter {
+    name = "cidr"
+    values = ["192.168.1.0/24"]
+  }
 }
 `

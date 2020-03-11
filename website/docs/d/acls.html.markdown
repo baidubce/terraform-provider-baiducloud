@@ -27,9 +27,15 @@ output "acls" {
 The following arguments are supported:
 
 * `acl_id` - (Optional) ID of the ACL to retrieve.
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `output_file` - (Optional, ForceNew) Output file for saving result.
 * `subnet_id` - (Optional) Subnet ID of the ACLs to retrieve.
 * `vpc_id` - (Optional) VPC ID of the ACLs to retrieve.
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

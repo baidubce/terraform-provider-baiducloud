@@ -25,10 +25,16 @@ output "eips" {
 The following arguments are supported:
 
 * `eip` - (Optional, ForceNew) Eip address
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `instance_id` - (Optional, ForceNew) Eip bind instance id
 * `instance_type` - (Optional, ForceNew) Eip bind instance type
 * `output_file` - (Optional, ForceNew) Eips search result output file
 * `status` - (Optional, ForceNew) Eip status
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

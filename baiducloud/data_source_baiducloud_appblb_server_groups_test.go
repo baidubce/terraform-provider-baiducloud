@@ -110,6 +110,11 @@ resource "baiducloud_appblb_server_group" "default" {
 data "baiducloud_appblb_server_groups" "default" {
   blb_id = baiducloud_appblb.default.id
   name   = baiducloud_appblb_server_group.default.name
+
+  filter {
+    name = "name"
+    values = ["test-BaiduAcc*"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC",
 		BaiduCloudTestResourceAttrNamePrefix+"Subnet",

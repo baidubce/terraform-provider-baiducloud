@@ -24,8 +24,14 @@ output "snapshots" {
 
 The following arguments are supported:
 
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `output_file` - (Optional, ForceNew) Snapshots search result output file.
 * `volume_id` - (Optional) Volume ID to be attached of snapshots, if volume is system disk, volume ID is instance ID
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

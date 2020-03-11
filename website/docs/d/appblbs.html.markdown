@@ -30,8 +30,14 @@ The following arguments are supported:
 * `bcc_id` - (Optional) ID of the BCC instance bound to the LoadBalance
 * `blb_id` - (Optional) ID of the LoadBalance instance to be queried
 * `exactly_match` - (Optional) Whether the query condition is an exact match or not, default false
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `name` - (Optional) Name of the LoadBalance instance to be queried
 * `output_file` - (Optional, ForceNew) Query result output file path
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

@@ -28,6 +28,7 @@ func dataSourceBaiduCloudSubnets() *schema.Resource {
 		Read: dataSourceBaiduCloudSubnetsRead,
 
 		Schema: map[string]*schema.Schema{
+			"filter": dataSourceFiltersSchema(),
 			"vpc_id": {
 				Type:        schema.TypeString,
 				Description: "VPC ID for subnets to retrieve.",
@@ -154,6 +155,7 @@ func dataSourceBaiduCloudSubnetsRead(d *schema.ResourceData, meta interface{}) e
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_subnets", action, BCESDKGoERROR)
 	}
 
+	filter := NewDataSourceFilter(d)
 	subnetsResult := make([]map[string]interface{}, 0, len(subnets))
 	for _, subnet := range subnets {
 		if subnetID != "" && subnetID != subnet.SubnetId {
@@ -170,6 +172,10 @@ func dataSourceBaiduCloudSubnetsRead(d *schema.ResourceData, meta interface{}) e
 		subnetMap["description"] = subnet.Description
 		subnetMap["available_ip"] = subnet.AvailableIp
 		subnetMap["tags"] = flattenTagsToMap(subnet.Tags)
+
+		if !filter.checkFilter(subnetMap) {
+			continue
+		}
 
 		subnetsResult = append(subnetsResult, subnetMap)
 	}

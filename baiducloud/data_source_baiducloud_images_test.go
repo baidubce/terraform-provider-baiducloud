@@ -38,5 +38,10 @@ data "baiducloud_images" "default" {
   image_type = "System"
   name_regex = "7.5.*"
   os_name    = "CentOs"
+
+  filter {
+    name = "name"
+    values = ["7.5.*"]
+  }
 }
 `

@@ -63,6 +63,11 @@ resource "baiducloud_security_group_rule" "default" {
 data "baiducloud_security_group_rules" "default" {
   security_group_id = baiducloud_security_group_rule.default.security_group_id
   vpc_id            = baiducloud_security_group.default.vpc_id
+
+  filter {
+    name = "protocol"
+    values = ["tcp", "udp"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC",
 		BaiduCloudTestResourceAttrNamePrefix+"SecurityGroup")

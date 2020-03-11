@@ -73,6 +73,11 @@ resource "baiducloud_instance" "default" {
 data "baiducloud_instances" "default" {
   internal_ip = baiducloud_instance.default.internal_ip
   zone_name   = baiducloud_instance.default.availability_zone
+
+  filter {
+    name = "name"
+    values = ["test-BaiduAcc*"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"BCC")
 }

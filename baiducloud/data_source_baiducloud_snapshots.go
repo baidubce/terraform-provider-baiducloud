@@ -36,6 +36,8 @@ func dataSourceBaiduCloudSnapshots() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
+
 			"snapshots": {
 				Type:        schema.TypeList,
 				Description: "The result of the snapshots list.",
@@ -105,6 +107,8 @@ func dataSourceBaiduCloudSnapshotsRead(d *schema.ResourceData, meta interface{})
 	}
 
 	snapshotMap := bccService.FlattenSnapshotModelToMap(snapshotList)
+	FilterDataSourceResult(d, &snapshotMap)
+
 	if err := d.Set("snapshots", snapshotMap); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_snapshots", action, BCESDKGoERROR)
 	}

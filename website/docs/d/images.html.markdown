@@ -24,10 +24,16 @@ output "images" {
 
 The following arguments are supported:
 
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `image_type` - (Optional, ForceNew) Image type of the images to be queried, support ALL/System/Custom/Integration/Sharing/GpuBccSystem/GpuBccCustom/FpgaBccSystem/FpgaBccCustom
 * `name_regex` - (Optional, ForceNew) Regex pattern of the search image name
 * `os_name` - (Optional, ForceNew) Search image OS Name
 * `output_file` - (Optional, ForceNew) Images search result output file
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

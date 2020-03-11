@@ -15,6 +15,11 @@ data "baiducloud_images" "default" {
   image_type = "System"
   name_regex = "7.5.*"
   os_name    = "CentOS"
+
+  filter{
+    name = "os_name"
+    values = ["CentOS"]
+  }
 }
 
 resource "baiducloud_cds" "default" {

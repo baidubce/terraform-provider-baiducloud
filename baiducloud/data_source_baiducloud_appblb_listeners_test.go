@@ -163,30 +163,55 @@ data "baiducloud_appblb_listeners" "default_TCP" {
   blb_id        = baiducloud_appblb.default.id
   protocol      = baiducloud_appblb_listener.default_TCP.protocol
   listener_port = baiducloud_appblb_listener.default_TCP.listener_port
+
+  filter {
+    name = "protocol"
+    values = ["TCP"]
+  }
 }
 
 data "baiducloud_appblb_listeners" "default_UDP" {
   blb_id        = baiducloud_appblb.default.id
   protocol      = baiducloud_appblb_listener.default_UDP.protocol
   listener_port = baiducloud_appblb_listener.default_UDP.listener_port
+
+  filter {
+    name = "protocol"
+    values = ["UDP"]
+  }
 }
 
 data "baiducloud_appblb_listeners" "default_HTTP" {
   blb_id        = baiducloud_appblb.default.id
   protocol      = baiducloud_appblb_listener.default_HTTP.protocol
   listener_port = baiducloud_appblb_listener.default_HTTP.listener_port
+
+  filter {
+    name = "protocol"
+    values = ["HTTP"]
+  }
 }
 
 data "baiducloud_appblb_listeners" "default_HTTPS" {
   blb_id        = baiducloud_appblb.default.id
   protocol      = baiducloud_appblb_listener.default_HTTPS.protocol
   listener_port = baiducloud_appblb_listener.default_HTTPS.listener_port
+
+  filter {
+    name = "protocol"
+    values = ["HTTPS"]
+  }
 }
 
 data "baiducloud_appblb_listeners" "default_SSL" {
   blb_id        = baiducloud_appblb.default.id
   protocol      = baiducloud_appblb_listener.default_SSL.protocol
   listener_port = baiducloud_appblb_listener.default_SSL.listener_port
+
+  filter {
+    name = "protocol"
+    values = ["SSL"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"BCC",
 		BaiduCloudTestResourceAttrNamePrefix+"VPC",

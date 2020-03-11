@@ -51,6 +51,7 @@ func dataSourceBaiduCloudRouteRules() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
 
 			// Attributes used for result
 			"route_rules": {
@@ -141,7 +142,7 @@ func dataSourceBaiduCloudRouteRulesRead(d *schema.ResourceData, meta interface{}
 	d.Set("route_table_id", result.RouteTableId)
 	d.Set("vpc_id", result.VpcId)
 
-	routeRulesResult := make([]interface{}, 0)
+	routeRulesResult := make([]map[string]interface{}, 0)
 	for _, rule := range result.RouteRules {
 		if routeRuleID != "" && routeRuleID != rule.RouteRuleId {
 			continue
@@ -151,6 +152,7 @@ func dataSourceBaiduCloudRouteRulesRead(d *schema.ResourceData, meta interface{}
 		routeRulesResult = append(routeRulesResult, ruleMap)
 	}
 
+	FilterDataSourceResult(d, &routeRulesResult)
 	d.Set("route_rules", routeRulesResult)
 	d.SetId(resource.UniqueId())
 

@@ -61,6 +61,7 @@ func dataSourceBaiduCloudAppBLBs() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
 
 			// Attributes used for result
 			"appblbs": {
@@ -194,6 +195,9 @@ func dataSourceBaiduCloudAppBLBRead(d *schema.ResourceData, meta interface{}) er
 	}
 
 	blbMap := appblbService.FlattenAppBLBDetailsToMap(appblbModels, appblbDetails)
+
+	FilterDataSourceResult(d, &blbMap)
+
 	if err := d.Set("appblbs", blbMap); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_appblbs", action, BCESDKGoERROR)
 	}

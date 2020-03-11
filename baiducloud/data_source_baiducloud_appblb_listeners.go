@@ -52,6 +52,7 @@ func dataSourceBaiduCloudAppBLBListeners() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
 
 			// Attributes used for result
 			"listeners": {
@@ -266,6 +267,9 @@ func dataSourceBaiduCloudAppBLBListenersRead(d *schema.ResourceData, meta interf
 	if err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_appblb_listeners", action, BCESDKGoERROR)
 	}
+
+	FilterDataSourceResult(d, &listeners)
+
 	if err := d.Set("listeners", listeners); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_appblb_listeners", action, BCESDKGoERROR)
 	}

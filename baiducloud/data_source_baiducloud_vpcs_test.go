@@ -49,5 +49,10 @@ resource "baiducloud_vpc" "default" {
 
 data "baiducloud_vpcs" "default" {
   vpc_id = baiducloud_vpc.default.id
+
+  filter {
+    name = "name"
+    values = ["test-BaiduAcc*"]
+  }
 }
 `

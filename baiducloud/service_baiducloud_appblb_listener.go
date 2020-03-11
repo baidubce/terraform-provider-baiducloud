@@ -127,7 +127,7 @@ func (s *APPBLBService) FlattenAppPolicysToMap(policys []appblb.AppPolicy) []map
 	return result
 }
 
-func (s *APPBLBService) ListAllTCPListeners(blbId string, port int) ([]interface{}, error) {
+func (s *APPBLBService) ListAllTCPListeners(blbId string, port int) ([]map[string]interface{}, error) {
 	args := &appblb.DescribeAppListenerArgs{
 		ListenerPort: uint16(port),
 	}
@@ -154,7 +154,7 @@ func (s *APPBLBService) ListAllTCPListeners(blbId string, port int) ([]interface
 		}
 	}
 
-	result := make([]interface{}, 0, len(listeners))
+	result := make([]map[string]interface{}, 0, len(listeners))
 	for _, listener := range listeners {
 		policys, err := s.DescribePolicys(blbId, TCP, int(listener.Port))
 		if err != nil {
@@ -173,7 +173,7 @@ func (s *APPBLBService) ListAllTCPListeners(blbId string, port int) ([]interface
 	return result, nil
 }
 
-func (s *APPBLBService) ListAllUDPListeners(blbId string, port int) ([]interface{}, error) {
+func (s *APPBLBService) ListAllUDPListeners(blbId string, port int) ([]map[string]interface{}, error) {
 	args := &appblb.DescribeAppListenerArgs{
 		ListenerPort: uint16(port),
 	}
@@ -200,7 +200,7 @@ func (s *APPBLBService) ListAllUDPListeners(blbId string, port int) ([]interface
 		}
 	}
 
-	result := make([]interface{}, 0, len(listeners))
+	result := make([]map[string]interface{}, 0, len(listeners))
 	for _, listener := range listeners {
 		policys, err := s.DescribePolicys(blbId, UDP, int(listener.Port))
 		if err != nil {
@@ -218,7 +218,7 @@ func (s *APPBLBService) ListAllUDPListeners(blbId string, port int) ([]interface
 	return result, nil
 }
 
-func (s *APPBLBService) ListAllHTTPListeners(blbId string, port int) ([]interface{}, error) {
+func (s *APPBLBService) ListAllHTTPListeners(blbId string, port int) ([]map[string]interface{}, error) {
 	args := &appblb.DescribeAppListenerArgs{
 		ListenerPort: uint16(port),
 	}
@@ -245,7 +245,7 @@ func (s *APPBLBService) ListAllHTTPListeners(blbId string, port int) ([]interfac
 		}
 	}
 
-	result := make([]interface{}, 0, len(listeners))
+	result := make([]map[string]interface{}, 0, len(listeners))
 	for _, listener := range listeners {
 		policys, err := s.DescribePolicys(blbId, HTTP, int(listener.ListenerPort))
 		if err != nil {
@@ -270,7 +270,7 @@ func (s *APPBLBService) ListAllHTTPListeners(blbId string, port int) ([]interfac
 	return result, nil
 }
 
-func (s *APPBLBService) ListAllHTTPSListeners(blbId string, port int) ([]interface{}, error) {
+func (s *APPBLBService) ListAllHTTPSListeners(blbId string, port int) ([]map[string]interface{}, error) {
 	args := &appblb.DescribeAppListenerArgs{
 		ListenerPort: uint16(port),
 	}
@@ -297,7 +297,7 @@ func (s *APPBLBService) ListAllHTTPSListeners(blbId string, port int) ([]interfa
 		}
 	}
 
-	result := make([]interface{}, 0, len(listeners))
+	result := make([]map[string]interface{}, 0, len(listeners))
 	for _, listener := range listeners {
 		policys, err := s.DescribePolicys(blbId, HTTPS, int(listener.ListenerPort))
 		if err != nil {
@@ -326,7 +326,7 @@ func (s *APPBLBService) ListAllHTTPSListeners(blbId string, port int) ([]interfa
 	return result, nil
 }
 
-func (s *APPBLBService) ListAllSSLListeners(blbId string, port int) ([]interface{}, error) {
+func (s *APPBLBService) ListAllSSLListeners(blbId string, port int) ([]map[string]interface{}, error) {
 	args := &appblb.DescribeAppListenerArgs{
 		ListenerPort: uint16(port),
 	}
@@ -353,7 +353,7 @@ func (s *APPBLBService) ListAllSSLListeners(blbId string, port int) ([]interface
 		}
 	}
 
-	result := make([]interface{}, 0, len(listeners))
+	result := make([]map[string]interface{}, 0, len(listeners))
 	for _, listener := range listeners {
 		policys, err := s.DescribePolicys(blbId, SSL, int(listener.ListenerPort))
 		if err != nil {
@@ -376,8 +376,8 @@ func (s *APPBLBService) ListAllSSLListeners(blbId string, port int) ([]interface
 	return result, nil
 }
 
-func (s *APPBLBService) ListAllListeners(blbId, protocol string, port int) ([]interface{}, error) {
-	result := make([]interface{}, 0)
+func (s *APPBLBService) ListAllListeners(blbId, protocol string, port int) ([]map[string]interface{}, error) {
+	result := make([]map[string]interface{}, 0)
 
 	if protocol == TCP || protocol == "" {
 		tcpListeners, err := s.ListAllTCPListeners(blbId, port)

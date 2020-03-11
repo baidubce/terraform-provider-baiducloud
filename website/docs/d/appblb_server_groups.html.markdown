@@ -28,8 +28,14 @@ The following arguments are supported:
 
 * `blb_id` - (Required) ID of the LoadBalance instance to be queried
 * `exactly_match` - (Optional) Whether the name is an exact match or not, default false
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `name` - (Optional) Name of the Server Group to be queried
 * `output_file` - (Optional, ForceNew) Query result output file path
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

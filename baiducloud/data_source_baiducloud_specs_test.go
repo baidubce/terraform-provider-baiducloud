@@ -40,5 +40,14 @@ data "baiducloud_specs" "default" {
     instance_type     = "General"
     cpu_count         = 1
     memory_size_in_gb = 2
+
+	filter {
+		name = "cpu_count"
+	 	values = ["1", "2"]
+	}
+	filter {
+		name = "memory_size_in_gb"
+	 	values = ["2", "3"]
+	}
 }
 `

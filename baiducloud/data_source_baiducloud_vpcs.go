@@ -45,6 +45,7 @@ func dataSourceBaiduCloudVpcs() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
 
 			// Attributes used for result
 			"vpcs": {
@@ -151,6 +152,7 @@ func dataSourceBaiduCloudVpcsRead(d *schema.ResourceData, meta interface{}) erro
 	}
 	addDebug(action, vpcsResult)
 
+	FilterDataSourceResult(d, &vpcsResult)
 	if err := d.Set("vpcs", vpcsResult); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_vpcs", action, BCESDKGoERROR)
 	}

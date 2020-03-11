@@ -60,6 +60,8 @@ func dataSourceBaiduCloudEips() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
+
 			"eips": {
 				Type:        schema.TypeList,
 				Description: "Eip list",
@@ -151,6 +153,8 @@ func dataSourceBaiduCloudEipsRead(d *schema.ResourceData, meta interface{}) erro
 	addDebug(action, eipList)
 
 	eipMap := eipService.FlattenEipModelsToMap(eipList)
+
+	FilterDataSourceResult(d, &eipMap)
 
 	if err := d.Set("eips", eipMap); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_eips", action, BCESDKGoERROR)

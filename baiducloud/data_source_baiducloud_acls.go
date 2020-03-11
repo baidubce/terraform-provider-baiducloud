@@ -51,6 +51,7 @@ func dataSourceBaiduCloudAcls() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
 
 			// Attributes used for result
 			"acls": {
@@ -175,6 +176,7 @@ func dataSourceBaiduCloudAclsRead(d *schema.ResourceData, meta interface{}) erro
 		aclRules = append(aclRules, acls...)
 	}
 
+	filter := NewDataSourceFilter(d)
 	aclsResult := make([]interface{}, 0)
 	for _, aclRule := range aclRules {
 		if aclID != "" && aclID != aclRule.Id {
@@ -182,6 +184,10 @@ func dataSourceBaiduCloudAclsRead(d *schema.ResourceData, meta interface{}) erro
 		}
 
 		aclMap := flattenACL(&aclRule)
+		if !filter.checkFilter(aclMap) {
+			continue
+		}
+
 		aclsResult = append(aclsResult, aclMap)
 	}
 

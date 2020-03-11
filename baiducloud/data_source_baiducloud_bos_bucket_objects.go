@@ -45,6 +45,7 @@ func dataSourceBaiduCloudBosBucketObjects() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
 
 			// Attributes used for result
 			"objects": {
@@ -184,7 +185,7 @@ func dataSourceBaiduCloudBosBucketObjectsRead(d *schema.ResourceData, meta inter
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_bucket_objects", action, BCESDKGoERROR)
 	}
 
-	objectsResult := make([]interface{}, 0, len(objects))
+	objectsResult := make([]map[string]interface{}, 0, len(objects))
 	for _, obj := range objects {
 		// read metadata
 		objMap, err := dataSourceBaiduCloudBosBucketObjectsReadMeta(bucket, obj.Key, meta)
@@ -208,6 +209,8 @@ func dataSourceBaiduCloudBosBucketObjectsRead(d *schema.ResourceData, meta inter
 
 		objectsResult = append(objectsResult, objMap)
 	}
+
+	FilterDataSourceResult(d, &objectsResult)
 
 	d.Set("objects", objectsResult)
 	d.SetId(resource.UniqueId())

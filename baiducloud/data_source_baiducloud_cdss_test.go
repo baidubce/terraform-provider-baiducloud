@@ -78,6 +78,11 @@ resource "baiducloud_cds_attachment" "default" {
 data "baiducloud_cdss" "default" {
   instance_id = baiducloud_cds_attachment.default.instance_id
   zone_name   = baiducloud_cds.default.zone_name
+
+  filter {
+    name = "name"
+    values = ["test-BaiduAcc*"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"BCC",
 		BaiduCloudTestResourceAttrNamePrefix+"CDS")

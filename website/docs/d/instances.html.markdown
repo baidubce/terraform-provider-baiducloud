@@ -25,9 +25,15 @@ output "instances" {
 The following arguments are supported:
 
 * `dedicated_host_id` - (Optional) Dedicated host id of the instance to retrieve.
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `internal_ip` - (Optional) Internal ip address of the instance to retrieve.
 * `output_file` - (Optional, ForceNew) Output file of the instances search result
 * `zone_name` - (Optional) Name of the available zone to which the instance belongs.
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

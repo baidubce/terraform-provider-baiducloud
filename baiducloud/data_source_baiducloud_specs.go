@@ -61,6 +61,8 @@ func dataSourceBaiduCloudSpecs() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
+
 			// Attributes used for result
 			"specs": {
 				Type:        schema.TypeList,
@@ -165,6 +167,7 @@ func dataSourceBaiduCloudSpecsRead(d *schema.ResourceData, meta interface{}) err
 		})
 	}
 
+	FilterDataSourceResult(d, &specMap)
 	if err := d.Set("specs", specMap); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_specs", action, BCESDKGoERROR)
 	}

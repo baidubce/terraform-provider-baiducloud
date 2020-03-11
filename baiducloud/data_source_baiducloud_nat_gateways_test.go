@@ -79,6 +79,11 @@ resource "baiducloud_nat_gateway" "default" {
 
 data "baiducloud_nat_gateways" "default" {
   nat_id = baiducloud_nat_gateway.default.id
+
+  filter {
+    name = "name"
+    values = ["test-BaiduAcc*"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"Subnet", testAccNatGatewayResourceAttrName)
 }
@@ -111,6 +116,11 @@ resource "baiducloud_nat_gateway" "default" {
 
 data "baiducloud_nat_gateways" "default" {
   vpc_id = baiducloud_vpc.default.id
+
+  filter {
+    name = "spec"
+    values = ["medium"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"Subnet", testAccNatGatewayResourceAttrName)
 }

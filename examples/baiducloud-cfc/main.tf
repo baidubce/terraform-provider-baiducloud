@@ -34,7 +34,7 @@ resource "baiducloud_cfc_function" "default" {
   }
   handler        = "index.handler"
   memory_size    = 256
-  runtime        = "nodejs8.5"
+  runtime        = "nodejs12"
   time_out       = 20
   code_file_name = "../../baiducloud/testFiles/cfcTestCode.zip"
   //code_file_dir                  = "../../baiducloud/testFiles/cfcTestCode"

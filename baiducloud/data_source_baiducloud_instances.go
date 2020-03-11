@@ -49,6 +49,7 @@ func dataSourceBaiduCloudInstances() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
 
 			"instances": {
 				Type:        schema.TypeList,
@@ -243,6 +244,8 @@ func dataSourceBaiduCloudInstancesRead(d *schema.ResourceData, meta interface{})
 	if err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instances", action, BCESDKGoERROR)
 	}
+
+	FilterDataSourceResult(d, &instanceMap)
 	if err = d.Set("instances", instanceMap); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instances", action, BCESDKGoERROR)
 	}

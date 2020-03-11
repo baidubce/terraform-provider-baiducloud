@@ -34,7 +34,7 @@ func TestAccBaiduCloudCFCVersion(t *testing.T) {
 					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "description", "terraform create"),
 					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "memory_size", "128"),
 					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "handler", "index.handler"),
-					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "runtime", "nodejs8.5"),
+					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "runtime", "nodejs12"),
 					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "time_out", "3"),
 					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "log_type", "none"),
 					resource.TestCheckResourceAttrSet(testAccCFCVersionResourceName, "update_time"),
@@ -103,7 +103,7 @@ resource "baiducloud_cfc_function" "default" {
   description    = "terraform create"
   handler        = "index.handler"
   memory_size    = 128
-  runtime        = "nodejs8.5"
+  runtime        = "nodejs12"
   time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
   vpc_config {

@@ -24,7 +24,7 @@ func TestAccBaiduCloudCFCFunctionDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "description", "terraform create"),
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "memory_size", "128"),
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "handler", "index.handler"),
-					resource.TestCheckResourceAttr(testAccCFCResourceName, "runtime", "nodejs8.5"),
+					resource.TestCheckResourceAttr(testAccCFCResourceName, "runtime", "nodejs12"),
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "time_out", "3"),
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "environment.%", "2"),
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "vpc_config.#", "1"),
@@ -36,7 +36,6 @@ func TestAccBaiduCloudCFCFunctionDataSource(t *testing.T) {
 					resource.TestCheckResourceAttrSet(testAccCFCResourceName, "commit_id"),
 					resource.TestCheckResourceAttrSet(testAccCFCResourceName, "uid"),
 					resource.TestCheckResourceAttrSet(testAccCFCResourceName, "region"),
-					resource.TestCheckResourceAttrSet(testAccCFCResourceName, "code_id"),
 				),
 			},
 		},
@@ -74,7 +73,7 @@ resource "baiducloud_cfc_function" "default" {
   }
   handler                        = "index.handler"
   memory_size                    = 128
-  runtime                        = "nodejs8.5"
+  runtime                        = "nodejs12"
   time_out                       = 3
   code_file_name                 = "testFiles/cfcTestCode.zip"
   reserved_concurrent_executions = 10

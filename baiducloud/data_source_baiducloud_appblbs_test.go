@@ -87,6 +87,11 @@ data "baiducloud_appblbs" "default" {
   blb_id  = baiducloud_appblb.default.id
   name    = baiducloud_appblb.default.name
   address = baiducloud_appblb.default.address
+
+  filter {
+    name = "vpc_id"
+    values = [baiducloud_vpc.default.id]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"BCC",
 		BaiduCloudTestResourceAttrNamePrefix+"VPC",

@@ -46,5 +46,10 @@ resource "baiducloud_eip" "my-eip" {
 
 data "baiducloud_eips" "default" {
   eip = baiducloud_eip.my-eip.id
+
+  filter {
+    name = "name"
+    values = ["test-BaiduAcc*"]
+  }
 }
 `

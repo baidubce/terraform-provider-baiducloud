@@ -44,6 +44,7 @@ func dataSourceBaiduCloudPeerConns() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
 
 			// Attributes used for result
 			"peer_conns": {
@@ -160,7 +161,7 @@ func dataSourceBaiduCloudPeerConnsRead(d *schema.ResourceData, meta interface{})
 
 	action := "Query Peer Conns " + vpcID + "_" + peerConnID
 
-	pcsResult := make([]interface{}, 0)
+	pcsResult := make([]map[string]interface{}, 0)
 
 	if peerConnID != "" {
 		pc, err := vpcService.GetPeerConnDetail(peerConnID, vpc.PEERCONN_ROLE_INITIATOR)
@@ -182,6 +183,7 @@ func dataSourceBaiduCloudPeerConnsRead(d *schema.ResourceData, meta interface{})
 		}
 	}
 
+	FilterDataSourceResult(d, &pcsResult)
 	d.Set("peer_conns", pcsResult)
 
 	d.SetId(resource.UniqueId())

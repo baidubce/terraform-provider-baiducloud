@@ -26,10 +26,16 @@ output "route_rules" {
 
 The following arguments are supported:
 
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `output_file` - (Optional, ForceNew) Output file for saving result.
 * `route_rule_id` - (Optional) ID of the routing rule to be retrieved.
 * `route_table_id` - (Optional) Routing table ID for the routing rules to retrieve.
 * `vpc_id` - (Optional) VPC ID for the routing rules.
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

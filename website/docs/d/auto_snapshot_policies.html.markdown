@@ -25,8 +25,14 @@ output "auto_snapshot_policiess" {
 The following arguments are supported:
 
 * `asp_name` - (Optional) Name of the automatic snapshot policy.
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `output_file` - (Optional, ForceNew) Automatic snapshot policies search result output file.
 * `volume_name` - (Optional) Name of the volume.
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

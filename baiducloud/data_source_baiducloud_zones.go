@@ -42,6 +42,7 @@ func dataSourceBaiduCloudZones() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
 
 			// Attributes used for result
 			"zones": {
@@ -97,6 +98,7 @@ func dataSourceBaiduCloudZonesRead(d *schema.ResourceData, meta interface{}) err
 		})
 	}
 
+	FilterDataSourceResult(d, &zoneMap)
 	if err := d.Set("zones", zoneMap); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_zones", action, BCESDKGoERROR)
 	}

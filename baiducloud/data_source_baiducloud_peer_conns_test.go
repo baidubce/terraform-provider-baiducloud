@@ -95,6 +95,11 @@ resource "baiducloud_peer_conn" "default" {
 
 data "baiducloud_peer_conns" "default" {
   peer_conn_id = baiducloud_peer_conn.default.id
+
+  filter {
+    name = "bandwidth_in_mbps"
+    values = ["20"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"VPC", region)
 }
@@ -126,6 +131,11 @@ resource "baiducloud_peer_conn" "default" {
 
 data "baiducloud_peer_conns" "default" {
   vpc_id = baiducloud_vpc.local-vpc.id
+
+  filter {
+    name = "bandwidth_in_mbps"
+    values = ["20"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"VPC", region)
 }

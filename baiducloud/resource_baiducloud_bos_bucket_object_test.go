@@ -35,6 +35,17 @@ func testSweepBosBucketObjects(region string) error {
 
 	client := rawClient.(*connectivity.BaiduClient)
 
+	exist, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
+		return bosClient.DoesBucketExist(testAccBosBucketResourceAttrName)
+	})
+	if err != nil {
+		log.Printf("[ERROR] Failed to check if the bucket %s exist %v.", testAccBosBucketResourceAttrName, err)
+		return fmt.Errorf("check bucket %s exist error: %v", testAccBosBucketResourceAttrName, err)
+	}
+	if !exist.(bool) {
+		return nil
+	}
+
 	bosService := &BosService{client}
 	objectList, err := bosService.ListAllObjects(testAccBosBucketResourceAttrName, "")
 	if err != nil {

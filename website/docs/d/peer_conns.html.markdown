@@ -26,9 +26,15 @@ output "peer_conns" {
 
 The following arguments are supported:
 
+* `filter` - (Optional, ForceNew) only support filter string/int/bool value
 * `output_file` - (Optional, ForceNew) Output file for saving result.
 * `peer_conn_id` - (Optional) ID of the peer connection to retrieve.
 * `vpc_id` - (Optional) VPC ID where the peer connections located.
+
+The `filter` object supports the following:
+
+* `name` - (Required) filter variable name
+* `values` - (Required) filter variable value list
 
 ## Attributes Reference
 

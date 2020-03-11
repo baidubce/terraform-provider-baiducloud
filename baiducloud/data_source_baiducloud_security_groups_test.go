@@ -24,7 +24,7 @@ func TestAccBaiduCloudSecurityGroupsDataSource(t *testing.T) {
 				Config: testAccSecurityGroupsDataSourceConfig(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccSecurityGroupsDataSourceName),
-					resource.TestCheckResourceAttr(testAccSecurityGroupsDataSourceName, "security_groups.#", "2"),
+					resource.TestCheckResourceAttr(testAccSecurityGroupsDataSourceName, "security_groups.#", "1"),
 				),
 			},
 		},
@@ -51,6 +51,11 @@ resource "baiducloud_security_group" "default" {
 
 data "baiducloud_security_groups" "default" {
   vpc_id = baiducloud_security_group.default.vpc_id
+
+  filter {
+    name = "name"
+    values = ["test-BaiduAcc*"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC",
 		BaiduCloudTestResourceAttrNamePrefix+"SecurityGroup")

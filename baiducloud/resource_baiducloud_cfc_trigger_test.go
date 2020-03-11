@@ -219,7 +219,7 @@ resource "baiducloud_cfc_function" "default" {
   description    = "terraform create"
   handler        = "index.handler"
   memory_size    = 128
-  runtime        = "nodejs8.5"
+  runtime        = "nodejs12"
   time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
@@ -242,7 +242,7 @@ resource "baiducloud_cfc_function" "default" {
   description    = "terraform create"
   handler        = "index.handler"
   memory_size    = 128
-  runtime        = "nodejs8.5"
+  runtime        = "nodejs12"
   time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
@@ -265,7 +265,7 @@ resource "baiducloud_cfc_function" "default" {
   description    = "terraform create"
   handler        = "index.handler"
   memory_size    = 128
-  runtime        = "nodejs8.5"
+  runtime        = "nodejs12"
   time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
@@ -287,7 +287,7 @@ resource "baiducloud_cfc_function" "default" {
   description    = "terraform create"
   handler        = "index.handler"
   memory_size    = 128
-  runtime        = "nodejs8.5"
+  runtime        = "nodejs12"
   time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
@@ -314,7 +314,7 @@ resource "baiducloud_cfc_function" "default" {
   description    = "terraform create"
   handler        = "index.handler"
   memory_size    = 128
-  runtime        = "nodejs8.5"
+  runtime        = "nodejs12"
   time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
@@ -345,7 +345,7 @@ resource "baiducloud_cfc_function" "default" {
   description    = "terraform create"
   handler        = "index.handler"
   memory_size    = 128
-  runtime        = "nodejs8.5"
+  runtime        = "nodejs12"
   time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
@@ -371,7 +371,7 @@ resource "baiducloud_cfc_function" "default" {
   description    = "terraform create"
   handler        = "index.handler"
   memory_size    = 128
-  runtime        = "nodejs8.5"
+  runtime        = "nodejs12"
   time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
@@ -391,7 +391,7 @@ resource "baiducloud_cfc_function" "default" {
   description    = "terraform create"
   handler        = "index.handler"
   memory_size    = 128
-  runtime        = "nodejs8.5"
+  runtime        = "nodejs12"
   time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }
@@ -414,7 +414,7 @@ resource "baiducloud_cfc_function" "default" {
   description    = "terraform create"
   handler        = "index.handler"
   memory_size    = 128
-  runtime        = "nodejs8.5"
+  runtime        = "nodejs12"
   time_out       = 3
   code_file_name = "testFiles/cfcTestCode.zip"
 }

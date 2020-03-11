@@ -191,11 +191,6 @@ func dataSourceBaiduCloudCFCFunction() *schema.Resource {
 				Description: "CFC Function source tag",
 				Computed:    true,
 			},
-			"code_id": {
-				Type:        schema.TypeString,
-				Description: "CFC Function code id",
-				Computed:    true,
-			},
 		},
 	}
 }
@@ -241,7 +236,6 @@ func dataSourceBaiduCloudCFCFunctionRead(d *schema.ResourceData, meta interface{
 	d.Set("commit_id", function.Configuration.CommitID)
 	d.Set("role", function.Configuration.Role)
 	d.Set("source_type", function.Configuration.SourceTag)
-	d.Set("code_id", function.Configuration.CodeID)
 	d.Set("log_type", function.Configuration.LogType)
 	if function.Configuration.LogType == "bos" {
 		if strings.HasPrefix(function.Configuration.LogBosDir, "bos://") {

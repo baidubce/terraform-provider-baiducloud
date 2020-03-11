@@ -84,8 +84,13 @@ resource "baiducloud_auto_snapshot_policy" "default" {
 }
 
 data "baiducloud_auto_snapshot_policies" "default" {
-   asp_name    = baiducloud_auto_snapshot_policy.default.name
-   volume_name = baiducloud_cds.default.name
+  asp_name    = baiducloud_auto_snapshot_policy.default.name
+  volume_name = baiducloud_cds.default.name
+
+  filter {
+    name = "name"
+    values = ["test-BaiduAcc*"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"BCC",
 		BaiduCloudTestResourceAttrNamePrefix+"CDS",

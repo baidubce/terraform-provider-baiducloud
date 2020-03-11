@@ -47,6 +47,8 @@ func dataSourceBaiduCloudSecurityGroupRules() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"filter": dataSourceFiltersSchema(),
+
 			"rules": {
 				Type:        schema.TypeList,
 				Description: "Security Group rules",
@@ -133,6 +135,8 @@ func dataSourceBaiduCloudSecurityGroupRulesRead(d *schema.ResourceData, meta int
 	for _, sg := range sgList {
 		if sg.Id == sgId {
 			ruleMap = bccService.FlattenSecurityGroupRuleModelsToMap(sg.Rules)
+			FilterDataSourceResult(d, &ruleMap)
+
 			if err := d.Set("rules", ruleMap); err != nil {
 				return WrapErrorf(err, DefaultErrorMsg, "baiducloud_security_group_rules", action, BCESDKGoERROR)
 			}

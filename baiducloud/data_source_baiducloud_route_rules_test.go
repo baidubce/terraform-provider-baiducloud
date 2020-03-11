@@ -88,6 +88,11 @@ resource "%s" "%s" {
 data "baiducloud_route_rules" "default" {
   route_table_id = baiducloud_vpc.default.route_table_id
   route_rule_id  = %s.%s.id
+
+  filter {
+    name = "next_hop_type"
+    values = ["custom"]
+  }
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"Subnet",
 		BaiduCloudTestResourceAttrNamePrefix+"BCC", testAccRouteRuleResourceType, BaiduCloudTestResourceName,

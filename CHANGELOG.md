@@ -1,4 +1,6 @@
 ## 1.0.1 (Unreleased)
+ENHANCEMENTS:
+- datasource/*: datasource add support "filter"
 
 BUG FIXES:
 - datasource/baiducloud_zones: Fix the problems of unavailable parameter "name_regex" ([#1](https://github.com/terraform-providers/terraform-provider-baiducloud/issues/1))
