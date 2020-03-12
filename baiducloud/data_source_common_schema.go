@@ -114,7 +114,7 @@ func (c *FilterConfig) checkValue(value interface{}) bool {
 	return false
 }
 
-func FilterDataSourceResult(d *schema.ResourceData, result *[]map[string]interface{})  {
+func FilterDataSourceResult(d *schema.ResourceData, result *[]map[string]interface{}) {
 	filter := NewDataSourceFilter(d)
 
 	for i, data := range *result {
