@@ -1,4 +1,4 @@
-## 1.1.0 (Unreleased)
+## 1.1.0 (March 12, 2020)
 ENHANCEMENTS:
 - datasource/*: datasource add support "filter"
 
