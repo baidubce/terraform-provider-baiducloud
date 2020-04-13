@@ -116,6 +116,7 @@ func resourceBaiduCloudEip() *schema.Resource {
 				Sensitive:        true,
 				DiffSuppressFunc: postPaidDiffSuppressFunc,
 				ValidateFunc:     validation.IntInSlice([]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36}),
+				ConflictsWith:    []string{"auto_renew_time", "auto_renew_time_unit"},
 			},
 			"reservation_time_unit": {
 				Type:             schema.TypeString,
@@ -124,6 +125,23 @@ func resourceBaiduCloudEip() *schema.Resource {
 				Sensitive:        true,
 				DiffSuppressFunc: postPaidDiffSuppressFunc,
 				ValidateFunc:     validation.StringInSlice([]string{"month"}, false),
+				ConflictsWith:    []string{"auto_renew_time", "auto_renew_time_unit"},
+			},
+			"auto_renew_time": {
+				Type:             schema.TypeInt,
+				Description:      "Eip auto renew time length, only useful when payment_timing is Prepaid. If auto_renew_time_unit is month, support 1-9, if auto_renew_time_unit is year, support 1-3.",
+				Optional:         true,
+				DiffSuppressFunc: postPaidDiffSuppressFunc,
+				ValidateFunc:     validation.IntInSlice([]int{1, 2, 3, 4, 5, 6, 7, 8, 9}),
+				ConflictsWith:    []string{"reservation_length", "reservation_time_unit"},
+			},
+			"auto_renew_time_unit": {
+				Type:             schema.TypeString,
+				Description:      "Eip auto renew time unit, only useful when payment_timing is Prepaid, support month/year",
+				Optional:         true,
+				DiffSuppressFunc: postPaidDiffSuppressFunc,
+				ValidateFunc:     validation.StringInSlice([]string{"month", "year"}, false),
+				ConflictsWith:    []string{"reservation_length", "reservation_time_unit"},
 			},
 			"tags": tagsSchema(),
 		},
@@ -226,6 +244,20 @@ func resourceBaiduCloudEipUpdate(d *schema.ResourceData, meta interface{}) error
 		d.SetPartial("bandwidth_in_mbps")
 	}
 
+	if d.Get("billing_method").(string) == "Prepaid" &&
+		(d.HasChange("auto_renew_time") || d.HasChange("auto_renew_time_unit")) {
+		isStart, args := buildUpdateAutoRenewArgs(d)
+		if isStart {
+			if err := eipClient.StartAutoRenew(eipAddr, args); err != nil {
+				return WrapError(err)
+			}
+		} else {
+			if err := eipClient.StopAutoRenew(eipAddr); err != nil {
+				return WrapError(err)
+			}
+		}
+	}
+
 	d.Partial(false)
 	return resourceBaiduCloudEipRead(d, meta)
 }
@@ -283,16 +315,43 @@ func buildBaiduCloudCreateEipArgs(d *schema.ResourceData) *eip.CreateEipArgs {
 	if request.Billing.PaymentTiming == "Prepaid" {
 		request.Billing.Reservation = &eip.Reservation{}
 
-		if v := d.Get("reservation_length").(int); v > 0 {
-			request.Billing.Reservation.ReservationLength = v
+		if v, ok := d.GetOk("reservation_length"); ok && v.(int) > 0 {
+			request.Billing.Reservation.ReservationLength = v.(int)
 		}
 
-		if v := d.Get("reservation_time_unit").(string); len(v) > 0 {
-			request.Billing.Reservation.ReservationTimeUnit = v
+		if v, ok := d.GetOk("reservation_time_unit"); ok && len(v.(string)) > 0 {
+			request.Billing.Reservation.ReservationTimeUnit = v.(string)
+		}
+
+		if v, ok := d.GetOk("auto_renew_time"); ok && v.(int) > 0 {
+			request.AutoRenewTime = v.(int)
+		}
+
+		if v, ok := d.GetOk("auto_renew_time_unit"); ok && len(v.(string)) > 0 {
+			request.AutoRenewTimeUnit = v.(string)
 		}
 	}
 
 	request.ClientToken = buildClientToken()
 
 	return request
+}
+
+func buildUpdateAutoRenewArgs(d *schema.ResourceData) (bool, *eip.StartAutoRenewArgs) {
+	_, nTime := d.GetChange("auto_renew_time")
+	_, nTimeUnit := d.GetChange("auto_renew_time_unit")
+
+	newIsStop := nTime == nil || nTime.(int) == 0 || nTimeUnit == nil || !stringInSlice([]string{"month", "year"}, nTimeUnit.(string))
+
+	if !newIsStop {
+		args := eip.StartAutoRenewArgs{
+			AutoRenewTime:     nTime.(int),
+			AutoRenewTimeUnit: nTimeUnit.(string),
+			ClientToken:       buildClientToken(),
+		}
+
+		return true, &args
+	}
+
+	return false, nil
 }

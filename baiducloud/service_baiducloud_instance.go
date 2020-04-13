@@ -1,6 +1,8 @@
 package baiducloud
 
 import (
+	"time"
+
 	"github.com/baidubce/bce-sdk-go/services/bcc"
 	"github.com/baidubce/bce-sdk-go/services/bcc/api"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -194,4 +196,50 @@ func (s *BccService) FlattenInstanceModelToMap(instances []api.InstanceModel) ([
 	}
 
 	return result, nil
+}
+
+func (s *BccService) StartInstance(instanceID string, timeout time.Duration) error {
+	action := "Start instance " + instanceID
+
+	_, err := s.client.WithBccClient(func(bccClient *bcc.Client) (i interface{}, e error) {
+		return nil, bccClient.StartInstance(instanceID)
+	})
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+	}
+
+	stateConf := buildStateConf(
+		[]string{string(api.InstanceStatusStopped), string(api.InstanceStatusStarting)},
+		[]string{string(api.InstanceStatusRunning)},
+		timeout,
+		s.InstanceStateRefresh(instanceID),
+	)
+	if _, err := stateConf.WaitForState(); err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+	}
+
+	return nil
+}
+
+func (s *BccService) StopInstance(instanceID string, timeout time.Duration) error {
+	action := "Stop instance " + instanceID
+
+	_, err := s.client.WithBccClient(func(bccClient *bcc.Client) (i interface{}, e error) {
+		return nil, bccClient.StopInstance(instanceID, false)
+	})
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+	}
+
+	stateConf := buildStateConf(
+		[]string{string(api.InstanceStatusStopping), string(api.InstanceStatusRunning)},
+		[]string{string(api.InstanceStatusStopped)},
+		timeout,
+		s.InstanceStateRefresh(instanceID),
+	)
+	if _, err := stateConf.WaitForState(); err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+	}
+
+	return nil
 }

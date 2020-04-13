@@ -28,6 +28,8 @@ The following arguments are supported:
 * `bandwidth_in_mbps` - (Required) Eip bandwidth(Mbps), if payment_timing is Prepaid or billing_method is ByBandWidth, support between 1 and 200, if billing_method is ByTraffic, support between 1 and 1000
 * `billing_method` - (Required, ForceNew) Eip billing method, support ByTraffic or ByBandwidth
 * `payment_timing` - (Required, ForceNew) Eip payment timing, support Prepaid and Postpaid
+* `auto_renew_time_unit` - (Optional) Eip auto renew time unit, only useful when payment_timing is Prepaid, support month/year
+* `auto_renew_time` - (Optional) Eip auto renew time length, only useful when payment_timing is Prepaid. If auto_renew_time_unit is month, support 1-9, if auto_renew_time_unit is year, support 1-3.
 * `name` - (Optional, ForceNew) Eip name, length must be between 1 and 65 bytes
 * `reservation_length` - (Optional) Eip Prepaid billing reservation length, only useful when payment_timing is Prepaid
 * `reservation_time_unit` - (Optional) Eip Prepaid billing reservation time unit, only useful when payment_timing is Prepaid

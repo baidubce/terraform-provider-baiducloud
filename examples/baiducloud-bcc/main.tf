@@ -90,6 +90,9 @@ resource "baiducloud_instance" "my-server" {
   related_release_flag     = true
   delete_cds_snapshot_flag = true
 
+  // The action is optional, which can be start or stop, default is start.
+  action = "start"
+
   cds_disks {
     cds_size_in_gb = 50
     storage_type   = "cloud_hp1"

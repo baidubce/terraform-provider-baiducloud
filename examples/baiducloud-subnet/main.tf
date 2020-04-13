@@ -21,5 +21,11 @@ resource "baiducloud_subnet" "default" {
 }
 
 data "baiducloud_subnets" "default" {
-  subnet_id = baiducloud_subnet.default.id
+  #subnet_id = baiducloud_subnet.default.id
+  vpc_id = baiducloud_vpc.default.id
+
+  filter {
+    name = "cidr"
+    values = ["192.168.1.0/26", ".*/24"]
+  }
 }

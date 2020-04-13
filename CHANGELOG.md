@@ -1,4 +1,11 @@
 ## 1.2.0 (Unreleased)
+NOTES:
+- resource/baiducloud_cfc: Fix wrong information in the baiducloud_cfc document
+
+ENHANCEMENTS:
+- resource/baiducloud_instance: support start/stop operation of the instance
+- resource/baiducloud_eip: support start/stop auto renew if eip is prepaid
+
 ## 1.1.0 (March 12, 2020)
 ENHANCEMENTS:
 - datasource/*: datasource add support "filter"

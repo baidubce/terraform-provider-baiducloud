@@ -35,6 +35,7 @@ The following arguments are supported:
 * `cpu_count` - (Required) Number of CPU cores to be created for the instance.
 * `image_id` - (Required) ID of the image to be used for the instance.
 * `memory_capacity_in_gb` - (Required) Memory capacity(GB) of the instance to be created.
+* `action` - (Optional) Start or stop the instance, which can only be start or stop, default start.
 * `admin_pass` - (Optional) Password of the instance to be started. This value should be 8-16 characters, and English, numbers and symbols must exist at the same time. The symbols is limited to "!@#$%^*()".
 * `auto_renew_time_length` - (Optional, ForceNew) The time length of automatic renewal. It is valid when payment_timing is Prepaid, and the value should be 1-9 when the auto_renew_time_unit is month and 1-3 when the auto_renew_time_unit is year. Default to 1.
 * `auto_renew_time_unit` - (Optional, ForceNew) Time unit of automatic renewal, the value can be month or year. The default value is empty, indicating no automatic renewal. It is valid only when the payment_timing is Prepaid.

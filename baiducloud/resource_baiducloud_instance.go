@@ -362,6 +362,13 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"action": {
+				Type:         schema.TypeString,
+				Description:  "Start or stop the instance, which can only be start or stop, default start.",
+				Optional:     true,
+				Default:      INSTANCE_ACTION_START,
+				ValidateFunc: validation.StringInSlice([]string{INSTANCE_ACTION_START, INSTANCE_ACTION_STOP}, false),
+			},
 			"tags": tagsSchema(),
 		},
 	}
@@ -432,6 +439,13 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 	// set instance description
 	if err := updateInstanceDescription(d, meta, d.Id()); err != nil {
 		return err
+	}
+
+	// stop the instance if the action field is stop.
+	if d.Get("action").(string) == INSTANCE_ACTION_STOP {
+		if err := bccService.StopInstance(d.Id(), d.Timeout(schema.TimeoutUpdate)); err != nil {
+			return err
+		}
 	}
 
 	return resourceBaiduCloudInstanceRead(d, meta)
@@ -571,6 +585,11 @@ func resourceBaiduCloudInstanceUpdate(d *schema.ResourceData, meta interface{}) 
 
 	// update instance subnet
 	if err := updateInstanceSubnet(d, meta, instanceID); err != nil {
+		return err
+	}
+
+	// update instance action
+	if err := updateInstanceAction(d, meta, instanceID); err != nil {
 		return err
 	}
 
@@ -1035,6 +1054,31 @@ func updateInstanceSubnet(d *schema.ResourceData, meta interface{}, instanceID s
 		}
 
 		d.SetPartial("subnet_id")
+	}
+
+	return nil
+}
+
+func updateInstanceAction(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	action := "Update instance action " + instanceID
+	client := meta.(*connectivity.BaiduClient)
+	bccService := BccService{client}
+
+	if d.HasChange("action") {
+		act := d.Get("action").(string)
+		addDebug(action, act)
+
+		if act == INSTANCE_ACTION_START {
+			if err := bccService.StartInstance(instanceID, d.Timeout(schema.TimeoutUpdate)); err != nil {
+				return err
+			}
+		} else if act == INSTANCE_ACTION_STOP {
+			if err := bccService.StopInstance(instanceID, d.Timeout(schema.TimeoutUpdate)); err != nil {
+				return err
+			}
+		}
+
+		d.SetPartial("action")
 	}
 
 	return nil

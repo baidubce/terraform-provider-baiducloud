@@ -119,7 +119,32 @@ func TestAccBaiduCloudInstance(t *testing.T) {
 					resource.TestCheckResourceAttr(testAccInstanceResourceName, "billing.payment_timing", "Postpaid"),
 					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "subnet_id"),
 					resource.TestCheckResourceAttr(testAccInstanceResourceName, "security_groups.#", "1"),
-					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "status"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "status", "Running"),
+					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "create_time"),
+					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "internal_ip"),
+					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "placement_policy"),
+					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "vpc_id"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "cds_disks.0.cds_size_in_gb", "50"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "cds_disks.0.storage_type", "cloud_hp1"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "tags.%", "1"),
+				),
+			},
+			{
+				Config: testAccInstanceActionUpdate(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckBaiduCloudDataSourceId(testAccInstanceResourceName),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "name", BaiduCloudTestResourceAttrNamePrefix+"BCC-update"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "description", "terraform test update instance"),
+					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "image_id"),
+					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "availability_zone"),
+					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "cpu_count"),
+					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "memory_capacity_in_gb"),
+					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "root_disk_size_in_gb"),
+					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "root_disk_storage_type"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "billing.payment_timing", "Postpaid"),
+					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "subnet_id"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "security_groups.#", "1"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "status", "Stopped"),
 					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "create_time"),
 					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "internal_ip"),
 					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "placement_policy"),
@@ -285,6 +310,96 @@ resource "baiducloud_instance" "default" {
   tags = {
     "testKey" = "testValue"
   }
+}
+
+resource "baiducloud_eip_association" "default" {
+  eip           = baiducloud_eip.default.id
+  instance_type = "BCC"
+  instance_id   = baiducloud_instance.default.id
+}
+`, BaiduCloudTestResourceAttrNamePrefix+"EIP",
+		BaiduCloudTestResourceAttrNamePrefix+"VPC",
+		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
+		BaiduCloudTestResourceAttrNamePrefix+"SG",
+		BaiduCloudTestResourceAttrNamePrefix+"Subnet02",
+		BaiduCloudTestResourceAttrNamePrefix+"SG02",
+		BaiduCloudTestResourceAttrNamePrefix+"BCC-update")
+}
+
+func testAccInstanceActionUpdate() string {
+	return fmt.Sprintf(`
+data "baiducloud_specs" "default" {}
+
+data "baiducloud_zones" "default" {}
+
+data "baiducloud_images" "default" {}
+
+resource "baiducloud_eip" "default" {
+  name              = "%s"
+  bandwidth_in_mbps = 1
+  payment_timing    = "Postpaid"
+  billing_method    = "ByTraffic"
+}
+
+resource "baiducloud_vpc" "default" {
+  name = "%s"
+  cidr = "192.168.0.0/16"
+}
+
+resource "baiducloud_subnet" "default" {
+  name      = "%s"
+  zone_name = data.baiducloud_zones.default.zones.0.zone_name
+  cidr      = "192.168.1.0/24"
+  vpc_id    = baiducloud_vpc.default.id
+}
+
+resource "baiducloud_security_group" "default" {
+  name        = "%s"
+  description = "security group created by terraform"
+  vpc_id      = baiducloud_vpc.default.id
+}
+
+resource "baiducloud_subnet" "default02" {
+  name      = "%s"
+  zone_name = data.baiducloud_zones.default.zones.0.zone_name
+  cidr      = "192.168.2.0/24"
+  vpc_id    = baiducloud_vpc.default.id
+}
+
+resource "baiducloud_security_group" "default02" {
+  name        = "%s"
+  description = "security group created by terraform"
+  vpc_id      = baiducloud_vpc.default.id
+}
+
+resource "baiducloud_instance" "default" {
+  image_id              = data.baiducloud_images.default.images.0.id
+  name                  = "%s"
+  description           = "terraform test update instance"
+  availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
+  cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
+  memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
+  billing = {
+    payment_timing = "Postpaid"
+  }
+  admin_pass = "terraform@123"
+
+  subnet_id       = baiducloud_subnet.default02.id
+  security_groups = [baiducloud_security_group.default02.id]
+
+  related_release_flag     = true
+  delete_cds_snapshot_flag = true
+
+  cds_disks {
+    cds_size_in_gb = 50
+    storage_type   = "cloud_hp1"
+  }
+
+  tags = {
+    "testKey" = "testValue"
+  }
+
+  action = "stop"
 }
 
 resource "baiducloud_eip_association" "default" {

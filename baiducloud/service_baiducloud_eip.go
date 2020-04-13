@@ -34,6 +34,40 @@ func (e *EipService) EipResizeBandwidth(ip string, new int) error {
 	return nil
 }
 
+func (e *EipService) StartAutoRenew(ip string, args *eip.StartAutoRenewArgs) error {
+	action := "Start Eip Auto Renew " + ip
+
+	_, err := e.client.WithEipClient(func(client *eip.Client) (i interface{}, e error) {
+		return nil, client.StartAutoRenew(ip, args)
+	})
+
+	if err != nil {
+		if !IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_eip", "", BCESDKGoERROR)
+		}
+	}
+
+	addDebug(action, action)
+	return nil
+}
+
+func (e *EipService) StopAutoRenew(ip string) error {
+	action := "Stop Eip Auto Renew " + ip
+
+	_, err := e.client.WithEipClient(func(client *eip.Client) (i interface{}, e error) {
+		return nil, client.StopAutoRenew(ip, buildClientToken())
+	})
+
+	if err != nil {
+		if !IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_eip", "", BCESDKGoERROR)
+		}
+	}
+
+	addDebug(action, action)
+	return nil
+}
+
 func (e *EipService) EipBind(ip, instanceType, instanceId string) error {
 	action := "Bind Eip " + ip
 
