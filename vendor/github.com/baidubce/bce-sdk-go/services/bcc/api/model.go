@@ -81,7 +81,7 @@ type InstanceModel struct {
 	CpuCount              int              `json:"cpuCount"`
 	GpuCard               string           `json:"gpuCard"`
 	FpgaCard              string           `json:"fpgaCard"`
-	CardCount             int              `json:"cardCount"`
+	CardCount             string           `json:"cardCount"`
 	MemoryCapacityInGB    int              `json:"memoryCapacityInGB"`
 	LocalDiskSizeInGB     int              `json:"localDiskSizeInGB"`
 	ImageId               string           `json:"imageId"`
@@ -223,6 +223,16 @@ type InstanceChangeSubnetArgs struct {
 	InstanceId string `json:"instanceId"`
 	SubnetId   string `json:"subnetId"`
 	Reboot     bool   `json:"reboot"`
+}
+
+type BatchAddIpArgs struct {
+	InstanceId string   `json:"instanceId"`
+	PrivateIps []string `json:"privateIps"`
+}
+
+type BatchDelIpArgs struct {
+	InstanceId string   `json:"instanceId"`
+	PrivateIps []string `json:"privateIps"`
 }
 
 type VolumeStatus string
