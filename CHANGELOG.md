@@ -1,4 +1,4 @@
-## 1.2.0 (Unreleased)
+## 1.2.0 (April 13, 2020)
 NOTES:
 - resource/baiducloud_cfc: Fix wrong information in the baiducloud_cfc document
 
