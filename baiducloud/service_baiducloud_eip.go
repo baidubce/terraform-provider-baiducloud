@@ -98,9 +98,28 @@ func (e *EipService) EipUnBind(ip string) error {
 		return nil, client.UnBindEip(ip, buildClientToken())
 	})
 
-	if err != nil {
-		if !IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
+	if err != nil && !NotFoundError(err) {
+		// if before unbind, relate resource like blb and instance has been deleted,
+		// may return UnsupportedOperation error
+		// so we check eip status again
+		eipDetail, errDetail := e.EipGetDetail(ip)
+		if errDetail != nil {
+			if NotFoundError(errDetail) {
+				addDebug(action, "")
+				return nil
+			}
+
+			// return unbind err
 			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_eip", "", BCESDKGoERROR)
+		}
+
+		if stringInSlice([]string{EIPStatusBinded, EIPStatusBinding}, eipDetail.Status) {
+			// eip still in use
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_eip", "", BCESDKGoERROR)
+		} else {
+			// eip not in use, return unbind success
+			addDebug(action, "")
+			return nil
 		}
 	}
 

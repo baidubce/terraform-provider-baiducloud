@@ -1,4 +1,20 @@
 ## 1.3.0 (Unreleased)
+FEATURES:
+
+* **New Data Source:** `baiducloud_cce_versions`
+* **New Data Source:** `baiducloud_cce_container_net`
+* **New Data Source:** `baiducloud_cce_cluster_nodes`
+* **New Data Source:** `baiducloud_cce_kubeconfig`
+* **New Resource:** `baiducloud_cce_cluster`
+
+BUG FIXES:
+- resource/baiducloud_cds: Fix the problem of before delete not check status
+- resource/baiducloud_cds_attachment: Fix the problem of detach error if cds has been detached or deleted before
+- resource/baiducloud_eip: Fix the problem of befor delete not check status
+- resource/baiducloud_eip_association: Fix the problem of unbind error if eip has been unbind or deleted before
+- resource/baiducloud_security_group_rule: Fix the problem of create rule error if protocol is all and port_range is not 1-65535
+- datasource/baiducloud_instances: Fix the problem of wrong parameter "card_count" type
+
 ## 1.2.0 (April 13, 2020)
 NOTES:
 - resource/baiducloud_cfc: Fix wrong information in the baiducloud_cfc document

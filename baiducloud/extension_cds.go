@@ -1,6 +1,10 @@
 package baiducloud
 
-import "github.com/baidubce/bce-sdk-go/services/bcc/api"
+import (
+	"fmt"
+
+	"github.com/baidubce/bce-sdk-go/services/bcc/api"
+)
 
 const CDSNotAttachedErrorCode = "Volume.DiskNotAttachedInstance"
 
@@ -21,3 +25,5 @@ var CDSProcessingStatus = []string{
 	string(api.VolumeStatusSNAPSHOTPROCESSING),
 	string(api.VolumeStatusIMAGEPROCESSING),
 }
+
+var cdsStillInUsed = fmt.Errorf("cds is still in used")

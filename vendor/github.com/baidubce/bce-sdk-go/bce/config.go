@@ -26,7 +26,7 @@ import (
 
 // Constants and default values for the package bce
 const (
-	SDK_VERSION                          = "0.9.6"
+	SDK_VERSION                          = "0.9.12"
 	URI_PREFIX                           = "/" // now support uri without prefix "v1" so just set root path
 	DEFAULT_DOMAIN                       = "baidubce.com"
 	DEFAULT_PROTOCOL                     = "http"
@@ -58,6 +58,9 @@ type BceClientConfiguration struct {
 	SignOption                *auth.SignOptions
 	Retry                     RetryPolicy
 	ConnectionTimeoutInMillis int
+	// CnameEnabled should be true when use custom domain as endpoint to visit bos resource
+	CnameEnabled   bool
+	BackupEndpoint string
 }
 
 func (c *BceClientConfiguration) String() string {

@@ -146,10 +146,40 @@ type CreateInstanceArgs struct {
 	CdsAutoRenew          bool             `json:"cdsAutoRenew"`
 	RelationTag           bool             `json:"relationTag,omitempty"`
 	Tags                  []model.TagModel `json:"tags,omitempty"`
+	DeployId              string           `json:"deployId,omitempty"`
 	ClientToken           string           `json:"-"`
 }
 
 type CreateInstanceResult struct {
+	InstanceIds []string `json:"instanceIds"`
+}
+
+type CreateInstanceBySpecArgs struct {
+	ImageId               string           `json:"imageId"`
+	Spec                  string           `json:"spec"`
+	RootDiskSizeInGb      int              `json:"rootDiskSizeInGb,omitempty"`
+	RootDiskStorageType   StorageType      `json:"rootDiskStorageType,omitempty"`
+	EphemeralDisks        []EphemeralDisk  `json:"ephemeralDisks,omitempty"`
+	CreateCdsList         []CreateCdsModel `json:"createCdsList,omitempty"`
+	NetWorkCapacityInMbps int              `json:"networkCapacityInMbps,omitempty"`
+	InternetChargeType    string           `json:"internetChargeType,omitempty"`
+	PurchaseCount         int              `json:"purchaseCount,omitempty"`
+	Name                  string           `json:"name,omitempty"`
+	AdminPass             string           `json:"adminPass,omitempty"`
+	Billing               Billing          `json:"billing"`
+	ZoneName              string           `json:"zoneName,omitempty"`
+	SubnetId              string           `json:"subnetId,omitempty"`
+	SecurityGroupId       string           `json:"securityGroupId,omitempty"`
+	RelationTag           bool             `json:"relationTag,omitempty"`
+	Tags                  []model.TagModel `json:"tags,omitempty"`
+	KeypairId             string           `json:"keypairId"`
+	AutoRenewTimeUnit     string           `json:"autoRenewTimeUnit"`
+	AutoRenewTime         int              `json:"autoRenewTime"`
+	CdsAutoRenew          bool             `json:"cdsAutoRenew"`
+	ClientToken           string           `json:"-"`
+}
+
+type CreateInstanceBySpecResult struct {
 	InstanceIds []string `json:"instanceIds"`
 }
 
@@ -648,4 +678,43 @@ type ZoneModel struct {
 
 type ListZoneResult struct {
 	Zones []ZoneModel `json:"zones"`
+}
+
+type CreateDeploySetArgs struct {
+	Strategy    string `json:"strategy"`
+	Name        string `json:"name,omitempty"`
+	Desc        string `json:"desc,omitempty"`
+	ClientToken string `json:"-"`
+}
+
+type ModifyDeploySetArgs struct {
+	Name        string `json:"name,omitempty"`
+	Desc        string `json:"desc,omitempty"`
+	ClientToken string `json:"-"`
+}
+
+type CreateDeploySetResult struct {
+	DeploySetIds []string `json:"deploySetIds"`
+}
+
+type ListDeploySetsResult struct {
+	DeploySetList []DeploySetModel `json:"deploySets"`
+}
+
+type DeploySetModel struct {
+	Strategy     string              `json:"strategy"`
+	InstanceList []AzIntstanceStatis `json:"azIntstanceStatisList"`
+	Name         string              `json:"name"`
+	Desc         string              `json:"desc"`
+	DeploySetId  string              `json:"deploysetId"`
+}
+
+type AzIntstanceStatis struct {
+	ZoneName string `json:"zoneName"`
+	Count    int    `json:"instanceCount"`
+	Total    int    `json:"instanceTotal"`
+}
+
+type GetDeploySetResult struct {
+	DeploySetModel
 }

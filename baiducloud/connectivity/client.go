@@ -6,6 +6,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/appblb"
 	"github.com/baidubce/bce-sdk-go/services/bcc"
 	"github.com/baidubce/bce-sdk-go/services/bos"
+	"github.com/baidubce/bce-sdk-go/services/cce"
 	"github.com/baidubce/bce-sdk-go/services/cert"
 	"github.com/baidubce/bce-sdk-go/services/cfc"
 	"github.com/baidubce/bce-sdk-go/services/eip"
@@ -28,6 +29,7 @@ type BaiduClient struct {
 	bosConn    *bos.Client
 	certConn   *cert.Client
 	cfcConn    *cfc.Client
+	cceConn    *cce.Client
 }
 
 type ApiVersion string
@@ -198,4 +200,22 @@ func (client *BaiduClient) WithCFCClient(do func(*cfc.Client) (interface{}, erro
 	}
 
 	return do(client.cfcConn)
+}
+
+func (client *BaiduClient) WithCCEClient(do func(*cce.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the CFC client if necessary
+	if client.cceConn == nil {
+		client.WithCommonClient(CCECode)
+		cceClient, err := cce.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+
+		client.cceConn = cceClient
+	}
+
+	return do(client.cceConn)
 }

@@ -304,6 +304,7 @@ func resourceBaiduCloudCDSUpdate(d *schema.ResourceData, meta interface{}) error
 
 func resourceBaiduCloudCDSDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
+	bccService := BccService{client: client}
 	id := d.Id()
 
 	action := "Delete CDS volume " + id
@@ -321,6 +322,15 @@ func resourceBaiduCloudCDSDelete(d *schema.ResourceData, meta interface{}) error
 	}
 
 	err := resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+		detail, errDetail := bccService.GetCDSVolumeDetail(id)
+		if errDetail != nil {
+			return resource.NonRetryableError(errDetail)
+		}
+
+		if stringInSlice(append(CDSProcessingStatus, string(api.VolumeStatusINUSE)), string(detail.Status)) {
+			return resource.RetryableError(cdsStillInUsed)
+		}
+
 		_, err := client.WithBccClient(func(client *bcc.Client) (i interface{}, e error) {
 			return id, client.DeleteCDSVolumeNew(id, args)
 		})

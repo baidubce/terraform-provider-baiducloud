@@ -79,9 +79,27 @@ func (s *BccService) DetachCDSVolume(volumeId, instanceId string) error {
 
 	addDebug(action, raw)
 
-	if err != nil {
-		if !IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
+	if err != nil && !NotFoundError(err) {
+		// if before detach, relate resource like instance has been deleted,
+		// may return DiskNotAttachedInstance error
+		// so we check cds status again
+		cdsDetail, errDetail := s.GetCDSVolumeDetail(volumeId)
+		if errDetail != nil {
+			if NotFoundError(errDetail) {
+				return nil
+			}
+
+			// return detach err
 			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_cds", action, BCESDKGoERROR)
+		}
+
+		if stringInSlice([]string{
+			string(api.VolumeStatusCREATING),
+			string(api.VolumeStatusATTACHING),
+			string(api.VolumeStatusINUSE)}, cdsDetail.SourceSnapshotId) {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_cds", action, BCESDKGoERROR)
+		} else {
+			return nil
 		}
 	}
 
@@ -90,7 +108,7 @@ func (s *BccService) DetachCDSVolume(volumeId, instanceId string) error {
 		[]string{string(api.VolumeStatusAVAILABLE)},
 		DefaultTimeout,
 		s.CDSVolumeStateRefreshFunc(volumeId, CDSFailedStatus))
-	if _, err := stateConf.WaitForState(); err != nil {
+	if _, err := stateConf.WaitForState(); err != nil && !NotFoundError(err) {
 		return WrapError(err)
 	}
 

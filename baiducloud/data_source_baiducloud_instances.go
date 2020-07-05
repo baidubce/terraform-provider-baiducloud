@@ -123,7 +123,7 @@ func dataSourceBaiduCloudInstances() *schema.Resource {
 							Computed:    true,
 						},
 						"card_count": {
-							Type:        schema.TypeInt,
+							Type:        schema.TypeString,
 							Description: "The card count of the instance.",
 							Computed:    true,
 						},

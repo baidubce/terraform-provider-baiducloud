@@ -165,7 +165,7 @@ func resourceBaiduCloudEipAssociationDelete(d *schema.ResourceData, meta interfa
 		[]string{EIPStatusAvailable},
 		d.Timeout(schema.TimeoutDelete),
 		eipClient.EipStateRefreshFunc(eipAddress, append(EIPFailedStatus, EIPStatusBinded)))
-	if _, err = stateConf.WaitForState(); err != nil {
+	if _, err = stateConf.WaitForState(); err != nil && !NotFoundError(err) {
 		return WrapError(err)
 	}
 

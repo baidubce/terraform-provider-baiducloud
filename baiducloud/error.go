@@ -29,6 +29,7 @@ type ErrorSource string
 const (
 	// common error
 	ResourceNotFound          = "ResourceNotfound"
+	ResourceNotFound2         = "ResourceNotFound"
 	ResourceNotFoundException = "ResourceNotFoundException"
 
 	// bcc error
@@ -38,6 +39,8 @@ const (
 	// not found error
 	InstanceNotFound = "InstanceNotFound"
 	EipNotFound      = "EipNotFound"
+	CceNotFound      = "Cce.warning.ClusterNotExist"
+	InstanceNotExist = "InstanceNotExist"
 )
 
 const (
@@ -62,9 +65,15 @@ var (
 
 	// replication configuration error
 	ReplicationConfigurationNotFound = []string{"NoReplicationConfiguration"}
+
+	// cce error
+	CceClusterNotFound = []string{CceNotFound}
 )
 
-var NotFoundErrorList = []string{ResourceNotFoundException, ResourceNotFound, InstanceNotFound, "NoSuchObject", "NoSuchNat", EipNotFound}
+var NotFoundErrorList = []string{
+	ResourceNotFoundException, ResourceNotFound, ResourceNotFound2, InstanceNotFound,
+	"NoSuchObject", "NoSuchNat", EipNotFound, InstanceNotExist, CceNotFound,
+}
 
 // An Error to wrap the different erros
 type WrapErrorOld struct {

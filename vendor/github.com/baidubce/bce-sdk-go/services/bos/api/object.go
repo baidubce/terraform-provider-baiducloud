@@ -105,7 +105,7 @@ func PutObject(cli bce.Client, bucket, object string, body *bce.Body,
 	}
 
 	resp := &bce.BceResponse{}
-	if err := cli.SendRequest(req, resp); err != nil {
+	if err := SendRequest(cli, req, resp); err != nil {
 		return "", err
 	}
 	if resp.IsFail() {
@@ -183,7 +183,7 @@ func CopyObject(cli bce.Client, bucket, object, source string,
 
 	// Send request and get the result
 	resp := &bce.BceResponse{}
-	if err := cli.SendRequest(req, resp); err != nil {
+	if err := SendRequest(cli, req, resp); err != nil {
 		return nil, err
 	}
 	if resp.IsFail() {
@@ -233,7 +233,7 @@ func GetObject(cli bce.Client, bucket, object string, responseHeaders map[string
 
 	// Send request and get the result
 	resp := &bce.BceResponse{}
-	if err := cli.SendRequest(req, resp); err != nil {
+	if err := SendRequest(cli, req, resp); err != nil {
 		return nil, err
 	}
 	if resp.IsFail() {
@@ -320,7 +320,7 @@ func GetObjectMeta(cli bce.Client, bucket, object string) (*GetObjectMetaResult,
 
 	// Send request and get the result
 	resp := &bce.BceResponse{}
-	if err := cli.SendRequest(req, resp); err != nil {
+	if err := SendRequest(cli, req, resp); err != nil {
 		return nil, err
 	}
 	if resp.IsFail() {
@@ -368,6 +368,9 @@ func GetObjectMeta(cli bce.Client, bucket, object string) (*GetObjectMetaResult,
 	}
 	if val, ok := headers[toHttpHeaderKey(http.BCE_STORAGE_CLASS)]; ok {
 		result.StorageClass = val
+	}
+	if val, ok := headers[toHttpHeaderKey(http.BCE_RESTORE)]; ok {
+		result.BceRestore = val
 	}
 	bcePrefix := toHttpHeaderKey(http.BCE_USER_METADATA_PREFIX)
 	for k, v := range headers {
@@ -417,7 +420,7 @@ func SelectObject(cli bce.Client, bucket, object string, args *SelectObjectArgs)
 
 	// Send request and get the result
 	resp := &bce.BceResponse{}
-	if err := cli.SendRequest(req, resp); err != nil {
+	if err := SendRequest(cli, req, resp); err != nil {
 		return nil, err
 	}
 	if resp.IsFail() {
@@ -473,7 +476,7 @@ func FetchObject(cli bce.Client, bucket, object, source string,
 
 	// Send request and get the result
 	resp := &bce.BceResponse{}
-	if err := cli.SendRequest(req, resp); err != nil {
+	if err := SendRequest(cli, req, resp); err != nil {
 		return nil, err
 	}
 	if resp.IsFail() {
@@ -545,7 +548,7 @@ func AppendObject(cli bce.Client, bucket, object string, content *bce.Body,
 
 	// Send request and get the result
 	resp := &bce.BceResponse{}
-	if err := cli.SendRequest(req, resp); err != nil {
+	if err := SendRequest(cli, req, resp); err != nil {
 		return nil, err
 	}
 	if resp.IsFail() {
@@ -589,7 +592,7 @@ func DeleteObject(cli bce.Client, bucket, object string) error {
 	req.SetMethod(http.DELETE)
 
 	resp := &bce.BceResponse{}
-	if err := cli.SendRequest(req, resp); err != nil {
+	if err := SendRequest(cli, req, resp); err != nil {
 		return err
 	}
 	if resp.IsFail() {
@@ -624,7 +627,7 @@ func DeleteMultipleObjects(cli bce.Client, bucket string,
 	req.SetBody(objectListStream)
 
 	resp := &bce.BceResponse{}
-	if err := cli.SendRequest(req, resp); err != nil {
+	if err := SendRequest(cli, req, resp); err != nil {
 		return nil, err
 	}
 	if resp.IsFail() {
@@ -669,9 +672,14 @@ func GeneratePresignedUrl(conf *bce.BceClientConfiguration, signer auth.Signer, 
 	}
 	if len(bucket) != 0 && net.ParseIP(domain) == nil { // not use an IP as the endpoint by client
 		req.SetUri(bce.URI_PREFIX + object)
-		req.SetHost(bucket + "." + req.Host())
+		if !conf.CnameEnabled && !isCnameLikeHost(conf.Endpoint) {
+			req.SetHost(bucket + "." + req.Host())
+		}
 	} else {
 		req.SetUri(getObjectUri(bucket, object))
+		if conf.CnameEnabled || isCnameLikeHost(conf.Endpoint) {
+			req.SetUri(getCnameUri(req.Uri()))
+		}
 	}
 
 	// Set headers and params if given.
@@ -754,7 +762,7 @@ func PutObjectAcl(cli bce.Client, bucket, object, cannedAcl string,
 
 	// Do sending request
 	resp := &bce.BceResponse{}
-	if err := cli.SendRequest(req, resp); err != nil {
+	if err := SendRequest(cli, req, resp); err != nil {
 		return err
 	}
 	if resp.IsFail() {
@@ -780,7 +788,7 @@ func GetObjectAcl(cli bce.Client, bucket, object string) (*GetObjectAclResult, e
 	req.SetParam("acl", "")
 
 	resp := &bce.BceResponse{}
-	if err := cli.SendRequest(req, resp); err != nil {
+	if err := SendRequest(cli, req, resp); err != nil {
 		return nil, err
 	}
 	if resp.IsFail() {
@@ -807,7 +815,7 @@ func DeleteObjectAcl(cli bce.Client, bucket, object string) error {
 	req.SetMethod(http.DELETE)
 	req.SetParam("acl", "")
 	resp := &bce.BceResponse{}
-	if err := cli.SendRequest(req, resp); err != nil {
+	if err := SendRequest(cli, req, resp); err != nil {
 		return err
 	}
 	if resp.IsFail() {
@@ -826,7 +834,7 @@ func RestoreObject(cli bce.Client, bucket string, object string, args ArchiveRes
 	req.SetHeader(http.BCE_RESTORE_TIER, args.RestoreTier)
 
 	resp := &bce.BceResponse{}
-	if err := cli.SendRequest(req, resp); err != nil {
+	if err := SendRequest(cli, req, resp); err != nil {
 		return err
 	}
 	if resp.IsFail() {

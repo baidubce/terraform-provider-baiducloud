@@ -21,6 +21,7 @@ resource "baiducloud_security_group_rule" "default" {
 package baiducloud
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/baidubce/bce-sdk-go/bce"
@@ -79,7 +80,7 @@ func resourceBaiduCloudSecurityGroupRule() *schema.Resource {
 			},
 			"port_range": {
 				Type:        schema.TypeString,
-				Description: "SecurityGroup rule's port range, you can set single port like 80, or set a port range, like 1-65535, default 1-65535",
+				Description: "SecurityGroup rule's port range, you can set single port like 80, or set a port range, like 1-65535, default 1-65535. If protocol is all, only support 1-65535",
 				Optional:    true,
 				Computed:    true,
 				ForceNew:    true,
@@ -132,7 +133,11 @@ func resourceBaiduCloudSecurityGroupRuleCreate(d *schema.ResourceData, meta inte
 	client := meta.(*connectivity.BaiduClient)
 	bccService := BccService{client}
 
-	singleRule := buildSingleSecurityGroupRuleModel(d)
+	singleRule, err := buildSingleSecurityGroupRuleModel(d)
+	if err != nil {
+		return WrapError(err)
+	}
+
 	ruleId, err := bccService.buildSecurityGroupRuleId(singleRule)
 	if err != nil {
 		return WrapError(err)
@@ -203,11 +208,15 @@ func resourceBaiduCloudSecurityGroupRuleDelete(d *schema.ResourceData, meta inte
 	client := meta.(*connectivity.BaiduClient)
 
 	action := "Delete Securitt Group Rule " + d.Id()
-	singleRule := buildSingleSecurityGroupRuleModel(d)
+	singleRule, err := buildSingleSecurityGroupRuleModel(d)
+	if err != nil {
+		return WrapError(err)
+	}
+
 	revokeArgs := &api.RevokeSecurityGroupArgs{
 		Rule: singleRule,
 	}
-	err := resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+	err = resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
 		_, err := client.WithBccClient(func(client *bcc.Client) (i interface{}, e error) {
 			return nil, client.RevokeSecurityGroupRule(singleRule.SecurityGroupId, revokeArgs)
 		})
@@ -230,7 +239,7 @@ func resourceBaiduCloudSecurityGroupRuleDelete(d *schema.ResourceData, meta inte
 	return nil
 }
 
-func buildSingleSecurityGroupRuleModel(d *schema.ResourceData) *api.SecurityGroupRuleModel {
+func buildSingleSecurityGroupRuleModel(d *schema.ResourceData) (*api.SecurityGroupRuleModel, error) {
 	singleRule := &api.SecurityGroupRuleModel{}
 	if v, ok := d.GetOk("remark"); ok && v.(string) != "" {
 		singleRule.Remark = v.(string)
@@ -263,5 +272,10 @@ func buildSingleSecurityGroupRuleModel(d *schema.ResourceData) *api.SecurityGrou
 		singleRule.SecurityGroupId = v.(string)
 	}
 
-	return singleRule
+	if singleRule.Protocol == "all" && !stringInSlice([]string{"", "1-65535"}, singleRule.PortRange) {
+		return nil, fmt.Errorf("if protocol is all, port_range only support [\"\", \"1-65535\"], but now is %s",
+			singleRule.PortRange)
+	}
+
+	return singleRule, nil
 }

@@ -264,11 +264,21 @@ func resourceBaiduCloudEipUpdate(d *schema.ResourceData, meta interface{}) error
 
 func resourceBaiduCloudEipDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
+	eipService := EipService{client: client}
 
 	eipAddr := d.Id()
 	action := "Delete EIP " + eipAddr
 
 	err := resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+		eipDetail, errGet := eipService.EipGetDetail(eipAddr)
+		if errGet != nil {
+			return resource.NonRetryableError(errGet)
+		}
+
+		if eipDetail.Status == EIPStatusBinded {
+			return resource.RetryableError(eipStillInUsed)
+		}
+
 		raw, errDelete := client.WithEipClient(func(client *eip.Client) (i interface{}, e error) {
 			return eipAddr, client.DeleteEip(eipAddr, buildClientToken())
 		})

@@ -23,6 +23,8 @@ const (
 	POST   = "POST"
 	DELETE = "DELETE"
 	HEAD   = "HEAD"
+	OPTIONS = "OPTIONS"
+	PATCH   = "PATCH"
 )
 
 // Constants of the HTTP headers for BCE
@@ -75,4 +77,5 @@ const (
 	BCE_PROCESS                         = "x-bce-process"
 	BCE_RESTORE_TIER                    = "x-bce-restore-tier"
 	BCE_RESTORE_DAYS                    = "x-bce-restore-days"
+	BCE_RESTORE                         = "x-bce-restore"
 )

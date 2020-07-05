@@ -43,6 +43,10 @@ Data Sources
   baiducloud_images
   baiducloud_certs
   baiducloud_cfc_function
+  baiducloud_cce_versions
+  baiducloud_cce_container_net
+  baiducloud_cce_cluster_nodes
+  baiducloud_cce_kubeconfig
 
 CERT Resources
   baiducloud_cert
@@ -83,6 +87,9 @@ CFC Resources
   baiducloud_cfc_alias
   baiducloud_cfc_trigger
   baiducloud_cfc_version
+
+CCE Resources
+ baiducloud_cce_cluster
 */
 package baiducloud
 
@@ -155,6 +162,10 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_specs":                  dataSourceBaiduCloudSpecs(),
 			"baiducloud_images":                 dataSourceBaiduCloudImages(),
 			"baiducloud_cfc_function":           dataSourceBaiduCloudCFCFunction(),
+			"baiducloud_cce_versions":           dataSourceBaiduCloudCceKubernetesVersion(),
+			"baiducloud_cce_container_net":      dataSourceBaiduCloudCceContainerNet(),
+			"baiducloud_cce_cluster_nodes":      dataSourceBaiduCloudCCEClusterNodes(),
+			"baiducloud_cce_kubeconfig":         dataSourceBaiduCloudCceKubeConfig(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -184,6 +195,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_cfc_alias":            resourceBaiduCloudCFCAlias(),
 			"baiducloud_cfc_version":          resourceBaiduCloudCFCVersion(),
 			"baiducloud_cfc_trigger":          resourceBaiduCloudCFCTrigger(),
+			"baiducloud_cce_cluster":          resourceBaiduCloudCCECluster(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -211,6 +223,8 @@ func init() {
 		"bos_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BOS endpoints.",
 
 		"cfc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CFC endpoints.",
+
+		"cce_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CCE endpoints.",
 	}
 }
 
@@ -256,6 +270,12 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["cfc_endpoint"],
 				},
+				"cce": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["cce_endpoint"],
+				},
 			},
 		},
 		Set: endpointsToHash,
@@ -271,6 +291,7 @@ func endpointsToHash(v interface{}) int {
 	buf.WriteString(fmt.Sprintf("%s-", m["appblb"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["bos"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["cfc"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["cce"].(string)))
 	return hashcode.String(buf.String())
 }
 
@@ -304,6 +325,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints[connectivity.APPBLBCode] = strings.TrimSpace(endpoints["appblb"].(string))
 		config.ConfigEndpoints[connectivity.BOSCode] = strings.TrimSpace(endpoints["bos"].(string))
 		config.ConfigEndpoints[connectivity.BOSCode] = strings.TrimSpace(endpoints["cfc"].(string))
+		config.ConfigEndpoints[connectivity.CCECode] = strings.TrimSpace(endpoints["cce"].(string))
 	}
 
 	client, err := config.Client()

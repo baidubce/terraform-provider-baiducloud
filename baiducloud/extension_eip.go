@@ -1,5 +1,7 @@
 package baiducloud
 
+import "fmt"
+
 const (
 	InstanceTypeBCC = "BCC"
 	InstanceTypeBLB = "BLB"
@@ -17,6 +19,8 @@ const (
 	EIPStatusPaused      = "paused"
 	EIPStatusUnavailable = "unavailable"
 )
+
+var eipStillInUsed = fmt.Errorf("eip is still in used")
 
 var EIPProcessingStatus = []string{EIPStatusCreating, EIPStatusBinding, EIPStatusUnBinding, EIPStatusUpdating}
 var EIPFailedStatus = []string{EIPStatusPaused, EIPStatusUnavailable}

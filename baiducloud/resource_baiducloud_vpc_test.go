@@ -27,6 +27,7 @@ func init() {
 			testAccInstanceResourceType,
 			testAccAppBLBResourceType,
 			testAccPeerConnResourceType,
+			testAccCceResourceType,
 		},
 	})
 }

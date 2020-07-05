@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/baidubce/bce-sdk-go/util"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/mitchellh/go-homedir"
 )
@@ -73,6 +73,7 @@ func writeToFile(filePath string, data interface{}) error {
 			return fmt.Errorf("delete old file error: %s", errRemove.Error())
 		}
 	}
+
 	bytes, err := json.Marshal(data)
 	if err != nil {
 		return fmt.Errorf("json marshal error: %s", err.Error())
@@ -81,9 +82,34 @@ func writeToFile(filePath string, data interface{}) error {
 	return ioutil.WriteFile(filePath, []byte(bytes), 0644)
 }
 
+// write data to file
+func writeStringToFile(filePath string, data string) error {
+	if strings.HasPrefix(filePath, "~") {
+		usr, errCurrent := user.Current()
+		if errCurrent != nil {
+			return fmt.Errorf("get current user error: %s", errCurrent.Error())
+		}
+		if usr.HomeDir != "" {
+			filePath = strings.Replace(filePath, "~", usr.HomeDir, 1)
+		}
+	}
+
+	fileInfo, err := os.Stat(filePath)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("stat file error: %s", err.Error())
+	}
+
+	if fileInfo != nil {
+		if errRemove := os.Remove(filePath); errRemove != nil {
+			return fmt.Errorf("delete old file error: %s", errRemove.Error())
+		}
+	}
+
+	return ioutil.WriteFile(filePath, []byte(data), 0644)
+}
+
 func buildClientToken() string {
-	uid, _ := uuid.NewV4()
-	return uid.String()
+	return util.NewUUID()
 }
 
 func buildStateConf(pending, target []string, timeout time.Duration, f resource.StateRefreshFunc) *resource.StateChangeConf {
