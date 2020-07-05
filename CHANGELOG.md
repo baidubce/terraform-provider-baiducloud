@@ -1,4 +1,4 @@
-## 1.3.0 (Unreleased)
+## 1.3.0 (July 05, 2020)
 FEATURES:
 
 * **New Data Source:** `baiducloud_cce_versions`
