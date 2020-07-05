@@ -145,7 +145,7 @@ data "baiducloud_images" "default" {
 
 resource "baiducloud_vpc" "default" {
   name        = "%s"
-  description = var.description
+  description = "created by terraform"
   cidr        = "192.168.0.0/16"
 }
 
@@ -154,7 +154,7 @@ resource "baiducloud_subnet" "defaultA" {
   zone_name   = data.baiducloud_zones.defaultA.zones.0.zone_name
   cidr        = "192.168.1.0/24"
   vpc_id      = baiducloud_vpc.default.id
-  description = "terraform create"
+  description = "created by terraform"
 }
 
 resource "baiducloud_subnet" "defaultB" {
@@ -162,7 +162,7 @@ resource "baiducloud_subnet" "defaultB" {
   zone_name   = data.baiducloud_zones.defaultB.zones.0.zone_name
   cidr        = "192.168.2.0/24"
   vpc_id      = baiducloud_vpc.default.id
-  description = "terraform create"
+  description = "created by terraform"
 }
 
 resource "baiducloud_security_group" "defualt" {
@@ -273,7 +273,7 @@ data "baiducloud_images" "default" {
 
 resource "baiducloud_vpc" "default" {
   name        = "%s"
-  description = "terraform create"
+  description = "created by terraform"
   cidr        = "192.168.0.0/16"
 }
 
@@ -282,7 +282,7 @@ resource "baiducloud_subnet" "defaultA" {
   zone_name   = data.baiducloud_zones.defaultA.zones.0.zone_name
   cidr        = "192.168.1.0/24"
   vpc_id      = baiducloud_vpc.default.id
-  description = "terraform create"
+  description = "created by terraform"
 }
 
 resource "baiducloud_subnet" "defaultB" {
@@ -290,7 +290,7 @@ resource "baiducloud_subnet" "defaultB" {
   zone_name   = data.baiducloud_zones.defaultB.zones.0.zone_name
   cidr        = "192.168.2.0/24"
   vpc_id      = baiducloud_vpc.default.id
-  description = "terraform create"
+  description = "created by terraform"
 }
 
 resource "baiducloud_security_group" "defualt" {

@@ -98,9 +98,8 @@ func (s *BccService) DetachCDSVolume(volumeId, instanceId string) error {
 			string(api.VolumeStatusATTACHING),
 			string(api.VolumeStatusINUSE)}, cdsDetail.SourceSnapshotId) {
 			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_cds", action, BCESDKGoERROR)
-		} else {
-			return nil
 		}
+		return nil
 	}
 
 	stateConf := buildStateConf(

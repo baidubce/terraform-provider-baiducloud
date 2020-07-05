@@ -116,11 +116,10 @@ func (e *EipService) EipUnBind(ip string) error {
 		if stringInSlice([]string{EIPStatusBinded, EIPStatusBinding}, eipDetail.Status) {
 			// eip still in use
 			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_eip", "", BCESDKGoERROR)
-		} else {
-			// eip not in use, return unbind success
-			addDebug(action, "")
-			return nil
 		}
+		// eip not in use, return unbind success
+		addDebug(action, "")
+		return nil
 	}
 
 	addDebug(action, "")
