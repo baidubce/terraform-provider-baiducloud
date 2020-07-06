@@ -43,6 +43,8 @@ Data Sources
   baiducloud_images
   baiducloud_certs
   baiducloud_cfc_function
+  baiducloud_scs_specs
+  baiducloud_scss
   baiducloud_cce_versions
   baiducloud_cce_container_net
   baiducloud_cce_cluster_nodes
@@ -87,6 +89,9 @@ CFC Resources
   baiducloud_cfc_alias
   baiducloud_cfc_trigger
   baiducloud_cfc_version
+
+SCS Resources
+  baiducloud_scs
 
 CCE Resources
   baiducloud_cce_cluster
@@ -162,6 +167,8 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_specs":                  dataSourceBaiduCloudSpecs(),
 			"baiducloud_images":                 dataSourceBaiduCloudImages(),
 			"baiducloud_cfc_function":           dataSourceBaiduCloudCFCFunction(),
+			"baiducloud_scs_specs":              dataSourceBaiduCloudScsSpecs(),
+			"baiducloud_scss":                   dataSourceBaiduCloudScss(),
 			"baiducloud_cce_versions":           dataSourceBaiduCloudCceKubernetesVersion(),
 			"baiducloud_cce_container_net":      dataSourceBaiduCloudCceContainerNet(),
 			"baiducloud_cce_cluster_nodes":      dataSourceBaiduCloudCCEClusterNodes(),
@@ -195,6 +202,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_cfc_alias":            resourceBaiduCloudCFCAlias(),
 			"baiducloud_cfc_version":          resourceBaiduCloudCFCVersion(),
 			"baiducloud_cfc_trigger":          resourceBaiduCloudCFCTrigger(),
+			"baiducloud_scs":                  resourceBaiduCloudScs(),
 			"baiducloud_cce_cluster":          resourceBaiduCloudCCECluster(),
 		},
 
@@ -223,6 +231,8 @@ func init() {
 		"bos_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BOS endpoints.",
 
 		"cfc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CFC endpoints.",
+
+		"scs_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom SCS endpoints.",
 
 		"cce_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CCE endpoints.",
 	}
@@ -270,6 +280,12 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["cfc_endpoint"],
 				},
+				"scs": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["scs_endpoint"],
+				},
 				"cce": {
 					Type:        schema.TypeString,
 					Optional:    true,
@@ -291,6 +307,7 @@ func endpointsToHash(v interface{}) int {
 	buf.WriteString(fmt.Sprintf("%s-", m["appblb"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["bos"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["cfc"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["scs"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["cce"].(string)))
 	return hashcode.String(buf.String())
 }
@@ -325,6 +342,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints[connectivity.APPBLBCode] = strings.TrimSpace(endpoints["appblb"].(string))
 		config.ConfigEndpoints[connectivity.BOSCode] = strings.TrimSpace(endpoints["bos"].(string))
 		config.ConfigEndpoints[connectivity.BOSCode] = strings.TrimSpace(endpoints["cfc"].(string))
+		config.ConfigEndpoints[connectivity.SCSCode] = strings.TrimSpace(endpoints["scs"].(string))
 		config.ConfigEndpoints[connectivity.CCECode] = strings.TrimSpace(endpoints["cce"].(string))
 	}
 

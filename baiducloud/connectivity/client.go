@@ -10,6 +10,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/cert"
 	"github.com/baidubce/bce-sdk-go/services/cfc"
 	"github.com/baidubce/bce-sdk-go/services/eip"
+	"github.com/baidubce/bce-sdk-go/services/scs"
 	"github.com/baidubce/bce-sdk-go/services/vpc"
 	"github.com/baidubce/bce-sdk-go/util/log"
 )
@@ -29,6 +30,7 @@ type BaiduClient struct {
 	bosConn    *bos.Client
 	certConn   *cert.Client
 	cfcConn    *cfc.Client
+	scsConn    *scs.Client
 	cceConn    *cce.Client
 }
 
@@ -200,6 +202,23 @@ func (client *BaiduClient) WithCFCClient(do func(*cfc.Client) (interface{}, erro
 	}
 
 	return do(client.cfcConn)
+}
+
+func (client *BaiduClient) WithScsClient(do func(*scs.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the SCS client if necessary
+	if client.scsConn == nil {
+		client.WithCommonClient(SCSCode)
+		scsClient, err := scs.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		client.scsConn = scsClient
+	}
+
+	return do(client.scsConn)
 }
 
 func (client *BaiduClient) WithCCEClient(do func(*cce.Client) (interface{}, error)) (interface{}, error) {

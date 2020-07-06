@@ -73,7 +73,6 @@ func TestAccBaiduCloudSnapshot(t *testing.T) {
 					resource.TestCheckResourceAttr(testAccSnapshotResourceName, "name", BaiduCloudTestResourceAttrNamePrefix+"Snapshot"),
 					resource.TestCheckResourceAttr(testAccSnapshotResourceName, "size_in_gb", "5"),
 					resource.TestCheckResourceAttr(testAccSnapshotResourceName, "status", "Available"),
-					resource.TestCheckResourceAttrSet(testAccSnapshotResourceName, "create_method"),
 					resource.TestCheckResourceAttrSet(testAccSnapshotResourceName, "create_time"),
 					resource.TestCheckResourceAttrSet(testAccSnapshotResourceName, "volume_id"),
 				),

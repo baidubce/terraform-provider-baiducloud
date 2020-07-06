@@ -41,6 +41,10 @@ const (
 	EipNotFound      = "EipNotFound"
 	CceNotFound      = "Cce.warning.ClusterNotExist"
 	InstanceNotExist = "InstanceNotExist"
+
+	// scs error
+	InvalidInstanceStatus = "InvalidInstanceStatus"
+	OperationException    = "OperationException"
 )
 
 const (
