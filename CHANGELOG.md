@@ -1,4 +1,4 @@
-## 1.4.0 (Unreleased)
+## 1.4.0 (July 06, 2020)
 FEATURES:
 
 * **New Data Source:** `baiducloud_scs_specs`
