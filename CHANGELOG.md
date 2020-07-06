@@ -1,4 +1,4 @@
-## 1.3.1 (Unreleased)
+## 1.3.1 (July 06, 2020)
 BUG FIXES:
 - resource/baiducloud_cce_cluster: Fix test tf config error
 - datasource/baiducloud_cce_cluster_nodes: Fix test tf config error
