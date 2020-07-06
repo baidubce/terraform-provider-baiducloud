@@ -190,7 +190,7 @@ data "baiducloud_cce_versions" "default" {
   version_regex = ".*13.*"
 }
 
-resource "baiducloud_cce_cluster" "default_independent" {
+resource "baiducloud_cce_cluster" "default" {
   cluster_name        = "%s"
   main_available_zone = "zoneA"
   version             = data.baiducloud_cce_versions.default.versions.0
@@ -318,7 +318,7 @@ data "baiducloud_cce_versions" "default" {
   version_regex = ".*13.*"
 }
 
-resource "baiducloud_cce_cluster" "default_independent" {
+resource "baiducloud_cce_cluster" "default" {
  cluster_name        = "%s"
   main_available_zone = "zoneA"
   version             = data.baiducloud_cce_versions.default.versions.0

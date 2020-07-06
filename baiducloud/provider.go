@@ -89,7 +89,7 @@ CFC Resources
   baiducloud_cfc_version
 
 CCE Resources
- baiducloud_cce_cluster
+  baiducloud_cce_cluster
 */
 package baiducloud
 

@@ -77,7 +77,7 @@ resource "baiducloud_security_group_rule" "default2" {
   direction         = "egress"
 }
 
-resource "baiducloud_cce_cluster" "default_independent" {
+resource "baiducloud_cce_cluster" "default" {
   cluster_name        = "%s"
   main_available_zone = "zoneA"
   version             = "1.13.10"
@@ -102,7 +102,7 @@ resource "baiducloud_cce_cluster" "default_independent" {
 }
 
 data "baiducloud_cce_cluster_nodes" "default" {
-    cluster_uuid        = baiducloud_cce_cluster.default_managed.id
+    cluster_uuid        = baiducloud_cce_cluster.default.id
     subnet_id           = baiducloud_subnet.defaultA.id
     instance_name_regex = "c.*"
     instance_type       = "10"

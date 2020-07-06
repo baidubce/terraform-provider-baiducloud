@@ -78,7 +78,7 @@ resource "baiducloud_security_group_rule" "default2" {
   direction         = "egress"
 }
 
-resource "baiducloud_cce_cluster" "default_independent" {
+resource "baiducloud_cce_cluster" "default" {
   cluster_name        = "%s"
   main_available_zone = "zoneA"
   version             = "1.13.10"
@@ -103,7 +103,7 @@ resource "baiducloud_cce_cluster" "default_independent" {
 }
 
 data "baiducloud_cce_kubeconfig" "default" {
-    cluster_uuid = baiducloud_cce_cluster.default_managed.id
+    cluster_uuid = baiducloud_cce_cluster.default.id
 }
 `, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"SubnetA",
 		BaiduCloudTestResourceAttrNamePrefix+"SG", BaiduCloudTestResourceAttrNamePrefix+"CCE")
