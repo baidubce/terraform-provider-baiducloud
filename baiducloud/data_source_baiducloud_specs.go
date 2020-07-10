@@ -154,7 +154,7 @@ func dataSourceBaiduCloudSpecsRead(d *schema.ResourceData, meta interface{}) err
 			continue
 		}
 
-		if memorySizeInGb > 0 && spec.MemorySizeInGB != memorySizeInGb {
+		if memorySizeInGb > 0 && spec.LocalDiskSizeInGB > 0 && spec.MemorySizeInGB != memorySizeInGb {
 			continue
 		}
 

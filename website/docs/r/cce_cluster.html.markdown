@@ -89,6 +89,7 @@ The `master_config` object supports the following:
 * `auto_renew` - (Optional, ForceNew) Whether the master is automatically renewed.
 * `gpu_card` - (Optional, ForceNew) Gpu card of the master node.
 * `gpu_count` - (Optional, ForceNew) Count of gpu card.
+* `keypair_id` - (Optional, ForceNew) Instance Key pair Id.
 * `product_type` - (Optional, ForceNew) Product type of the master node, which can be postpay or prepay.
 * `purchase_length` - (Optional, ForceNew) Purchase duration of the master node.
 * `root_disk_size_in_gb` - (Optional, ForceNew) System disk size(GB) of the master node.
@@ -112,6 +113,7 @@ The `worker_config` object supports the following:
 * `eip` - (Optional, ForceNew) Eip of the worker node.
 * `gpu_card` - (Optional, ForceNew) Gpu card of the worker node.
 * `gpu_count` - (Optional, ForceNew) Gpu count of the worker node.
+* `keypair_id` - (Optional, ForceNew) Instance Key pair Id.
 * `product_type` - (Optional, ForceNew) Product type of the worker node, which can be postpay or prepay.
 * `purchase_length` - (Optional, ForceNew) Purchase duration of the worker node.
 * `root_disk_size_in_gb` - (Optional, ForceNew) System disk size(GB) of the worker node.

@@ -49,7 +49,8 @@ The following arguments are supported:
 * `ephemeral_disks` - (Optional) Ephemeral disks of the instance.
 * `fpga_card` - (Optional, ForceNew) FPGA card of the instance.
 * `gpu_card` - (Optional, ForceNew) GPU card of the instance.
-* `instance_type` - (Optional, ForceNew) Type of the instance to start. Available values are N1, N2, N3, C1, C2, S1, G1, F1. Default to N3.
+* `instance_type` - (Optional, ForceNew) Type of the instance to start. Available values are N1, N2, N3, N4, N5, C1, C2, S1, G1, F1. Default to N3.
+* `keypair_id` - (Optional, ForceNew) Key pair id of the instance.
 * `name` - (Optional) Name of the instance. Support for uppercase and lowercase letters, numbers, Chinese and special characters, such as "-","_","/",".", the value must start with a letter, length 1-65.
 * `related_release_flag` - (Optional, ForceNew) Whether to release the eip and data disks mounted by the current instance. Can only be released uniformly or not. Default to false.
 * `relation_tag` - (Optional, ForceNew) The new instance associated with existing Tags or not, default false. The Tags should already exit if set true
@@ -88,7 +89,6 @@ In addition to all arguments above, the following attributes are exported:
 * `create_time` - Create time of the instance.
 * `expire_time` - Expire time of the instance.
 * `internal_ip` - Internal IP assigned to the instance.
-* `keypair_id` - Key pair id of the instance.
 * `keypair_name` - Key pair name of the instance.
 * `network_capacity_in_mbps` - Public network bandwidth(Mbps) of the instance.
 * `placement_policy` - The placement policy of the instance, which can be default or dedicatedHost.

@@ -46,7 +46,7 @@ resource "baiducloud_subnet" "defaultB" {
   }
 }
 
-resource "baiducloud_security_group" "defualt" {
+resource "baiducloud_security_group" "default" {
   name   = var.scurity-group-name
   vpc_id = baiducloud_vpc.default.id
 }
@@ -54,7 +54,7 @@ resource "baiducloud_security_group" "defualt" {
 # for more detail CCE Cluster security group rule config
 # please refer to https://cloud.baidu.com/doc/CCE/s/Fjwvy1cid
 resource "baiducloud_security_group_rule" "default" {
-  security_group_id = baiducloud_security_group.defualt.id
+  security_group_id = baiducloud_security_group.default.id
   remark            = "remark"
   protocol          = "all"
   port_range        = "1-65535"
@@ -62,7 +62,7 @@ resource "baiducloud_security_group_rule" "default" {
 }
 
 resource "baiducloud_security_group_rule" "default2" {
-  security_group_id = baiducloud_security_group.defualt.id
+  security_group_id = baiducloud_security_group.default.id
   remark            = "remark"
   protocol          = "all"
   port_range        = "1-65535"
@@ -119,15 +119,18 @@ resource "baiducloud_cce_cluster" "default_managed" {
     instance_type     = "10"
     cpu               = 1
     memory            = 2
-    security_group_id = baiducloud_security_group.defualt.id
+    security_group_id = baiducloud_security_group.default.id
     product_type      = "postpay"
     image_id          = data.baiducloud_images.default.images.0.id
+    image_type        = "common"
 
     # optional param
     root_disk_size_in_gb   = 100
     root_disk_storage_type = "ssd"
     admin_pass             = "baiduPasswd@123"
-    image_type             = "common"
+
+    # please set your keypair id
+    #keypair_id             = "k-xxxxxxx"
 
     cds_disks {
       volume_type     = "sata"
@@ -178,12 +181,15 @@ resource "baiducloud_cce_cluster" "default_managed" {
 #    security_group_id = baiducloud_security_group.defualt.id
 #    product_type      = "postpay"
 #    image_id          = data.baiducloud_images.default.images.0.id
+#    image_type        = "common"
 #
 #    # optional param
 #    root_disk_size_in_gb   = 100
 #    root_disk_storage_type = "ssd"
 #    admin_pass             = "baiduPasswd@123"
-#    image_type             = "common"
+#
+#    # please set your keypair id
+#    #keypair_id            = "k-xxxxxxx"
 #
 #    cds_disks {
 #      volume_type     = "sata"
@@ -206,6 +212,8 @@ resource "baiducloud_cce_cluster" "default_managed" {
 #    security_group_id = baiducloud_security_group.defualt.id
 #    product_type      = "postpay"
 #    image_id          = data.baiducloud_images.default.images.0.id
+#    # please set your keypair id
+#    #keypair_id       = "k-xxxxxxx"
 #  }
 #}
 

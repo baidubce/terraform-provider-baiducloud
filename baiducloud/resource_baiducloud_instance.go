@@ -120,7 +120,7 @@ func resourceBaiduCloudInstance() *schema.Resource {
 			},
 			"instance_type": {
 				Type:         schema.TypeString,
-				Description:  "Type of the instance to start. Available values are N1, N2, N3, C1, C2, S1, G1, F1. Default to N3.",
+				Description:  "Type of the instance to start. Available values are N1, N2, N3, N4, N5, C1, C2, S1, G1, F1. Default to N3.",
 				Optional:     true,
 				ForceNew:     true,
 				Default:      api.InstanceTypeN3,
@@ -349,7 +349,9 @@ func resourceBaiduCloudInstance() *schema.Resource {
 			"keypair_id": {
 				Type:        schema.TypeString,
 				Description: "Key pair id of the instance.",
+				Optional:    true,
 				Computed:    true,
+				ForceNew:    true,
 			},
 			"keypair_name": {
 				Type:        schema.TypeString,
@@ -378,23 +380,50 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 	client := meta.(*connectivity.BaiduClient)
 	bccService := BccService{client}
 
-	createInstanceArgs, err := buildBaiduCloudInstanceArgs(d, meta)
-	if err != nil {
-		return WrapError(err)
+	var createArgs interface{}
+	createBySpec := false
+	if value, ok := d.GetOk("instance_spec"); ok && value.(string) != "" {
+		createBySpec = true
 	}
 
 	securityGroups := make([]interface{}, 0)
 	groups, ok := d.GetOk("security_groups")
 	if ok {
 		securityGroups = groups.(*schema.Set).List()
-		createInstanceArgs.SecurityGroupId = securityGroups[0].(string)
 	}
 
-	action := "Create BCC Instance " + createInstanceArgs.Name
+	var err error
+	if createBySpec {
+		createInstanceArgs, err := buildBaiduCloudInstanceBySpecArgs(d, meta)
+		if err != nil {
+			return WrapError(err)
+		}
+
+		if len(securityGroups) > 0 {
+			createInstanceArgs.SecurityGroupId = securityGroups[0].(string)
+		}
+		createArgs = createInstanceArgs
+	} else {
+		createInstanceArgs, err := buildBaiduCloudInstanceArgs(d, meta)
+		if err != nil {
+			return WrapError(err)
+		}
+
+		if len(securityGroups) > 0 {
+			createInstanceArgs.SecurityGroupId = securityGroups[0].(string)
+		}
+		createArgs = createInstanceArgs
+	}
+
+	action := "Create BCC Instance"
 
 	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 		raw, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
-			return bccClient.CreateInstance(createInstanceArgs)
+			if createBySpec {
+				return bccClient.CreateInstanceBySpec(createArgs.(*api.CreateInstanceBySpecArgs))
+			} else {
+				return bccClient.CreateInstance(createArgs.(*api.CreateInstanceArgs))
+			}
 		})
 		if err != nil {
 			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
@@ -762,6 +791,10 @@ func buildBaiduCloudInstanceArgs(d *schema.ResourceData, meta interface{}) (*api
 		request.DedicateHostId = dedicateHostId.(string)
 	}
 
+	if keypairId, ok := d.GetOk("keypair_id"); ok {
+		request.KeypairId = keypairId.(string)
+	}
+
 	if subnetId, ok := d.GetOk("subnet_id"); ok {
 		request.SubnetId = subnetId.(string)
 	}
@@ -776,6 +809,128 @@ func buildBaiduCloudInstanceArgs(d *schema.ResourceData, meta interface{}) (*api
 
 	if cardCount, ok := d.GetOk("card_count"); ok {
 		request.CardCount = cardCount.(string)
+	}
+
+	if relationTag, ok := d.GetOk("relation_tag"); ok && relationTag.(bool) {
+		request.RelationTag = relationTag.(bool)
+	}
+
+	if v, ok := d.GetOk("tags"); ok {
+		request.Tags = tranceTagMapToModel(v.(map[string]interface{}))
+	}
+
+	return request, nil
+}
+
+func buildBaiduCloudInstanceBySpecArgs(d *schema.ResourceData, meta interface{}) (*api.CreateInstanceBySpecArgs, error) {
+	request := &api.CreateInstanceBySpecArgs{
+		ClientToken: buildClientToken(),
+	}
+
+	if imageID, ok := d.GetOk("image_id"); ok {
+		request.ImageId = imageID.(string)
+	}
+
+	if name, ok := d.GetOk("name"); ok {
+		request.Name = name.(string)
+	}
+
+	if zoneName, ok := d.GetOk("availability_zone"); ok {
+		request.ZoneName = zoneName.(string)
+	}
+
+	if instanceSpec, ok := d.GetOk("instance_spec"); ok {
+		request.Spec = instanceSpec.(string)
+	}
+
+	if v, ok := d.GetOk("billing"); ok {
+		billing := v.(map[string]interface{})
+		billingRequest := api.Billing{
+			PaymentTiming: api.PaymentTimingType(""),
+			Reservation:   &api.Reservation{},
+		}
+		if p, ok := billing["payment_timing"]; ok {
+			paymentTiming := api.PaymentTimingType(p.(string))
+			billingRequest.PaymentTiming = paymentTiming
+		}
+		if billingRequest.PaymentTiming == api.PaymentTimingPrePaid {
+			if r, ok := billing["reservation"]; ok {
+				reservation := r.(map[string]interface{})
+				if reservationLength, ok := reservation["reservation_length"]; ok {
+					billingRequest.Reservation.ReservationLength = reservationLength.(int)
+				}
+				if reservationTimeUnit, ok := reservation["reservation_time_unit"]; ok {
+					billingRequest.Reservation.ReservationTimeUnit = reservationTimeUnit.(string)
+				}
+			}
+			// if the field is set, then auto-renewal is effective.
+			if v, ok := d.GetOk("auto_renew_time_unit"); ok {
+				request.AutoRenewTimeUnit = v.(string)
+
+				if v, ok := d.GetOk("auto_renew_time_length"); ok {
+					request.AutoRenewTime = v.(int)
+				}
+				if v, ok := d.GetOk("cds_auto_renew"); ok {
+					request.CdsAutoRenew = v.(bool)
+				}
+			}
+		}
+
+		request.Billing = billingRequest
+	}
+
+	if adminPass, ok := d.GetOk("admin_pass"); ok {
+		request.AdminPass = adminPass.(string)
+	}
+
+	if rootDiskSizeInGb, ok := d.GetOk("root_disk_size_in_gb"); ok {
+		request.RootDiskSizeInGb = rootDiskSizeInGb.(int)
+	}
+
+	if keypairId, ok := d.GetOk("keypair_id"); ok {
+		request.KeypairId = keypairId.(string)
+	}
+
+	if rootDiskStorageType, ok := d.GetOk("root_disk_storage_type"); ok {
+		dst := rootDiskStorageType.(string)
+		request.RootDiskStorageType = api.StorageType(dst)
+	}
+
+	if v, ok := d.GetOk("ephemeral_disks"); ok {
+		disks := v.([]interface{})
+		var ephemeralDiskRequests []api.EphemeralDisk
+		for iDisk := range disks {
+			disk := disks[iDisk].(map[string]interface{})
+
+			ephemeralDiskRequest := api.EphemeralDisk{
+				SizeInGB:    disk["size_in_gb"].(int),
+				StorageType: api.StorageType(disk["storage_type"].(string)),
+			}
+
+			ephemeralDiskRequests = append(ephemeralDiskRequests, ephemeralDiskRequest)
+		}
+		request.EphemeralDisks = ephemeralDiskRequests
+	}
+
+	if v, ok := d.GetOk("cds_disks"); ok {
+		cdsList := v.([]interface{})
+		cdsRequests := make([]api.CreateCdsModel, len(cdsList))
+		for iCds := range cdsList {
+			cds := cdsList[iCds].(map[string]interface{})
+
+			cdsRequest := api.CreateCdsModel{
+				CdsSizeInGB: cds["cds_size_in_gb"].(int),
+				StorageType: api.StorageType(cds["storage_type"].(string)),
+				SnapShotId:  cds["snapshot_id"].(string),
+			}
+
+			cdsRequests[iCds] = cdsRequest
+		}
+		request.CreateCdsList = cdsRequests
+	}
+
+	if subnetId, ok := d.GetOk("subnet_id"); ok {
+		request.SubnetId = subnetId.(string)
 	}
 
 	if relationTag, ok := d.GetOk("relation_tag"); ok && relationTag.(bool) {

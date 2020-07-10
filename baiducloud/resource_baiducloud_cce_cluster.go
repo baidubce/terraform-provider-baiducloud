@@ -189,6 +189,12 @@ func resourceBaiduCloudCCECluster() *schema.Resource {
 								ValidateFunc: validation.IntAtLeast(1),
 							},
 						},
+						"keypair_id": {
+							Type:        schema.TypeString,
+							Description: "Instance Key pair Id.",
+							Optional:    true,
+							ForceNew:    true,
+						},
 						"instance_type": {
 							Type:        schema.TypeString,
 							Description: "Instance type of the worker node.",
@@ -405,6 +411,12 @@ func resourceBaiduCloudCCECluster() *schema.Resource {
 							Type:        schema.TypeString,
 							Description: "Logical zone of the master node.",
 							Required:    true,
+							ForceNew:    true,
+						},
+						"keypair_id": {
+							Type:        schema.TypeString,
+							Description: "Instance Key pair Id.",
+							Optional:    true,
 							ForceNew:    true,
 						},
 						"instance_type": {
@@ -1062,6 +1074,10 @@ func buildBaiduCloudCCENodeBCCCDSArgs(config map[string]interface{}, purchaseNum
 
 	if value, ok := config["root_disk_storage_type"]; ok {
 		bccConfig.RootDiskStorageType = cce.VolumeType(value.(string))
+	}
+
+	if value, ok := config["keypair_id"]; ok {
+		bccConfig.KeypairId = value.(string)
 	}
 
 	result := []cce.Item{

@@ -93,6 +93,9 @@ resource "baiducloud_instance" "my-server" {
   // The action is optional, which can be start or stop, default is start.
   action = "start"
 
+  // option parameter, please set your keypair id
+  #keypair_id = "k-xxxxxx"
+
   cds_disks {
     cds_size_in_gb = 50
     storage_type   = "cloud_hp1"

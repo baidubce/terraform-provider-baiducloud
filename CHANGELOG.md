@@ -1,4 +1,9 @@
-## 1.5.0 (Unreleased)
+## 1.4.1 (Unreleased)
+
+ENHANCEMENTS:
+- resource/baiducloud_instance: support keypair_id when creating instances
+- resource/baiducloud_cce_cluster: support keypair_id when creating cluster nodes
+
 ## 1.4.0 (July 06, 2020)
 FEATURES:
 
