@@ -1,4 +1,4 @@
-## 1.4.1 (Unreleased)
+## 1.4.1 (July 10, 2020)
 
 ENHANCEMENTS:
 - resource/baiducloud_instance: support keypair_id when creating instances
