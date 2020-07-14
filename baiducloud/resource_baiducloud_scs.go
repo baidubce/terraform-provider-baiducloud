@@ -55,8 +55,8 @@ func resourceBaiduCloudScs() *schema.Resource {
 		},
 
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(10 * time.Minute),
-			Update: schema.DefaultTimeout(10 * time.Minute),
+			Create: schema.DefaultTimeout(20 * time.Minute),
+			Update: schema.DefaultTimeout(30 * time.Minute),
 			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
@@ -88,18 +88,21 @@ func resourceBaiduCloudScs() *schema.Resource {
 				Description: "The number of instance proxy.",
 				Default:     0,
 				Optional:    true,
+				ForceNew:    true,
 			},
 			"replication_num": {
 				Type:        schema.TypeInt,
 				Description: "The number of instance copies.",
 				Default:     2,
 				Optional:    true,
+				ForceNew:    true,
 			},
 			"port": {
 				Type:        schema.TypeInt,
 				Description: "The port used to access a instance.",
 				Optional:    true,
 				Default:     6379,
+				ForceNew:    true,
 			},
 			"domain": {
 				Type:        schema.TypeString,
@@ -119,6 +122,7 @@ func resourceBaiduCloudScs() *schema.Resource {
 				Description:  "Engine version of the instance. Available values are 3.2, 4.0.",
 				Optional:     true,
 				Default:      "3.2",
+				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{"3.2", "4.0"}, false),
 			},
 			"engine": {
@@ -131,10 +135,11 @@ func resourceBaiduCloudScs() *schema.Resource {
 				Description: "ID of the specific VPC",
 				Optional:    true,
 				Computed:    true,
+				ForceNew:    true,
 			},
 			"v_net_ip": {
 				Type:        schema.TypeString,
-				Description: "ID of the specific vnet.",
+				Description: "The internal ip used to access a instance.",
 				Computed:    true,
 			},
 			"subnets": {
@@ -148,11 +153,15 @@ func resourceBaiduCloudScs() *schema.Resource {
 							Type:        schema.TypeString,
 							Description: "ID of the subnet.",
 							Optional:    true,
+							Computed:    true,
+							ForceNew:    true,
 						},
 						"zone_name": {
 							Type:        schema.TypeString,
 							Description: "Zone name of the subnet.",
 							Optional:    true,
+							Computed:    true,
+							ForceNew:    true,
 						},
 					},
 				},
@@ -602,7 +611,7 @@ func updateInstanceNodeType(d *schema.ResourceData, meta interface{}, instanceID
 		stateConf := buildStateConf(
 			[]string{SCSStatusStatusModifying},
 			[]string{SCSStatusStatusRunning},
-			d.Timeout(schema.TimeoutCreate),
+			d.Timeout(schema.TimeoutUpdate),
 			scsService.InstanceStateRefresh(d.Id(), []string{}),
 		)
 		if _, err := stateConf.WaitForState(); err != nil {

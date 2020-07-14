@@ -10,6 +10,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/cert"
 	"github.com/baidubce/bce-sdk-go/services/cfc"
 	"github.com/baidubce/bce-sdk-go/services/eip"
+	"github.com/baidubce/bce-sdk-go/services/rds"
 	"github.com/baidubce/bce-sdk-go/services/scs"
 	"github.com/baidubce/bce-sdk-go/services/vpc"
 	"github.com/baidubce/bce-sdk-go/util/log"
@@ -32,6 +33,7 @@ type BaiduClient struct {
 	cfcConn    *cfc.Client
 	scsConn    *scs.Client
 	cceConn    *cce.Client
+	rdsConn    *rds.Client
 }
 
 type ApiVersion string
@@ -237,4 +239,22 @@ func (client *BaiduClient) WithCCEClient(do func(*cce.Client) (interface{}, erro
 	}
 
 	return do(client.cceConn)
+}
+
+func (client *BaiduClient) WithRdsClient(do func(*rds.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the RDS client if necessary
+	if client.rdsConn == nil {
+		client.WithCommonClient(RDSCode)
+		rdsClient, err := rds.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		client.rdsConn = rdsClient
+	}
+
+	return do(client.rdsConn)
+
 }

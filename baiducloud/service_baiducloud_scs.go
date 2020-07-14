@@ -3,6 +3,7 @@ package baiducloud
 import (
 	"github.com/baidubce/bce-sdk-go/services/scs"
 	"github.com/hashicorp/terraform/helper/resource"
+
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 )
 

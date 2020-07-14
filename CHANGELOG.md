@@ -1,4 +1,14 @@
 ## 1.5.0 (Unreleased)
+FEATURES:
+
+* **New Data Source:** `data_source_baiducloud_rdss`
+* **New Resource:** `resource_baiducloud_rds_account`
+* **New Resource:** `resource_baiducloud_rds_instance`
+* **New Resource:** `resource_baiducloud_rds_readonly_instance`
+
+BUG FIXES:
+- resource/resource_baiducloud_scs: Fix forceNew behavior of parameters "proxy_num"、"replication_num"、"port"、"engine_version"、"subnets"
+
 ## 1.4.1 (July 10, 2020)
 
 ENHANCEMENTS:

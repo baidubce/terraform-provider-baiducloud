@@ -6,7 +6,7 @@ Example Usage
 ```hcl
 data "data.baiducloud_scs_specs" "default" {}
 
-output "spec" {
+output "specs" {
   value = "${data.baiducloud_scs_specs.default.specs}"
 }
 ```

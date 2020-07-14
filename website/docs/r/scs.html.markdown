@@ -38,14 +38,14 @@ The following arguments are supported:
 * `instance_name` - (Required) Name of the instance. Support for uppercase and lowercase letters, numbers, Chinese and special characters, such as "-","_","/",".", the value must start with a letter, length 1-65.
 * `node_type` - (Required) Type of the instance. Available values are cache.n1.micro, cache.n1.small, cache.n1.medium...cache.n1hs3.4xlarge.
 * `cluster_type` - (Optional, ForceNew) Type of the instance,  Available values are cluster, master_slave.
-* `engine_version` - (Optional) Engine version of the instance. Available values are 3.2, 4.0.
-* `port` - (Optional) The port used to access a instance.
-* `proxy_num` - (Optional) The number of instance proxy.
+* `engine_version` - (Optional, ForceNew) Engine version of the instance. Available values are 3.2, 4.0.
+* `port` - (Optional, ForceNew) The port used to access a instance.
+* `proxy_num` - (Optional, ForceNew) The number of instance proxy.
 * `purchase_count` - (Optional) Count of the instance to buy
-* `replication_num` - (Optional) The number of instance copies.
+* `replication_num` - (Optional, ForceNew) The number of instance copies.
 * `shard_num` - (Optional) The number of instance shard. IF cluster_type is cluster, support 2/4/6/8/12/16/24/32/48/64/96/128, if cluster_type is master_slave, support 1.
 * `subnets` - (Optional) Subnets of the instance.
-* `vpc_id` - (Optional) ID of the specific VPC
+* `vpc_id` - (Optional, ForceNew) ID of the specific VPC
 
 The `billing` object supports the following:
 
@@ -59,8 +59,8 @@ The `reservation` object supports the following:
 
 The `subnets` object supports the following:
 
-* `subnet_id` - (Optional) ID of the subnet.
-* `zone_name` - (Optional) Zone name of the subnet.
+* `subnet_id` - (Optional, ForceNew) ID of the subnet.
+* `zone_name` - (Optional, ForceNew) Zone name of the subnet.
 
 ## Attributes Reference
 
@@ -79,7 +79,7 @@ In addition to all arguments above, the following attributes are exported:
 * `payment_timing` - SCS payment timing
 * `tags` - Tags
 * `used_capacity` - Memory capacity(GB) of the instance to be used.
-* `v_net_ip` - ID of the specific vnet.
+* `v_net_ip` - The internal ip used to access a instance.
 * `zone_names` - Zone name list
 
 

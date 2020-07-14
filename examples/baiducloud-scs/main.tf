@@ -32,7 +32,7 @@ resource "baiducloud_scs" "default" {
   port = 6379
   engine_version = "3.2"
   node_type = data.baiducloud_scs_specs.default.specs.0.node_type
-  cluster_type = "master_slave1"
+  cluster_type = "master_slave"
   replication_num = 1
 }
 

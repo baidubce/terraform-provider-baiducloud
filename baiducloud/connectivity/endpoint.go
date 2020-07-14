@@ -21,6 +21,7 @@ const (
 	CFCCode    = ServiceCode("CFC")
 	CCECode    = ServiceCode("CCE")
 	SCSCode    = ServiceCode("SCS")
+	RDSCode    = ServiceCode("RDS")
 )
 
 const (
@@ -31,6 +32,7 @@ const (
 	DefaultBJRegionCfcEndPoint = "cfc.bj.baidubce.com"
 	DefaultBJRegionCceEndPoint = "cce.bj.baidubce.com"
 	DefaultBJRegionScsEndPoint = "redis.bj.baidubce.com"
+	DefaultBJRegionRdsEndPoint = "rds.bj.baidubce.com"
 
 	DefaultGZRegionBccEndPoint = "bcc.gz.baidubce.com"
 	DefaultGZRegionEipEndPoint = "eip.gz.baidubce.com"
@@ -39,6 +41,7 @@ const (
 	DefaultGZRegionCfcEndPoint = "cfc.gz.baidubce.com"
 	DefaultGZRegionCceEndPoint = "cce.gz.baidubce.com"
 	DefaultGZRegionScsEndPoint = "redis.gz.baidubce.com"
+	DefaultGZRegionRdsEndPoint = "rds.gz.baidubce.com"
 
 	DefaultSURegionBccEndPoint = "bcc.su.baidubce.com"
 	DefaultSURegionEipEndPoint = "eip.su.baidubce.com"
@@ -47,6 +50,7 @@ const (
 	DefaultSURegionCfcEndPoint = "cfc.su.baidubce.com"
 	DefaultSURegionCceEndPoint = "cce.su.baidubce.com"
 	DefaultSURegionScsEndPoint = "redis.su.baidubce.com"
+	DefaultSURegionRdsEndPoint = "rds.su.baidubce.com"
 
 	DefaultFWHRegionBccEndPoint = "bcc.fwh.baidubce.com"
 	DefaultFWHRegionEipEndPoint = "eip.fwh.baidubce.com"
@@ -55,6 +59,7 @@ const (
 	DefaultFWHRegionCfcEndPoint = "cfc.fwh.baidubce.com"
 	DefaultFWHRegionCceEndPoint = "cce.fwh.baidubce.com"
 	DefaultFWHRegionScsEndPoint = "redis.fwh.baidubce.com"
+	DefaultFWHRegionRdsEndPoint = "rds.fwh.baidubce.com"
 
 	DefaultCERTEndPoint = "certificate.baidubce.com"
 )
@@ -79,6 +84,7 @@ var (
 		CFCCode:    DefaultBJRegionCfcEndPoint,
 		CCECode:    DefaultBJRegionCceEndPoint,
 		SCSCode:    DefaultBJRegionScsEndPoint,
+		RDSCode:    DefaultBJRegionRdsEndPoint,
 	}
 
 	// Region GZ Service Endpoints
@@ -92,6 +98,7 @@ var (
 		CFCCode:    DefaultGZRegionCfcEndPoint,
 		CCECode:    DefaultGZRegionCceEndPoint,
 		SCSCode:    DefaultGZRegionScsEndPoint,
+		RDSCode:    DefaultGZRegionRdsEndPoint,
 	}
 
 	// Region SU Service Endpoints
@@ -105,6 +112,7 @@ var (
 		CFCCode:    DefaultSURegionCfcEndPoint,
 		CCECode:    DefaultSURegionCceEndPoint,
 		SCSCode:    DefaultSURegionScsEndPoint,
+		RDSCode:    DefaultSURegionRdsEndPoint,
 	}
 
 	// Region FWH Service Endpoints
@@ -118,6 +126,7 @@ var (
 		CFCCode:    DefaultFWHRegionCfcEndPoint,
 		CCECode:    DefaultFWHRegionCceEndPoint,
 		SCSCode:    DefaultFWHRegionScsEndPoint,
+		RDSCode:    DefaultFWHRegionRdsEndPoint,
 	}
 )
 

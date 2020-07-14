@@ -173,37 +173,41 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_cce_container_net":      dataSourceBaiduCloudCceContainerNet(),
 			"baiducloud_cce_cluster_nodes":      dataSourceBaiduCloudCCEClusterNodes(),
 			"baiducloud_cce_kubeconfig":         dataSourceBaiduCloudCceKubeConfig(),
+			"baiducloud_rdss":                   dataSourceBaiduCloudRdss(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			"baiducloud_instance":             resourceBaiduCloudInstance(),
-			"baiducloud_cds":                  resourceBaiduCloudCDS(),
-			"baiducloud_cds_attachment":       resourceBaiduCloudCDSAttachment(),
-			"baiducloud_snapshot":             resourceBaiduCloudSnapshot(),
-			"baiducloud_auto_snapshot_policy": resourceBaiduCloudAutoSnapshotPolicy(),
-			"baiducloud_vpc":                  resourceBaiduCloudVpc(),
-			"baiducloud_subnet":               resourceBaiduCloudSubnet(),
-			"baiducloud_route_rule":           resourceBaiduCloudRouteRule(),
-			"baiducloud_security_group":       resourceBaiduCloudSecurityGroup(),
-			"baiducloud_security_group_rule":  resourceBaiduCloudSecurityGroupRule(),
-			"baiducloud_eip":                  resourceBaiduCloudEip(),
-			"baiducloud_eip_association":      resourceBaiduCloudEipAssociation(),
-			"baiducloud_acl":                  resourceBaiduCloudAcl(),
-			"baiducloud_nat_gateway":          resourceBaiduCloudNatGateway(),
-			"baiducloud_appblb":               resourceBaiduCloudAppBLB(),
-			"baiducloud_peer_conn":            resourceBaiduCloudPeerConn(),
-			"baiducloud_peer_conn_acceptor":   resourceBaiduCloudPeerConnAcceptor(),
-			"baiducloud_appblb_server_group":  resourceBaiduCloudAppBlbServerGroup(),
-			"baiducloud_appblb_listener":      resourceBaiduCloudAppBlbListener(),
-			"baiducloud_bos_bucket":           resourceBaiduCloudBosBucket(),
-			"baiducloud_bos_bucket_object":    resourceBaiduCloudBucketObject(),
-			"baiducloud_cert":                 resourceBaiduCloudCert(),
-			"baiducloud_cfc_function":         resourceBaiduCloudCFCFunction(),
-			"baiducloud_cfc_alias":            resourceBaiduCloudCFCAlias(),
-			"baiducloud_cfc_version":          resourceBaiduCloudCFCVersion(),
-			"baiducloud_cfc_trigger":          resourceBaiduCloudCFCTrigger(),
-			"baiducloud_scs":                  resourceBaiduCloudScs(),
-			"baiducloud_cce_cluster":          resourceBaiduCloudCCECluster(),
+			"baiducloud_instance":              resourceBaiduCloudInstance(),
+			"baiducloud_cds":                   resourceBaiduCloudCDS(),
+			"baiducloud_cds_attachment":        resourceBaiduCloudCDSAttachment(),
+			"baiducloud_snapshot":              resourceBaiduCloudSnapshot(),
+			"baiducloud_auto_snapshot_policy":  resourceBaiduCloudAutoSnapshotPolicy(),
+			"baiducloud_vpc":                   resourceBaiduCloudVpc(),
+			"baiducloud_subnet":                resourceBaiduCloudSubnet(),
+			"baiducloud_route_rule":            resourceBaiduCloudRouteRule(),
+			"baiducloud_security_group":        resourceBaiduCloudSecurityGroup(),
+			"baiducloud_security_group_rule":   resourceBaiduCloudSecurityGroupRule(),
+			"baiducloud_eip":                   resourceBaiduCloudEip(),
+			"baiducloud_eip_association":       resourceBaiduCloudEipAssociation(),
+			"baiducloud_acl":                   resourceBaiduCloudAcl(),
+			"baiducloud_nat_gateway":           resourceBaiduCloudNatGateway(),
+			"baiducloud_appblb":                resourceBaiduCloudAppBLB(),
+			"baiducloud_peer_conn":             resourceBaiduCloudPeerConn(),
+			"baiducloud_peer_conn_acceptor":    resourceBaiduCloudPeerConnAcceptor(),
+			"baiducloud_appblb_server_group":   resourceBaiduCloudAppBlbServerGroup(),
+			"baiducloud_appblb_listener":       resourceBaiduCloudAppBlbListener(),
+			"baiducloud_bos_bucket":            resourceBaiduCloudBosBucket(),
+			"baiducloud_bos_bucket_object":     resourceBaiduCloudBucketObject(),
+			"baiducloud_cert":                  resourceBaiduCloudCert(),
+			"baiducloud_cfc_function":          resourceBaiduCloudCFCFunction(),
+			"baiducloud_cfc_alias":             resourceBaiduCloudCFCAlias(),
+			"baiducloud_cfc_version":           resourceBaiduCloudCFCVersion(),
+			"baiducloud_cfc_trigger":           resourceBaiduCloudCFCTrigger(),
+			"baiducloud_scs":                   resourceBaiduCloudScs(),
+			"baiducloud_cce_cluster":           resourceBaiduCloudCCECluster(),
+			"baiducloud_rds_instance":          resourceBaiduCloudRdsInstance(),
+			"baiducloud_rds_readonly_instance": resourceBaiduCloudRdsReadOnlyInstance(),
+			"baiducloud_rds_account":           resourceBaiduCloudRdsAccount(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -235,6 +239,8 @@ func init() {
 		"scs_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom SCS endpoints.",
 
 		"cce_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CCE endpoints.",
+
+		"rds_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom RDS endpoints.",
 	}
 }
 
@@ -292,6 +298,12 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["cce_endpoint"],
 				},
+				"rds": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["rds_endpoint"],
+				},
 			},
 		},
 		Set: endpointsToHash,
@@ -309,6 +321,7 @@ func endpointsToHash(v interface{}) int {
 	buf.WriteString(fmt.Sprintf("%s-", m["cfc"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["scs"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["cce"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["rds"].(string)))
 	return hashcode.String(buf.String())
 }
 
@@ -344,6 +357,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints[connectivity.BOSCode] = strings.TrimSpace(endpoints["cfc"].(string))
 		config.ConfigEndpoints[connectivity.SCSCode] = strings.TrimSpace(endpoints["scs"].(string))
 		config.ConfigEndpoints[connectivity.CCECode] = strings.TrimSpace(endpoints["cce"].(string))
+		config.ConfigEndpoints[connectivity.RDSCode] = strings.TrimSpace(endpoints["rds"].(string))
 	}
 
 	client, err := config.Client()
