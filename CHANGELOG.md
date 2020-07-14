@@ -1,4 +1,4 @@
-## 1.5.0 (Unreleased)
+## 1.5.0 (July 14, 2020)
 FEATURES:
 
 * **New Data Source:** `data_source_baiducloud_rdss`
