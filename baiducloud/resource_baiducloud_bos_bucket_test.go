@@ -49,7 +49,7 @@ func testSweepBosBuckets(region string) error {
 	}
 
 	for _, buc := range result.Buckets {
-		if !strings.HasPrefix(buc.Name, BaiduCloudTestResourceAttrNamePrefix) {
+		if !strings.HasPrefix(buc.Name, BaiduCloudTestBucketResourceAttrNamePrefix) {
 			log.Printf("[INFO] Skipping bucket: %s", buc.Name)
 			continue
 		}

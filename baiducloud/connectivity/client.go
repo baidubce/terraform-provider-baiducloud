@@ -3,6 +3,7 @@ package connectivity
 import (
 	"sync"
 
+	"github.com/baidubce/bce-sdk-go/auth"
 	"github.com/baidubce/bce-sdk-go/services/appblb"
 	"github.com/baidubce/bce-sdk-go/services/bcc"
 	"github.com/baidubce/bce-sdk-go/services/bos"
@@ -12,6 +13,8 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/eip"
 	"github.com/baidubce/bce-sdk-go/services/rds"
 	"github.com/baidubce/bce-sdk-go/services/scs"
+	"github.com/baidubce/bce-sdk-go/services/sts"
+	"github.com/baidubce/bce-sdk-go/services/sts/api"
 	"github.com/baidubce/bce-sdk-go/services/vpc"
 	"github.com/baidubce/bce-sdk-go/util/log"
 )
@@ -19,10 +22,10 @@ import (
 // BaiduClient of BaiduCloud
 type BaiduClient struct {
 	config    *Config
-	AccessKey string
-	SecretKey string
 	Region    Region
 	Endpoint  string
+
+	Credentials *auth.BceCredentials
 
 	bccConn    *bcc.Client
 	vpcConn    *vpc.Client
@@ -42,12 +45,47 @@ var goSdkMutex = sync.RWMutex{} // The Go SDK is not thread-safe
 
 // Client for BaiduCloudClient
 func (c *Config) Client() (*BaiduClient, error) {
-	return &BaiduClient{
+	client := &BaiduClient{
 		config:    c,
-		AccessKey: c.AccessKey,
-		SecretKey: c.SecretKey,
 		Region:    c.Region,
-	}, nil
+	}
+
+	if c.AssumeRoleAccountId != "" && c.AssumeRoleRoleName != "" {
+		stsClient, err := sts.NewClient(c.AccessKey, c.SecretKey)
+		if err != nil {
+			return nil, err
+		}
+
+		args := &api.AssumeRoleArgs{
+			AccountId: c.AssumeRoleAccountId,
+			RoleName:  c.AssumeRoleRoleName,
+			UserId:    c.AssumeRoleUserId,
+			Acl:       c.AssumeRoleAcl,
+		}
+		assumeRole, err := stsClient.AssumeRole(args)
+		if err != nil {
+			return nil, err
+		}
+
+		stsCredential, err := auth.NewSessionBceCredentials(
+			assumeRole.AccessKeyId,
+			assumeRole.SecretAccessKey,
+			assumeRole.SessionToken)
+		if err != nil {
+			return nil, err
+		}
+
+		client.Credentials = stsCredential
+	} else {
+		credentials, err := auth.NewBceCredentials(c.AccessKey, c.SecretKey)
+		if err != nil {
+			return nil, err
+		}
+
+		client.Credentials = credentials
+	}
+
+	return client, nil
 }
 
 func (client *BaiduClient) WithCommonClient(serviceCode ServiceCode) *BaiduClient {
@@ -55,8 +93,6 @@ func (client *BaiduClient) WithCommonClient(serviceCode ServiceCode) *BaiduClien
 	log.SetLogHandler(log.NONE)
 	//log.SetLogDir(LogDir)
 
-	accessKey := client.config.AccessKey
-	secretKey := client.config.SecretKey
 	region := client.config.Region
 	if region == "" {
 		region = DefaultRegion
@@ -67,12 +103,6 @@ func (client *BaiduClient) WithCommonClient(serviceCode ServiceCode) *BaiduClien
 	}
 	client.Endpoint = endpoint
 
-	if client.AccessKey == "" {
-		client.AccessKey = accessKey
-	}
-	if client.SecretKey == "" {
-		client.SecretKey = secretKey
-	}
 	if client.Region == "" {
 		client.Region = region
 	}
@@ -87,10 +117,11 @@ func (client *BaiduClient) WithBccClient(do func(*bcc.Client) (interface{}, erro
 	// Initialize the BCC client if necessary
 	if client.bccConn == nil {
 		client.WithCommonClient(BCCCode)
-		bccClient, err := bcc.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		bccClient, err := bcc.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
 		if err != nil {
 			return nil, err
 		}
+		bccClient.Config.Credentials = client.Credentials
 
 		client.bccConn = bccClient
 	}
@@ -105,10 +136,11 @@ func (client *BaiduClient) WithVpcClient(do func(*vpc.Client) (interface{}, erro
 	// Initialize the VPC client if necessary
 	if client.vpcConn == nil {
 		client.WithCommonClient(VPCCode)
-		vpcClient, err := vpc.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		vpcClient, err := vpc.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
 		if err != nil {
 			return nil, err
 		}
+		vpcClient.Config.Credentials = client.Credentials
 
 		client.vpcConn = vpcClient
 	}
@@ -123,10 +155,11 @@ func (client *BaiduClient) WithEipClient(do func(*eip.Client) (interface{}, erro
 	// Initialize the EIP client if necessary
 	if client.eipConn == nil {
 		client.WithCommonClient(EIPCode)
-		eipClient, err := eip.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		eipClient, err := eip.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
 		if err != nil {
 			return nil, err
 		}
+		eipClient.Config.Credentials = client.Credentials
 
 		client.eipConn = eipClient
 	}
@@ -141,10 +174,11 @@ func (client *BaiduClient) WithAppBLBClient(do func(*appblb.Client) (interface{}
 	// Initialize the APPBLB client if necessary
 	if client.appBlbConn == nil {
 		client.WithCommonClient(APPBLBCode)
-		appBlbClient, err := appblb.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		appBlbClient, err := appblb.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
 		if err != nil {
 			return nil, err
 		}
+		appBlbClient.Config.Credentials = client.Credentials
 
 		client.appBlbConn = appBlbClient
 	}
@@ -159,10 +193,11 @@ func (client *BaiduClient) WithBosClient(do func(*bos.Client) (interface{}, erro
 	// Initialize the BOS client if necessary
 	if client.bosConn == nil {
 		client.WithCommonClient(BOSCode)
-		bosClient, err := bos.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		bosClient, err := bos.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
 		if err != nil {
 			return nil, err
 		}
+		bosClient.Config.Credentials = client.Credentials
 
 		client.bosConn = bosClient
 	}
@@ -177,10 +212,11 @@ func (client *BaiduClient) WithCertClient(do func(*cert.Client) (interface{}, er
 	// Initialize the CERT client if necessary
 	if client.certConn == nil {
 		client.WithCommonClient(CERTCode)
-		certClient, err := cert.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		certClient, err := cert.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
 		if err != nil {
 			return nil, err
 		}
+		certClient.Config.Credentials = client.Credentials
 
 		client.certConn = certClient
 	}
@@ -195,10 +231,11 @@ func (client *BaiduClient) WithCFCClient(do func(*cfc.Client) (interface{}, erro
 	// Initialize the CFC client if necessary
 	if client.cfcConn == nil {
 		client.WithCommonClient(CFCCode)
-		cfcClient, err := cfc.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		cfcClient, err := cfc.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
 		if err != nil {
 			return nil, err
 		}
+		cfcClient.Config.Credentials = client.Credentials
 
 		client.cfcConn = cfcClient
 	}
@@ -213,10 +250,12 @@ func (client *BaiduClient) WithScsClient(do func(*scs.Client) (interface{}, erro
 	// Initialize the SCS client if necessary
 	if client.scsConn == nil {
 		client.WithCommonClient(SCSCode)
-		scsClient, err := scs.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		scsClient, err := scs.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
 		if err != nil {
 			return nil, err
 		}
+		scsClient.Config.Credentials = client.Credentials
+
 		client.scsConn = scsClient
 	}
 
@@ -230,10 +269,11 @@ func (client *BaiduClient) WithCCEClient(do func(*cce.Client) (interface{}, erro
 	// Initialize the CFC client if necessary
 	if client.cceConn == nil {
 		client.WithCommonClient(CCECode)
-		cceClient, err := cce.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		cceClient, err := cce.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
 		if err != nil {
 			return nil, err
 		}
+		cceClient.Config.Credentials = client.Credentials
 
 		client.cceConn = cceClient
 	}
@@ -248,10 +288,12 @@ func (client *BaiduClient) WithRdsClient(do func(*rds.Client) (interface{}, erro
 	// Initialize the RDS client if necessary
 	if client.rdsConn == nil {
 		client.WithCommonClient(RDSCode)
-		rdsClient, err := rds.NewClient(client.AccessKey, client.SecretKey, client.Endpoint)
+		rdsClient, err := rds.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
 		if err != nil {
 			return nil, err
 		}
+		rdsClient.Config.Credentials = client.Credentials
+
 		client.rdsConn = rdsClient
 	}
 

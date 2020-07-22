@@ -140,7 +140,9 @@ func Provider() terraform.ResourceProvider {
 				Description:  descriptions["region"],
 				InputDefault: "bj",
 			},
-			"endpoints": endpointsSchema(),
+			"endpoints":   endpointsSchema(),
+
+			"assume_role": assumeRoleSchema(),
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
@@ -223,6 +225,14 @@ func init() {
 		"secret_key": "The Secret key of BaiduCloud for API operations. You can retrieve this from the 'Security Management' section of the BaiduCloud console.",
 
 		"region": "The region where BaiduCloud operations will take place. Examples are bj, su, gz, etc.",
+
+		"assume_role_name": "The role name for assume role.",
+
+		"assume_role_account_id": "The account id for assume role.",
+
+		"assume_role_user_id": "The user id for assume role.",
+
+		"assume_role_acl": "The acl for assume role.",
 
 		"bcc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BCC endpoints.",
 
@@ -345,6 +355,29 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		Region:    connectivity.Region(region.(string)),
 	}
 
+	assumeRoleList, ok := d.GetOk("assume_role")
+	if ok {
+		if assumeRoles, ok := assumeRoleList.([]interface{}); ok && len(assumeRoles) > 0 {
+			assumeRole := assumeRoles[0].(map[string]interface{})
+
+			if accountId, ok := assumeRole["account_id"]; ok {
+				config.AssumeRoleAccountId = accountId.(string)
+			}
+
+			if roleName, ok := assumeRole["role_name"]; ok {
+				config.AssumeRoleRoleName = roleName.(string)
+			}
+
+			if userId, ok := assumeRole["user_id"]; ok {
+				config.AssumeRoleUserId = userId.(string)
+			}
+
+			if acl, ok := assumeRole["acl"]; ok {
+				config.AssumeRoleAcl = acl.(string)
+			}
+		}
+	}
+
 	endpointsSet := d.Get("endpoints").(*schema.Set)
 
 	for _, endpointsSetI := range endpointsSet.List() {
@@ -366,4 +399,40 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	}
 
 	return client, nil
+}
+
+func assumeRoleSchema() *schema.Schema {
+	return &schema.Schema{
+		Type:        schema.TypeList,
+		Optional:    true,
+		MaxItems:    1,
+		Description: "Assume role configurations, for more information, please refer to https://cloud.baidu.com/doc/IAM/s/Qjwvyc8ov",
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"role_name": {
+					Type:        schema.TypeString,
+					Required:    true,
+					Description: descriptions["assume_role_name"],
+				},
+
+				"account_id": {
+					Type:        schema.TypeString,
+					Required:    true,
+					Description: descriptions["assume_role_account_id"],
+				},
+
+				"user_id": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Description: descriptions["assume_role_user_id"],
+				},
+
+				"acl": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Description: descriptions["assume_role_acl"],
+				},
+			},
+		},
+	}
 }

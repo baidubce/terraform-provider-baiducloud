@@ -10,20 +10,20 @@ description: |-
 
 Use this resource to get information about a RDS instance.
 
-~> **NOTE:** The terminate operation of rds does NOT take effect immediately，maybe takes for several minites.
+~> **NOTE:** The terminate operation of rds instance does NOT take effect immediately，maybe takes for several minites.
 
 ## Example Usage
 
 ```hcl
 resource "baiducloud_rds_instance" "default" {
-	billing = {
-		payment_timing 		= "Postpaid"
-	}
-	engine_version 			= "5.6"
-	engine 					= "MySQL"
-	cpu_count				= 1
-	memory_capacity			= 1
-	volume_capacity			= 5
+    billing = {
+        payment_timing        = "Postpaid"
+    }
+    engine_version            = "5.6"
+    engine                    = "MySQL"
+    cpu_count                 = 1
+    memory_capacity           = 1
+    volume_capacity           = 5
 }
 ```
 

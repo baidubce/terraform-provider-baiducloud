@@ -74,7 +74,7 @@ func (s *BosService) resourceBaiduCloudBosBucketReadReplicationConfigure(bucket 
 	action := "read bos bucket replication configuration " + bucket
 
 	raw, err := s.client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
-		return bosClient.GetBucketReplication(bucket)
+		return bosClient.GetBucketReplication(bucket, "")
 	})
 	if err != nil {
 		if !IsExceptedErrors(err, ReplicationConfigurationNotFound) {

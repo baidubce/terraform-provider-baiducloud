@@ -736,7 +736,7 @@ func resourceBaiduCloudBosBucketDelete(d *schema.ResourceData, meta interface{})
 
 			if IsExceptedErrors(errDelete, []string{"ReplicationStatusNotEmpty"}) {
 				_, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
-					return nil, bosClient.DeleteBucketReplication(bucket)
+					return nil, bosClient.DeleteBucketReplication(bucket, "")
 				})
 				if err != nil {
 					return resource.NonRetryableError(err)
@@ -825,7 +825,7 @@ func resourceBaiduCloudBosBucketReplicationConfigurationUpdate(d *schema.Resourc
 		status, ok := oldRC[0].(map[string]interface{})["status"]
 		if ok && (status == api.STATUS_ENABLED || len(newRC) == 0) {
 			_, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
-				return nil, bosClient.DeleteBucketReplication(bucket)
+				return nil, bosClient.DeleteBucketReplication(bucket, "")
 			})
 			if err != nil {
 				return WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_bucket", action, BCESDKGoERROR)
@@ -875,7 +875,7 @@ func resourceBaiduCloudBosBucketReplicationConfigurationUpdate(d *schema.Resourc
 		args.ReplicateDeletes = rc["replicate_deletes"].(string)
 
 		_, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
-			return nil, bosClient.PutBucketReplicationFromStruct(bucket, args)
+			return nil, bosClient.PutBucketReplicationFromStruct(bucket, args, "")
 		})
 		if err != nil {
 			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_bucket", action, BCESDKGoERROR)

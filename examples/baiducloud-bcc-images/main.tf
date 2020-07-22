@@ -1,4 +1,10 @@
-provider "baiducloud" {}
+provider "baiducloud" {
+  # option config, you can use assume role as the operation account
+  #assume_role {
+  #  account_id = "your-account-id"
+  #  role_name = "your-role-name"
+  #}
+}
 
 data "baiducloud_specs" "default" {
   # for more detailed conf, please refer to https://cloud.baidu.com/doc/BCC/s/6jwvyo0q2#%E5%8C%BA%E5%9F%9F%E6%9C%BA%E5%9E%8B%E4%BB%A5%E5%8F%8A%E5%8F%AF%E9%80%89%E9%85%8D%E7%BD%AE

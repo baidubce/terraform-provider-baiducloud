@@ -10,8 +10,6 @@ description: |-
 
 Use this resource to get information about a RDS Account.
 
-~> **NOTE:** The terminate operation of rds does NOT take effect immediately，maybe takes for several minites.
-
 ## Example Usage
 
 ```hcl
@@ -38,7 +36,7 @@ In addition to all arguments above, the following attributes are exported:
 
 ## Import
 
-RDS can be imported, e.g.
+RDS Account can be imported, e.g.
 
 ```hcl
 $ terraform import baiducloud_rds_account.default id

@@ -14,6 +14,12 @@ type Config struct {
 	SecretKey string
 	Region    Region
 
+	// assume role
+	AssumeRoleRoleName        string
+	AssumeRoleAccountId       string
+	AssumeRoleUserId          string
+	AssumeRoleAcl             string
+
 	// Config Service Endpoints Map
 	ConfigEndpoints ConfigEndpoints
 }
