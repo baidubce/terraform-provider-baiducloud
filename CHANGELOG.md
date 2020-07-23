@@ -1,4 +1,4 @@
-## 1.6.0 (Unreleased)
+## 1.6.0 (July 23, 2020)
 
 ENHANCEMENTS:
 - provider: Support assume role
