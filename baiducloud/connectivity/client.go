@@ -21,9 +21,9 @@ import (
 
 // BaiduClient of BaiduCloud
 type BaiduClient struct {
-	config    *Config
-	Region    Region
-	Endpoint  string
+	config   *Config
+	Region   Region
+	Endpoint string
 
 	Credentials *auth.BceCredentials
 
@@ -46,8 +46,8 @@ var goSdkMutex = sync.RWMutex{} // The Go SDK is not thread-safe
 // Client for BaiduCloudClient
 func (c *Config) Client() (*BaiduClient, error) {
 	client := &BaiduClient{
-		config:    c,
-		Region:    c.Region,
+		config: c,
+		Region: c.Region,
 	}
 
 	if c.AssumeRoleAccountId != "" && c.AssumeRoleRoleName != "" {

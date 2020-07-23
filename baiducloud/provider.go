@@ -140,7 +140,7 @@ func Provider() terraform.ResourceProvider {
 				Description:  descriptions["region"],
 				InputDefault: "bj",
 			},
-			"endpoints":   endpointsSchema(),
+			"endpoints": endpointsSchema(),
 
 			"assume_role": assumeRoleSchema(),
 		},
