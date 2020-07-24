@@ -1,4 +1,4 @@
-## 1.6,1 (Unreleased)
+## 1.6.1 (July 24, 2020)
 NOTES
 - provider: Fix wrong information in the provider index document 
 
