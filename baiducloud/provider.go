@@ -228,11 +228,11 @@ func init() {
 
 		"assume_role_name": "The role name for assume role.",
 
-		"assume_role_account_id": "The account id for assume role.",
+		"assume_role_account_id": "The main account id for assume role account.",
 
 		"assume_role_user_id": "The user id for assume role.",
 
-		"assume_role_acl": "The acl for assume role.",
+		"assume_role_acl": "The acl for this assume role.",
 
 		"bcc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BCC endpoints.",
 

@@ -81,6 +81,7 @@ The following methods are supported, and explained below in this order:
 
 - Static credentials
 - Environment variables
+- AssumeRole credentials
 
 ### Static credentials
 
@@ -96,7 +97,6 @@ provider "baiducloud" {
   region     = "${var.region}"
 }
 ```
-
 
 ### Environment variables
 
@@ -117,6 +117,24 @@ $ export BAIDUCLOUD_REGION="bj"
 $ terraform plan
 ```
 
+### AssumeRole credentials
+
+You can use `assume_role` as your credential role:
+
+Usage:
+
+```hcl
+provider "baiducloud" {
+  access_key = "${var.access_key}"
+  secret_key = "${var.secret_key}"
+  region     = "${var.region}"
+
+  assume_role {
+    account_id = "your-account-id"
+    role_name = "your-role-name"
+  }
+}
+```
 
 ## Endpoints
 
@@ -153,6 +171,8 @@ The following arguments are supported:
 
 * `endpoints` - (Optional) An `endpoints` block (documented below) to support custom endpoints.
 
+* `assume_role` - (Optional) An `assume_role` block (documented below) to support assume role credentials. Assume role configurations, for more information, please refer to [STS Service](https://cloud.baidu.com/doc/IAM/s/Qjwvyc8ov).
+
 Nested `endpoints` block supports the following:
 
 * `bcc` - (Optional) Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BCC endpoints.
@@ -162,6 +182,26 @@ Nested `endpoints` block supports the following:
 * `eip` - (Optional) Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom EIP endpoints.
 
 * `appblb` - (Optional) Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BLB endpoints.
+
+* `bos` - (Optional) Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BOS endpoints.
+
+* `cfc` - (Optional) Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CFC endpoints.
+
+* `scs` - (Optional) Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom SCS endpoints.
+
+* `cce` - (Optional) Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CCE endpoints.
+
+* `rds` - (Optional) Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom RDS endpoints.
+
+Nested `assume_role` block supports the following:
+
+* `role_name` - (Required) The role name for assume role.
+
+* `account_id` - (Required) The main account id for assume role account.
+
+* `user_id` - (Optional) The user id for assume role.
+
+* `acl` - (Optional) The acl for this assume role.
 
 
 ## Testing

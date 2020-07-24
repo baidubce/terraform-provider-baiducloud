@@ -1,4 +1,7 @@
-## 1.7.0 (Unreleased)
+## 1.6,1 (Unreleased)
+NOTES
+- provider: Fix wrong information in the provider index document 
+
 ## 1.6.0 (July 23, 2020)
 
 ENHANCEMENTS:
