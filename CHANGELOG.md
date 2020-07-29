@@ -1,6 +1,13 @@
 ## 1.7.0 (Unreleased)
+
+FEATURES:
+
+* **New Data Source:** `data_source_baiducloud_dtss`
+* **New Resource:** `resource_baiducloud_dts`
+
 ## 1.6.1 (July 24, 2020)
-NOTES
+
+NOTES:
 - provider: Fix wrong information in the provider index document 
 
 ## 1.6.0 (July 23, 2020)
@@ -9,6 +16,7 @@ ENHANCEMENTS:
 - provider: Support assume role
 
 ## 1.5.0 (July 14, 2020)
+
 FEATURES:
 
 * **New Data Source:** `data_source_baiducloud_rdss`
@@ -26,6 +34,7 @@ ENHANCEMENTS:
 - resource/baiducloud_cce_cluster: support keypair_id when creating cluster nodes
 
 ## 1.4.0 (July 06, 2020)
+
 FEATURES:
 
 * **New Data Source:** `baiducloud_scs_specs`
@@ -33,12 +42,14 @@ FEATURES:
 * **New Resource:** `baiducloud_scs`
 
 ## 1.3.1 (July 06, 2020)
+
 BUG FIXES:
 - resource/baiducloud_cce_cluster: Fix test tf config error
 - datasource/baiducloud_cce_cluster_nodes: Fix test tf config error
 - datasource/baiducloud_cce_kubeconfig: Fix test tf config error
 
 ## 1.3.0 (July 05, 2020)
+
 FEATURES:
 
 * **New Data Source:** `baiducloud_cce_versions`
@@ -56,6 +67,7 @@ BUG FIXES:
 - datasource/baiducloud_instances: Fix the problem of wrong parameter "card_count" type
 
 ## 1.2.0 (April 13, 2020)
+
 NOTES:
 - resource/baiducloud_cfc: Fix wrong information in the baiducloud_cfc document
 
@@ -64,6 +76,7 @@ ENHANCEMENTS:
 - resource/baiducloud_eip: support start/stop auto renew if eip is prepaid
 
 ## 1.1.0 (March 12, 2020)
+
 ENHANCEMENTS:
 - datasource/*: datasource add support "filter"
 

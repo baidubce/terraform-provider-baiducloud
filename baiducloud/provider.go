@@ -49,6 +49,7 @@ Data Sources
   baiducloud_cce_container_net
   baiducloud_cce_cluster_nodes
   baiducloud_cce_kubeconfig
+  baiducloud_dtss
 
 CERT Resources
   baiducloud_cert
@@ -92,6 +93,9 @@ CFC Resources
 
 SCS Resources
   baiducloud_scs
+
+DTS Resources
+  baiducloud_dts
 
 CCE Resources
   baiducloud_cce_cluster
@@ -176,6 +180,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_cce_cluster_nodes":      dataSourceBaiduCloudCCEClusterNodes(),
 			"baiducloud_cce_kubeconfig":         dataSourceBaiduCloudCceKubeConfig(),
 			"baiducloud_rdss":                   dataSourceBaiduCloudRdss(),
+			"baiducloud_dtss":                   dataSourceBaiduCloudDtss(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -210,6 +215,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_rds_instance":          resourceBaiduCloudRdsInstance(),
 			"baiducloud_rds_readonly_instance": resourceBaiduCloudRdsReadOnlyInstance(),
 			"baiducloud_rds_account":           resourceBaiduCloudRdsAccount(),
+			"baiducloud_dts":                   resourceBaiduCloudDts(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -251,6 +257,8 @@ func init() {
 		"cce_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CCE endpoints.",
 
 		"rds_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom RDS endpoints.",
+
+		"dts_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom DTS endpoints.",
 	}
 }
 
@@ -314,6 +322,12 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["rds_endpoint"],
 				},
+				"dts": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["dts_endpoint"],
+				},
 			},
 		},
 		Set: endpointsToHash,
@@ -332,6 +346,7 @@ func endpointsToHash(v interface{}) int {
 	buf.WriteString(fmt.Sprintf("%s-", m["scs"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["cce"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["rds"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["dts"].(string)))
 	return hashcode.String(buf.String())
 }
 
@@ -391,6 +406,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints[connectivity.SCSCode] = strings.TrimSpace(endpoints["scs"].(string))
 		config.ConfigEndpoints[connectivity.CCECode] = strings.TrimSpace(endpoints["cce"].(string))
 		config.ConfigEndpoints[connectivity.RDSCode] = strings.TrimSpace(endpoints["rds"].(string))
+		config.ConfigEndpoints[connectivity.DTSCode] = strings.TrimSpace(endpoints["dts"].(string))
 	}
 
 	client, err := config.Client()

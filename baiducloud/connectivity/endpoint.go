@@ -22,6 +22,7 @@ const (
 	CCECode    = ServiceCode("CCE")
 	SCSCode    = ServiceCode("SCS")
 	RDSCode    = ServiceCode("RDS")
+	DTSCode    = ServiceCode("DTS")
 )
 
 const (
@@ -33,6 +34,7 @@ const (
 	DefaultBJRegionCceEndPoint = "cce.bj.baidubce.com"
 	DefaultBJRegionScsEndPoint = "redis.bj.baidubce.com"
 	DefaultBJRegionRdsEndPoint = "rds.bj.baidubce.com"
+	DefaultBJRegionDtsEndPoint = "rds.bj.baidubce.com"
 
 	DefaultGZRegionBccEndPoint = "bcc.gz.baidubce.com"
 	DefaultGZRegionEipEndPoint = "eip.gz.baidubce.com"
@@ -85,6 +87,7 @@ var (
 		CCECode:    DefaultBJRegionCceEndPoint,
 		SCSCode:    DefaultBJRegionScsEndPoint,
 		RDSCode:    DefaultBJRegionRdsEndPoint,
+		DTSCode:    DefaultBJRegionDtsEndPoint,
 	}
 
 	// Region GZ Service Endpoints

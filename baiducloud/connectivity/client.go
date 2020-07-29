@@ -10,6 +10,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/cce"
 	"github.com/baidubce/bce-sdk-go/services/cert"
 	"github.com/baidubce/bce-sdk-go/services/cfc"
+	"github.com/baidubce/bce-sdk-go/services/dts"
 	"github.com/baidubce/bce-sdk-go/services/eip"
 	"github.com/baidubce/bce-sdk-go/services/rds"
 	"github.com/baidubce/bce-sdk-go/services/scs"
@@ -37,6 +38,7 @@ type BaiduClient struct {
 	scsConn    *scs.Client
 	cceConn    *cce.Client
 	rdsConn    *rds.Client
+	dtsConn    *dts.Client
 }
 
 type ApiVersion string
@@ -299,4 +301,21 @@ func (client *BaiduClient) WithRdsClient(do func(*rds.Client) (interface{}, erro
 
 	return do(client.rdsConn)
 
+}
+
+func (client *BaiduClient) WithDtsClient(do func(*dts.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the DTS client if necessary
+	if client.dtsConn == nil {
+		client.WithCommonClient(DTSCode)
+		dtsClient, err := dts.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		client.dtsConn = dtsClient
+	}
+
+	return do(client.dtsConn)
 }
