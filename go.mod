@@ -1,7 +1,7 @@
 module github.com/terraform-providers/terraform-provider-baiducloud
 
 require (
-	github.com/baidubce/bce-sdk-go v0.9.17
+	github.com/baidubce/bce-sdk-go v0.9.20
 	github.com/hashicorp/terraform v0.12.20
 	github.com/mitchellh/go-homedir v1.1.0
 )

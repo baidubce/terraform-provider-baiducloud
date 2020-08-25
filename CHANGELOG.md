@@ -1,4 +1,13 @@
 ## 1.8.0 (Unreleased)
+
+FEATURES:
+
+* **New Data Source:** `data_source_baiducloud_ccev2_clusterip_cidr`
+* **New Data Source:** `data_source_baiducloud_ccev2_container_cidr`
+
+* **New Resource:** `resource_baiducloud_ccev2_cluster`
+* **New Resource:** `resource_baiducloud_ccev2_instance_group`
+
 ## 1.7.0 (July 29, 2020)
 
 FEATURES:

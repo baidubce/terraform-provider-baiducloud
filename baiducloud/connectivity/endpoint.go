@@ -20,6 +20,7 @@ const (
 	CERTCode   = ServiceCode("CERT")
 	CFCCode    = ServiceCode("CFC")
 	CCECode    = ServiceCode("CCE")
+	CCEv2Code  = ServiceCode("CCEv2")
 	SCSCode    = ServiceCode("SCS")
 	RDSCode    = ServiceCode("RDS")
 	DTSCode    = ServiceCode("DTS")
@@ -85,6 +86,7 @@ var (
 		CERTCode:   DefaultCERTEndPoint,
 		CFCCode:    DefaultBJRegionCfcEndPoint,
 		CCECode:    DefaultBJRegionCceEndPoint,
+		CCEv2Code:  DefaultBJRegionCceEndPoint,
 		SCSCode:    DefaultBJRegionScsEndPoint,
 		RDSCode:    DefaultBJRegionRdsEndPoint,
 		DTSCode:    DefaultBJRegionDtsEndPoint,
@@ -100,6 +102,7 @@ var (
 		CERTCode:   DefaultCERTEndPoint,
 		CFCCode:    DefaultGZRegionCfcEndPoint,
 		CCECode:    DefaultGZRegionCceEndPoint,
+		CCEv2Code:  DefaultGZRegionCceEndPoint,
 		SCSCode:    DefaultGZRegionScsEndPoint,
 		RDSCode:    DefaultGZRegionRdsEndPoint,
 	}
@@ -114,6 +117,7 @@ var (
 		CERTCode:   DefaultCERTEndPoint,
 		CFCCode:    DefaultSURegionCfcEndPoint,
 		CCECode:    DefaultSURegionCceEndPoint,
+		CCEv2Code:  DefaultSURegionCceEndPoint,
 		SCSCode:    DefaultSURegionScsEndPoint,
 		RDSCode:    DefaultSURegionRdsEndPoint,
 	}
@@ -128,6 +132,7 @@ var (
 		CERTCode:   DefaultCERTEndPoint,
 		CFCCode:    DefaultFWHRegionCfcEndPoint,
 		CCECode:    DefaultFWHRegionCceEndPoint,
+		CCEv2Code:  DefaultFWHRegionCceEndPoint,
 		SCSCode:    DefaultFWHRegionScsEndPoint,
 		RDSCode:    DefaultFWHRegionRdsEndPoint,
 	}

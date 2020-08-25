@@ -8,6 +8,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/bcc"
 	"github.com/baidubce/bce-sdk-go/services/bos"
 	"github.com/baidubce/bce-sdk-go/services/cce"
+	ccev2 "github.com/baidubce/bce-sdk-go/services/cce/v2"
 	"github.com/baidubce/bce-sdk-go/services/cert"
 	"github.com/baidubce/bce-sdk-go/services/cfc"
 	"github.com/baidubce/bce-sdk-go/services/dts"
@@ -37,6 +38,7 @@ type BaiduClient struct {
 	cfcConn    *cfc.Client
 	scsConn    *scs.Client
 	cceConn    *cce.Client
+	ccev2Conn  *ccev2.Client
 	rdsConn    *rds.Client
 	dtsConn    *dts.Client
 }
@@ -268,7 +270,7 @@ func (client *BaiduClient) WithCCEClient(do func(*cce.Client) (interface{}, erro
 	goSdkMutex.Lock()
 	defer goSdkMutex.Unlock()
 
-	// Initialize the CFC client if necessary
+	// Initialize the CCE client if necessary
 	if client.cceConn == nil {
 		client.WithCommonClient(CCECode)
 		cceClient, err := cce.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
@@ -281,6 +283,25 @@ func (client *BaiduClient) WithCCEClient(do func(*cce.Client) (interface{}, erro
 	}
 
 	return do(client.cceConn)
+}
+
+func (client *BaiduClient) WithCCEv2Client(do func(*ccev2.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the CCEv2 client if necessary
+	if client.ccev2Conn == nil {
+		client.WithCommonClient(CCEv2Code)
+		ccev2Client, err := ccev2.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		ccev2Client.Config.Credentials = client.Credentials
+
+		client.ccev2Conn = ccev2Client
+	}
+
+	return do(client.ccev2Conn)
 }
 
 func (client *BaiduClient) WithRdsClient(do func(*rds.Client) (interface{}, error)) (interface{}, error) {

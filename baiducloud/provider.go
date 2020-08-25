@@ -178,6 +178,8 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_cce_versions":           dataSourceBaiduCloudCceKubernetesVersion(),
 			"baiducloud_cce_container_net":      dataSourceBaiduCloudCceContainerNet(),
 			"baiducloud_cce_cluster_nodes":      dataSourceBaiduCloudCCEClusterNodes(),
+			"baiducloud_ccev2_container_cidr":   dataSourceBaiduCloudCCEv2ContainerCIDRs(),
+			"baiducloud_ccev2_clusterip_cidr":   dataSourceBaiduCloudCCEv2ClusterIPCidrs(),
 			"baiducloud_cce_kubeconfig":         dataSourceBaiduCloudCceKubeConfig(),
 			"baiducloud_rdss":                   dataSourceBaiduCloudRdss(),
 			"baiducloud_dtss":                   dataSourceBaiduCloudDtss(),
@@ -212,6 +214,8 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_cfc_trigger":           resourceBaiduCloudCFCTrigger(),
 			"baiducloud_scs":                   resourceBaiduCloudScs(),
 			"baiducloud_cce_cluster":           resourceBaiduCloudCCECluster(),
+			"baiducloud_ccev2_cluster":         resourceBaiduCloudCCEv2Cluster(),
+			"baiducloud_ccev2_instance_group":  resourceBaiduCloudCCEv2InstanceGroup(),
 			"baiducloud_rds_instance":          resourceBaiduCloudRdsInstance(),
 			"baiducloud_rds_readonly_instance": resourceBaiduCloudRdsReadOnlyInstance(),
 			"baiducloud_rds_account":           resourceBaiduCloudRdsAccount(),
@@ -255,6 +259,8 @@ func init() {
 		"scs_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom SCS endpoints.",
 
 		"cce_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CCE endpoints.",
+
+		"ccev2_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CCEv2 endpoints.",
 
 		"rds_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom RDS endpoints.",
 
@@ -316,6 +322,12 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["cce_endpoint"],
 				},
+				"ccev2": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["ccev2_endpoint"],
+				},
 				"rds": {
 					Type:        schema.TypeString,
 					Optional:    true,
@@ -345,6 +357,7 @@ func endpointsToHash(v interface{}) int {
 	buf.WriteString(fmt.Sprintf("%s-", m["cfc"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["scs"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["cce"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["ccev2"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["rds"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["dts"].(string)))
 	return hashcode.String(buf.String())
@@ -405,6 +418,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints[connectivity.BOSCode] = strings.TrimSpace(endpoints["cfc"].(string))
 		config.ConfigEndpoints[connectivity.SCSCode] = strings.TrimSpace(endpoints["scs"].(string))
 		config.ConfigEndpoints[connectivity.CCECode] = strings.TrimSpace(endpoints["cce"].(string))
+		config.ConfigEndpoints[connectivity.CCEv2Code] = strings.TrimSpace(endpoints["ccev2"].(string))
 		config.ConfigEndpoints[connectivity.RDSCode] = strings.TrimSpace(endpoints["rds"].(string))
 		config.ConfigEndpoints[connectivity.DTSCode] = strings.TrimSpace(endpoints["dts"].(string))
 	}
