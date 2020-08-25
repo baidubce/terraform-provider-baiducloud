@@ -298,6 +298,7 @@ type ObjectMeta struct {
 	NextAppendOffset   string
 	ObjectType         string
 	BceRestore         string
+	BceObjectType      string
 }
 
 // GetObjectResult defines the result data of the get object api.
@@ -456,6 +457,12 @@ type UploadPartCopyArgs struct {
 	IfNoneMatch       string
 	IfModifiedSince   string
 	IfUnmodifiedSince string
+}
+
+type PutSymlinkArgs struct {
+	ForbidOverwrite string
+	StorageClass    string
+	UserMeta        map[string]string
 }
 
 // UploadInfoType defines an uploaded part info structure.

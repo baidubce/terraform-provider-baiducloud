@@ -52,7 +52,7 @@ github.com/aws/aws-sdk-go/private/protocol/xml/xmlutil
 github.com/aws/aws-sdk-go/service/s3
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
-# github.com/baidubce/bce-sdk-go v0.9.17
+# github.com/baidubce/bce-sdk-go v0.9.20
 github.com/baidubce/bce-sdk-go/auth
 github.com/baidubce/bce-sdk-go/bce
 github.com/baidubce/bce-sdk-go/http
@@ -63,6 +63,8 @@ github.com/baidubce/bce-sdk-go/services/bcc/api
 github.com/baidubce/bce-sdk-go/services/bos
 github.com/baidubce/bce-sdk-go/services/bos/api
 github.com/baidubce/bce-sdk-go/services/cce
+github.com/baidubce/bce-sdk-go/services/cce/v2
+github.com/baidubce/bce-sdk-go/services/cce/v2/types
 github.com/baidubce/bce-sdk-go/services/cert
 github.com/baidubce/bce-sdk-go/services/cfc
 github.com/baidubce/bce-sdk-go/services/cfc/api

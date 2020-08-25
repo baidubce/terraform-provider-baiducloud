@@ -1219,6 +1219,23 @@ func (c *Client) BasicUploadPart(bucket, object, uploadId string, partNumber int
 	return api.UploadPart(c, bucket, object, uploadId, partNumber, content, nil)
 }
 
+// UploadPartFromBytes - upload the single part in the multipart upload process
+//
+// PARAMS:
+//     - bucket: the bucket name
+//     - object: the object name
+//     - uploadId: the multipart upload id
+//     - partNumber: the current part number
+//     - content: the uploaded part content
+//     - args: the optional arguments
+// RETURNS:
+//     - string: the etag of the uploaded part
+//     - error: nil if ok otherwise the specific error
+func (c *Client) UploadPartFromBytes(bucket, object, uploadId string, partNumber int,
+	content []byte, args *api.UploadPartArgs) (string, error) {
+	return api.UploadPartFromBytes(c, bucket, object, uploadId, partNumber, content, args)
+}
+
 // UploadPartCopy - copy the multipart object
 //
 // PARAMS:
@@ -2099,4 +2116,29 @@ func (c *Client) singlePartCopy(source string, bucket string, object string, upl
 	}
 	result <- api.UploadInfoType{PartNumber: partNumber, ETag: copyObjectResult.ETag}
 	return
+}
+
+// PutSymlink - create symlink for exist target object
+//
+// PARAMS:
+//     - bucket: the name of the bucket
+//     - object: the name of the object
+//     - symlinkKey: the name of the symlink
+//     - symlinkArgs: the optional arguments
+// RETURNS:
+//     - error: the put error if any occurs
+func (c *Client) PutSymlink(bucket string, object string, symlinkKey string, symlinkArgs *api.PutSymlinkArgs) error {
+	return api.PutObjectSymlink(c, bucket, object, symlinkKey, symlinkArgs)
+}
+
+// PutSymlink - create symlink for exist target object
+//
+// PARAMS:
+//     - bucket: the name of the bucket
+//     - object: the name of the symlink
+// RETURNS:
+//	   - string: the target of the symlink
+//     - error: the put error if any occurs
+func (c *Client) GetSymlink(bucket string, object string) (string, error) {
+	return api.GetObjectSymlink(c, bucket, object)
 }
