@@ -1,4 +1,10 @@
 ## 1.9.0 (Unreleased)
+
+FEATURES:
+
+* **New Data Source:** `data_source_baiducloud_ccev2_cluster_instances`
+* **New Data Source:** `data_source_baiducloud_ccev2_instance_group_instances`
+
 ## 1.8.0 (August 25, 2020)
 
 FEATURES:

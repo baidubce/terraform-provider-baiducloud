@@ -1,5 +1,5 @@
 /*
-Use this resource to create a CCEv2 Instance Group.
+Use this resource to create a CCEv2 InstanceGroup.
 
 ~> **NOTE:** The create/update/delete operation of ccev2 does NOT take effect immediately，maybe takes for several minutes.
 
@@ -8,21 +8,25 @@ Example Usage
 ```hcl
 resource "baiducloud_ccev2_instance_group" "ccev2_instance_group_1" {
   spec {
-    cluster_id = baiducloud_ccev2_cluster.default_managed.id
+    cluster_id = baiducloud_ccev2_cluster.default_custom.id
     replicas = var.instance_group_replica_1
-    instance_group_name = "ccev2_instance_group_1"
+    instance_group_name = "ig_1"
     instance_template {
       cce_instance_id = ""
-      instance_name = "ccev2_test_instance"
+      instance_name = "tf_ins_ig_1"
       cluster_role = "node"
       existed = false
       machine_type = "BCC"
       instance_type = "N3"
       vpc_config {
-        vpc_id = var.vpc_id
-        vpc_subnet_id = var.vpc_subnet_id
-        security_group_id = var.security_group_id
+        vpc_id = baiducloud_vpc.default.id
+        vpc_subnet_id = baiducloud_subnet.defaultA.id
+        security_group_id = baiducloud_security_group.default.id
         available_zone = "zoneA"
+      }
+      deploy_custom_config {
+        pre_user_script  = "ls"
+        post_user_script = "date"
       }
       instance_resource {
         cpu = 4
@@ -30,7 +34,7 @@ resource "baiducloud_ccev2_instance_group" "ccev2_instance_group_1" {
         root_disk_size = 40
         local_disk_size = 0
       }
-      image_id = var.image_id
+      image_id = data.baiducloud_images.default.images.0.id
       instance_os {
         image_type = "System"
       }
@@ -66,6 +70,10 @@ func resourceBaiduCloudCCEv2InstanceGroup() *schema.Resource {
 		Delete: resourceBaiduCloudCCEv2InstanceGroupDelete,
 		Update: resourceBaiduCloudCCEv2InstanceGroupUpdate,
 
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(20 * time.Minute),
 			Update: schema.DefaultTimeout(20 * time.Minute),
@@ -73,6 +81,7 @@ func resourceBaiduCloudCCEv2InstanceGroup() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
+			//Params for creating/updating the instance group
 			"spec": {
 				Type:        schema.TypeList,
 				Description: "Instance Group Spec",
@@ -108,6 +117,7 @@ func resourceBaiduCloudCCEv2InstanceGroup() *schema.Resource {
 					},
 				},
 			},
+			//Status of the instance group
 			"status": {
 				Type:        schema.TypeList,
 				Description: "Instance Group Status",
@@ -136,16 +146,16 @@ func resourceBaiduCloudCCEv2InstanceGroup() *schema.Resource {
 func resourceBaiduCloudCCEv2InstanceGroupCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
 
-	arg, err := buildCreateInstanceGroupArgs(d)
+	args, err := buildCreateInstanceGroupArgs(d)
 	if err != nil {
-		log.Printf("Build Create Instance Group Args Fail:" + err.Error())
+		log.Printf("Build CreateInstanceGroupArgs Error:" + err.Error())
 		return WrapError(err)
 	}
 
-	action := "Create CCE Instance Group " + arg.Request.InstanceGroupName
+	action := "Create CCEv2 Instance Group " + args.Request.InstanceGroupName
 	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 		raw, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
-			return client.CreateInstanceGroup(arg)
+			return client.CreateInstanceGroup(args)
 		})
 		if err != nil {
 			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
@@ -163,7 +173,7 @@ func resourceBaiduCloudCCEv2InstanceGroupCreate(d *schema.ResourceData, meta int
 		for i = 1; i <= loopsCount; i++ {
 			time.Sleep(5 * time.Second)
 			argsGetInstanceGroup := &ccev2.GetInstanceGroupArgs{
-				ClusterID:       arg.ClusterID,
+				ClusterID:       args.ClusterID,
 				InstanceGroupID: resp.InstanceGroupID,
 			}
 			rawInstanceGroupResp, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
@@ -191,6 +201,7 @@ func resourceBaiduCloudCCEv2InstanceGroupCreate(d *schema.ResourceData, meta int
 	})
 
 	if err != nil {
+		log.Printf("Create InstanceGroup Error:" + err.Error())
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", action, BCESDKGoERROR)
 	}
 
@@ -202,50 +213,66 @@ func resourceBaiduCloudCCEv2InstanceGroupRead(d *schema.ResourceData, meta inter
 
 	argsGetInstanceGroup, err := buildGetInstanceGroupArgs(d)
 	if err != nil {
-		log.Printf("Build Get Instance Group Args Fail:" + err.Error())
+		log.Printf("Build GetInstanceGroupArgs Error:" + err.Error())
 		return WrapError(err)
 	}
 
+	action := "Get CCEv2 Instance Group. ClusterID:" + argsGetInstanceGroup.ClusterID + " InstanceGroupID:" + argsGetInstanceGroup.InstanceGroupID
 	rawInstanceGroupResp, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
 		return client.GetInstanceGroup(argsGetInstanceGroup)
 	})
-
 	if err != nil {
-		return WrapError(err)
+		if NotFoundError(err) {
+			log.Printf("InstanceGroup Not Found. Set Resource ID to Empty.")
+			d.SetId("") //Resource Not Found, make the ID of resource to empty to delete it in state file.
+			return nil
+		}
+		log.Printf("Get InstanceGroup Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", action, BCESDKGoERROR)
 	}
 	getInstanceGroupResp := rawInstanceGroupResp.(*ccev2.GetInstanceGroupResponse)
 
 	if getInstanceGroupResp.InstanceGroup == nil || getInstanceGroupResp.InstanceGroup.Status == nil {
-		return WrapError(errors.New("GetInstanceGroupResponse.InstanceGroup or  GetInstanceGroupResponse.InstanceGroup.Status is nil"))
+		err := errors.New("GetInstanceGroupResponse.InstanceGroup or  GetInstanceGroupResponse.InstanceGroup.Status is nil")
+		log.Printf("Get InstanceGroup Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", action, BCESDKGoERROR)
 	}
 
 	statusList := make([]interface{}, 0)
 	statusMap := make(map[string]interface{})
 	statusMap["ready_replicas"] = getInstanceGroupResp.InstanceGroup.Status.ReadyReplicas
 	statusList = append(statusList, statusMap)
-	d.Set("status", statusList)
+	err = d.Set("status", statusList)
+	if err != nil {
+		log.Printf("Set status Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", action, BCESDKGoERROR)
+	}
 
 	argsGetInstanceOfInstanceGroup, err := buildGetInstancesOfInstanceGroupArgs(d)
 	if err != nil {
-		log.Printf("Build Get Instances of Instance Group Args Fail:" + err.Error())
-		return WrapError(err)
+		log.Printf("Build ListInstanceByInstanceGroupIDArgs Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", action, BCESDKGoERROR)
 	}
 	rawInstancesResp, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
 		return client.ListInstancesByInstanceGroupID(argsGetInstanceOfInstanceGroup)
 	})
 	if err != nil {
-		return WrapError(err)
+		log.Printf("Get Instances of InstanceGroup Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", action, BCESDKGoERROR)
 	}
+
 	instancesResp := rawInstancesResp.(*ccev2.ListInstancesByInstanceGroupIDResponse)
 	nodes, err := convertInstanceFromJsonToMap(instancesResp.Page.List, types.ClusterRoleNode)
 	if err != nil {
-		log.Printf("Get Instance Group Nodes Fail" + err.Error())
-	} else {
-		err = d.Set("nodes", nodes)
+		log.Printf("Get Instance Group Nodes Error" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", action, BCESDKGoERROR)
 	}
+	err = d.Set("nodes", nodes)
 	if err != nil {
-		log.Printf("Set Instance Group Nodes Fail" + err.Error())
+		log.Printf("Set nodes Error" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", action, BCESDKGoERROR)
 	}
+
 	return nil
 }
 
@@ -254,7 +281,7 @@ func resourceBaiduCloudCCEv2InstanceGroupUpdate(d *schema.ResourceData, meta int
 
 	args, err := buildUpdateInstanceGroupReplicaArgs(d)
 	if err != nil {
-		log.Printf("Build Update Instance Group Replica Args Fail:" + err.Error())
+		log.Printf("Build UpdateInstanceGroupReplicasArgs Error:" + err.Error())
 		return WrapError(err)
 	}
 	action := "Update CCE Instance Group: " + args.InstanceGroupID
@@ -270,7 +297,7 @@ func resourceBaiduCloudCCEv2InstanceGroupUpdate(d *schema.ResourceData, meta int
 		}
 		//waiting all instance in instance group are ready
 		createTimeOutTime := d.Timeout(schema.TimeoutCreate)
-		loopsCount := createTimeOutTime.Microseconds() / ((10 * time.Second).Microseconds())
+		loopsCount := createTimeOutTime.Microseconds() / ((5 * time.Second).Microseconds())
 		var i int64
 		for i = 1; i <= loopsCount; i++ {
 			time.Sleep(5 * time.Second)
@@ -301,6 +328,7 @@ func resourceBaiduCloudCCEv2InstanceGroupUpdate(d *schema.ResourceData, meta int
 		return nil
 	})
 	if err != nil {
+		log.Printf("Update InstanceGroup Error:" + err.Error())
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", action, BCESDKGoERROR)
 	}
 	return resourceBaiduCloudCCEv2InstanceGroupRead(d, meta)
@@ -310,9 +338,10 @@ func resourceBaiduCloudCCEv2InstanceGroupDelete(d *schema.ResourceData, meta int
 	client := meta.(*connectivity.BaiduClient)
 	args, err := buildDeleteInstanceGroupArgs(d)
 	if err != nil {
-		log.Printf("Build Delete Instance Group Args Fail:" + err.Error())
+		log.Printf("Build DeleteInstanceGroupArgs Error:" + err.Error())
 		return WrapError(err)
 	}
+
 	action := "Delete CCE Instance Group: " + args.InstanceGroupID
 	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 		raw, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
@@ -334,6 +363,7 @@ func resourceBaiduCloudCCEv2InstanceGroupDelete(d *schema.ResourceData, meta int
 		return nil
 	})
 	if err != nil {
+		log.Printf("Delete InstanceGroup Error:" + err.Error())
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", action, BCESDKGoERROR)
 	}
 	return nil

@@ -37,11 +37,12 @@ const (
 	ReleaseWhileCreating = "Instance.ReleaseWhileCreating"
 
 	// not found error
-	InstanceNotFound = "InstanceNotFound"
-	EipNotFound      = "EipNotFound"
-	CceNotFound      = "Cce.warning.ClusterNotExist"
-	Ccev2NotFound    = "cce.warning.ClusterNotFound"
-	InstanceNotExist = "InstanceNotExist"
+	InstanceNotFound           = "InstanceNotFound"
+	EipNotFound                = "EipNotFound"
+	CceNotFound                = "Cce.warning.ClusterNotExist"
+	Ccev2ClusterNotFound       = "cce.warning.ClusterNotFound"
+	Ccev2InstanceGroupNotFound = "cce.warning.InstanceGroupNotFound"
+	InstanceNotExist           = "InstanceNotExist"
 
 	// scs error
 	InvalidInstanceStatus = "InvalidInstanceStatus"
@@ -75,12 +76,13 @@ var (
 	CceClusterNotFound = []string{CceNotFound}
 
 	//ccev2 error
-	Ccev2ClusterNotFound = []string{Ccev2NotFound}
+	Ccev2NotFound = []string{Ccev2ClusterNotFound, Ccev2InstanceGroupNotFound}
 )
 
 var NotFoundErrorList = []string{
 	ResourceNotFoundException, ResourceNotFound, ResourceNotFound2, InstanceNotFound,
-	"NoSuchObject", "NoSuchNat", EipNotFound, InstanceNotExist, CceNotFound, Ccev2NotFound,
+	"NoSuchObject", "NoSuchNat", EipNotFound, InstanceNotExist, CceNotFound,
+	Ccev2ClusterNotFound, Ccev2InstanceGroupNotFound,
 }
 
 // An Error to wrap the different erros

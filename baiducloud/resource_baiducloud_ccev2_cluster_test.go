@@ -76,7 +76,7 @@ func testSweepCcev2Cluster(region string) error {
 	return nil
 }
 
-func TestAccBaiduCloudCCEv2Cluster(t *testing.T) {
+func TestAccBaiduCloudCCEv2ClusterResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -148,11 +148,6 @@ resource "baiducloud_subnet" "defaultA" {
   cidr        = "192.168.1.0/24"
   vpc_id      = baiducloud_vpc.default.id
   description = "test-subnet-tf-auto"
-
-  tags = {
-    "testKey"  = "testValue"
-    "testKey2" = "testValue2"
-  }
 }
 resource "baiducloud_security_group" "default" {
   name   = "%s"

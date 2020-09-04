@@ -49,6 +49,10 @@ Data Sources
   baiducloud_cce_container_net
   baiducloud_cce_cluster_nodes
   baiducloud_cce_kubeconfig
+  baiducloud_ccev2_container_cidr
+  baiducloud_ccev2_clusterip_cidr
+  baiducloud_ccev2_cluster_instances
+  baiducloud_ccev2_instance_group_instances
   baiducloud_dtss
 
 CERT Resources
@@ -99,6 +103,10 @@ DTS Resources
 
 CCE Resources
   baiducloud_cce_cluster
+
+CCEv2 Resources
+  baiducloud_ccev2_cluster
+  baiducloud_ccev2_instance_group
 */
 package baiducloud
 
@@ -150,39 +158,41 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
-			"baiducloud_vpcs":                   dataSourceBaiduCloudVpcs(),
-			"baiducloud_subnets":                dataSourceBaiduCloudSubnets(),
-			"baiducloud_route_rules":            dataSourceBaiduCloudRouteRules(),
-			"baiducloud_acls":                   dataSourceBaiduCloudAcls(),
-			"baiducloud_nat_gateways":           dataSourceBaiduCloudNatGateways(),
-			"baiducloud_peer_conns":             dataSourceBaiduCloudPeerConns(),
-			"baiducloud_bos_buckets":            dataSourceBaiduCloudBosBuckets(),
-			"baiducloud_bos_bucket_objects":     dataSourceBaiduCloudBosBucketObjects(),
-			"baiducloud_appblbs":                dataSourceBaiduCloudAppBLBs(),
-			"baiducloud_appblb_listeners":       dataSourceBaiduCloudAppBLBListeners(),
-			"baiducloud_appblb_server_groups":   dataSourceBaiduCloudAppBLBServerGroups(),
-			"baiducloud_certs":                  dataSourceBaiduCloudCerts(),
-			"baiducloud_eips":                   dataSourceBaiduCloudEips(),
-			"baiducloud_instances":              dataSourceBaiduCloudInstances(),
-			"baiducloud_cdss":                   dataSourceBaiduCloudCDSs(),
-			"baiducloud_security_groups":        dataSourceBaiduCloudSecurityGroups(),
-			"baiducloud_security_group_rules":   dataSourceBaiduCloudSecurityGroupRules(),
-			"baiducloud_snapshots":              dataSourceBaiduCloudSnapshots(),
-			"baiducloud_auto_snapshot_policies": dataSourceBaiduCloudAutoSnapshotPolicies(),
-			"baiducloud_zones":                  dataSourceBaiduCloudZones(),
-			"baiducloud_specs":                  dataSourceBaiduCloudSpecs(),
-			"baiducloud_images":                 dataSourceBaiduCloudImages(),
-			"baiducloud_cfc_function":           dataSourceBaiduCloudCFCFunction(),
-			"baiducloud_scs_specs":              dataSourceBaiduCloudScsSpecs(),
-			"baiducloud_scss":                   dataSourceBaiduCloudScss(),
-			"baiducloud_cce_versions":           dataSourceBaiduCloudCceKubernetesVersion(),
-			"baiducloud_cce_container_net":      dataSourceBaiduCloudCceContainerNet(),
-			"baiducloud_cce_cluster_nodes":      dataSourceBaiduCloudCCEClusterNodes(),
-			"baiducloud_ccev2_container_cidr":   dataSourceBaiduCloudCCEv2ContainerCIDRs(),
-			"baiducloud_ccev2_clusterip_cidr":   dataSourceBaiduCloudCCEv2ClusterIPCidrs(),
-			"baiducloud_cce_kubeconfig":         dataSourceBaiduCloudCceKubeConfig(),
-			"baiducloud_rdss":                   dataSourceBaiduCloudRdss(),
-			"baiducloud_dtss":                   dataSourceBaiduCloudDtss(),
+			"baiducloud_vpcs":                           dataSourceBaiduCloudVpcs(),
+			"baiducloud_subnets":                        dataSourceBaiduCloudSubnets(),
+			"baiducloud_route_rules":                    dataSourceBaiduCloudRouteRules(),
+			"baiducloud_acls":                           dataSourceBaiduCloudAcls(),
+			"baiducloud_nat_gateways":                   dataSourceBaiduCloudNatGateways(),
+			"baiducloud_peer_conns":                     dataSourceBaiduCloudPeerConns(),
+			"baiducloud_bos_buckets":                    dataSourceBaiduCloudBosBuckets(),
+			"baiducloud_bos_bucket_objects":             dataSourceBaiduCloudBosBucketObjects(),
+			"baiducloud_appblbs":                        dataSourceBaiduCloudAppBLBs(),
+			"baiducloud_appblb_listeners":               dataSourceBaiduCloudAppBLBListeners(),
+			"baiducloud_appblb_server_groups":           dataSourceBaiduCloudAppBLBServerGroups(),
+			"baiducloud_certs":                          dataSourceBaiduCloudCerts(),
+			"baiducloud_eips":                           dataSourceBaiduCloudEips(),
+			"baiducloud_instances":                      dataSourceBaiduCloudInstances(),
+			"baiducloud_cdss":                           dataSourceBaiduCloudCDSs(),
+			"baiducloud_security_groups":                dataSourceBaiduCloudSecurityGroups(),
+			"baiducloud_security_group_rules":           dataSourceBaiduCloudSecurityGroupRules(),
+			"baiducloud_snapshots":                      dataSourceBaiduCloudSnapshots(),
+			"baiducloud_auto_snapshot_policies":         dataSourceBaiduCloudAutoSnapshotPolicies(),
+			"baiducloud_zones":                          dataSourceBaiduCloudZones(),
+			"baiducloud_specs":                          dataSourceBaiduCloudSpecs(),
+			"baiducloud_images":                         dataSourceBaiduCloudImages(),
+			"baiducloud_cfc_function":                   dataSourceBaiduCloudCFCFunction(),
+			"baiducloud_scs_specs":                      dataSourceBaiduCloudScsSpecs(),
+			"baiducloud_scss":                           dataSourceBaiduCloudScss(),
+			"baiducloud_cce_versions":                   dataSourceBaiduCloudCceKubernetesVersion(),
+			"baiducloud_cce_container_net":              dataSourceBaiduCloudCceContainerNet(),
+			"baiducloud_cce_cluster_nodes":              dataSourceBaiduCloudCCEClusterNodes(),
+			"baiducloud_ccev2_container_cidr":           dataSourceBaiduCloudCCEv2ContainerCIDRs(),
+			"baiducloud_ccev2_clusterip_cidr":           dataSourceBaiduCloudCCEv2ClusterIPCidrs(),
+			"baiducloud_ccev2_cluster_instances":        dataSourceBaiduCloudCCEv2ClusterInstances(),
+			"baiducloud_ccev2_instance_group_instances": dataSourceBaiduCloudCCEv2InstanceGroupInstances(),
+			"baiducloud_cce_kubeconfig":                 dataSourceBaiduCloudCceKubeConfig(),
+			"baiducloud_rdss":                           dataSourceBaiduCloudRdss(),
+			"baiducloud_dtss":                           dataSourceBaiduCloudDtss(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{

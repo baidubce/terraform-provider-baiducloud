@@ -7,24 +7,30 @@ Example Usage
 resource "baiducloud_ccev2_cluster" "default_managed" {
   cluster_spec  {
     cluster_name = var.cluster_name
+    cluster_type = "normal"
     k8s_version = "1.16.8"
     runtime_type = "docker"
-    vpc_id = var.vpc_id
-
+    vpc_id = baiducloud_vpc.default.id
+    plugins = ["core-dns", "kube-proxy"]
     master_config {
       master_type = "managed"
-      cluster_ha = 1
+      cluster_ha = 2
       exposed_public = false
-      cluster_blb_vpc_subnet_id = var.vpc_subnet_id
+      cluster_blb_vpc_subnet_id = baiducloud_subnet.defaultA.id
       managed_cluster_master_option {
         master_vpc_subnet_zone = "zoneA"
       }
     }
     container_network_config  {
       mode = "kubenet"
-      lb_service_vpc_subnet_id = var.vpc_subnet_id
+      lb_service_vpc_subnet_id = baiducloud_subnet.defaultA.id
+      node_port_range_min = 30000
+      node_port_range_max = 32767
+      max_pods_per_node = 64
       cluster_pod_cidr = var.cluster_pod_cidr
       cluster_ip_service_cidr = var.cluster_ip_service_cidr
+      ip_version = "ipv4"
+      kube_proxy_mode = "iptables"
     }
     cluster_delete_option {
       delete_resource = true
@@ -66,6 +72,7 @@ func resourceBaiduCloudCCEv2Cluster() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
+			//Params for creating the cluster
 			"cluster_spec": {
 				Type:        schema.TypeList,
 				Description: "Specification of the cluster",
@@ -96,7 +103,7 @@ func resourceBaiduCloudCCEv2Cluster() *schema.Resource {
 					},
 				},
 			},
-			//Computed Values
+			//Status of the cluster
 			"cluster_status": {
 				Type:        schema.TypeList,
 				Description: "Statue of the cluster",
@@ -137,11 +144,11 @@ func resourceBaiduCloudCCEv2ClusterCreate(d *schema.ResourceData, meta interface
 
 	createClusterArgs, err := buildCCEv2CreateClusterArgs(d)
 	if err != nil {
-		log.Printf("Build Create Cluster Args Fail:" + err.Error())
+		log.Printf("Build CreateClusterArgs Error:" + err.Error())
 		return WrapError(err)
 	}
 
-	action := "Create CCE cluster " + createClusterArgs.CreateClusterRequest.ClusterSpec.ClusterName
+	action := "Create CCEv2 cluster " + createClusterArgs.CreateClusterRequest.ClusterSpec.ClusterName
 	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 		raw, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
 			return client.CreateCluster(createClusterArgs)
@@ -162,6 +169,7 @@ func resourceBaiduCloudCCEv2ClusterCreate(d *schema.ResourceData, meta interface
 		return nil
 	})
 	if err != nil {
+		log.Printf("Create Cluster Error:" + err.Error())
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
 
@@ -178,6 +186,7 @@ func resourceBaiduCloudCCEv2ClusterCreate(d *schema.ResourceData, meta interface
 		}),
 	)
 	if _, err := stateConf.WaitForState(); err != nil {
+		log.Printf("Create Cluster Error:" + err.Error())
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
 
@@ -186,40 +195,52 @@ func resourceBaiduCloudCCEv2ClusterCreate(d *schema.ResourceData, meta interface
 
 func resourceBaiduCloudCCEv2ClusterRead(d *schema.ResourceData, meta interface{}) error {
 	clusterId := d.Id()
-	action := "Get CCE Cluster " + clusterId
+	action := "Get CCEv2 Cluster " + clusterId
 	client := meta.(*connectivity.BaiduClient)
+
+	//1.Get Status of the Cluster
 	raw, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
 		return client.GetCluster(clusterId)
 	})
 	if err != nil {
+		if NotFoundError(err) {
+			log.Printf("Cluster Not Found. Set Resource ID to Empty.")
+			d.SetId("") //Resource Not Found, make the ID of resource to empty to delete it in state file.
+			return nil
+		}
+		log.Printf("Get Cluster Error:" + err.Error())
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
-
 	response := raw.(*ccev2.GetClusterResponse)
-
 	if response == nil {
-		return Error("Response is nil")
+		err := Error("Response is nil")
+		log.Printf("Get Cluster Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
 
 	clusterStatus, err := convertClusterStatusFromJsonToTfMap(response.Cluster.Status)
 	if err != nil {
-		log.Printf("Get Cluster Status Fail:" + err.Error())
+		log.Printf("Get Cluster Status Error:" + err.Error())
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
 	err = d.Set("cluster_status", clusterStatus)
 	if err != nil {
-		log.Printf("Refresh Cluster Status Fail:" + err.Error())
+		log.Printf("Set cluster_status Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
 
 	err = d.Set("created_at", response.Cluster.CreatedAt.String())
 	if err != nil {
-		log.Printf("Refresh Create Time Fail:" + err.Error())
+		log.Printf("Set created_at Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
 	err = d.Set("updated_at", response.Cluster.UpdatedAt.String())
 	if err != nil {
-		log.Printf("Refresh Update Time Fail:" + err.Error())
+		log.Printf("Set updated_at Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
 
+	//2.Get Instances of the Cluster
 	listInstancesRaw, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
 		args := &ccev2.ListInstancesByPageArgs{
 			ClusterID: clusterId,
@@ -235,30 +256,39 @@ func resourceBaiduCloudCCEv2ClusterRead(d *schema.ResourceData, meta interface{}
 		return client.ListInstancesByPage(args)
 	})
 	if err != nil {
-		log.Printf("Get Cluster List Fail" + err.Error())
+		log.Printf("Get Cluster Instance List Error" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
 	listInstanceResponse := listInstancesRaw.(*ccev2.ListInstancesResponse)
+	if listInstanceResponse == nil {
+		err := Error("ListInstancesResponse is nil")
+		log.Printf("Get Cluster Instance Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
+	}
+
 	//masterList
 	masters, err := convertInstanceFromJsonToMap(listInstanceResponse.InstancePage.InstanceList, ccev2types.ClusterRoleMaster)
 	if err != nil {
-		log.Printf("Get Cluster Masters Fail：" + err.Error())
-	} else {
-		err = d.Set("masters", masters)
+		log.Printf("Get Cluster Master Instances Error：" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
-
+	err = d.Set("masters", masters)
 	if err != nil {
-		log.Printf("Refresh Cluster Masters Fail:" + err.Error())
+		log.Printf("Set masters Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
 	//nodeList
 	nodes, err := convertInstanceFromJsonToMap(listInstanceResponse.InstancePage.InstanceList, ccev2types.ClusterRoleNode)
 	if err != nil {
-		log.Printf("Get Cluster Nodes Fail:" + err.Error())
-	} else {
-		err = d.Set("nodes", nodes)
+		log.Printf("Get Cluster Follower Nodes Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
+	err = d.Set("nodes", nodes)
 	if err != nil {
-		log.Printf("Refresh Cluster Nodes Fail:" + err.Error())
+		log.Printf("Set nodes Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
+
 	return nil
 }
 
@@ -268,10 +298,11 @@ func resourceBaiduCloudCCEv2ClusterDelete(d *schema.ResourceData, meta interface
 
 	args, err := buildCCEv2DeleteClusterArgs(d)
 	if err != nil {
+		log.Printf("Build DeleteClusterArgs Error:" + err.Error())
 		return WrapError(err)
 	}
 
-	action := "Delete CCE Cluster " + args.ClusterID
+	action := "Delete CCEv2 Cluster " + args.ClusterID
 	err = resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
 		raw, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
 			return client.DeleteCluster(args)
@@ -286,6 +317,7 @@ func resourceBaiduCloudCCEv2ClusterDelete(d *schema.ResourceData, meta interface
 		return nil
 	})
 	if err != nil {
+		log.Printf("Delete Cluster Error:" + err.Error())
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
 
@@ -304,6 +336,7 @@ func resourceBaiduCloudCCEv2ClusterDelete(d *schema.ResourceData, meta interface
 		}),
 	)
 	if _, err := stateConf.WaitForState(); err != nil {
+		log.Printf("Delete Cluster Error:" + err.Error())
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
 	time.Sleep(1 * time.Minute) //waiting for infrastructure delete before delete vpc & security group

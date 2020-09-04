@@ -191,7 +191,11 @@ Nested `endpoints` block supports the following:
 
 * `cce` - (Optional) Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CCE endpoints.
 
+* `ccev2` - (Optional) Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CCEv2 endpoints.
+
 * `rds` - (Optional) Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom RDS endpoints.
+
+* `dts` - (Optional) Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom DTS endpoints.
 
 Nested `assume_role` block supports the following:
 

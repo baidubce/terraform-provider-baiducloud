@@ -9,6 +9,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/vpc"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 )
 
@@ -54,9 +55,10 @@ func resourceCCEv2ClusterSpec() *schema.Resource {
 				Optional:    true,
 			},
 			"cluster_type": {
-				Type:        schema.TypeString,
-				Description: "Cluster Type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Cluster Type. Available Value: [normal].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(ClusterTypePermitted, false),
 			},
 			"description": {
 				Type:        schema.TypeString,
@@ -64,14 +66,16 @@ func resourceCCEv2ClusterSpec() *schema.Resource {
 				Optional:    true,
 			},
 			"k8s_version": {
-				Type:        schema.TypeString,
-				Description: "Kubernetes Version",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Kubernetes Version. Available Value: [1.13.10, 1.16.8].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(K8SVersionPermitted, false),
 			},
 			"runtime_type": {
-				Type:        schema.TypeString,
-				Description: "Container Runtime Type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Container Runtime Type. Available Value: [docker].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(RuntimeTypePermitted, false),
 			},
 			"runtime_version": {
 				Type:        schema.TypeString,
@@ -193,9 +197,10 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Optional:    true,
 			},
 			"runtime_type": {
-				Type:        schema.TypeString,
-				Description: "Container Runtime Type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Container Runtime Type. Available Value: [docker].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(RuntimeTypePermitted, false),
 			},
 			"runtime_version": {
 				Type:        schema.TypeString,
@@ -208,9 +213,10 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Optional:    true,
 			},
 			"cluster_role": {
-				Type:        schema.TypeString,
-				Description: "Cluster Role of Instance, Master or Nodes",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Cluster Role of Instance, Master or Nodes. Available Value: [master, node].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(ClusterRolePermitted, false),
 			},
 			"instance_group_id": {
 				Type:        schema.TypeString,
@@ -223,9 +229,10 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Optional:    true,
 			},
 			"master_type": {
-				Type:        schema.TypeString,
-				Description: "Master Type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Master Type. Available Value: [managed, custom, serverless].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(MasterTypePermitted, false),
 			},
 			"existed": {
 				Type:        schema.TypeBool,
@@ -240,14 +247,16 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Elem:        resourceCCEv2ExistedOption(),
 			},
 			"machine_type": {
-				Type:        schema.TypeString,
-				Description: "Machine Type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Machine Type. Available Value: [BCC, BBC, Metal].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(MachineTypePermitted, false),
 			},
 			"instance_type": {
-				Type:        schema.TypeString,
-				Description: "Instance Type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Instance Type Available Value: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(BCCInstanceTypePermitted, false),
 			},
 			"bbc_option": {
 				Type:        schema.TypeList,
@@ -305,9 +314,10 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Optional:    true,
 			},
 			"instance_charging_type": {
-				Type:        schema.TypeString,
-				Description: "Instance charging type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Instance charging type. Available Value: [Prepaid, Postpaid, bidding].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(PaymentTimingTypePermitted, false),
 			},
 			"instance_precharging_option": {
 				Type:        schema.TypeList,
@@ -440,9 +450,10 @@ func resourceCCEv2MountConfig() *schema.Resource {
 				Optional:    true,
 			},
 			"storage_type": {
-				Type:        schema.TypeString,
-				Description: "Storage type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Storage type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(StorageTypePermitted, false),
 			},
 		},
 	}
@@ -519,14 +530,16 @@ func resourceCCEv2MasterConfig() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"master_type": {
-				Type:        schema.TypeString,
-				Description: "Master Type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Master Type. Available Value: [managed, custom, serverless].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(MasterTypePermitted, false),
 			},
 			"cluster_ha": {
-				Type:        schema.TypeInt,
-				Description: "Number of master nodes",
-				Optional:    true,
+				Type:         schema.TypeInt,
+				Description:  "Number of master nodes. Available Value: [1, 3, 5, 2(for serverless)].",
+				Optional:     true,
+				ValidateFunc: validation.IntInSlice(ClusterHAPermitted),
 			},
 			"exposed_public": {
 				Type:        schema.TypeBool,
@@ -546,9 +559,10 @@ func resourceCCEv2MasterConfig() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"master_vpc_subnet_zone": {
-							Type:        schema.TypeString,
-							Description: "Master VPC Sunbet Zone",
-							Optional:    true,
+							Type:         schema.TypeString,
+							Description:  "Master VPC Subnet Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF].",
+							Optional:     true,
+							ValidateFunc: validation.StringInSlice(AvailableZonePermitted, false),
 						},
 					},
 				},
@@ -561,9 +575,10 @@ func resourceCCEv2ContainerNetworkConfig() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"mode": {
-				Type:        schema.TypeString,
-				Description: "Network MOde",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Network Mode. Available Value: [kubenet, vpc-cni, vpc-route-veth, vpc-route-ipvlan, vpc-route-auto-detect, vpc-secondary-ip-veth, vpc-secondary-ip-ipvlan, vpc-secondary-ip-auto-detect].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(ContainerNetworkModePermitted, false),
 			},
 			"eni_vpc_subnet_ids": {
 				Type:        schema.TypeList,
@@ -588,9 +603,10 @@ func resourceCCEv2ContainerNetworkConfig() *schema.Resource {
 				Optional:    true,
 			},
 			"ip_version": {
-				Type:        schema.TypeString,
-				Description: "IP Version",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "IP Version. Available Value: [ipv4, ipv6, dualStack].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(ContainerNetworkIPTypePermitted, false),
 			},
 			"lb_service_vpc_subnet_id": {
 				Type:        schema.TypeString,
@@ -633,9 +649,10 @@ func resourceCCEv2ContainerNetworkConfig() *schema.Resource {
 				Optional:    true,
 			},
 			"kube_proxy_mode": {
-				Type:        schema.TypeString,
-				Description: "KubeProxy Mode",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "KubeProxy Mode. Available Value: [iptables, ipvs].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(KubeProxyModePermitted, false),
 			},
 		},
 	}
@@ -699,9 +716,10 @@ func resourceCCEv2VPCConfig() *schema.Resource {
 				Optional:    true,
 			},
 			"vpc_subnet_type": {
-				Type:        schema.TypeString,
-				Description: "VPC Subnet type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "VPC Subnet type. Available Value: [BCC, BCC_NAT, BBC].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(VPCSubnetTypePermitted, false),
 			},
 			"vpc_subnet_cidr": {
 				Type:        schema.TypeString,
@@ -714,9 +732,10 @@ func resourceCCEv2VPCConfig() *schema.Resource {
 				Optional:    true,
 			},
 			"available_zone": {
-				Type:        schema.TypeString,
-				Description: "Available Zone",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(AvailableZonePermitted, false),
 			},
 		},
 	}
@@ -777,9 +796,10 @@ func resourceCCEv2InstanceResource() *schema.Resource {
 				Optional:    true,
 			},
 			"root_disk_type": {
-				Type:        schema.TypeString,
-				Description: "Root disk type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Root disk type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(StorageTypePermitted, false),
 			},
 			"root_disk_size": {
 				Type:        schema.TypeInt,
@@ -803,9 +823,10 @@ func resourceCCEv2InstanceResource() *schema.Resource {
 							Optional:    true,
 						},
 						"storage_type": {
-							Type:        schema.TypeString,
-							Description: "Storage Type",
-							Optional:    true,
+							Type:         schema.TypeString,
+							Description:  "Storage Type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].",
+							Optional:     true,
+							ValidateFunc: validation.StringInSlice(StorageTypePermitted, false),
 						},
 						"cds_size": {
 							Type:        schema.TypeInt,
@@ -821,9 +842,10 @@ func resourceCCEv2InstanceResource() *schema.Resource {
 				},
 			},
 			"gpu_type": {
-				Type:        schema.TypeString,
-				Description: "GPU Type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "GPU Type. Available Value: [V100-32, V100-16, P40, P4, K40, DLCard].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(GPUTypePermitted, false),
 			},
 			"gpu_count": {
 				Type:        schema.TypeInt,
@@ -838,9 +860,10 @@ func resourceCCEv2InstanceOS() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"image_type": {
-				Type:        schema.TypeString,
-				Description: "Image type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Image type. Available Value: [Integration, System, All, Custom, Sharing, GpuBccSystem, GpuBccCustom, BbcSystem, BbcCustom].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(ImageTypePermitted, false),
 			},
 			"image_name": {
 				Type:        schema.TypeString,
@@ -848,14 +871,16 @@ func resourceCCEv2InstanceOS() *schema.Resource {
 				Optional:    true,
 			},
 			"os_type": {
-				Type:        schema.TypeString,
-				Description: "OS type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "OS type. Available Value: [linux, windows].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(OSTypePermitted, false),
 			},
 			"os_name": {
-				Type:        schema.TypeString,
-				Description: "OS name",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "OS name. Available Value: [CentOS, Ubuntu, Windows Server, Debian, opensuse].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(OSNamePermitted, false),
 			},
 			"os_version": {
 				Type:        schema.TypeString,
@@ -885,9 +910,10 @@ func resourceCCEv2EIPOption() *schema.Resource {
 				Optional:    true,
 			},
 			"eip_charging_type": {
-				Type:        schema.TypeString,
-				Description: "EIP Charging Type",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "EIP Charging Type. Available Value: [ByTraffic, ByBandwidth].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(EIPBillingMethodPermitted, false),
 			},
 			"eip_bandwidth": {
 				Type:        schema.TypeInt,
@@ -912,13 +938,14 @@ func resourceCCEv2Taint() *schema.Resource {
 				Optional:    true,
 			},
 			"effect": {
-				Type:        schema.TypeString,
-				Description: "Taint Effect",
-				Optional:    true,
+				Type:         schema.TypeString,
+				Description:  "Taint Effect. Available Value: [NoSchedule, PreferNoSchedule, NoExecute].",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(TaintEffectPermitted, false),
 			},
 			"time_added": {
 				Type:        schema.TypeString,
-				Description: "Taint Added Time",
+				Description: "Taint Added Time. Format RFC3339",
 				Optional:    true,
 			},
 		},
@@ -1170,8 +1197,9 @@ func buildGetInstancesOfInstanceGroupArgs(d *schema.ResourceData) (*ccev2.ListIn
 
 func convertInstanceFromJsonToMap(instances []*ccev2.Instance, role ccev2types.ClusterRole) ([]interface{}, error) {
 	targetInstances := make([]*ccev2.Instance, 0)
+	resultInstances := make([]interface{}, 0, len(targetInstances))
 	if instances == nil || len(instances) == 0 {
-		return nil, nil
+		return resultInstances, nil
 	}
 
 	//区分是master机器还是node机器
@@ -1180,7 +1208,6 @@ func convertInstanceFromJsonToMap(instances []*ccev2.Instance, role ccev2types.C
 			targetInstances = append(targetInstances, instance)
 		}
 	}
-	resultInstances := make([]interface{}, 0, len(targetInstances))
 
 	for _, instance := range targetInstances {
 
@@ -1212,9 +1239,9 @@ func convertInstanceFromJsonToMap(instances []*ccev2.Instance, role ccev2types.C
 }
 
 func convertInstanceSpecFromJsonToMap(spec *ccev2.InstanceSpec) ([]interface{}, error) {
-	resultSpec := make([]interface{}, 0, 1)
+	resultSpec := make([]interface{}, 0)
 	if spec == nil {
-		return nil, nil
+		return resultSpec, nil
 	}
 	specMap := make(map[string]interface{})
 
@@ -1255,7 +1282,7 @@ func convertInstanceSpecFromJsonToMap(spec *ccev2.InstanceSpec) ([]interface{}, 
 	specMap["need_eip"] = spec.NeedEIP
 
 	if spec.SSHKeyID != "" {
-		specMap["ssh_key_id"] = spec.ImageID
+		specMap["ssh_key_id"] = spec.SSHKeyID
 	}
 
 	if spec.BBCOption != nil {
@@ -1336,9 +1363,9 @@ func convertInstanceSpecFromJsonToMap(spec *ccev2.InstanceSpec) ([]interface{}, 
 }
 
 func convertDeployCustomConfigFromJsonToMap(config *ccev2types.DeployCustomConfig) ([]interface{}, error) {
-	result := make([]interface{}, 0, 1)
+	result := make([]interface{}, 0)
 	if config == nil {
-		return nil, nil
+		return result, nil
 	}
 	configMap := make(map[string]interface{})
 
@@ -1356,7 +1383,9 @@ func convertDeployCustomConfigFromJsonToMap(config *ccev2types.DeployCustomConfi
 	if config.KubeReserved != nil {
 		configMap["kube_reserved"] = config.KubeReserved
 	}
-	dockerConfig, err := convertDockerConfigFromJsonToMap(&config.DockerConfig)
+
+	//DockerConfig is not a pointer.
+	dockerConfig, err := convertDockerConfigFromJsonToMap(config.DockerConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -1366,11 +1395,9 @@ func convertDeployCustomConfigFromJsonToMap(config *ccev2types.DeployCustomConfi
 	return result, nil
 }
 
-func convertDockerConfigFromJsonToMap(config *ccev2types.DockerConfig) ([]interface{}, error) {
-	result := make([]interface{}, 0, 1)
-	if config == nil {
-		return nil, nil
-	}
+func convertDockerConfigFromJsonToMap(config ccev2types.DockerConfig) ([]interface{}, error) {
+	result := make([]interface{}, 0)
+
 	configMap := make(map[string]interface{})
 
 	if config.BIP != "" {
@@ -1399,7 +1426,7 @@ func convertDockerConfigFromJsonToMap(config *ccev2types.DockerConfig) ([]interf
 func convertTaintListFromJsonToMap(taintList []ccev2types.Taint) ([]interface{}, error) {
 	result := make([]interface{}, 0, len(taintList))
 	if taintList == nil {
-		return nil, nil
+		return result, nil
 	}
 	for _, taint := range taintList {
 		cdsMap := make(map[string]interface{})
@@ -1425,7 +1452,7 @@ func convertTaintListFromJsonToMap(taintList []ccev2types.Taint) ([]interface{},
 func convertTagListFromJsonToMap(tagList []ccev2types.Tag) ([]interface{}, error) {
 	result := make([]interface{}, 0, len(tagList))
 	if tagList == nil {
-		return nil, nil
+		return result, nil
 	}
 
 	for _, tag := range tagList {
@@ -1443,9 +1470,9 @@ func convertTagListFromJsonToMap(tagList []ccev2types.Tag) ([]interface{}, error
 }
 
 func convertInstanceResourceFromJsonToMap(config *ccev2types.InstanceResource) ([]interface{}, error) {
-	result := make([]interface{}, 0, 1)
+	result := make([]interface{}, 0)
 	if config == nil {
-		return nil, nil
+		return result, nil
 	}
 	configMap := make(map[string]interface{})
 
@@ -1479,14 +1506,14 @@ func convertCDSListFromJsonToMap(cdsList []ccev2types.CDSConfig) ([]interface{},
 	for _, cds := range cdsList {
 		cdsMap := make(map[string]interface{})
 
-		if cds.Path != "nil" {
-			cdsMap["device"] = cds.Path
+		if cds.Path != "" {
+			cdsMap["path"] = cds.Path
 		}
 		if cds.StorageType != "" {
-			cdsMap["cds_id"] = cds.StorageType
+			cdsMap["storage_type"] = cds.StorageType
 		}
-		if cds.StorageType != "" {
-			cdsMap["path"] = cds.StorageType
+		if cds.SnapshotID != "" {
+			cdsMap["snapshot_id"] = cds.SnapshotID
 		}
 		cdsMap["cds_size"] = cds.CDSSize
 
@@ -1496,9 +1523,9 @@ func convertCDSListFromJsonToMap(cdsList []ccev2types.CDSConfig) ([]interface{},
 }
 
 func convertInstanceOSFromJsonToMap(config *ccev2types.InstanceOS) ([]interface{}, error) {
-	result := make([]interface{}, 0, 1)
+	result := make([]interface{}, 0)
 	if config == nil {
-		return nil, nil
+		return result, nil
 	}
 	configMap := make(map[string]interface{})
 
@@ -1529,9 +1556,9 @@ func convertInstanceOSFromJsonToMap(config *ccev2types.InstanceOS) ([]interface{
 }
 
 func convertDeleteOptionFromJsonToMap(option *ccev2types.DeleteOption) ([]interface{}, error) {
-	result := make([]interface{}, 0, 1)
+	result := make([]interface{}, 0)
 	if option == nil {
-		return nil, nil
+		return result, nil
 	}
 	optionMap := make(map[string]interface{})
 	optionMap["move_out"] = option.MoveOut
@@ -1543,9 +1570,9 @@ func convertDeleteOptionFromJsonToMap(option *ccev2types.DeleteOption) ([]interf
 }
 
 func convertBBCOptionFromJsonToMap(option *ccev2types.BBCOption) ([]interface{}, error) {
-	result := make([]interface{}, 0, 1)
+	result := make([]interface{}, 0)
 	if option == nil {
-		return nil, nil
+		return result, nil
 	}
 
 	optionMap := make(map[string]interface{})
@@ -1560,9 +1587,9 @@ func convertBBCOptionFromJsonToMap(option *ccev2types.BBCOption) ([]interface{},
 }
 
 func convertVPCConfigFromJsonToMap(config *ccev2types.VPCConfig) ([]interface{}, error) {
-	result := make([]interface{}, 0, 1)
+	result := make([]interface{}, 0)
 	if config == nil {
-		return nil, nil
+		return result, nil
 	}
 
 	configMap := make(map[string]interface{})
@@ -1593,9 +1620,9 @@ func convertVPCConfigFromJsonToMap(config *ccev2types.VPCConfig) ([]interface{},
 }
 
 func convertEIPOptionFromJsonToMap(option *ccev2types.EIPOption) ([]interface{}, error) {
-	result := make([]interface{}, 0, 1)
+	result := make([]interface{}, 0)
 	if option == nil {
-		return nil, nil
+		return result, nil
 	}
 
 	optionMap := make(map[string]interface{})
@@ -1612,10 +1639,9 @@ func convertEIPOptionFromJsonToMap(option *ccev2types.EIPOption) ([]interface{},
 }
 
 func convertInstanceStatusFromJsonToMap(status *ccev2.InstanceStatus) ([]interface{}, error) {
-
-	resultStatus := make([]interface{}, 0, 1)
+	resultStatus := make([]interface{}, 0)
 	if status == nil {
-		return nil, nil
+		return resultStatus, nil
 	}
 
 	statusMap := make(map[string]interface{})
@@ -1640,9 +1666,9 @@ func convertInstanceStatusFromJsonToMap(status *ccev2.InstanceStatus) ([]interfa
 }
 
 func convertMachineFromJsonToMap(machine *ccev2.Machine) ([]interface{}, error) {
-	result := make([]interface{}, 0, 1)
+	result := make([]interface{}, 0)
 	if machine == nil {
-		return nil, nil
+		return result, nil
 	}
 
 	machineMap := make(map[string]interface{})
@@ -1679,7 +1705,7 @@ func convertMountListFromJsonToMap(mountconfigs []ccev2types.MountConfig) ([]int
 		mountMap := make(map[string]interface{})
 
 		mountMap["cds_size"] = config.CDSSize
-		if config.Device != "nil" {
+		if config.Device != "" {
 			mountMap["device"] = config.Device
 		}
 		if config.CDSID != "" {
@@ -1699,10 +1725,10 @@ func convertMountListFromJsonToMap(mountconfigs []ccev2types.MountConfig) ([]int
 }
 
 func convertClusterStatusFromJsonToTfMap(status *ccev2.ClusterStatus) ([]interface{}, error) {
+	clusterStatusMapList := make([]interface{}, 0)
 	if status == nil {
-		return nil, nil
+		return clusterStatusMapList, nil
 	}
-	clusterStatusMapList := make([]interface{}, 0, 1)
 
 	blbMapList, err := convertBLBFromJsonToTfMap(&status.ClusterBLB)
 	if err != nil {
@@ -1719,11 +1745,11 @@ func convertClusterStatusFromJsonToTfMap(status *ccev2.ClusterStatus) ([]interfa
 }
 
 func convertBLBFromJsonToTfMap(blb *ccev2.BLB) ([]interface{}, error) {
+	blbMapList := make([]interface{}, 0)
 	if blb == nil {
-		return nil, nil
+		return blbMapList, nil
 	}
 
-	blbMapList := make([]interface{}, 0, 1)
 	blbMap := make(map[string]interface{})
 	blbMap["id"] = blb.ID
 	blbMap["vpc_ip"] = blb.VPCIP
@@ -1737,47 +1763,47 @@ func convertBLBFromJsonToTfMap(blb *ccev2.BLB) ([]interface{}, error) {
 //.tf是用户传入的配置文件，某些sdk要求的值可能并没有设置
 //Tip: Build系函数对于sdk参数中存在但是.tf中没有设置的参数，会自动跳过赋值，即试用默认值
 
-func buildCCEv2CreateClusterClusterSpec(clusterSpecRaw map[string]interface{}) (*ccev2types.ClusterSpec, error) {
+func buildCCEv2CreateClusterClusterSpec(clusterSpecRawMap map[string]interface{}) (*ccev2types.ClusterSpec, error) {
 
 	clusterSpec := &ccev2types.ClusterSpec{}
 
-	if v, ok := clusterSpecRaw["cluster_name"]; ok && v.(string) != "" {
+	if v, ok := clusterSpecRawMap["cluster_name"]; ok && v.(string) != "" {
 		clusterSpec.ClusterName = v.(string)
 	}
 
-	if v, ok := clusterSpecRaw["cluster_type"]; ok && v.(string) != "" {
+	if v, ok := clusterSpecRawMap["cluster_type"]; ok && v.(string) != "" {
 		clusterSpec.ClusterType = ccev2types.ClusterType(v.(string))
 	}
 
-	if v, ok := clusterSpecRaw["description"]; ok && v.(string) != "" {
+	if v, ok := clusterSpecRawMap["description"]; ok && v.(string) != "" {
 		clusterSpec.Description = v.(string)
 	}
 
-	if v, ok := clusterSpecRaw["k8s_version"]; ok && v.(string) != "" {
+	if v, ok := clusterSpecRawMap["k8s_version"]; ok && v.(string) != "" {
 		clusterSpec.K8SVersion = ccev2types.K8SVersion(v.(string))
 	}
 
-	if v, ok := clusterSpecRaw["runtime_type"]; ok && v.(string) != "" {
+	if v, ok := clusterSpecRawMap["runtime_type"]; ok && v.(string) != "" {
 		clusterSpec.RuntimeType = ccev2types.RuntimeType(v.(string))
 	}
 
-	if v, ok := clusterSpecRaw["runtime_version"]; ok && v.(string) != "" {
+	if v, ok := clusterSpecRawMap["runtime_version"]; ok && v.(string) != "" {
 		clusterSpec.RuntimeVersion = v.(string)
 	}
 
-	if v, ok := clusterSpecRaw["vpc_id"]; ok && v.(string) != "" {
+	if v, ok := clusterSpecRawMap["vpc_id"]; ok && v.(string) != "" {
 		clusterSpec.VPCID = v.(string)
 	}
 
-	if v, ok := clusterSpecRaw["vpc_cidr"]; ok && v.(string) != "" {
+	if v, ok := clusterSpecRawMap["vpc_cidr"]; ok && v.(string) != "" {
 		clusterSpec.VPCCIDR = v.(string)
 	}
 
-	if v, ok := clusterSpecRaw["vpc_cidr_ipv6"]; ok && v.(string) != "" {
+	if v, ok := clusterSpecRawMap["vpc_cidr_ipv6"]; ok && v.(string) != "" {
 		clusterSpec.VPCCIDRIPv6 = v.(string)
 	}
 
-	if v, ok := clusterSpecRaw["plugins"]; ok && v != nil {
+	if v, ok := clusterSpecRawMap["plugins"]; ok && v != nil {
 		pluginList := make([]string, 0)
 		for _, pluginRaw := range v.([]interface{}) {
 			pluginList = append(pluginList, pluginRaw.(string))
@@ -1785,28 +1811,31 @@ func buildCCEv2CreateClusterClusterSpec(clusterSpecRaw map[string]interface{}) (
 		clusterSpec.Plugins = pluginList
 	}
 
-	if v, ok := clusterSpecRaw["container_network_config"]; ok && len(v.([]interface{})) == 1 {
+	if v, ok := clusterSpecRawMap["container_network_config"]; ok && len(v.([]interface{})) == 1 {
 		containerNetworkConfigRaw := v.([]interface{})[0].(map[string]interface{})
 		containerNetworkConfig, err := buildCCEv2ContainerNetworkConfig(containerNetworkConfigRaw)
 		if err != nil {
+			log.Println("Build ClusterSpec ContainerNetworkConfig Error:" + err.Error())
 			return nil, err
 		}
 		clusterSpec.ContainerNetworkConfig = *containerNetworkConfig
 	}
 
-	if v, ok := clusterSpecRaw["master_config"]; ok && len(v.([]interface{})) == 1 {
+	if v, ok := clusterSpecRawMap["master_config"]; ok && len(v.([]interface{})) == 1 {
 		masterConfigRaw := v.([]interface{})[0].(map[string]interface{})
 		masterConfig, err := buildCCEv2MasterConfig(masterConfigRaw)
 		if err != nil {
+			log.Println("Build ClusterSpec MasterConfig Error:" + err.Error())
 			return nil, err
 		}
 		clusterSpec.MasterConfig = *masterConfig
 	}
 
-	if v, ok := clusterSpecRaw["k8s_custom_config"]; ok && len(v.([]interface{})) == 1 {
+	if v, ok := clusterSpecRawMap["k8s_custom_config"]; ok && len(v.([]interface{})) == 1 {
 		k8sCustomConfigRaw := v.([]interface{})[0].(map[string]interface{})
 		k8sCustomConfig, err := buildK8SCustomConfig(k8sCustomConfigRaw)
 		if err != nil {
+			log.Println("Build ClusterSpec MasterConfig Error:" + err.Error())
 			return nil, err
 		}
 		clusterSpec.K8SCustomConfig = *k8sCustomConfig
@@ -1815,30 +1844,30 @@ func buildCCEv2CreateClusterClusterSpec(clusterSpecRaw map[string]interface{}) (
 	return clusterSpec, nil
 }
 
-func buildCCEv2MasterConfig(d map[string]interface{}) (*ccev2types.MasterConfig, error) {
+func buildCCEv2MasterConfig(masterConfigRawMap map[string]interface{}) (*ccev2types.MasterConfig, error) {
 	config := &ccev2types.MasterConfig{}
 
-	if v, ok := d["master_type"]; ok && v.(string) != "" {
+	if v, ok := masterConfigRawMap["master_type"]; ok && v.(string) != "" {
 		config.MasterType = ccev2types.MasterType(v.(string))
 	}
 
-	if v, ok := d["cluster_ha"]; ok {
+	if v, ok := masterConfigRawMap["cluster_ha"]; ok {
 		config.ClusterHA = ccev2types.ClusterHA(v.(int))
 	}
 
-	if v, ok := d["exposed_public"]; ok {
+	if v, ok := masterConfigRawMap["exposed_public"]; ok {
 		config.ExposedPublic = v.(bool)
 	}
 
-	if v, ok := d["cluster_blb_vpc_subnet_id"]; ok && v.(string) != "" {
+	if v, ok := masterConfigRawMap["cluster_blb_vpc_subnet_id"]; ok && v.(string) != "" {
 		config.ClusterBLBVPCSubnetID = v.(string)
 	}
 
-	if v, ok := d["managed_cluster_master_option"]; ok && len(v.([]interface{})) == 1 {
+	if v, ok := masterConfigRawMap["managed_cluster_master_option"]; ok && len(v.([]interface{})) == 1 {
 		managedClusterMasterOptionRaw := v.([]interface{})[0].(map[string]interface{})
 		managedClusterMasterOption, err := buildManagedClusterMasterOption(managedClusterMasterOptionRaw)
 		if err != nil {
-			log.Printf("构建 Managed Cluster Master Option 失败:" + err.Error())
+			log.Println("Build MasterConfig ManagedClusterMasterOption Error:" + err.Error())
 			return nil, err
 		}
 		config.ManagedClusterMasterOption = *managedClusterMasterOption
@@ -1856,259 +1885,263 @@ func buildManagedClusterMasterOption(d map[string]interface{}) (*ccev2types.Mana
 	return option, nil
 }
 
-func buildENIVPCSubnetIDs(d []interface{}) (map[ccev2types.AvailableZone][]string, error) {
-	if d == nil {
+func buildENIVPCSubnetIDs(zoneAndIDRawMapList []interface{}) (map[ccev2types.AvailableZone][]string, error) {
+	if zoneAndIDRawMapList == nil {
 		return nil, nil
 	}
 	result := make(map[ccev2types.AvailableZone][]string, 0)
 
-	for _, zoneAndIdMapRaw := range d {
+	for _, zoneAndIdMapRaw := range zoneAndIDRawMapList {
 		outMap, _ := zoneAndIdMapRaw.(map[string]interface{})["zone_and_id"]
 		zoneAndIdMap := outMap.(map[string]interface{})
-		for k, v := range zoneAndIdMap {
-			if _, ok := result[ccev2types.AvailableZone(k)]; !ok {
-				result[ccev2types.AvailableZone(k)] = make([]string, 0)
+		for zone, id := range zoneAndIdMap {
+			if _, ok := result[ccev2types.AvailableZone(zone)]; !ok {
+				result[ccev2types.AvailableZone(zone)] = make([]string, 0)
 			}
-			tempArr := result[ccev2types.AvailableZone(k)]
-			tempArr = append(tempArr, v.(string))
-			result[ccev2types.AvailableZone(k)] = tempArr
+			idListOfZone := result[ccev2types.AvailableZone(zone)]
+			idListOfZone = append(idListOfZone, id.(string))
+			result[ccev2types.AvailableZone(zone)] = idListOfZone
 		}
 	}
 
 	return result, nil
 }
 
-func buildCCEv2ContainerNetworkConfig(d map[string]interface{}) (*ccev2types.ContainerNetworkConfig, error) {
+func buildCCEv2ContainerNetworkConfig(containerNetworkConfigRawMap map[string]interface{}) (*ccev2types.ContainerNetworkConfig, error) {
 	config := &ccev2types.ContainerNetworkConfig{}
 
-	if v, ok := d["mode"]; ok && v.(string) != "" {
+	if v, ok := containerNetworkConfigRawMap["mode"]; ok && v.(string) != "" {
 		config.Mode = ccev2types.ContainerNetworkMode(v.(string))
 	}
 
 	config.ENIVPCSubnetIDs = nil
-	if v, ok := d["eni_vpc_subnet_ids"]; ok {
+	if v, ok := containerNetworkConfigRawMap["eni_vpc_subnet_ids"]; ok {
 		values := v.([]interface{})
 		ids, err := buildENIVPCSubnetIDs(values)
 		if err != nil {
+			log.Println("Build ContainerNetworkConfig ENIVPCSubnetIDs Error:" + err.Error())
 			return nil, err
 		}
 		config.ENIVPCSubnetIDs = ids
 	}
 
-	if v, ok := d["eni_security_group_id"]; ok && v.(string) != "" {
+	if v, ok := containerNetworkConfigRawMap["eni_security_group_id"]; ok && v.(string) != "" {
 		config.ENISecurityGroupID = v.(string)
 	}
 
-	if v, ok := d["ip_version"]; ok && v.(string) != "" {
+	if v, ok := containerNetworkConfigRawMap["ip_version"]; ok && v.(string) != "" {
 		config.IPVersion = ccev2types.ContainerNetworkIPType(v.(string))
 	}
 
-	if v, ok := d["lb_service_vpc_subnet_id"]; ok && v.(string) != "" {
+	if v, ok := containerNetworkConfigRawMap["lb_service_vpc_subnet_id"]; ok && v.(string) != "" {
 		config.LBServiceVPCSubnetID = v.(string)
 	}
 
-	if v, ok := d["node_port_range_min"]; ok {
+	if v, ok := containerNetworkConfigRawMap["node_port_range_min"]; ok {
 		config.NodePortRangeMin = v.(int)
 	}
 
-	if v, ok := d["node_port_range_max"]; ok {
+	if v, ok := containerNetworkConfigRawMap["node_port_range_max"]; ok {
 		config.NodePortRangeMax = v.(int)
 	}
 
-	if v, ok := d["cluster_pod_cidr"]; ok && v.(string) != "" {
+	if v, ok := containerNetworkConfigRawMap["cluster_pod_cidr"]; ok && v.(string) != "" {
 		config.ClusterPodCIDR = v.(string)
 	}
 
-	if v, ok := d["cluster_pod_cidr_ipv6"]; ok && v.(string) != "" {
+	if v, ok := containerNetworkConfigRawMap["cluster_pod_cidr_ipv6"]; ok && v.(string) != "" {
 		config.ClusterPodCIDRIPv6 = v.(string)
 	}
 
-	if v, ok := d["cluster_ip_service_cidr"]; ok && v.(string) != "" {
+	if v, ok := containerNetworkConfigRawMap["cluster_ip_service_cidr"]; ok && v.(string) != "" {
 		config.ClusterIPServiceCIDR = v.(string)
 	}
 
-	if v, ok := d["cluster_ip_service_cidr_ipv6"]; ok && v.(string) != "" {
+	if v, ok := containerNetworkConfigRawMap["cluster_ip_service_cidr_ipv6"]; ok && v.(string) != "" {
 		config.ClusterIPServiceCIDRIPv6 = v.(string)
 	}
 
-	if v, ok := d["max_pods_per_node"]; ok {
+	if v, ok := containerNetworkConfigRawMap["max_pods_per_node"]; ok {
 		config.MaxPodsPerNode = v.(int)
 	}
 
-	if v, ok := d["kube_proxy_mode"]; ok && v.(string) != "" {
+	if v, ok := containerNetworkConfigRawMap["kube_proxy_mode"]; ok && v.(string) != "" {
 		config.KubeProxyMode = ccev2types.KubeProxyMode(v.(string))
 	}
 
 	return config, nil
 }
 
-func buildInstanceSpec(d map[string]interface{}) (*ccev2types.InstanceSpec, error) {
+func buildInstanceSpec(instanceSpecRawMap map[string]interface{}) (*ccev2types.InstanceSpec, error) {
 	instanceSpec := &ccev2types.InstanceSpec{}
 
-	if v, ok := d["cce_instance_id"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["cce_instance_id"]; ok && v.(string) != "" {
 		instanceSpec.CCEInstanceID = v.(string)
 	}
 
-	if v, ok := d["instance_name"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["instance_name"]; ok && v.(string) != "" {
 		instanceSpec.InstanceName = v.(string)
 	}
 
-	if v, ok := d["runtime_type"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["runtime_type"]; ok && v.(string) != "" {
 		instanceSpec.RuntimeType = ccev2types.RuntimeType(v.(string))
 	}
 
-	if v, ok := d["runtime_version"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["runtime_version"]; ok && v.(string) != "" {
 		instanceSpec.RuntimeVersion = v.(string)
 	}
 
-	if v, ok := d["cluster_id"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["cluster_id"]; ok && v.(string) != "" {
 		instanceSpec.ClusterID = v.(string)
 	}
 
-	if v, ok := d["cluster_role"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["cluster_role"]; ok && v.(string) != "" {
 		instanceSpec.ClusterRole = ccev2types.ClusterRole(v.(string))
 	}
 
-	if v, ok := d["instance_group_id"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["instance_group_id"]; ok && v.(string) != "" {
 		instanceSpec.InstanceGroupID = v.(string)
 	}
 
-	if v, ok := d["instance_group_name"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["instance_group_name"]; ok && v.(string) != "" {
 		instanceSpec.InstanceGroupName = v.(string)
 	}
 
-	if v, ok := d["master_type"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["master_type"]; ok && v.(string) != "" {
 		instanceSpec.MasterType = ccev2types.MasterType(v.(string))
 	}
 
-	if v, ok := d["existed"]; ok {
+	if v, ok := instanceSpecRawMap["existed"]; ok {
 		instanceSpec.Existed = v.(bool)
 	}
 
-	if v, ok := d["existed_option"]; ok && len(v.([]interface{})) == 1 {
+	if v, ok := instanceSpecRawMap["existed_option"]; ok && len(v.([]interface{})) == 1 {
 		existedOptionRaw := v.([]interface{})[0].(map[string]interface{})
-		existedOption, err := buildExitedOption(existedOptionRaw)
+		existedOption, err := buildExistedOption(existedOptionRaw)
 		if err != nil {
+			log.Println("Build InstanceSpec ExistedOption Error:" + err.Error())
 			return nil, err
 		}
 		instanceSpec.ExistedOption = *existedOption
 	}
 
-	if v, ok := d["machine_type"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["machine_type"]; ok && v.(string) != "" {
 		instanceSpec.MachineType = ccev2types.MachineType(v.(string))
 	}
 
-	if v, ok := d["instance_type"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["instance_type"]; ok && v.(string) != "" {
 		instanceSpec.InstanceType = bccapi.InstanceType(v.(string))
 	}
 
-	if v, ok := d["bbc_option"]; ok && len(v.([]interface{})) == 1 {
+	if v, ok := instanceSpecRawMap["bbc_option"]; ok && len(v.([]interface{})) == 1 {
 		bbcOptionRaw := v.([]interface{})[0].(map[string]interface{})
 		bbcOption, err := buildBBCOption(bbcOptionRaw)
 		if err != nil {
-			log.Printf("Build BBC Option Fail:" + err.Error())
+			log.Println("Build InstanceSpec BCCOption Error:" + err.Error())
 			return nil, err
 		}
 		instanceSpec.BBCOption = *bbcOption
 	}
-	if v, ok := d["vpc_config"]; ok && len(v.([]interface{})) == 1 {
+	if v, ok := instanceSpecRawMap["vpc_config"]; ok && len(v.([]interface{})) == 1 {
 		vpcConfigRaw := v.([]interface{})[0].(map[string]interface{})
 		vpcConfig, err := buildVPCConfig(vpcConfigRaw)
 		if err != nil {
-			log.Printf("Build VPC Config Fail:" + err.Error())
+			log.Println("Build InstanceSpec VPCConfig Error:" + err.Error())
 			return nil, err
 		}
 		instanceSpec.VPCConfig = *vpcConfig
 	}
 
-	if v, ok := d["instance_resource"]; ok && len(v.([]interface{})) == 1 {
+	if v, ok := instanceSpecRawMap["instance_resource"]; ok && len(v.([]interface{})) == 1 {
 		instanceResourceRaw := v.([]interface{})[0].(map[string]interface{})
 		instanceResource, err := buildInstanceResource(instanceResourceRaw)
 		if err != nil {
-			log.Printf("BUild Instance Resource Fail:" + err.Error())
+			log.Println("Build InstanceSpec InstanceResource Error:" + err.Error())
 			return nil, err
 		}
 		instanceSpec.InstanceResource = *instanceResource
 	}
 
-	if v, ok := d["image_id"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["image_id"]; ok && v.(string) != "" {
 		instanceSpec.ImageID = v.(string)
 	}
 
-	if v, ok := d["instance_os"]; ok && len(v.([]interface{})) == 1 {
+	if v, ok := instanceSpecRawMap["instance_os"]; ok && len(v.([]interface{})) == 1 {
 		instanceOSRaw := v.([]interface{})[0].(map[string]interface{})
 		instanceOS, err := buildInstanceOS(instanceOSRaw)
 		if err != nil {
-			log.Printf("Build Instance OS Fail:" + err.Error())
+			log.Println("Build InstanceSpec InstanceOS Error:" + err.Error())
 			return nil, err
 		}
 		instanceSpec.InstanceOS = *instanceOS
 	}
 
-	if v, ok := d["need_eip"]; ok {
+	if v, ok := instanceSpecRawMap["need_eip"]; ok {
 		instanceSpec.NeedEIP = v.(bool)
 	}
 
-	if v, ok := d["eip_option"]; ok && len(v.([]interface{})) == 1 {
+	if v, ok := instanceSpecRawMap["eip_option"]; ok && len(v.([]interface{})) == 1 {
 		eipOptionRaw := v.([]interface{})[0].(map[string]interface{})
 		eipOption, err := buildEIPOption(eipOptionRaw)
 		if err != nil {
-			log.Printf("Build EIP Option Fail:" + err.Error())
+			log.Println("Build InstanceSpec EIPOption Error:" + err.Error())
 			return nil, err
 		}
 		instanceSpec.EIPOption = *eipOption
 	}
 
-	if v, ok := d["admin_password"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["admin_password"]; ok && v.(string) != "" {
 		instanceSpec.AdminPassword = v.(string)
 	}
 
-	if v, ok := d["ssh_key_id"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["ssh_key_id"]; ok && v.(string) != "" {
 		instanceSpec.SSHKeyID = v.(string)
 	}
 
-	if v, ok := d["instance_charging_type"]; ok && v.(string) != "" {
+	if v, ok := instanceSpecRawMap["instance_charging_type"]; ok && v.(string) != "" {
 		instanceSpec.InstanceChargingType = bccapi.PaymentTimingType(v.(string))
 	}
 
-	if v, ok := d["instance_precharging_option"]; ok && len(v.([]interface{})) == 1 {
+	if v, ok := instanceSpecRawMap["instance_precharging_option"]; ok && len(v.([]interface{})) == 1 {
 		instancePrechargingOptionRaw := v.([]interface{})[0].(map[string]interface{})
 		instancePrechargingOption, err := buildInstancePrechargingOption(instancePrechargingOptionRaw)
 		if err != nil {
-			log.Printf("Build Instance Precharging Option Fail:" + err.Error())
+			log.Println("Build InstanceSpec InstancePreChargingOption Error:" + err.Error())
 			return nil, err
 		}
 		instanceSpec.InstancePreChargingOption = *instancePrechargingOption
 	}
 
-	if v, ok := d["delete_option"]; ok && len(v.([]interface{})) == 1 {
+	if v, ok := instanceSpecRawMap["delete_option"]; ok && len(v.([]interface{})) == 1 {
 		instanceDeleteOptionRaw := v.([]interface{})[0].(map[string]interface{})
 		instanceDeleteOption, err := buildInstanceDeleteOption(instanceDeleteOptionRaw)
 		if err != nil {
-			log.Printf("Build Instance Delete Option Fail:" + err.Error())
+			log.Println("Build InstanceSpec DeleteOption Error:" + err.Error())
 			return nil, err
 		}
 		instanceSpec.DeleteOption = *instanceDeleteOption
 	}
 
-	if v, ok := d["deploy_custom_config"]; ok && len(v.([]interface{})) == 1 {
+	if v, ok := instanceSpecRawMap["deploy_custom_config"]; ok && len(v.([]interface{})) == 1 {
 		deployCustomOptionRaw := v.([]interface{})[0].(map[string]interface{})
 		deployCustomOption, err := buildDeployCustomConfig(deployCustomOptionRaw)
 		if err != nil {
-			log.Printf("Build Deploy Custom Option Fail:" + err.Error())
+			log.Println("Build InstanceSpec DeployCustomConfig Error:" + err.Error())
 			return nil, err
 		}
 		instanceSpec.DeployCustomConfig = *deployCustomOption
 	}
 
-	if v, ok := d["tag_list"]; ok {
+	if v, ok := instanceSpecRawMap["tag_list"]; ok {
 		tagList, err := buildTags(v.([]interface{}))
-		if err == nil {
-			instanceSpec.Tags = tagList
+		if err != nil {
+			log.Println("Build InstanceSpec Tags Error:" + err.Error())
+			return nil, err
 		}
+		instanceSpec.Tags = tagList
 	}
 
-	if v, ok := d["labels"]; ok {
+	if v, ok := instanceSpecRawMap["labels"]; ok {
 		labels := make(map[string]string)
 		for key, value := range v.(map[string]interface{}) {
 			labels[key] = value.(string)
@@ -2116,38 +2149,45 @@ func buildInstanceSpec(d map[string]interface{}) (*ccev2types.InstanceSpec, erro
 		instanceSpec.Labels = labels
 	}
 
-	if v, ok := d["instance_taints"]; ok {
+	if v, ok := instanceSpecRawMap["instance_taints"]; ok {
 		taintList, err := buildTaints(v.([]interface{}))
-		if err == nil {
-			instanceSpec.Taints = taintList
+		if err != nil {
+			log.Println("Build InstanceSpec Taints Error:" + err.Error())
+			return nil, err
 		}
+		instanceSpec.Taints = taintList
 	}
 
 	return instanceSpec, nil
 }
 
-func buildTaints(d []interface{}) ([]ccev2types.Taint, error) {
+func buildTaints(taintRawMapList []interface{}) ([]ccev2types.Taint, error) {
 	taintList := make([]ccev2types.Taint, 0)
 
-	for _, taintRaw := range d {
+	for _, taintRaw := range taintRawMapList {
 		taintRawMap := taintRaw.(map[string]interface{})
 
 		taint := ccev2types.Taint{}
+
 		if v, ok := taintRawMap["key"]; ok && v.(string) != "" {
 			taint.Key = v.(string)
 		}
+
 		if v, ok := taintRawMap["value"]; ok && v.(string) != "" {
 			taint.Value = v.(string)
 		}
+
 		if v, ok := taintRawMap["effect"]; ok && v.(string) != "" {
 			taint.Effect = ccev2types.TaintEffect(v.(string))
 		}
+
 		if v, ok := taintRawMap["time_added"]; ok && v.(string) != "" {
-			//format RFC3339 = "2006-01-02T15:04:05Z07:00"
+			//time format RFC3339
 			taint.TimeAdded = &ccev2types.Time{}
 			err := taint.TimeAdded.UnmarshalQueryParameter(v.(string))
 			if err != nil {
-				log.Println("TimeAdded format error:" + err.Error())
+				log.Println("Taint TimeAdded Format Error:" + err.Error())
+				return nil, err
 			}
 		}
 
@@ -2157,16 +2197,18 @@ func buildTaints(d []interface{}) ([]ccev2types.Taint, error) {
 	return taintList, nil
 }
 
-func buildTags(d []interface{}) ([]ccev2types.Tag, error) {
+func buildTags(tagRawMapList []interface{}) ([]ccev2types.Tag, error) {
 	tagList := make([]ccev2types.Tag, 0)
 
-	for _, tagRaw := range d {
+	for _, tagRaw := range tagRawMapList {
 		tagRawMap := tagRaw.(map[string]interface{})
 
 		tag := ccev2types.Tag{}
+
 		if v, ok := tagRawMap["tag_key"]; ok && v.(string) != "" {
 			tag.TagKey = v.(string)
 		}
+
 		if v, ok := tagRawMap["tag_value"]; ok && v.(string) != "" {
 			tag.TagValue = v.(string)
 		}
@@ -2176,63 +2218,72 @@ func buildTags(d []interface{}) ([]ccev2types.Tag, error) {
 	return tagList, nil
 }
 
-func buildK8SCustomConfig(d map[string]interface{}) (*ccev2types.K8SCustomConfig, error) {
+func buildK8SCustomConfig(k8sCustomConfigRawMap map[string]interface{}) (*ccev2types.K8SCustomConfig, error) {
 	config := &ccev2types.K8SCustomConfig{}
-	if v, ok := d["master_feature_gates"]; ok {
+
+	if v, ok := k8sCustomConfigRawMap["master_feature_gates"]; ok {
 		masterFeatureGates := make(map[string]bool)
 		for key, value := range v.(map[string]interface{}) {
 			masterFeatureGates[key] = value.(bool)
 		}
 		config.MasterFeatureGates = masterFeatureGates
 	}
-	if v, ok := d["node_feature_gates"]; ok {
+
+	if v, ok := k8sCustomConfigRawMap["node_feature_gates"]; ok {
 		nodeFeatureGates := make(map[string]bool)
 		for key, value := range v.(map[string]interface{}) {
 			nodeFeatureGates[key] = value.(bool)
 		}
 		config.NodeFeatureGates = nodeFeatureGates
 	}
-	if v, ok := d["admission_plugins"]; ok && v != nil {
+
+	if v, ok := k8sCustomConfigRawMap["admission_plugins"]; ok && v != nil {
 		admissionPlugins := make([]string, 0)
 		for _, plugin := range v.([]interface{}) {
 			admissionPlugins = append(admissionPlugins, plugin.(string))
 		}
 		config.AdmissionPlugins = admissionPlugins
 	}
-	if v, ok := d["pause_image"]; ok && v.(string) != "" {
+
+	if v, ok := k8sCustomConfigRawMap["pause_image"]; ok && v.(string) != "" {
 		config.PauseImage = v.(string)
 	}
-	if v, ok := d["kube_api_qps"]; ok {
+
+	if v, ok := k8sCustomConfigRawMap["kube_api_qps"]; ok {
 		config.KubeAPIQPS = v.(int)
 	}
-	if v, ok := d["kube_api_burst"]; ok {
+
+	if v, ok := k8sCustomConfigRawMap["kube_api_burst"]; ok {
 		config.KubeAPIBurst = v.(int)
 	}
-	if v, ok := d["scheduler_predicated"]; ok && v != nil {
+
+	if v, ok := k8sCustomConfigRawMap["scheduler_predicated"]; ok && v != nil {
 		schedulerPredicates := make([]string, 0)
 		for _, schedulerPredicate := range v.([]interface{}) {
 			schedulerPredicates = append(schedulerPredicates, schedulerPredicate.(string))
 		}
 		config.SchedulerPredicates = schedulerPredicates
 	}
-	if v, ok := d["scheduler_priorities"]; ok {
+
+	if v, ok := k8sCustomConfigRawMap["scheduler_priorities"]; ok {
 		schedulerPriority := make(map[string]int)
 		for key, value := range v.(map[string]interface{}) {
 			schedulerPriority[key] = value.(int)
 		}
 		config.SchedulerPriorities = schedulerPriority
 	}
-	if v, ok := d["etcd_data_path"]; ok && v.(string) != "" {
+
+	if v, ok := k8sCustomConfigRawMap["etcd_data_path"]; ok && v.(string) != "" {
 		config.ETCDDataPath = v.(string)
 	}
 
 	return config, nil
 }
 
-func buildDeployCustomConfig(d map[string]interface{}) (*ccev2types.DeployCustomConfig, error) {
+func buildDeployCustomConfig(deployCustomConfigRawMap map[string]interface{}) (*ccev2types.DeployCustomConfig, error) {
 	option := &ccev2types.DeployCustomConfig{}
 
-	if v, ok := d["docker_config"]; ok && len(v.([]interface{})) == 1 {
+	if v, ok := deployCustomConfigRawMap["docker_config"]; ok && len(v.([]interface{})) == 1 {
 		dockerConfigRaw := v.([]interface{})[0].(map[string]interface{})
 		dockerConfigOption, err := buildDockerConfig(dockerConfigRaw)
 		if err != nil {
@@ -2242,15 +2293,15 @@ func buildDeployCustomConfig(d map[string]interface{}) (*ccev2types.DeployCustom
 		option.DockerConfig = *dockerConfigOption
 	}
 
-	if v, ok := d["kubelet_root_dir"]; ok && v.(string) != "" {
+	if v, ok := deployCustomConfigRawMap["kubelet_root_dir"]; ok && v.(string) != "" {
 		option.KubeletRootDir = v.(string)
 	}
 
-	if v, ok := d["enable_resource_reserved"]; ok {
+	if v, ok := deployCustomConfigRawMap["enable_resource_reserved"]; ok {
 		option.EnableResourceReserved = v.(bool)
 	}
 
-	if v, ok := d["kube_reserved"]; ok {
+	if v, ok := deployCustomConfigRawMap["kube_reserved"]; ok {
 		kubeReserved := make(map[string]string)
 		for key, value := range v.(map[string]interface{}) {
 			kubeReserved[key] = value.(string)
@@ -2258,49 +2309,53 @@ func buildDeployCustomConfig(d map[string]interface{}) (*ccev2types.DeployCustom
 		option.KubeReserved = kubeReserved
 	}
 
-	if v, ok := d["pre_user_script"]; ok && v.(string) != "" {
+	if v, ok := deployCustomConfigRawMap["enable_cordon"]; ok {
+		option.EnableCordon = v.(bool)
+	}
+
+	if v, ok := deployCustomConfigRawMap["pre_user_script"]; ok && v.(string) != "" {
 		option.PreUserScript = v.(string)
 	}
 
-	if v, ok := d["post_user_script"]; ok && v.(string) != "" {
+	if v, ok := deployCustomConfigRawMap["post_user_script"]; ok && v.(string) != "" {
 		option.PostUserScript = v.(string)
 	}
 
 	return option, nil
 }
 
-func buildDockerConfig(d map[string]interface{}) (*ccev2types.DockerConfig, error) {
+func buildDockerConfig(dockerConfigRawMap map[string]interface{}) (*ccev2types.DockerConfig, error) {
 	config := &ccev2types.DockerConfig{}
 
-	if v, ok := d["docker_data_root"]; ok && v.(string) != "" {
+	if v, ok := dockerConfigRawMap["docker_data_root"]; ok && v.(string) != "" {
 		config.DockerDataRoot = v.(string)
 	}
 
-	if v, ok := d["registry_mirrors"]; ok && v != nil {
-		registryMirros := make([]string, 0)
-		for _, mirrosRaw := range v.([]interface{}) {
-			registryMirros = append(registryMirros, mirrosRaw.(string))
+	if v, ok := dockerConfigRawMap["registry_mirrors"]; ok && v != nil {
+		registryMirrors := make([]string, 0)
+		for _, mirrorsRaw := range v.([]interface{}) {
+			registryMirrors = append(registryMirrors, mirrorsRaw.(string))
 		}
-		config.RegistryMirrors = registryMirros
+		config.RegistryMirrors = registryMirrors
 	}
 
-	if v, ok := d["insecure_registries"]; ok && v != nil {
+	if v, ok := dockerConfigRawMap["insecure_registries"]; ok && v != nil {
 		registries := make([]string, 0)
-		for _, registiesRaw := range v.([]interface{}) {
-			registries = append(registries, registiesRaw.(string))
+		for _, registriesRaw := range v.([]interface{}) {
+			registries = append(registries, registriesRaw.(string))
 		}
 		config.RegistryMirrors = registries
 	}
 
-	if v, ok := d["docker_log_max_size"]; ok && v.(string) != "" {
+	if v, ok := dockerConfigRawMap["docker_log_max_size"]; ok && v.(string) != "" {
 		config.DockerLogMaxSize = v.(string)
 	}
 
-	if v, ok := d["docker_log_max_file"]; ok && v.(string) != "" {
+	if v, ok := dockerConfigRawMap["docker_log_max_file"]; ok && v.(string) != "" {
 		config.DockerLogMaxFile = v.(string)
 	}
 
-	if v, ok := d["bip"]; ok && v.(string) != "" {
+	if v, ok := dockerConfigRawMap["bip"]; ok && v.(string) != "" {
 		config.BIP = v.(string)
 	}
 
@@ -2325,29 +2380,29 @@ func buildInstanceDeleteOption(d map[string]interface{}) (*ccev2types.DeleteOpti
 	return option, nil
 }
 
-func buildInstancePrechargingOption(d map[string]interface{}) (*ccev2types.InstancePreChargingOption, error) {
+func buildInstancePrechargingOption(instancePreChargingOptionRawMap map[string]interface{}) (*ccev2types.InstancePreChargingOption, error) {
 	option := &ccev2types.InstancePreChargingOption{}
 
-	if v, ok := d["purchase_time"]; ok {
+	if v, ok := instancePreChargingOptionRawMap["purchase_time"]; ok {
 		option.PurchaseTime = v.(int)
 	}
 
-	if v, ok := d["auto_renew"]; ok {
+	if v, ok := instancePreChargingOptionRawMap["auto_renew"]; ok {
 		option.AutoRenew = v.(bool)
 	}
 
-	if v, ok := d["auto_renew_time_unit"]; ok && v.(string) != "" {
+	if v, ok := instancePreChargingOptionRawMap["auto_renew_time_unit"]; ok && v.(string) != "" {
 		option.AutoRenewTimeUnit = v.(string)
 	}
 
-	if v, ok := d["auto_renew_time"]; ok {
+	if v, ok := instancePreChargingOptionRawMap["auto_renew_time"]; ok {
 		option.AutoRenewTime = v.(int)
 	}
 
 	return option, nil
 }
 
-func buildExitedOption(d map[string]interface{}) (*ccev2types.ExistedOption, error) {
+func buildExistedOption(d map[string]interface{}) (*ccev2types.ExistedOption, error) {
 	existedOption := &ccev2types.ExistedOption{}
 
 	if v, ok := d["existed_instance_id"]; ok && v.(string) != "" {
@@ -2397,34 +2452,34 @@ func buildBBCOption(d map[string]interface{}) (*ccev2types.BBCOption, error) {
 	return bbcOption, nil
 }
 
-func buildVPCConfig(d map[string]interface{}) (*ccev2types.VPCConfig, error) {
+func buildVPCConfig(vpcRawMap map[string]interface{}) (*ccev2types.VPCConfig, error) {
 	vpcConfig := &ccev2types.VPCConfig{}
 
-	if v, ok := d["vpc_id"]; ok && v.(string) != "" {
+	if v, ok := vpcRawMap["vpc_id"]; ok && v.(string) != "" {
 		vpcConfig.VPCID = v.(string)
 	}
 
-	if v, ok := d["vpc_subnet_id"]; ok && v.(string) != "" {
+	if v, ok := vpcRawMap["vpc_subnet_id"]; ok && v.(string) != "" {
 		vpcConfig.VPCSubnetID = v.(string)
 	}
 
-	if v, ok := d["security_group_id"]; ok && v.(string) != "" {
+	if v, ok := vpcRawMap["security_group_id"]; ok && v.(string) != "" {
 		vpcConfig.SecurityGroupID = v.(string)
 	}
 
-	if v, ok := d["vpc_subnet_type"]; ok && v.(string) != "" {
+	if v, ok := vpcRawMap["vpc_subnet_type"]; ok && v.(string) != "" {
 		vpcConfig.VPCSubnetType = vpc.SubnetType(v.(string))
 	}
 
-	if v, ok := d["vpc_subnet_cidr"]; ok && v.(string) != "" {
+	if v, ok := vpcRawMap["vpc_subnet_cidr"]; ok && v.(string) != "" {
 		vpcConfig.VPCSubnetCIDR = v.(string)
 	}
 
-	if v, ok := d["vpc_subnet_cidr_ipv6"]; ok && v.(string) != "" {
+	if v, ok := vpcRawMap["vpc_subnet_cidr_ipv6"]; ok && v.(string) != "" {
 		vpcConfig.VPCSubnetCIDRIPv6 = v.(string)
 	}
 
-	if v, ok := d["available_zone"]; ok && v.(string) != "" {
+	if v, ok := vpcRawMap["available_zone"]; ok && v.(string) != "" {
 		vpcConfig.AvailableZone = ccev2types.AvailableZone(v.(string))
 	}
 
@@ -2447,7 +2502,7 @@ func buildInstanceResource(d map[string]interface{}) (*ccev2types.InstanceResour
 	}
 
 	if v, ok := d["node_mem_quota"]; ok {
-		instanceResource.NodeCPUQuota = v.(int)
+		instanceResource.NodeMEMQuota = v.(int)
 	}
 
 	if v, ok := d["root_disk_type"]; ok && v.(string) != "" {
@@ -2464,9 +2519,10 @@ func buildInstanceResource(d map[string]interface{}) (*ccev2types.InstanceResour
 
 	if v, ok := d["cds_list"]; ok {
 		cdsList, err := buildCDSList(v.([]interface{}))
-		if err == nil {
-			instanceResource.CDSList = cdsList
+		if err != nil {
+			return nil, err
 		}
+		instanceResource.CDSList = cdsList
 	}
 
 	if v, ok := d["gpu_type"]; ok && v.(string) != "" {
@@ -2480,10 +2536,10 @@ func buildInstanceResource(d map[string]interface{}) (*ccev2types.InstanceResour
 	return instanceResource, nil
 }
 
-func buildCDSList(d []interface{}) ([]ccev2types.CDSConfig, error) {
+func buildCDSList(cdsRawList []interface{}) ([]ccev2types.CDSConfig, error) {
 	cdsList := make([]ccev2types.CDSConfig, 0)
 
-	for _, cdsConfigRaw := range d {
+	for _, cdsConfigRaw := range cdsRawList {
 		cdsConfigRawMap := cdsConfigRaw.(map[string]interface{})
 
 		config := ccev2types.CDSConfig{}
@@ -2545,7 +2601,7 @@ func buildCCEv2CreateClusterArgs(d *schema.ResourceData) (*ccev2.CreateClusterAr
 	clusterSpecRaw := d.Get("cluster_spec.0").(map[string]interface{})
 	clusterSpec, err := buildCCEv2CreateClusterClusterSpec(clusterSpecRaw)
 	if err != nil {
-		log.Printf("Build Create Cluster Cluster Spec Fail:" + err.Error())
+		log.Printf("Build CreateClusterArgs ClusterSpec Fail:" + err.Error())
 		return nil, err
 	}
 	argsRequest.ClusterSpec = clusterSpec
@@ -2559,6 +2615,7 @@ func buildCCEv2CreateClusterArgs(d *schema.ResourceData) (*ccev2.CreateClusterAr
 
 		masterSpec, err := buildInstanceSpec(masterSpecRaw.(map[string]interface{}))
 		if err != nil {
+			log.Printf("Build CreateClusterArgs MasterSpecs Fail:" + err.Error())
 			return nil, err
 		}
 		instanceSet := &ccev2.InstanceSet{
@@ -2588,4 +2645,169 @@ func buildCCEv2DeleteClusterArgs(d *schema.ResourceData) (*ccev2.DeleteClusterAr
 	}
 
 	return args, nil
+}
+
+var ClusterTypePermitted = []string{
+	string(ccev2types.ClusterTypeNormal),
+}
+
+var K8SVersionPermitted = []string{
+	string(ccev2types.K8S_1_13_10),
+	string(ccev2types.K8S_1_16_8),
+}
+
+var RuntimeTypePermitted = []string{
+	string(ccev2types.RuntimeTypeDocker),
+}
+
+var MasterTypePermitted = []string{
+	string(ccev2types.MasterTypeManaged),
+	string(ccev2types.MasterTypeCustom),
+	string(ccev2types.MasterTypeServerless),
+}
+
+var ClusterHAPermitted = []int{
+	int(ccev2types.ClusterHALow),
+	int(ccev2types.ClusterHAMedium),
+	int(ccev2types.ClusterHAHigh),
+	int(ccev2types.ClusterHAServerless),
+}
+
+var AvailableZonePermitted = []string{
+	string(ccev2types.AvailableZoneA),
+	string(ccev2types.AvailableZoneB),
+	string(ccev2types.AvailableZoneC),
+	string(ccev2types.AvailableZoneD),
+	string(ccev2types.AvailableZoneE),
+	string(ccev2types.AvailableZoneF),
+}
+
+var ContainerNetworkModePermitted = []string{
+	string(ccev2types.ContainerNetworkModeKubenet),
+	string(ccev2types.ContainerNetworkModeVPCCNI),
+	string(ccev2types.ContainerNetworkModeVPCRouteVeth),
+	string(ccev2types.ContainerNetworkModeVPCRouteIPVlan),
+	string(ccev2types.ContainerNetworkModeVPCRouteAutoDetect),
+	string(ccev2types.ContainerNetworkModeVPCSecondaryIPVeth),
+	string(ccev2types.ContainerNetworkModeVPCSecondaryIPIPVlan),
+	string(ccev2types.ContainerNetworkModeVPCSecondaryIPAutoDetect),
+}
+
+var ContainerNetworkIPTypePermitted = []string{
+	string(ccev2types.ContainerNetworkIPTypeIPv4),
+	string(ccev2types.ContainerNetworkIPTypeIPv6),
+	string(ccev2types.ContainerNetworkIPTypeDualStack),
+}
+
+var KubeProxyModePermitted = []string{
+	string(ccev2types.KubeProxyModeIptables),
+	string(ccev2types.KubeProxyModeIPVS),
+}
+
+var ClusterRolePermitted = []string{
+	string(ccev2types.ClusterRoleMaster),
+	string(ccev2types.ClusterRoleNode),
+}
+
+var MachineTypePermitted = []string{
+	string(ccev2types.MachineTypeBBC),
+	string(ccev2types.MachineTypeBCC),
+	string(ccev2types.MachineTypeMetal),
+}
+
+var BCCInstanceTypePermitted = []string{
+	string(bccapi.InstanceTypeN1),
+	string(bccapi.InstanceTypeN2),
+	string(bccapi.InstanceTypeN3),
+	string(bccapi.InstanceTypeN4),
+	string(bccapi.InstanceTypeN5),
+	string(bccapi.InstanceTypeC1),
+	string(bccapi.InstanceTypeC2),
+	string(bccapi.InstanceTypeS1),
+	string(bccapi.InstanceTypeG1),
+	string(bccapi.InstanceTypeF1),
+}
+
+var VPCSubnetTypePermitted = []string{
+	string(vpc.SUBNET_TYPE_BCC),
+	string(vpc.SUBNET_TYPE_BCCNAT),
+	string(vpc.SUBNET_TYPE_BBC),
+}
+
+var StorageTypePermitted = []string{
+	string(bccapi.StorageTypeStd1),     //  "上一代云磁盘, sata 盘"
+	string(bccapi.StorageTypeHP1),      //  "高性能云磁盘, ssd 盘"
+	string(bccapi.StorageTypeCloudHP1), //  "SSD 云磁盘, premium ssd 盘"
+	string(bccapi.StorageTypeLocal),    //  "本地盘"
+	string(bccapi.StorageTypeSATA),     //  "sata盘, 创建 DCC 子网实例专用"
+	string(bccapi.StorageTypeSSD),      //  "ssd盘, 创建 DCC 子网实例专用"
+	//bccapi.StorageTypeHDDThroughput,
+	string(bccapi.StorageTypeHdd), //  "普通型"
+}
+
+var GPUTypePermitted = []string{
+	string(ccev2types.GPUTypeV100_32), //  NVIDIA Tesla V100-32G
+	string(ccev2types.GPUTypeV100_16), //  NVIDIA Tesla V100-16G
+	string(ccev2types.GPUTypeP40),     //  NVIDIA Tesla P40
+	string(ccev2types.GPUTypeP4),      //   NVIDIA Tesla P4
+	string(ccev2types.GPUTypeK40),     //  NVIDIA Tesla K40
+	string(ccev2types.GPUTypeDLCard),  //  NVIDIA 深度学习开发卡
+}
+
+var ImageTypePermitted = []string{
+	string(bccapi.ImageTypeAll),         //  所有镜像类型
+	string(bccapi.ImageTypeSystem),      //  "系统镜像/公共镜像"
+	string(bccapi.ImageTypeCustom),      //  "自定义镜像"
+	string(bccapi.ImageTypeIntegration), //  "服务集成镜像"
+	string(bccapi.ImageTypeSharing),     //  共享镜像
+	string(bccapi.ImageTypeGPUSystem),   //  gpu公有
+	string(bccapi.ImageTypeGPUCustom),   //  gpu 自定义
+	string(bccapi.ImageTypeBBCSystem),   //  BBC 公有
+	string(bccapi.ImageTypeBBCCustom),   //  BBC 自定义
+}
+
+var OSTypePermitted = []string{
+	string(ccev2types.OSTypeLinux),
+	string(ccev2types.OSTypeWindows),
+}
+
+var OSNamePermitted = []string{
+	string(ccev2types.OSNameCentOS),
+	string(ccev2types.OSNameUbuntu),
+	string(ccev2types.OSNameWindows),
+	string(ccev2types.OSNameDebian),
+	string(ccev2types.OSNameOpensuse),
+}
+
+var TaintEffectPermitted = []string{
+	string(ccev2types.TaintEffectNoSchedule),
+	string(ccev2types.TaintEffectPreferNoSchedule),
+	string(ccev2types.TaintEffectNoExecute),
+}
+
+var EIPBillingMethodPermitted = []string{
+	string(ccev2types.BillingMethodByTraffic),   //按照流量计费
+	string(ccev2types.BillingMethodByBandwidth), //按带宽计费
+}
+
+var PaymentTimingTypePermitted = []string{
+	string(bccapi.PaymentTimingPrePaid),
+	string(bccapi.PaymentTimingPostPaid),
+	string(bccapi.PaymentTimingBidding),
+}
+
+var QueryOrderPermitted = []string{
+	string(ccev2.OrderASC),
+	string(ccev2.OrderDESC),
+}
+
+var InstanceQueryKeywordTypePermitted = []string{
+	string(ccev2.InstanceKeywordTypeInstanceName),
+	string(ccev2.InstanceKeywordTypeInstanceID),
+}
+
+var InstanceQueryOrderByPermitted = []string{
+	string(ccev2.InstanceOrderByInstanceName),
+	string(ccev2.InstanceOrderByInstanceID),
+	string(ccev2.InstanceOrderByCreatedAt),
 }
