@@ -27,6 +27,31 @@ data "baiducloud_ccev2_clusterip_cidr" "default" {
   # output_file = "${path.cwd}/recommendClusterIPCidr.txt"
 }
 
+# ====To delete a specific instance of a instance group====
+# A instance with a lower "cce_instance_priority" will be deleted firstly when you shrink a instance group.
+# The default value of "cce_instance_priority" is 5.
+# Step 1:
+# If you wish delete a specific instance of a instance group, set the "cce_instance_priority" to a lower value, for example, 1.
+# Tips: Apply a new "baiducloud_ccev2_instance" resource will not create a new instance.
+#       It is just a bind to a existed remote instance.
+#       If you want to create more instances, please use resource "baiducloud_ccev2_instance_group"
+resource "baiducloud_ccev2_instance" "default" {
+  cluster_id        = baiducloud_ccev2_cluster.default_custom.id
+  instance_id       = data.baiducloud_ccev2_instance_group_instances.default.instance_list.0.instance_spec.0.cce_instance_id
+  spec {
+    cce_instance_priority = 1 # Set this value lower than the default value, fox example, 1.
+  }
+}
+# Step 2: type "terraform apply" to update "cce_instance_priority" value of the instance.
+
+# YOU MUST APPLY THE CHANGE IN STEP_2 BEFORE STEP_3
+# Step 3: set the value "replicas" of the instance group from "N" to "N-1" and then apply the change.
+variable "instance_group_replica_3" {
+  # default 4 => 3
+  default = 3
+}
+#===========================================================
+
 # Steps to create an CCEv2 cluster:
 # For custom cluster,  follow steps 1, 2, 3, 4, 5.1, 6
 # For managed cluster, follow steps 1, 2, 3, 4, 5.2, 6
@@ -167,7 +192,6 @@ resource "baiducloud_ccev2_cluster" "default_custom" {
         instance_name = master_specs.value.master_name
         cluster_role = "master"
         existed = false
-        machine_type = "BCC"
         instance_type = "N3"
         vpc_config {
           vpc_id = baiducloud_vpc.default.id
@@ -245,7 +269,6 @@ resource "baiducloud_ccev2_instance_group" "ccev2_instance_group_1" {
       instance_name = "tf_ins_ig_1"
       cluster_role = "node"
       existed = false
-      machine_type = "BCC"
       instance_type = "N3"
 
       vpc_config {
@@ -259,8 +282,8 @@ resource "baiducloud_ccev2_instance_group" "ccev2_instance_group_1" {
         post_user_script = "date"
       }
       instance_resource {
-        cpu = 4
-        mem = 8
+        cpu = 1
+        mem = 4
         root_disk_size = 40
         local_disk_size = 0
       }
@@ -287,7 +310,6 @@ resource "baiducloud_ccev2_instance_group" "ccev2_instance_group_2" {
       instance_name = "tf_ins_ig_2"
       cluster_role = "node"
       existed = false
-      machine_type = "BCC"
       instance_type = "N3"
       vpc_config {
         vpc_id = baiducloud_vpc.default.id
@@ -296,8 +318,8 @@ resource "baiducloud_ccev2_instance_group" "ccev2_instance_group_2" {
         available_zone = "zoneB"
       }
       instance_resource {
-        cpu = 4
-        mem = 8
+        cpu = 1
+        mem = 4
         root_disk_size = 40
         local_disk_size = 0
       }
@@ -324,7 +346,6 @@ resource "baiducloud_ccev2_instance_group" "ccev2_instance_group_3" {
       instance_name = "tf_ins_ig_3"
       cluster_role = "node"
       existed = false
-      machine_type = "BCC"
       instance_type = "N3"
       vpc_config {
         vpc_id = baiducloud_vpc.default.id
@@ -333,8 +354,8 @@ resource "baiducloud_ccev2_instance_group" "ccev2_instance_group_3" {
         available_zone = "zoneC"
       }
       instance_resource {
-        cpu = 4
-        mem = 8
+        cpu = 1
+        mem = 4
         root_disk_size = 40
         local_disk_size = 0
       }
@@ -360,7 +381,7 @@ data "baiducloud_ccev2_cluster_instances" "default" {
 # Get the instance list of the instance group
 data "baiducloud_ccev2_instance_group_instances" "default" {
   cluster_id = baiducloud_ccev2_cluster.default_custom.id
-  instance_group_id = baiducloud_ccev2_instance_group.ccev2_instance_group_1.id
+  instance_group_id = baiducloud_ccev2_instance_group.ccev2_instance_group_3.id
 }
 
 

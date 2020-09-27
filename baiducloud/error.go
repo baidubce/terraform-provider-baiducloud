@@ -42,6 +42,7 @@ const (
 	CceNotFound                = "Cce.warning.ClusterNotExist"
 	Ccev2ClusterNotFound       = "cce.warning.ClusterNotFound"
 	Ccev2InstanceGroupNotFound = "cce.warning.InstanceGroupNotFound"
+	Ccev2InstanceNotFound      = "cce.warning.InstanceNotFound"
 	InstanceNotExist           = "InstanceNotExist"
 
 	// scs error
@@ -76,13 +77,13 @@ var (
 	CceClusterNotFound = []string{CceNotFound}
 
 	//ccev2 error
-	Ccev2NotFound = []string{Ccev2ClusterNotFound, Ccev2InstanceGroupNotFound}
+	Ccev2NotFound = []string{Ccev2ClusterNotFound, Ccev2InstanceGroupNotFound, Ccev2InstanceNotFound}
 )
 
 var NotFoundErrorList = []string{
 	ResourceNotFoundException, ResourceNotFound, ResourceNotFound2, InstanceNotFound,
 	"NoSuchObject", "NoSuchNat", EipNotFound, InstanceNotExist, CceNotFound,
-	Ccev2ClusterNotFound, Ccev2InstanceGroupNotFound,
+	Ccev2ClusterNotFound, Ccev2InstanceGroupNotFound, Ccev2InstanceNotFound,
 }
 
 // An Error to wrap the different erros

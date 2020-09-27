@@ -19,13 +19,9 @@ variable "cluster_ip_service_cidr" {
 }
 
 variable "instance_group_replica_1" {
-  default = 1
-}
-
-variable "instance_group_replica_2" {
   default = 0
 }
 
-variable "instance_group_replica_3" {
+variable "instance_group_replica_2" {
   default = 0
 }

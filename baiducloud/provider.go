@@ -225,6 +225,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_scs":                   resourceBaiduCloudScs(),
 			"baiducloud_cce_cluster":           resourceBaiduCloudCCECluster(),
 			"baiducloud_ccev2_cluster":         resourceBaiduCloudCCEv2Cluster(),
+			"baiducloud_ccev2_instance":        resourceBaiduCloudCCEv2Instance(),
 			"baiducloud_ccev2_instance_group":  resourceBaiduCloudCCEv2InstanceGroup(),
 			"baiducloud_rds_instance":          resourceBaiduCloudRdsInstance(),
 			"baiducloud_rds_readonly_instance": resourceBaiduCloudRdsReadOnlyInstance(),

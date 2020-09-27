@@ -143,19 +143,19 @@ func resourceCCEv2ClusterStatus() *schema.Resource {
 			"cluster_blb": {
 				Type:        schema.TypeList,
 				Description: "Cluster BLB",
-				Optional:    true,
+				Computed:    true,
 				MaxItems:    1,
 				Elem:        resourceCCEv2BLB(),
 			},
 			"cluster_phase": {
 				Type:        schema.TypeString,
 				Description: "Cluster Phase",
-				Optional:    true,
+				Computed:    true,
 			},
 			"node_num": {
 				Type:        schema.TypeInt,
 				Description: "Cluster Node Number",
-				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -190,59 +190,70 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Instance ID",
 				Optional:    true,
+				Computed:    true,
 			},
 			"instance_name": {
 				Type:        schema.TypeString,
 				Description: "Instance Name",
 				Optional:    true,
+				Computed:    true,
 			},
 			"runtime_type": {
 				Type:         schema.TypeString,
 				Description:  "Container Runtime Type. Available Value: [docker].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(RuntimeTypePermitted, false),
 			},
 			"runtime_version": {
 				Type:        schema.TypeString,
 				Description: "Container Runtime Version",
 				Optional:    true,
+				Computed:    true,
 			},
 			"cluster_id": {
 				Type:        schema.TypeString,
 				Description: "Cluster ID of this Instance",
 				Optional:    true,
+				Computed:    true,
 			},
 			"cluster_role": {
 				Type:         schema.TypeString,
 				Description:  "Cluster Role of Instance, Master or Nodes. Available Value: [master, node].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(ClusterRolePermitted, false),
 			},
 			"instance_group_id": {
 				Type:        schema.TypeString,
 				Description: "Instance Group ID of this Instance",
 				Optional:    true,
+				Computed:    true,
 			},
 			"instance_group_name": {
 				Type:        schema.TypeString,
 				Description: "Name of Instance Group",
 				Optional:    true,
+				Computed:    true,
 			},
 			"master_type": {
 				Type:         schema.TypeString,
 				Description:  "Master Type. Available Value: [managed, custom, serverless].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(MasterTypePermitted, false),
 			},
 			"existed": {
 				Type:        schema.TypeBool,
 				Description: "Is the instance existed",
 				Optional:    true,
+				Computed:    true,
 			},
 			"existed_option": {
 				Type:        schema.TypeList,
 				Description: "Existed Instance Option",
 				Optional:    true,
+				Computed:    true,
 				MaxItems:    1,
 				Elem:        resourceCCEv2ExistedOption(),
 			},
@@ -250,18 +261,21 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Type:         schema.TypeString,
 				Description:  "Machine Type. Available Value: [BCC, BBC, Metal].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(MachineTypePermitted, false),
 			},
 			"instance_type": {
 				Type:         schema.TypeString,
 				Description:  "Instance Type Available Value: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(BCCInstanceTypePermitted, false),
 			},
 			"bbc_option": {
 				Type:        schema.TypeList,
 				Description: "BBC Option",
 				Optional:    true,
+				Computed:    true,
 				MaxItems:    1,
 				Elem:        resourceCCEv2BBCOption(),
 			},
@@ -269,6 +283,7 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Type:        schema.TypeList,
 				Description: "VPC Config",
 				Optional:    true,
+				Computed:    true,
 				MaxItems:    1,
 				Elem:        resourceCCEv2VPCConfig(),
 			},
@@ -276,6 +291,7 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Type:        schema.TypeList,
 				Description: "Instance Resource Config",
 				Optional:    true,
+				Computed:    true,
 				MaxItems:    1,
 				Elem:        resourceCCEv2InstanceResource(),
 			},
@@ -283,11 +299,13 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Image ID",
 				Optional:    true,
+				Computed:    true,
 			},
 			"instance_os": {
 				Type:        schema.TypeList,
 				Description: "OS Config of the instance",
 				Optional:    true,
+				Computed:    true,
 				MaxItems:    1,
 				Elem:        resourceCCEv2InstanceOS(),
 			},
@@ -295,11 +313,13 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Type:        schema.TypeBool,
 				Description: "Whether the instance need a EIP",
 				Optional:    true,
+				Computed:    true,
 			},
 			"eip_option": {
 				Type:        schema.TypeList,
 				Description: "EIP Option",
 				Optional:    true,
+				Computed:    true,
 				MaxItems:    1,
 				Elem:        resourceCCEv2EIPOption(),
 			},
@@ -307,22 +327,26 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Admin Password",
 				Optional:    true,
+				Computed:    true,
 			},
 			"ssh_key_id": {
 				Type:        schema.TypeString,
 				Description: "SSH Key ID",
 				Optional:    true,
+				Computed:    true,
 			},
 			"instance_charging_type": {
 				Type:         schema.TypeString,
 				Description:  "Instance charging type. Available Value: [Prepaid, Postpaid, bidding].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(PaymentTimingTypePermitted, false),
 			},
 			"instance_precharging_option": {
 				Type:        schema.TypeList,
 				Description: "Instance Pre-charging Option",
 				Optional:    true,
+				Computed:    true,
 				MaxItems:    1,
 				Elem:        resourceCCEv2InstancePrechargingOption(),
 			},
@@ -330,6 +354,7 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Type:        schema.TypeList,
 				Description: "Delete Option",
 				Optional:    true,
+				Computed:    true,
 				MaxItems:    1,
 				Elem:        resourceCCEv2DeleteOption(),
 			},
@@ -337,6 +362,7 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Type:        schema.TypeList,
 				Description: "Deploy Custom Option",
 				Optional:    true,
+				Computed:    true,
 				MaxItems:    1,
 				Elem:        resourceCCEv2DeployCustomConfig(),
 			},
@@ -344,12 +370,14 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Type:        schema.TypeList,
 				Description: "Tag List",
 				Optional:    true,
+				Computed:    true,
 				Elem:        resourceCCEv2Tag(),
 			},
 			"labels": {
 				Type:        schema.TypeMap,
 				Description: "Labels List",
 				Optional:    true,
+				Computed:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -358,7 +386,13 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Type:        schema.TypeList,
 				Description: "Taint List",
 				Optional:    true,
+				Computed:    true,
 				Elem:        resourceCCEv2Taint(),
+			},
+			"cce_instance_priority": {
+				Type:        schema.TypeInt,
+				Description: "Priority of this instance.",
+				Computed:    true,
 			},
 		},
 	}
@@ -665,11 +699,13 @@ func resourceCCEv2ExistedOption() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Existed Instance ID",
 				Optional:    true,
+				Computed:    true,
 			},
 			"rebuild": {
 				Type:        schema.TypeBool,
 				Description: "Whether re-install OS",
 				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -682,16 +718,19 @@ func resourceCCEv2BBCOption() *schema.Resource {
 				Type:        schema.TypeBool,
 				Description: "Whether reserve data",
 				Optional:    true,
+				Computed:    true,
 			},
 			"raid_id": {
 				Type:        schema.TypeString,
 				Description: "Disk Raid ID",
 				Optional:    true,
+				Computed:    true,
 			},
 			"sys_disk_size": {
 				Type:        schema.TypeInt,
 				Description: "System Disk Size",
 				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -704,37 +743,44 @@ func resourceCCEv2VPCConfig() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "VPC ID",
 				Optional:    true,
+				Computed:    true,
 			},
 			"vpc_subnet_id": {
 				Type:        schema.TypeString,
 				Description: "VPC Subnet ID",
 				Optional:    true,
+				Computed:    true,
 			},
 			"security_group_id": {
 				Type:        schema.TypeString,
 				Description: "Security Group ID",
 				Optional:    true,
+				Computed:    true,
 			},
 			"vpc_subnet_type": {
 				Type:         schema.TypeString,
 				Description:  "VPC Subnet type. Available Value: [BCC, BCC_NAT, BBC].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(VPCSubnetTypePermitted, false),
 			},
 			"vpc_subnet_cidr": {
 				Type:        schema.TypeString,
 				Description: "VPC Subnet CIDR",
 				Optional:    true,
+				Computed:    true,
 			},
 			"vpc_subnet_cidr_ipv6": {
 				Type:        schema.TypeString,
 				Description: "VPC Sunbet CIDR IPv6",
 				Optional:    true,
+				Computed:    true,
 			},
 			"available_zone": {
 				Type:         schema.TypeString,
 				Description:  "Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(AvailableZonePermitted, false),
 			},
 		},
@@ -747,7 +793,7 @@ func resourceCCEv2Instance() *schema.Resource {
 			"instance_spec": {
 				Type:        schema.TypeList,
 				Description: "Instance specification",
-				Optional:    true,
+				Computed:    true,
 				MaxItems:    1,
 				Elem:        resourceCCEv2InstanceSpec(),
 			},
@@ -779,64 +825,76 @@ func resourceCCEv2InstanceResource() *schema.Resource {
 				Type:        schema.TypeInt,
 				Description: "CPU cores",
 				Optional:    true,
+				Computed:    true,
 			},
 			"mem": {
 				Type:        schema.TypeInt,
 				Description: "memory GB",
 				Optional:    true,
+				Computed:    true,
 			},
 			"node_cpu_quota": {
 				Type:        schema.TypeInt,
 				Description: "Node cpu quota",
 				Optional:    true,
+				Computed:    true,
 			},
 			"node_mem_quota": {
 				Type:        schema.TypeInt,
 				Description: "Node memory quota",
 				Optional:    true,
+				Computed:    true,
 			},
 			"root_disk_type": {
 				Type:         schema.TypeString,
 				Description:  "Root disk type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(StorageTypePermitted, false),
 			},
 			"root_disk_size": {
 				Type:        schema.TypeInt,
 				Description: "Root disk size",
 				Optional:    true,
+				Computed:    true,
 			},
 			"local_disk_size": {
 				Type:        schema.TypeInt,
 				Description: "Local disk size",
 				Optional:    true,
+				Computed:    true,
 			},
 			"cds_list": {
 				Type:        schema.TypeList,
 				Description: "CDS List",
 				Optional:    true,
+				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"path": {
 							Type:        schema.TypeString,
 							Description: "CDS path",
 							Optional:    true,
+							Computed:    true,
 						},
 						"storage_type": {
 							Type:         schema.TypeString,
 							Description:  "Storage Type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].",
 							Optional:     true,
+							Computed:     true,
 							ValidateFunc: validation.StringInSlice(StorageTypePermitted, false),
 						},
 						"cds_size": {
 							Type:        schema.TypeInt,
 							Description: "CDS Size",
 							Optional:    true,
+							Computed:    true,
 						},
 						"snapshot_id": {
 							Type:        schema.TypeString,
 							Description: "Snap shot ID",
 							Optional:    true,
+							Computed:    true,
 						},
 					},
 				},
@@ -845,12 +903,14 @@ func resourceCCEv2InstanceResource() *schema.Resource {
 				Type:         schema.TypeString,
 				Description:  "GPU Type. Available Value: [V100-32, V100-16, P40, P4, K40, DLCard].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(GPUTypePermitted, false),
 			},
 			"gpu_count": {
 				Type:        schema.TypeInt,
 				Description: "GPU Number",
 				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -863,39 +923,46 @@ func resourceCCEv2InstanceOS() *schema.Resource {
 				Type:         schema.TypeString,
 				Description:  "Image type. Available Value: [Integration, System, All, Custom, Sharing, GpuBccSystem, GpuBccCustom, BbcSystem, BbcCustom].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(ImageTypePermitted, false),
 			},
 			"image_name": {
 				Type:        schema.TypeString,
 				Description: "Image Name",
 				Optional:    true,
+				Computed:    true,
 			},
 			"os_type": {
 				Type:         schema.TypeString,
 				Description:  "OS type. Available Value: [linux, windows].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(OSTypePermitted, false),
 			},
 			"os_name": {
 				Type:         schema.TypeString,
 				Description:  "OS name. Available Value: [CentOS, Ubuntu, Windows Server, Debian, opensuse].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(OSNamePermitted, false),
 			},
 			"os_version": {
 				Type:        schema.TypeString,
 				Description: "OS version",
 				Optional:    true,
+				Computed:    true,
 			},
 			"os_arch": {
 				Type:        schema.TypeString,
 				Description: "OS arch",
 				Optional:    true,
+				Computed:    true,
 			},
 			"os_build": {
 				Type:        schema.TypeString,
 				Description: "OS Build Time",
 				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -908,17 +975,20 @@ func resourceCCEv2EIPOption() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "EIP Name",
 				Optional:    true,
+				Computed:    true,
 			},
 			"eip_charging_type": {
 				Type:         schema.TypeString,
 				Description:  "EIP Charging Type. Available Value: [ByTraffic, ByBandwidth].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(EIPBillingMethodPermitted, false),
 			},
 			"eip_bandwidth": {
 				Type:        schema.TypeInt,
 				Description: "EIP Bandwidth",
 				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -931,22 +1001,26 @@ func resourceCCEv2Taint() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Taint Key",
 				Optional:    true,
+				Computed:    true,
 			},
 			"value": {
 				Type:        schema.TypeString,
 				Description: "Taint Value",
 				Optional:    true,
+				Computed:    true,
 			},
 			"effect": {
 				Type:         schema.TypeString,
 				Description:  "Taint Effect. Available Value: [NoSchedule, PreferNoSchedule, NoExecute].",
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice(TaintEffectPermitted, false),
 			},
 			"time_added": {
 				Type:        schema.TypeString,
 				Description: "Taint Added Time. Format RFC3339",
 				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -959,11 +1033,13 @@ func resourceCCEv2Tag() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Tag Key",
 				Optional:    true,
+				Computed:    true,
 			},
 			"tag_value": {
 				Type:        schema.TypeString,
 				Description: "Tag Value",
 				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -976,16 +1052,19 @@ func resourceCCEv2DeleteOption() *schema.Resource {
 				Type:        schema.TypeBool,
 				Description: "Whether move out the instance",
 				Optional:    true,
+				Computed:    true,
 			},
 			"delete_resource": {
 				Type:        schema.TypeBool,
 				Description: "Whether delete resources",
 				Optional:    true,
+				Computed:    true,
 			},
 			"delete_cds_snapshot": {
 				Type:        schema.TypeBool,
 				Description: "Whether delete CDS snapshot",
 				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -998,11 +1077,13 @@ func resourceCCEv2ClusterDeleteOption() *schema.Resource {
 				Type:        schema.TypeBool,
 				Description: "Whether to delete resources",
 				Optional:    true,
+				Computed:    true,
 			},
 			"delete_cds_snapshot": {
 				Type:        schema.TypeBool,
 				Description: "Whether to delete CDS snapshot",
 				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -1015,6 +1096,7 @@ func resourceCCEv2DeployCustomConfig() *schema.Resource {
 				Type:        schema.TypeList,
 				Description: "Docker Config Info",
 				Optional:    true,
+				Computed:    true,
 				MaxItems:    1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -1022,11 +1104,13 @@ func resourceCCEv2DeployCustomConfig() *schema.Resource {
 							Type:        schema.TypeString,
 							Description: "Customized Docker Data Directory",
 							Optional:    true,
+							Computed:    true,
 						},
 						"registry_mirrors": {
 							Type:        schema.TypeList,
 							Description: "Customized RegistryMirrors",
 							Optional:    true,
+							Computed:    true,
 							Elem: &schema.Schema{
 								Type: schema.TypeString,
 							},
@@ -1035,6 +1119,7 @@ func resourceCCEv2DeployCustomConfig() *schema.Resource {
 							Type:        schema.TypeList,
 							Description: "Customized InsecureRegistries",
 							Optional:    true,
+							Computed:    true,
 							Elem: &schema.Schema{
 								Type: schema.TypeString,
 							},
@@ -1043,16 +1128,19 @@ func resourceCCEv2DeployCustomConfig() *schema.Resource {
 							Type:        schema.TypeString,
 							Description: "docker Log Max Size",
 							Optional:    true,
+							Computed:    true,
 						},
 						"docker_log_max_file": {
 							Type:        schema.TypeString,
 							Description: "docker Log Max File",
 							Optional:    true,
+							Computed:    true,
 						},
 						"bip": {
 							Type:        schema.TypeString,
 							Description: "docker0 Network Bridge Network Segment",
 							Optional:    true,
+							Computed:    true,
 						},
 					},
 				},
@@ -1061,16 +1149,19 @@ func resourceCCEv2DeployCustomConfig() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "kubelet Data Directory",
 				Optional:    true,
+				Computed:    true,
 			},
 			"enable_resource_reserved": {
 				Type:        schema.TypeBool,
 				Description: "Whether to Enable Resource Quota",
 				Optional:    true,
+				Computed:    true,
 			},
 			"kube_reserved": {
 				Type:        schema.TypeMap,
 				Description: "Resource Quota",
 				Optional:    true,
+				Computed:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -1079,16 +1170,19 @@ func resourceCCEv2DeployCustomConfig() *schema.Resource {
 				Type:        schema.TypeBool,
 				Description: "Whether enable cordon",
 				Optional:    true,
+				Computed:    true,
 			},
 			"pre_user_script": {
 				Type:        schema.TypeString,
 				Description: "Script before deployment, base64 encoded",
 				Optional:    true,
+				Computed:    true,
 			},
 			"post_user_script": {
 				Type:        schema.TypeString,
 				Description: "Script after deployment, base64 encoded",
 				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -1101,21 +1195,25 @@ func resourceCCEv2InstancePrechargingOption() *schema.Resource {
 				Type:        schema.TypeInt,
 				Description: "Time of purchase",
 				Optional:    true,
+				Computed:    true,
 			},
 			"auto_renew": {
 				Type:        schema.TypeBool,
 				Description: "Is Auto Renew",
 				Optional:    true,
+				Computed:    true,
 			},
 			"auto_renew_time_unit": {
 				Type:        schema.TypeString,
 				Description: "Time unit for auto renew",
 				Optional:    true,
+				Computed:    true,
 			},
 			"auto_renew_time": {
 				Type:        schema.TypeInt,
 				Description: "Number of time unit for auto renew",
 				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -1238,7 +1336,7 @@ func convertInstanceFromJsonToMap(instances []*ccev2.Instance, role ccev2types.C
 	return resultInstances, nil
 }
 
-func convertInstanceSpecFromJsonToMap(spec *ccev2.InstanceSpec) ([]interface{}, error) {
+func convertInstanceSpecFromJsonToMap(spec *ccev2types.InstanceSpec) ([]interface{}, error) {
 	resultSpec := make([]interface{}, 0)
 	if spec == nil {
 		return resultSpec, nil
@@ -1278,6 +1376,7 @@ func convertInstanceSpecFromJsonToMap(spec *ccev2.InstanceSpec) ([]interface{}, 
 	if spec.ImageID != "" {
 		specMap["image_id"] = spec.ImageID
 	}
+	specMap["cce_instance_priority"] = spec.CCEInstancePriority
 
 	specMap["need_eip"] = spec.NeedEIP
 
@@ -2040,7 +2139,7 @@ func buildInstanceSpec(instanceSpecRawMap map[string]interface{}) (*ccev2types.I
 			log.Println("Build InstanceSpec BCCOption Error:" + err.Error())
 			return nil, err
 		}
-		instanceSpec.BBCOption = *bbcOption
+		instanceSpec.BBCOption = bbcOption
 	}
 	if v, ok := instanceSpecRawMap["vpc_config"]; ok && len(v.([]interface{})) == 1 {
 		vpcConfigRaw := v.([]interface{})[0].(map[string]interface{})
@@ -2087,7 +2186,7 @@ func buildInstanceSpec(instanceSpecRawMap map[string]interface{}) (*ccev2types.I
 			log.Println("Build InstanceSpec EIPOption Error:" + err.Error())
 			return nil, err
 		}
-		instanceSpec.EIPOption = *eipOption
+		instanceSpec.EIPOption = eipOption
 	}
 
 	if v, ok := instanceSpecRawMap["admin_password"]; ok && v.(string) != "" {
@@ -2119,7 +2218,7 @@ func buildInstanceSpec(instanceSpecRawMap map[string]interface{}) (*ccev2types.I
 			log.Println("Build InstanceSpec DeleteOption Error:" + err.Error())
 			return nil, err
 		}
-		instanceSpec.DeleteOption = *instanceDeleteOption
+		instanceSpec.DeleteOption = instanceDeleteOption
 	}
 
 	if v, ok := instanceSpecRawMap["deploy_custom_config"]; ok && len(v.([]interface{})) == 1 {
@@ -2156,6 +2255,10 @@ func buildInstanceSpec(instanceSpecRawMap map[string]interface{}) (*ccev2types.I
 			return nil, err
 		}
 		instanceSpec.Taints = taintList
+	}
+
+	if v, ok := instanceSpecRawMap["cce_instance_priority"]; ok {
+		instanceSpec.CCEInstancePriority = v.(int)
 	}
 
 	return instanceSpec, nil

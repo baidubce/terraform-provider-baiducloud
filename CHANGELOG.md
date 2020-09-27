@@ -1,4 +1,9 @@
 ## 1.10.0 (Unreleased)
+
+FEATURES:
+
+* **New Resource:** `resource_baiducloud_ccev2_instance`
+
 ## 1.9.0 (September 04, 2020)
 
 FEATURES:
