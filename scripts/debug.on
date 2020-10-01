@@ -1,0 +1,5 @@
+# Usage: source debug.on
+# 使用addDebug方法打印调试日志，日志保存在TF_LOG_PATH环境变量配置的文件terraform.log中
+export TF_LOG_PATH=terraform.log
+export TF_LOG=TRACE
+export DEBUG=terraform
