@@ -64,7 +64,7 @@ echo
 
 echo "git add CHANGELOG.md"
 git add CHANGELOG.md
-git commit -m $currentVersion
+git commit -m "v"$currentVersion
 git tag "v"$currentVersion
 echo "------------------"
 echo
