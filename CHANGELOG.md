@@ -1,4 +1,5 @@
-## 1.10.1 (Unreleased)
+## 1.11.0 (Unreleased)
+## 1.10.1 (October 10, 2020)
 
 NOTES:
 - provider: Add a note about the debugging usage of the provider.
