@@ -65,8 +65,8 @@ echo
 echo "git add CHANGELOG.md"
 git add CHANGELOG.md
 git commit -m $currentVersion
-git tag $currentVersion
+git tag "v"$currentVersion
 echo "------------------"
 echo
 
-echo "The repository is ready to push. Please use "git push" to trigger the github actions to publish the provider."
+echo 'The repository is ready to push. Please use "git push && git push --tag" to trigger the github actions to publish the provider.'
