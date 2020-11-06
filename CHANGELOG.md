@@ -1,4 +1,11 @@
-## 1.11.0 (Unreleased)
+## 1.10.2 (Unreleased)
+
+BUG FIXES:
+- provider: Fix wrong usage of nonRetryable error
+
+NOTES:
+- provider: Fix wrong information in the provider index document 
+
 ## 1.10.1 (October 10, 2020)
 
 NOTES:

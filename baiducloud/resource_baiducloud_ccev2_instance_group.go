@@ -55,7 +55,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/baidubce/bce-sdk-go/bce"
 	ccev2 "github.com/baidubce/bce-sdk-go/services/cce/v2"
 	"github.com/baidubce/bce-sdk-go/services/cce/v2/types"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -158,9 +157,6 @@ func resourceBaiduCloudCCEv2InstanceGroupCreate(d *schema.ResourceData, meta int
 			return client.CreateInstanceGroup(args)
 		})
 		if err != nil {
-			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
-				return resource.RetryableError(err)
-			}
 			return resource.NonRetryableError(err)
 		}
 
@@ -290,9 +286,6 @@ func resourceBaiduCloudCCEv2InstanceGroupUpdate(d *schema.ResourceData, meta int
 			return client.UpdateInstanceGroupReplicas(args)
 		})
 		if err != nil {
-			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
-				return resource.RetryableError(err)
-			}
 			return resource.NonRetryableError(err)
 		}
 		//waiting all instance in instance group are ready
@@ -348,9 +341,6 @@ func resourceBaiduCloudCCEv2InstanceGroupDelete(d *schema.ResourceData, meta int
 			return client.DeleteInstanceGroup(args)
 		})
 		if err != nil {
-			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
-				return resource.RetryableError(err)
-			}
 			return resource.NonRetryableError(err)
 		}
 		time.Sleep(1 * time.Minute) //waiting for infrastructure delete before delete vpc & security group

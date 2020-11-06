@@ -47,7 +47,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/baidubce/bce-sdk-go/bce"
 	ccev2 "github.com/baidubce/bce-sdk-go/services/cce/v2"
 	ccev2types "github.com/baidubce/bce-sdk-go/services/cce/v2/types"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -154,9 +153,6 @@ func resourceBaiduCloudCCEv2ClusterCreate(d *schema.ResourceData, meta interface
 			return client.CreateCluster(createClusterArgs)
 		})
 		if err != nil {
-			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
-				return resource.RetryableError(err)
-			}
 			return resource.NonRetryableError(err)
 		}
 		addDebug(action, raw)
@@ -308,9 +304,6 @@ func resourceBaiduCloudCCEv2ClusterDelete(d *schema.ResourceData, meta interface
 			return client.DeleteCluster(args)
 		})
 		if err != nil {
-			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
-				return resource.RetryableError(err)
-			}
 			return resource.NonRetryableError(err)
 		}
 		addDebug(action, raw)
