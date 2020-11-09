@@ -1,4 +1,5 @@
-## 1.10.2 (Unreleased)
+## 1.11.0 (Unreleased)
+## 1.10.2 (November 06, 2020)
 
 BUG FIXES:
 - provider: Fix wrong usage of nonRetryable error
