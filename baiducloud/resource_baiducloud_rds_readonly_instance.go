@@ -432,6 +432,30 @@ func buildBaiduCloudRdsReadOnlyInstanceArgs(d *schema.ResourceData, meta interfa
 		request.IsDirectPay = isDirectPay.(bool)
 	}
 
+	if purchaseCount, ok := d.GetOk("purchase_count"); ok {
+		request.PurchaseCount = purchaseCount.(int)
+	}
+
+	if vpcID, ok := d.GetOk("vpc_id"); ok {
+		request.VpcId = vpcID.(string)
+	}
+
+	if v, ok := d.GetOk("subnets"); ok {
+		subnetList := v.([]interface{})
+		subnetRequests := make([]rds.SubnetMap, len(subnetList))
+		for id := range subnetList {
+			subnet := subnetList[id].(map[string]interface{})
+
+			subnetRequest := rds.SubnetMap{
+				SubnetId: subnet["subnet_id"].(string),
+				ZoneName: subnet["zone_name"].(string),
+			}
+
+			subnetRequests[id] = subnetRequest
+		}
+		request.Subnets = subnetRequests
+	}
+
 	return request, nil
 
 }

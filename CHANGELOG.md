@@ -1,4 +1,9 @@
-## 1.11.0 (Unreleased)
+## 1.10.3 (Unreleased)
+
+BUG FIXES:
+
+- provider: Fix a bug that failed to create RDS read-only instance with self built VPC
+
 ## 1.10.2 (November 06, 2020)
 
 BUG FIXES:
