@@ -1,4 +1,5 @@
-## 1.11.0 (Unreleased)
+## 1.12.0 (Unreleased)
+## 1.11.0 (February 27, 2021)
 
 FEATURES:
 * **New Resource:** `resource_baiducloud_iam_user`
