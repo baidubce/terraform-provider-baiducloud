@@ -24,6 +24,7 @@ import (
 )
 
 const (
+	URI_PREFIXV3 = bce.URI_PREFIX + "v3"
 	URI_PREFIXV2 = bce.URI_PREFIX + "v2"
 	URI_PREFIXV1 = bce.URI_PREFIX + "v1"
 
@@ -39,37 +40,44 @@ const (
 	REQUEST_LIST_URI             = "/list"
 	REQUEST_SECURITYGROUP_URI    = "/securityGroup"
 	REQUEST_SNAPSHOT_URI         = "/snapshot"
-	REQUEST_CHAIN_URI             = "/chain"
+	REQUEST_CHAIN_URI            = "/chain"
 	REQUEST_SPEC_URI             = "/instance/spec"
 	REQUEST_SUBNET_URI           = "/subnet"
 	REQUEST_VNC_SUFFIX           = "/vnc"
 	REQUEST_VOLUME_URI           = "/volume"
 	REQUEST_ZONE_URI             = "/zone"
+	REQUEST_RECYCLE              = "/recycle"
 	//
-	REQUEST_FLAVOR_SPEC_URI      = "/instance/flavorSpec"
+	REQUEST_FLAVOR_SPEC_URI       = "/instance/flavorSpec"
 	REQUEST_PRICE_URI             = "/price"
 	REQUEST_AUTO_RENEW_URI        = "/autoRenew"
 	REQUEST_CANCEL_AUTO_RENEW_URI = "/cancelAutoRenew"
 	REQUEST_BID_PRICE_URI         = "/bidPrice"
 	REQUEST_BID_FLAVOR_URI        = "/bidFlavor"
 	//
-	REQUEST_INSTANCE_PRICE_URI   = "/instance/price"
-	REQUEST_INSTANCE_BY_SPEC_URI = "/instanceBySpec"
-	REQUEST_VOLUME_DISK_URI       = "/volume/disk"
-	REQUEST_TYPE_ZONE_URI         = "/instance/flavorZones"
-	REQUEST_ENI_URI               = "/eni"
-	REQUEST_KEYPAIR_URI           = "/keypair"
-	REQUEST_REBUILD_URI = "/rebuild"
-	REQUEST_TAG_URI = "/tag"
-	REQUEST_NOCHARGE_URI = "/noCharge"
-	REQUEST_BID_URI = "/bid"
-	REQUEST_CANCEL_BIDORDER_URI = "/cancelBidOrder"
+	REQUEST_INSTANCE_PRICE_URI               = "/instance/price"
+	REQUEST_INSTANCE_BY_SPEC_URI             = "/instanceBySpec"
+	REQUEST_VOLUME_DISK_URI                  = "/volume/disk"
+	REQUEST_TYPE_ZONE_URI                    = "/instance/flavorZones"
+	REQUEST_ENI_URI                          = "/eni"
+	REQUEST_KEYPAIR_URI                      = "/keypair"
+	REQUEST_REBUILD_URI                      = "/rebuild"
+	REQUEST_TAG_URI                          = "/tag"
+	REQUEST_NOCHARGE_URI                     = "/noCharge"
+	REQUEST_BID_URI                          = "/bid"
+	REQUEST_RECOVERY_URI                     = "/recovery"
+	REQUEST_CANCEL_BIDORDER_URI              = "/cancelBidOrder"
 	REQUEST_BATCH_CREATE_AUTORENEW_RULES_URI = "/batchCreateAutoRenewRules"
 	REQUEST_BATCH_Delete_AUTORENEW_RULES_URI = "/batchDeleteAutoRenewRules"
+	REQUEST_GET_ALL_STOCKS                   = "/getAllStocks"
 )
 
 func getInstanceUri() string {
 	return URI_PREFIXV2 + REQUEST_INSTANCE_URI
+}
+
+func getRecycleInstanceListUri() string {
+	return URI_PREFIXV2 + REQUEST_RECYCLE + REQUEST_INSTANCE_URI
 }
 
 func getInstanceBySpecUri() string {
@@ -78,6 +86,10 @@ func getInstanceBySpecUri() string {
 
 func getInstanceUriWithId(id string) string {
 	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + "/" + id
+}
+
+func getRecoveryInstanceUri() string {
+	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + REQUEST_RECOVERY_URI
 }
 
 func getBatchAddIpUri() string {
@@ -117,8 +129,16 @@ func getVolumeUri() string {
 	return URI_PREFIXV2 + REQUEST_VOLUME_URI
 }
 
+func getVolumeV3Uri() string {
+	return URI_PREFIXV3 + REQUEST_VOLUME_URI
+}
+
 func getVolumeUriWithId(id string) string {
 	return URI_PREFIXV2 + REQUEST_VOLUME_URI + "/" + id
+}
+
+func getVolumeV3UriWithId(id string) string {
+	return URI_PREFIXV3 + REQUEST_VOLUME_URI + "/" + id
 }
 
 func getAutoRenewVolumeUri() string {
@@ -206,6 +226,10 @@ func getKeypairUri() string {
 
 func getKeypairWithId(id string) string {
 	return URI_PREFIXV2 + REQUEST_KEYPAIR_URI + "/" + id
+}
+
+func getAllStocks() string {
+	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + REQUEST_GET_ALL_STOCKS
 }
 
 func getCreateInstanceStock() string {

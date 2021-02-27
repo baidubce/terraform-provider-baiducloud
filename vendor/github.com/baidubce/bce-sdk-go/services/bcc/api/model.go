@@ -64,6 +64,26 @@ const (
 	StorageTypeSSD           StorageType = "ssd"
 	StorageTypeHDDThroughput StorageType = "HDD_Throughput"
 	StorageTypeHdd           StorageType = "hdd"
+	StorageTypeLocalSSD      StorageType = "local-ssd"
+	StorageTypeLocalHDD      StorageType = "local-hdd"
+	StorageTypeLocalNVME     StorageType = "local-nvme"
+)
+
+type StorageTypeV3 string
+
+const (
+	StorageTypeV3CloudSATA          StorageTypeV3 = "Cloud_Sata"
+	StorageTypeV3CloudHDDGeneral    StorageTypeV3 = "Cloud_HDD_General"
+	StorageTypeV3CloudHDDThroughput StorageTypeV3 = "Cloud_HDD_Throughput"
+	StorageTypeV3CloudPremium       StorageTypeV3 = "Cloud_Premium"
+	StorageTypeV3CloudSSDGeneral    StorageTypeV3 = "Cloud_SSD_General"
+	StorageTypeV3CloudSSDEnhanced   StorageTypeV3 = "Cloud_SSD_Enhanced"
+	StorageTypeV3LocalHDD           StorageTypeV3 = "Local_HDD"
+	StorageTypeV3LocalSSD           StorageTypeV3 = "Local_SSD"
+	StorageTypeV3LocalNVME          StorageTypeV3 = "Local_NVME"
+	StorageTypeV3LocalPVHDD         StorageTypeV3 = "Local_PV_HDD"
+	StorageTypeV3LocalPVSSD         StorageTypeV3 = "Local_PV_SSD"
+	StorageTypeV3LocalPVNVME        StorageTypeV3 = "Local_PV_NVME"
 )
 
 type PaymentTimingType string
@@ -79,6 +99,7 @@ type InstanceModel struct {
 	InstanceId            string           `json:"id"`
 	SerialNumber          string           `json:"serialNumber"`
 	InstanceName          string           `json:"name"`
+	Hostname              string           `json:"hostname"`
 	InstanceType          InstanceType     `json:"instanceType"`
 	Description           string           `json:"desc"`
 	Status                InstanceStatus   `json:"status"`
@@ -107,7 +128,62 @@ type InstanceModel struct {
 	Ipv6                  string           `json:"ipv6"`
 	SwitchId              string           `json:"switchId"`
 	HostId                string           `json:"hostId"`
+	DeploysetId           string           `json:"deploysetId"`
 	RackId                string           `json:"rackId"`
+	NicInfo               NicInfo          `json:"nicInfo"`
+}
+
+type GetAllStocksResult struct {
+	BccStocks []BccStock `json:"bccStocks"`
+	BbcStocks []BbcStock `json:"bbcStocks"`
+}
+
+type BccStock struct {
+	Spec              string `json:"spec"`
+	SpecId            string `json:"specId"`
+	InventoryQuantity int    `json:"inventoryQuantity"`
+	UpdatedTime       string `json:"updatedTime"`
+	CollectionTime    string `json:"collectionTime"`
+	ZoneName          string `json:"logicalZone"`
+}
+
+type BbcStock struct {
+	FlavorId          string `json:"flavorId"`
+	InventoryQuantity int    `json:"inventoryQuantity"`
+	UpdatedTime       string `json:"updatedTime"`
+	CollectionTime    string `json:"collectionTime"`
+	ZoneName          string `json:"logicalZone"`
+}
+
+type NicInfo struct {
+	Status         string    `json:"status"`
+	MacAddress     string    `json:"macAddress"`
+	DeviceId       string    `json:"deviceId"`
+	VpcId          string    `json:"vpcId"`
+	EniId          string    `json:"eniId"`
+	Name           string    `json:"name"`
+	Type           string    `json:"type"`
+	CreatedTime    string    `json:"createdTime"`
+	SubnetType     string    `json:"subnetType"`
+	SubnetId       string    `json:"subnetId"`
+	EniNum         int       `json:"eniNum"`
+	Az             string    `json:"az"`
+	EniUuid        string    `json:"eniUuid"`
+	Description    string    `json:"description"`
+	Ips            []IpModel `json:"ips"`
+	SecurityGroups []string  `json:"securityGroups"`
+}
+
+type IpModel struct {
+	Eip             string `json:"eip"`
+	EipStatus       string `json:"eipStatus"`
+	EipSize         string `json:"eipSize"`
+	EipId           string `json:"eipId"`
+	Primary         string `json:"primary"`
+	PrivateIp       string `json:"privateIp"`
+	EipAllocationId string `json:"eipAllocationId"`
+	EipType         string `json:"eipType"`
+	EipGroupId      string `json:"eipGroupId"`
 }
 
 type Reservation struct {
@@ -158,6 +234,9 @@ type CreateInstanceArgs struct {
 	DedicateHostId        string           `json:"dedicatedHostId,omitempty"`
 	PurchaseCount         int              `json:"purchaseCount,omitempty"`
 	Name                  string           `json:"name,omitempty"`
+	Hostname              string           `json:"hostname,omitempty"`
+	IsOpenHostnameDomain  bool             `json:"isOpenHostnameDomain,omitempty"`
+	AutoSeqSuffix         bool             `json:"autoSeqSuffix,omitempty"`
 	AdminPass             string           `json:"adminPass,omitempty"`
 	ZoneName              string           `json:"zoneName,omitempty"`
 	SubnetId              string           `json:"subnetId,omitempty"`
@@ -243,6 +322,9 @@ type CreateInstanceBySpecArgs struct {
 	InternetChargeType    string           `json:"internetChargeType,omitempty"`
 	PurchaseCount         int              `json:"purchaseCount,omitempty"`
 	Name                  string           `json:"name,omitempty"`
+	Hostname              string           `json:"hostname,omitempty"`
+	IsOpenHostnameDomain  bool             `json:"isOpenHostnameDomain,omitempty"`
+	AutoSeqSuffix         bool             `json:"autoSeqSuffix,omitempty"`
 	AdminPass             string           `json:"adminPass,omitempty"`
 	Billing               Billing          `json:"billing"`
 	ZoneName              string           `json:"zoneName,omitempty"`
@@ -280,6 +362,42 @@ type ListInstanceResult struct {
 	NextMarker  string          `json:"nextMarker"`
 	MaxKeys     int             `json:"maxKeys"`
 	Instances   []InstanceModel `json:"instances"`
+}
+
+type ListRecycleInstanceArgs struct {
+	Marker        string `json:"marker,omitempty"`
+	MaxKeys       int    `json:"maxKeys,omitempty"`
+	InstanceId    string `json:"instanceId,omitempty"`
+	Name          string `json:"name,omitempty"`
+	PaymentTiming string `json:"paymentTiming,omitempty"`
+	RecycleBegin  string `json:"recycleBegin,omitempty"`
+	RecycleEnd    string `json:"recycleEnd,omitempty"`
+}
+
+type ListRecycleInstanceResult struct {
+	Marker      string                 `json:"marker"`
+	IsTruncated bool                   `json:"isTruncated"`
+	NextMarker  string                 `json:"nextMarker"`
+	MaxKeys     int                    `json:"maxKeys"`
+	Instances   []RecycleInstanceModel `json:"instances"`
+}
+
+type RecycleInstanceModel struct {
+	InstanceId    string   `json:"id"`
+	SerialNumber  string   `json:"serialNumber"`
+	InstanceName  string   `json:"name"`
+	RecycleTime   string   `json:"recycleTime"`
+	DeleteTime    string   `json:"deleteTime"`
+	PaymentTiming string   `json:"paymentTiming"`
+	ServiceName   string   `json:"serviceName"`
+	ServiceType   string   `json:"serviceType"`
+	ConfigItems   []string `json:"configItems"`
+}
+
+type ModifyInstanceHostnameArgs struct {
+	Hostname             string `json:"hostname"`
+	IsOpenHostnameDomain bool   `json:"isOpenHostnameDomain"`
+	Reboot               bool   `json:"reboot"`
 }
 
 type GetInstanceDetailResult struct {
@@ -372,6 +490,7 @@ const (
 type DeleteInstanceWithRelateResourceArgs struct {
 	RelatedReleaseFlag    bool `json:"relatedReleaseFlag"`
 	DeleteCdsSnapshotFlag bool `json:"deleteCdsSnapshotFlag"`
+	BccRecycleFlag        bool `json:"bccRecycleFlag"`
 }
 
 type InstanceChangeSubnetArgs struct {
@@ -384,6 +503,7 @@ type BatchAddIpArgs struct {
 	InstanceId                     string   `json:"instanceId"`
 	PrivateIps                     []string `json:"privateIps"`
 	SecondaryPrivateIpAddressCount int      `json:"secondaryPrivateIpAddressCount"`
+	ClientToken                    string   `json:"-"`
 }
 
 type BatchAddIpResponse struct {
@@ -391,8 +511,9 @@ type BatchAddIpResponse struct {
 }
 
 type BatchDelIpArgs struct {
-	InstanceId string   `json:"instanceId"`
-	PrivateIps []string `json:"privateIps"`
+	InstanceId  string   `json:"instanceId"`
+	PrivateIps  []string `json:"privateIps"`
+	ClientToken string   `json:"-"`
 }
 
 type VolumeStatus string
@@ -414,12 +535,39 @@ const (
 	VolumeStatusERROR              VolumeStatus = "Error"
 )
 
+type VolumeStatusV3 string
+
+const (
+	VolumeStatusV3AVAILABLE          VolumeStatusV3 = "Available"
+	VolumeStatusV3INUSE              VolumeStatusV3 = "InUse"
+	VolumeStatusV3SNAPSHOTPROCESSING VolumeStatusV3 = "SnapshotProcessing"
+	VolumeStatusV3RECHARGING         VolumeStatusV3 = "Recharging"
+	VolumeStatusV3DETACHING          VolumeStatusV3 = "Detaching"
+	VolumeStatusV3DELETING           VolumeStatusV3 = "Deleting"
+	VolumeStatusV3EXPIRED            VolumeStatusV3 = "Expired"
+	VolumeStatusV3NOTAVAILABLE       VolumeStatusV3 = "NotAvailable"
+	VolumeStatusV3DELETED            VolumeStatusV3 = "Deleted"
+	VolumeStatusV3SCALING            VolumeStatusV3 = "Scaling"
+	VolumeStatusV3IMAGEPROCESSING    VolumeStatusV3 = "ImageProcessing"
+	VolumeStatusV3CREATING           VolumeStatusV3 = "Creating"
+	VolumeStatusV3ATTACHING          VolumeStatusV3 = "Attaching"
+	VolumeStatusV3ERROR              VolumeStatusV3 = "Error"
+	VolumeStatusV3Recycled           VolumeStatusV3 = "Recycled"
+)
+
 type VolumeType string
 
 const (
 	VolumeTypeSYSTEM    VolumeType = "System"
 	VolumeTypeEPHEMERAL VolumeType = "Ephemeral"
 	VolumeTypeCDS       VolumeType = "Cds"
+)
+
+type VolumeTypeV3 string
+
+const (
+	VolumeTypeV3SYSTEM VolumeTypeV3 = "SYSTEM"
+	VolumeTypeV3DATA   VolumeTypeV3 = "DATA"
 )
 
 type RenameCSDVolumeArgs struct {
@@ -457,6 +605,14 @@ type ListCDSVolumeResult struct {
 	Volumes     []VolumeModel `json:"volumes"`
 }
 
+type ListCDSVolumeResultV3 struct {
+	Marker      string          `json:"marker"`
+	IsTruncated bool            `json:"isTruncated"`
+	NextMarker  string          `json:"nextMarker"`
+	MaxKeys     int             `json:"maxKeys"`
+	Volumes     []VolumeModelV3 `json:"volumes"`
+}
+
 type VolumeModel struct {
 	Type               VolumeType               `json:"type"`
 	StorageType        StorageType              `json:"storageType"`
@@ -477,6 +633,35 @@ type VolumeModel struct {
 	SnapshotNum        string                   `json:"snapshotNum"`
 	Tags               []model.TagModel         `json:"tags"`
 	Encrypted          bool                     `json:"encrypted"`
+}
+
+type VolumeModelV3 struct {
+	Id                   string                   `json:"volumeId"`
+	Name                 string                   `json:"volumeName"`
+	VolumeSizeInGB       int                      `json:"volumeSizeInGB"`
+	VolumeStatus         VolumeStatusV3           `json:"volumeStatus"`
+	VolumeType           VolumeTypeV3             `json:"volumeType"`
+	StorageType          StorageTypeV3            `json:"storageType"`
+	CreateTime           string                   `json:"createTime"`
+	ExpireTime           string                   `json:"expireTime"`
+	Desc                 string                   `json:"description"`
+	PaymentTiming        string                   `json:"paymentTiming"`
+	EnableAutoRenew      bool                     `json:"enableAutoRenew"`
+	AutoRenewTime        int                      `json:"autoRenewTime"`
+	ZoneName             string                   `json:"zoneName"`
+	SourceSnapshotId     string                   `json:"sourceSnapshotId"`
+	Region               string                   `json:"region"`
+	SnapshotCount        int                      `json:"snapshotCount"`
+	AutoSnapshotPolicyId string                   `json:"autoSnapshotPolicyId"`
+	Encrypted            bool                     `json:"encrypted"`
+	Tags                 []model.TagModel         `json:"tags"`
+	Attachments          []VolumeAttachmentsModel `json:"volumeAttachments"`
+}
+
+type VolumeAttachmentsModel struct {
+	InstanceId string `json:"instanceId"`
+	Device     string `json:"device"`
+	AttachTime string `json:"attachTime"`
 }
 
 type VolumeAttachmentModel struct {
@@ -503,12 +688,30 @@ type CreateCDSVolumeArgs struct {
 	ClientToken   string      `json:"-"`
 }
 
+type CreateCDSVolumeV3Args struct {
+	VolumeName           string        `json:"volumeName,omitempty"`
+	Description          string        `json:"description,omitempty"`
+	SnapshotId           string        `json:"snapshotId,omitempty"`
+	ZoneName             string        `json:"zoneName,omitempty"`
+	PurchaseCount        int           `json:"purchaseCount,omitempty"`
+	VolumeSizeInGB       int           `json:"volumeSizeInGB,omitempty"`
+	StorageType          StorageTypeV3 `json:"storageType,omitempty"`
+	Billing              *Billing      `json:"billing"`
+	EncryptKey           string        `json:"encryptKey"`
+	AutoSnapshotPolicyId string        `json:"autoSnapshotPolicyId"`
+	ClientToken          string        `json:"-"`
+}
+
 type CreateCDSVolumeResult struct {
 	VolumeIds []string `json:"volumeIds"`
 }
 
 type GetVolumeDetailResult struct {
 	Volume *VolumeModel `json:"volume"`
+}
+
+type GetVolumeDetailResultV3 struct {
+	Volume *VolumeModelV3 `json:"volume"`
 }
 
 type GetAvailableDiskInfoResult struct {
@@ -936,15 +1139,21 @@ type DeploySetResult struct {
 }
 
 type AzIntstanceStatisDetail struct {
-	ZoneName    string   `json:"zoneName"`
-	Count       int      `json:"instanceCount"`
-	Total       int      `json:"instanceTotal"`
-	InstanceIds []string `json:"instanceIds"`
+	ZoneName       string   `json:"zoneName"`
+	Count          int      `json:"instanceCount"`
+	BccCount       int      `json:"bccInstanceCnt"`
+	BbcCount       int      `json:"bbcInstanceCnt"`
+	Total          int      `json:"instanceTotal"`
+	InstanceIds    []string `json:"instanceIds"`
+	BccInstanceIds []string `json:"bccInstanceIds"`
+	BbcInstanceIds []string `json:"bbcInstanceIds"`
 }
 
 type AzIntstanceStatis struct {
 	ZoneName string `json:"zoneName"`
 	Count    int    `json:"instanceCount"`
+	BbcCount int    `json:"bbcInstanceCnt"`
+	BccCount int    `json:"bccInstanceCnt"`
 	Total    int    `json:"instanceTotal"`
 }
 
@@ -1152,7 +1361,7 @@ type BccCreateAutoRenewArgs struct {
 }
 
 type BccDeleteAutoRenewArgs struct {
-	InstanceId    string `json:"instanceId"`
+	InstanceId string `json:"instanceId"`
 }
 
 type DeleteInstanceIngorePaymentArgs struct {
@@ -1172,5 +1381,13 @@ type DeleteInstanceModel struct {
 
 type DeleteInstanceResult struct {
 	SuccessResources *DeleteInstanceModel `json:"successResources"`
-	FailResources *DeleteInstanceModel `json:"failResources"`
+	FailResources    *DeleteInstanceModel `json:"failResources"`
+}
+
+type RecoveryInstanceArgs struct {
+	InstanceIds []RecoveryInstanceModel `json:"instanceIds"`
+}
+
+type RecoveryInstanceModel struct {
+	InstanceId string `json:"instanceId"`
 }

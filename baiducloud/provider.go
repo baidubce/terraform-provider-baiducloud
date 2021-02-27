@@ -107,6 +107,14 @@ CCE Resources
 CCEv2 Resources
   baiducloud_ccev2_cluster
   baiducloud_ccev2_instance_group
+
+IAM Resources
+  baiducloud_iam_user
+  baiducloud_iam_group
+  baiducloud_iam_group_membership
+  baiducloud_iam_policy
+  baiducloud_iam_user_policy_attachment
+  baiducloud_iam_group_policy_attachment
 */
 package baiducloud
 
@@ -196,41 +204,47 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			"baiducloud_instance":              resourceBaiduCloudInstance(),
-			"baiducloud_cds":                   resourceBaiduCloudCDS(),
-			"baiducloud_cds_attachment":        resourceBaiduCloudCDSAttachment(),
-			"baiducloud_snapshot":              resourceBaiduCloudSnapshot(),
-			"baiducloud_auto_snapshot_policy":  resourceBaiduCloudAutoSnapshotPolicy(),
-			"baiducloud_vpc":                   resourceBaiduCloudVpc(),
-			"baiducloud_subnet":                resourceBaiduCloudSubnet(),
-			"baiducloud_route_rule":            resourceBaiduCloudRouteRule(),
-			"baiducloud_security_group":        resourceBaiduCloudSecurityGroup(),
-			"baiducloud_security_group_rule":   resourceBaiduCloudSecurityGroupRule(),
-			"baiducloud_eip":                   resourceBaiduCloudEip(),
-			"baiducloud_eip_association":       resourceBaiduCloudEipAssociation(),
-			"baiducloud_acl":                   resourceBaiduCloudAcl(),
-			"baiducloud_nat_gateway":           resourceBaiduCloudNatGateway(),
-			"baiducloud_appblb":                resourceBaiduCloudAppBLB(),
-			"baiducloud_peer_conn":             resourceBaiduCloudPeerConn(),
-			"baiducloud_peer_conn_acceptor":    resourceBaiduCloudPeerConnAcceptor(),
-			"baiducloud_appblb_server_group":   resourceBaiduCloudAppBlbServerGroup(),
-			"baiducloud_appblb_listener":       resourceBaiduCloudAppBlbListener(),
-			"baiducloud_bos_bucket":            resourceBaiduCloudBosBucket(),
-			"baiducloud_bos_bucket_object":     resourceBaiduCloudBucketObject(),
-			"baiducloud_cert":                  resourceBaiduCloudCert(),
-			"baiducloud_cfc_function":          resourceBaiduCloudCFCFunction(),
-			"baiducloud_cfc_alias":             resourceBaiduCloudCFCAlias(),
-			"baiducloud_cfc_version":           resourceBaiduCloudCFCVersion(),
-			"baiducloud_cfc_trigger":           resourceBaiduCloudCFCTrigger(),
-			"baiducloud_scs":                   resourceBaiduCloudScs(),
-			"baiducloud_cce_cluster":           resourceBaiduCloudCCECluster(),
-			"baiducloud_ccev2_cluster":         resourceBaiduCloudCCEv2Cluster(),
-			"baiducloud_ccev2_instance":        resourceBaiduCloudCCEv2Instance(),
-			"baiducloud_ccev2_instance_group":  resourceBaiduCloudCCEv2InstanceGroup(),
-			"baiducloud_rds_instance":          resourceBaiduCloudRdsInstance(),
-			"baiducloud_rds_readonly_instance": resourceBaiduCloudRdsReadOnlyInstance(),
-			"baiducloud_rds_account":           resourceBaiduCloudRdsAccount(),
-			"baiducloud_dts":                   resourceBaiduCloudDts(),
+			"baiducloud_instance":                    resourceBaiduCloudInstance(),
+			"baiducloud_cds":                         resourceBaiduCloudCDS(),
+			"baiducloud_cds_attachment":              resourceBaiduCloudCDSAttachment(),
+			"baiducloud_snapshot":                    resourceBaiduCloudSnapshot(),
+			"baiducloud_auto_snapshot_policy":        resourceBaiduCloudAutoSnapshotPolicy(),
+			"baiducloud_vpc":                         resourceBaiduCloudVpc(),
+			"baiducloud_subnet":                      resourceBaiduCloudSubnet(),
+			"baiducloud_route_rule":                  resourceBaiduCloudRouteRule(),
+			"baiducloud_security_group":              resourceBaiduCloudSecurityGroup(),
+			"baiducloud_security_group_rule":         resourceBaiduCloudSecurityGroupRule(),
+			"baiducloud_eip":                         resourceBaiduCloudEip(),
+			"baiducloud_eip_association":             resourceBaiduCloudEipAssociation(),
+			"baiducloud_acl":                         resourceBaiduCloudAcl(),
+			"baiducloud_nat_gateway":                 resourceBaiduCloudNatGateway(),
+			"baiducloud_appblb":                      resourceBaiduCloudAppBLB(),
+			"baiducloud_peer_conn":                   resourceBaiduCloudPeerConn(),
+			"baiducloud_peer_conn_acceptor":          resourceBaiduCloudPeerConnAcceptor(),
+			"baiducloud_appblb_server_group":         resourceBaiduCloudAppBlbServerGroup(),
+			"baiducloud_appblb_listener":             resourceBaiduCloudAppBlbListener(),
+			"baiducloud_bos_bucket":                  resourceBaiduCloudBosBucket(),
+			"baiducloud_bos_bucket_object":           resourceBaiduCloudBucketObject(),
+			"baiducloud_cert":                        resourceBaiduCloudCert(),
+			"baiducloud_cfc_function":                resourceBaiduCloudCFCFunction(),
+			"baiducloud_cfc_alias":                   resourceBaiduCloudCFCAlias(),
+			"baiducloud_cfc_version":                 resourceBaiduCloudCFCVersion(),
+			"baiducloud_cfc_trigger":                 resourceBaiduCloudCFCTrigger(),
+			"baiducloud_scs":                         resourceBaiduCloudScs(),
+			"baiducloud_cce_cluster":                 resourceBaiduCloudCCECluster(),
+			"baiducloud_ccev2_cluster":               resourceBaiduCloudCCEv2Cluster(),
+			"baiducloud_ccev2_instance":              resourceBaiduCloudCCEv2Instance(),
+			"baiducloud_ccev2_instance_group":        resourceBaiduCloudCCEv2InstanceGroup(),
+			"baiducloud_rds_instance":                resourceBaiduCloudRdsInstance(),
+			"baiducloud_rds_readonly_instance":       resourceBaiduCloudRdsReadOnlyInstance(),
+			"baiducloud_rds_account":                 resourceBaiduCloudRdsAccount(),
+			"baiducloud_dts":                         resourceBaiduCloudDts(),
+			"baiducloud_iam_user":                    resourceBaiduCloudIamUser(),
+			"baiducloud_iam_group":                   resourceBaiduCloudIamGroup(),
+			"baiducloud_iam_group_membership":        resourceBaiduCloudIamGroupMembership(),
+			"baiducloud_iam_policy":                  resourceBaiduCloudIamPolicy(),
+			"baiducloud_iam_user_policy_attachment":  resourceBaiduCloudIamUserPolicyAttachment(),
+			"baiducloud_iam_group_policy_attachment": resourceBaiduCloudIamGroupPolicyAttachment(),
 		},
 
 		ConfigureFunc: providerConfigure,

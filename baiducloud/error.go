@@ -28,6 +28,7 @@ type ErrorSource string
 
 const (
 	// common error
+	NotFound                  = "NotFound"
 	ResourceNotFound          = "ResourceNotfound"
 	ResourceNotFound2         = "ResourceNotFound"
 	ResourceNotFoundException = "ResourceNotFoundException"
@@ -81,7 +82,7 @@ var (
 )
 
 var NotFoundErrorList = []string{
-	ResourceNotFoundException, ResourceNotFound, ResourceNotFound2, InstanceNotFound,
+	NotFound, ResourceNotFoundException, ResourceNotFound, ResourceNotFound2, InstanceNotFound,
 	"NoSuchObject", "NoSuchNat", EipNotFound, InstanceNotExist, CceNotFound,
 	Ccev2ClusterNotFound, Ccev2InstanceGroupNotFound, Ccev2InstanceNotFound,
 }

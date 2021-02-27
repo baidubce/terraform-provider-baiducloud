@@ -24,6 +24,7 @@ const (
 	SCSCode    = ServiceCode("SCS")
 	RDSCode    = ServiceCode("RDS")
 	DTSCode    = ServiceCode("DTS")
+	IAMCode    = ServiceCode("IAM")
 )
 
 const (
@@ -65,6 +66,7 @@ const (
 	DefaultFWHRegionRdsEndPoint = "rds.fwh.baidubce.com"
 
 	DefaultCERTEndPoint = "certificate.baidubce.com"
+	DefaultIAMEndPoint  = "iam.bj.baidubce.com"
 )
 
 var (
@@ -90,6 +92,7 @@ var (
 		SCSCode:    DefaultBJRegionScsEndPoint,
 		RDSCode:    DefaultBJRegionRdsEndPoint,
 		DTSCode:    DefaultBJRegionDtsEndPoint,
+		IAMCode:    DefaultIAMEndPoint,
 	}
 
 	// Region GZ Service Endpoints
@@ -105,6 +108,7 @@ var (
 		CCEv2Code:  DefaultGZRegionCceEndPoint,
 		SCSCode:    DefaultGZRegionScsEndPoint,
 		RDSCode:    DefaultGZRegionRdsEndPoint,
+		IAMCode:    DefaultIAMEndPoint,
 	}
 
 	// Region SU Service Endpoints
@@ -120,6 +124,7 @@ var (
 		CCEv2Code:  DefaultSURegionCceEndPoint,
 		SCSCode:    DefaultSURegionScsEndPoint,
 		RDSCode:    DefaultSURegionRdsEndPoint,
+		IAMCode:    DefaultIAMEndPoint,
 	}
 
 	// Region FWH Service Endpoints
@@ -135,6 +140,7 @@ var (
 		CCEv2Code:  DefaultFWHRegionCceEndPoint,
 		SCSCode:    DefaultFWHRegionScsEndPoint,
 		RDSCode:    DefaultFWHRegionRdsEndPoint,
+		IAMCode:    DefaultIAMEndPoint,
 	}
 )
 

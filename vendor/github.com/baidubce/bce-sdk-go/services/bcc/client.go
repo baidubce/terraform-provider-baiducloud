@@ -129,6 +129,17 @@ func (c *Client) ListInstances(args *api.ListInstanceArgs) (*api.ListInstanceRes
 	return api.ListInstances(c, args)
 }
 
+// ListRecycleInstances - list all instance in the recycle bin with the specific parameters
+//
+// PARAMS:
+//     - args: the arguments to list all instance in the recycle bin
+// RETURNS:
+//     - *api.ListRecycleInstanceResult: the result of list Instance in the recycle bin
+//     - error: nil if success otherwise the specific error
+func (c *Client) ListRecycleInstances(args *api.ListRecycleInstanceArgs) (*api.ListRecycleInstanceResult, error) {
+	return api.ListRecycleInstances(c, args)
+}
+
 // GetInstanceDetail - get a specific instance detail info
 //
 // PARAMS:
@@ -143,6 +154,12 @@ func (c *Client) GetInstanceDetail(instanceId string) (*api.GetInstanceDetailRes
 func (c *Client) GetInstanceDetailWithDeploySet(instanceId string, isDeploySet bool) (*api.GetInstanceDetailResult,
 	error) {
 	return api.GetInstanceDetailWithDeploySet(c, instanceId, isDeploySet)
+}
+
+func (c *Client) GetInstanceDetailWithDeploySetAndFailed(instanceId string,
+	isDeploySet bool, containsFailed bool) (*api.GetInstanceDetailResult,
+	error) {
+	return api.GetInstanceDetailWithDeploySetAndFailed(c, instanceId, isDeploySet, containsFailed)
 }
 
 // DeleteInstance - delete a specific instance
@@ -283,6 +300,19 @@ func (c *Client) RebootInstance(instanceId string, forceStop bool) error {
 	return api.RebootInstance(c, instanceId, body)
 }
 
+func (c *Client) RecoveryInstance(args *api.RecoveryInstanceArgs) error {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return err
+	}
+
+	return api.RecoveryInstance(c, body)
+}
+
 // ChangeInstancePass - change an instance's password
 //
 // PARAMS:
@@ -347,6 +377,26 @@ func (c *Client) ModifyInstanceDesc(instanceId string, args *api.ModifyInstanceD
 	}
 
 	return api.ModifyInstanceDesc(c, instanceId, body)
+}
+
+// ModifyInstanceHostname - modify an instance's hostname
+//
+// PARAMS:
+//     - instanceId: the specific instance ID
+//     - args: the arguments of now instance's hostname
+// RETURNS:
+//     - error: nil if success otherwise the specific error
+func (c *Client) ModifyInstanceHostname(instanceId string, args *api.ModifyInstanceHostnameArgs) error {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return err
+	}
+
+	return api.ModifyInstanceHostname(c, instanceId, body)
 }
 
 // BindSecurityGroup - bind a security group to an instance
@@ -515,7 +565,7 @@ func (c *Client) BatchAddIP(args *api.BatchAddIpArgs) (*api.BatchAddIpResponse, 
 		return nil, err
 	}
 
-	return api.BatchAddIp(c, body)
+	return api.BatchAddIp(c,args, body)
 }
 
 // BatchDelIP - Delete ips of instance
@@ -533,7 +583,7 @@ func (c *Client) BatchDelIP(args *api.BatchDelIpArgs) error {
 	if err != nil {
 		return err
 	}
-	return api.BatchDelIp(c, body)
+	return api.BatchDelIp(c, args, body)
 }
 
 //cds sdk
@@ -548,6 +598,18 @@ func (c *Client) CreateCDSVolume(args *api.CreateCDSVolumeArgs) (*api.CreateCDSV
 	return api.CreateCDSVolume(c, args)
 }
 
+//cds sdk
+// CreateCDSVolumeV3 - create a CDS volume
+//
+// PARAMS:
+//     - args: the arguments to create CDS
+// RETURNS:
+//     - *api.CreateCDSVolumeResult: the result of create CDS volume, contains new volume ID
+//     - error: nil if success otherwise the specific error
+func (c *Client) CreateCDSVolumeV3(args *api.CreateCDSVolumeV3Args) (*api.CreateCDSVolumeResult, error) {
+	return api.CreateCDSVolumeV3(c, args)
+}
+
 // ListCDSVolume - list all cds volume with the specific parameters
 //
 // PARAMS:
@@ -559,6 +621,17 @@ func (c *Client) ListCDSVolume(queryArgs *api.ListCDSVolumeArgs) (*api.ListCDSVo
 	return api.ListCDSVolume(c, queryArgs)
 }
 
+// ListCDSVolumeV3 - list all cds volume with the specific parameters
+//
+// PARAMS:
+//     - args: the arguments to list all cds
+// RETURNS:
+//     - *api.ListCDSVolumeResultV3: the result of list all CDS volume
+//     - error: nil if success otherwise the specific error
+func (c *Client) ListCDSVolumeV3(queryArgs *api.ListCDSVolumeArgs) (*api.ListCDSVolumeResultV3, error) {
+	return api.ListCDSVolumeV3(c, queryArgs)
+}
+
 // GetCDSVolumeDetail - get a CDS volume's detail info
 //
 // PARAMS:
@@ -568,6 +641,17 @@ func (c *Client) ListCDSVolume(queryArgs *api.ListCDSVolumeArgs) (*api.ListCDSVo
 //     - error: nil if success otherwise the specific error
 func (c *Client) GetCDSVolumeDetail(volumeId string) (*api.GetVolumeDetailResult, error) {
 	return api.GetCDSVolumeDetail(c, volumeId)
+}
+
+// GetCDSVolumeDetailV3 - get a CDS volume's detail info
+//
+// PARAMS:
+//     - volumeId: the specific CDS volume ID
+// RETURNS:
+//     - *api.GetVolumeDetailResultV3: the result of get a specific CDS volume's info
+//     - error: nil if success otherwise the specific error
+func (c *Client) GetCDSVolumeDetailV3(volumeId string) (*api.GetVolumeDetailResultV3, error) {
+	return api.GetCDSVolumeDetailV3(c, volumeId)
 }
 
 // AttachCDSVolume - attach a CDS volume to an instance
@@ -1334,6 +1418,15 @@ func (c *Client) RenameKeypair(args *api.RenameKeypairArgs) error {
 
 func (c *Client) UpdateKeypairDescription(args *api.KeypairUpdateDescArgs) error {
 	return api.UpdateKeypairDescription(c, args)
+}
+
+// GetAllStocks - get the bcc and bbc's stock
+//
+// RETURNS:
+//     - *GetAllStocksResult: the result of the bcc and bbc's stock
+//     - error: nil if success otherwise the specific error
+func (c *Client) GetAllStocks() (*api.GetAllStocksResult, error) {
+	return api.GetAllStocks(c)
 }
 
 func (c *Client) GetInstanceCreateStock(args *api.CreateInstanceStockArgs) (*api.InstanceStockResult, error) {

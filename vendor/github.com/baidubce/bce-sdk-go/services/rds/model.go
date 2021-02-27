@@ -16,24 +16,28 @@
 
 package rds
 
-import "github.com/baidubce/bce-sdk-go/model"
+import (
+	"github.com/baidubce/bce-sdk-go/model"
+)
 
 type CreateRdsArgs struct {
-	ClientToken    string           `json:"-"`
-	Billing        Billing          `json:"billing"`
-	PurchaseCount  int              `json:"purchaseCount,omitempty"`
-	InstanceName   string           `json:"instanceName,omitempty"`
-	Engine         string           `json:"engine"`
-	EngineVersion  string           `json:"engineVersion"`
-	Category       string           `json:"category,omitempty"`
-	CpuCount       int              `json:"cpuCount"`
-	MemoryCapacity float64          `json:"memoryCapacity"`
-	VolumeCapacity int              `json:"volumeCapacity"`
-	ZoneNames      []string         `json:"zoneNames,omitempty"`
-	VpcId          string           `json:"vpcId,omitempty"`
-	IsDirectPay    bool             `json:"isDirectPay,omitempty"`
-	Subnets        []SubnetMap      `json:"subnets,omitempty"`
-	Tags           []model.TagModel `json:"tags,omitempty"`
+	ClientToken       string           `json:"-"`
+	Billing           Billing          `json:"billing"`
+	PurchaseCount     int              `json:"purchaseCount,omitempty"`
+	InstanceName      string           `json:"instanceName,omitempty"`
+	Engine            string           `json:"engine"`
+	EngineVersion     string           `json:"engineVersion"`
+	Category          string           `json:"category,omitempty"`
+	CpuCount          int              `json:"cpuCount"`
+	MemoryCapacity    float64          `json:"memoryCapacity"`
+	VolumeCapacity    int              `json:"volumeCapacity"`
+	ZoneNames         []string         `json:"zoneNames,omitempty"`
+	VpcId             string           `json:"vpcId,omitempty"`
+	IsDirectPay       bool             `json:"isDirectPay,omitempty"`
+	Subnets           []SubnetMap      `json:"subnets,omitempty"`
+	Tags              []model.TagModel `json:"tags,omitempty"`
+	AutoRenewTimeUnit string           `json:"autoRenewTimeUnit,omitempty"`
+	AutoRenewTime     int              `json:"autoRenewTime,omitempty"`
 }
 
 type Billing struct {
@@ -115,6 +119,7 @@ type Instance struct {
 	VpcId              string       `json:"vpcId"`
 	Subnets            []Subnet     `json:"subnets"`
 	Topology           Topology     `json:"topology"`
+	Task               string       `json:"task"`
 	PaymentTiming      string       `json:"paymentTiming"`
 }
 
@@ -190,4 +195,91 @@ type Account struct {
 
 type ListAccountResult struct {
 	Accounts []Account `json:"accounts"`
+}
+
+type UpdateInstanceNameArgs struct {
+	InstanceName string `json:"instanceName"`
+}
+
+type ModifySyncModeArgs struct {
+	SyncMode string `json:"syncMode"`
+}
+
+type ModifyEndpointArgs struct {
+	Address string `json:"address"`
+}
+
+type ModifyPublicAccessArgs struct {
+	PublicAccess bool `json:"publicAccess"`
+}
+
+type GetBackupListArgs struct {
+	Marker  string
+	MaxKeys int
+}
+
+type GetBackupListResult struct {
+	Marker      string         `json:"marker"`
+	MaxKeys     int            `json:"maxKeys"`
+	IsTruncated bool           `json:"isTruncated"`
+	NextMarker  string         `json:"nextMarker"`
+	Backups     []BackupPolicy `json:"backups"`
+}
+
+type GetZoneListResult struct {
+	Zones []ZoneName `json:"zones"`
+}
+
+type ZoneName struct {
+	ZoneNames []string `json:"zoneNames"`
+}
+
+type ListSubnetsArgs struct {
+	VpcId    string `json:"vpcId"`
+	ZoneName string `json:"zoneName"`
+}
+
+type ListSubnetsResult struct {
+	Subnets []Subnet `json:"subnets"`
+}
+
+type GetSecurityIpsResult struct {
+	Etag        string   `json:"etag"`
+	SecurityIps []string `json:"securityIps"`
+}
+
+type UpdateSecurityIpsArgs struct {
+	SecurityIps []string `json:"securityIps"`
+}
+
+type ListParametersResult struct {
+	Etag       string      `json:"etag"`
+	Parameters []Parameter `json:"parameters"`
+}
+
+type Parameter struct {
+	Name          string `json:"name"`
+	DefaultValue  string `json:"defaultValue"`
+	Value         string `json:"value"`
+	PendingValue  string `json:"pendingValue"`
+	Type          string `json:"type"`
+	Dynamic       string `json:"dynamic"`
+	Modifiable    string `json:"modifiable"`
+	AllowedValues string `json:"allowedValues"`
+	Desc          string `json:"desc"`
+}
+
+type UpdateParameterArgs struct {
+	Parameters []KVParameter `json:"parameters"`
+}
+
+type KVParameter struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+type AutoRenewArgs struct {
+	InstanceIds       []string `json:"instanceIds"`
+	AutoRenewTimeUnit string   `json:"autoRenewTimeUnit"`
+	AutoRenewTime     int      `json:"autoRenewTime"`
 }

@@ -1,4 +1,13 @@
 ## 1.11.0 (Unreleased)
+
+FEATURES:
+* **New Resource:** `resource_baiducloud_iam_user`
+* **New Resource:** `resource_baiducloud_iam_group`
+* **New Resource:** `resource_baiducloud_iam_group_membership`
+* **New Resource:** `resource_baiducloud_iam_policy`
+* **New Resource:** `resource_baiducloud_iam_user_policy_attachment`
+* **New Resource:** `resource_baiducloud_iam_group_policy_attachment`
+
 ## 1.10.3 (November 30, 2020)
 
 BUG FIXES:

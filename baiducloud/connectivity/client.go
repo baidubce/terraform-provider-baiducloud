@@ -13,6 +13,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/cfc"
 	"github.com/baidubce/bce-sdk-go/services/dts"
 	"github.com/baidubce/bce-sdk-go/services/eip"
+	"github.com/baidubce/bce-sdk-go/services/iam"
 	"github.com/baidubce/bce-sdk-go/services/rds"
 	"github.com/baidubce/bce-sdk-go/services/scs"
 	"github.com/baidubce/bce-sdk-go/services/sts"
@@ -41,6 +42,7 @@ type BaiduClient struct {
 	ccev2Conn  *ccev2.Client
 	rdsConn    *rds.Client
 	dtsConn    *dts.Client
+	iamConn    *iam.Client
 }
 
 type ApiVersion string
@@ -339,4 +341,22 @@ func (client *BaiduClient) WithDtsClient(do func(*dts.Client) (interface{}, erro
 	}
 
 	return do(client.dtsConn)
+}
+
+func (client *BaiduClient) WithIamClient(do func(*iam.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the IAM client if necessary
+	if client.iamConn == nil {
+		client.WithCommonClient(IAMCode)
+		iamClient, err := iam.NewClientWithEndpoint(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey,
+			client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		client.iamConn = iamClient
+	}
+
+	return do(client.iamConn)
 }

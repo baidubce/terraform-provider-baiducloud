@@ -164,6 +164,7 @@ type Subnet struct {
 	VPCId       string           `json:"vpcId"`
 	SubnetType  SubnetType       `json:"subnetType"`
 	Description string           `json:"description"`
+	CreatedTime string           `json:"createdTime"`
 	AvailableIp int              `json:"availableIp"`
 	Tags        []model.TagModel `json:"tags"`
 }
@@ -177,14 +178,15 @@ type UpdateVPCArgs struct {
 
 // CreateSubnetArgs defines the structure of the input parameters for the CreateSubnet api
 type CreateSubnetArgs struct {
-	ClientToken string           `json:"-"`
-	Name        string           `json:"name"`
-	ZoneName    string           `json:"zoneName"`
-	Cidr        string           `json:"cidr"`
-	VpcId       string           `json:"vpcId"`
-	SubnetType  SubnetType       `json:"subnetType,omitempty"`
-	Description string           `json:"description,omitempty"`
-	Tags        []model.TagModel `json:"tags,omitempty"`
+	ClientToken      string           `json:"-"`
+	Name             string           `json:"name"`
+	ZoneName         string           `json:"zoneName"`
+	Cidr             string           `json:"cidr"`
+	VpcId            string           `json:"vpcId"`
+	VpcSecondaryCidr string           `json:"vpcSecondaryCidr,omitempty"`
+	SubnetType       SubnetType       `json:"subnetType,omitempty"`
+	Description      string           `json:"description,omitempty"`
+	Tags             []model.TagModel `json:"tags,omitempty"`
 }
 
 // CreateSubnetResult defines the structure of the output parameters for the CreateSubnet api
@@ -489,4 +491,29 @@ type RenewPeerConnArgs struct {
 type PeerConnSyncDNSArgs struct {
 	Role        PeerConnRoleType `json:"role"`
 	ClientToken string           `json:"-"`
+}
+
+/* Get VpcPrivateIpAddressedInfo args
+   VpcId:the vpc you want to query ips
+   PrivateIpAddresses:the privateIp list you want to query
+   PrivateIpRange:the range of privateIp .ex:"192.168.0.1-192.168.0.5"
+   pay attention that the size of PrivateIpAddresses and PrivateIpRange must less than 100
+   if both PrivateIpAddresses and PrivateIpRange ,the PrivateIpRange will effect
+*/
+type GetVpcPrivateIpArgs struct {
+	VpcId              string   `json:"vpcId"`
+	PrivateIpAddresses []string `json:"privateIpAddresses",omitempty`
+	PrivateIpRange     string   `json:"privateIpRange,omitempty"`
+}
+
+type VpcPrivateIpAddress struct {
+	PrivateIpAddress     string `json:"privateIpAddress"`
+	Cidr                 string `json:"cidr"`
+	PrivateIpAddressType string `json:"privateIpAddressType`
+	CreatedTime          string `json:"createdTime"`
+}
+
+// VpcPrivateIpAddressesResult defines the structure of the output parameters for the GetPrivateIpAddressInfo api
+type VpcPrivateIpAddressesResult struct {
+	VpcPrivateIpAddresses []VpcPrivateIpAddress `json:"vpcPrivateIpAddresses"`
 }
