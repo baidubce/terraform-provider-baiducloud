@@ -1,4 +1,8 @@
-## 1.12.0 (Unreleased)
+## 1.11.1 (Unreleased)
+
+BUG FIXES:
+- provider: Fix wrong argument verify when resize eip
+
 ## 1.11.0 (February 27, 2021)
 
 FEATURES:
@@ -12,7 +16,6 @@ FEATURES:
 ## 1.10.3 (November 30, 2020)
 
 BUG FIXES:
-
 - provider: Fix a bug that failed to create RDS read-only instance with self built VPC
 
 ## 1.10.2 (November 06, 2020)
