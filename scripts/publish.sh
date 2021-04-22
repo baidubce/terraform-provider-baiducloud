@@ -4,8 +4,8 @@ echo "Start publishing"
 echo "------------------"
 echo
 
-echo "cd $(pwd)"
 cd ..
+echo "cd $(pwd)"
 echo "------------------"
 echo
 
@@ -20,7 +20,9 @@ echo "------------------"
 echo
 
 echo "Generate documents..."
-go run gendocs/main.go gendocs/template.go
+cd gendocs
+go run main.go template.go
+cd ..
 echo "------------------"
 echo
 

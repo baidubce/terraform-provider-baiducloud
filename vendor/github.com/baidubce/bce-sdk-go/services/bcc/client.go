@@ -118,6 +118,35 @@ func (c *Client) CreateInstanceBySpec(args *api.CreateInstanceBySpecArgs) (*api.
 	return api.CreateInstanceBySpec(c, args, body)
 }
 
+// CreateInstanceV3 - create an instance with the specific parameters
+//
+// PARAMS:
+//     - args: the arguments to create instance
+// RETURNS:
+//     - *api.CreateInstanceV3Result: the result of create Instance, contains new Instance ID
+//     - error: nil if success otherwise the specific error
+func (c *Client) CreateInstanceV3(args *api.CreateInstanceV3Args) (*api.CreateInstanceV3Result, error) {
+	if len(args.Password) > 0 {
+		cryptedPass, err := api.Aes128EncryptUseSecreteKey(c.Config.Credentials.SecretAccessKey, args.Password)
+		if err != nil {
+			return nil, err
+		}
+
+		args.Password = cryptedPass
+	}
+
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return api.CreateInstanceV3(c, args, body)
+}
+
 // ListInstances - list all instance with the specific parameters
 //
 // PARAMS:
@@ -549,6 +578,25 @@ func (c *Client) InstanceChangeSubnet(args *api.InstanceChangeSubnetArgs) error 
 	return api.InstanceChangeSubnet(c, body)
 }
 
+// InstanceChangeVpc - change an instance's vpc
+//
+// PARAMS:
+//     - args: the arguments to change an instance's vpc
+// RETURNS:
+//     - error: nil if success otherwise the specific error
+func (c *Client) InstanceChangeVpc(args *api.InstanceChangeVpcArgs) error {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return err
+	}
+
+	return api.InstanceChangeVpc(c, body)
+}
+
 // BatchAddIP - Add ips to instance
 //
 // PARAMS:
@@ -565,7 +613,7 @@ func (c *Client) BatchAddIP(args *api.BatchAddIpArgs) (*api.BatchAddIpResponse, 
 		return nil, err
 	}
 
-	return api.BatchAddIp(c,args, body)
+	return api.BatchAddIp(c, args, body)
 }
 
 // BatchDelIP - Delete ips of instance
@@ -1184,6 +1232,42 @@ func (c *Client) DeleteDeploySet(deploySetId string) error {
 func (c *Client) GetDeploySet(deploySetId string) (*api.DeploySetResult, error) {
 	return api.GetDeploySet(c, deploySetId)
 }
+
+// UpdateInstanceDeploySet - update deployset and instance relation
+//
+// PARAMS:
+//     - args: the arguments to update deployset and instance relation
+// RETURNS:
+//     - error: nil if success otherwise the specific error
+//func (c *Client) UpdateInstanceDeploySet(args *api.UpdateInstanceDeployArgs) (error, error) {
+//	jsonBytes, jsonErr := json.Marshal(args)
+//	if jsonErr != nil {
+//		return nil, jsonErr
+//	}
+//	body, err := bce.NewBodyFromBytes(jsonBytes)
+//	if err != nil {
+//		return nil, err
+//	}
+//	return api.UpdateInstanceDeploy(c, args.ClientToken, body), nil
+//}
+
+// DelInstanceDeploySet - delete deployset and instance relation
+//
+// PARAMS:
+//     - args: the arguments to delete deployset and instance relation
+// RETURNS:
+//     - error: nil if success otherwise the specific error
+//func (c *Client) DelInstanceDeploySet(args *api.DelInstanceDeployArgs) (error, error) {
+//	jsonBytes, jsonErr := json.Marshal(args)
+//	if jsonErr != nil {
+//		return nil, jsonErr
+//	}
+//	body, err := bce.NewBodyFromBytes(jsonBytes)
+//	if err != nil {
+//		return nil, err
+//	}
+//	return api.DelInstanceDeploy(c, args.ClientToken, body), nil
+//}
 
 // ResizeInstanceBySpec - resize a specific instance
 //

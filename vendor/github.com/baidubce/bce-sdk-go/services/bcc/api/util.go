@@ -32,6 +32,8 @@ const (
 	REQUEST_BATCHADDIP_URI       = "/batchAddIp"
 	REQUEST_BATCHDELIP_URI       = "/batchDelIp"
 	REQUEST_CREATE_URI           = "/create"
+	REQUEST_UPDATE_URI           = "/updateRelation"
+	REQUEST_DEL_URI              = "/delRelation"
 	REQUEST_DEPLOYSET_URI        = "/deployset"
 	REQUEST_IMAGE_URI            = "/image"
 	REQUEST_IMAGE_SHAREDUSER_URI = "/sharedUsers"
@@ -43,6 +45,7 @@ const (
 	REQUEST_CHAIN_URI            = "/chain"
 	REQUEST_SPEC_URI             = "/instance/spec"
 	REQUEST_SUBNET_URI           = "/subnet"
+	REQUEST_VPC_URI              = "/vpc"
 	REQUEST_VNC_SUFFIX           = "/vnc"
 	REQUEST_VOLUME_URI           = "/volume"
 	REQUEST_ZONE_URI             = "/zone"
@@ -74,6 +77,10 @@ const (
 
 func getInstanceUri() string {
 	return URI_PREFIXV2 + REQUEST_INSTANCE_URI
+}
+
+func getInstanceUriV3() string {
+	return URI_PREFIXV3 + REQUEST_INSTANCE_URI
 }
 
 func getRecycleInstanceListUri() string {
@@ -214,6 +221,10 @@ func getInstanceTypeZoneUri() string {
 
 func getChangeSubnetUri() string {
 	return URI_PREFIXV2 + REQUEST_SUBNET_URI + "/changeSubnet"
+}
+
+func getChangeVpcUri() string {
+	return URI_PREFIXV2 + REQUEST_VPC_URI + "/changeVpc"
 }
 
 func getInstanceEniUri(instanceId string) string {

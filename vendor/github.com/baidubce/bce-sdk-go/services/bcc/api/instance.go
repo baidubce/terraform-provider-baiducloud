@@ -103,6 +103,45 @@ func CreateInstanceBySpec(cli bce.Client, args *CreateInstanceBySpecArgs, reqBod
 	return jsonBody, nil
 }
 
+// CreateInstanceV3 - create an instance with specified spec.
+//
+// PARAMS:
+//     - cli: the client agent which can perform sending request
+//     - reqBody: the request body to create instance
+// RETURNS:
+//     - *CreateInstanceV3Result: result of the instance ids newly created
+//     - error: nil if success otherwise the specific error
+func CreateInstanceV3(cli bce.Client, args *CreateInstanceV3Args, reqBody *bce.Body) (
+	*CreateInstanceV3Result, error) {
+	// Build the request
+	clientToken := args.ClientToken
+	requestToken := args.RequestToken
+	req := &bce.BceRequest{}
+	req.SetUri(getInstanceUriV3())
+	req.SetMethod(http.POST)
+	req.SetBody(reqBody)
+	req.SetHeader("x-request-token", requestToken)
+	if clientToken != "" {
+		req.SetParam("clientToken", clientToken)
+	}
+
+	// Send request and get response
+	resp := &bce.BceResponse{}
+	if err := cli.SendRequest(req, resp); err != nil {
+		return nil, err
+	}
+	if resp.IsFail() {
+		return nil, resp.ServiceError()
+	}
+
+	jsonBody := &CreateInstanceV3Result{}
+	if err := resp.ParseJsonBody(jsonBody); err != nil {
+		return nil, err
+	}
+
+	return jsonBody, nil
+}
+
 // ListInstances - list all instances with the specified parameters
 //
 // PARAMS:
@@ -799,6 +838,33 @@ func InstanceChangeSubnet(cli bce.Client, reqBody *bce.Body) error {
 	// Build the request
 	req := &bce.BceRequest{}
 	req.SetUri(getChangeSubnetUri())
+	req.SetMethod(http.PUT)
+	req.SetBody(reqBody)
+
+	// Send request and get response
+	resp := &bce.BceResponse{}
+	if err := cli.SendRequest(req, resp); err != nil {
+		return err
+	}
+	if resp.IsFail() {
+		return resp.ServiceError()
+	}
+
+	defer func() { resp.Body().Close() }()
+	return nil
+}
+
+// InstanceChangeVpc - change the vpc to which the instance belongs
+//
+// PARAMS:
+//     - cli: the client agent which can perform sending request
+//     - reqBody: request body to change vpc of instance
+// RETURNS:
+//     - error: nil if success otherwise the specific error
+func InstanceChangeVpc(cli bce.Client, reqBody *bce.Body) error {
+	// Build the request
+	req := &bce.BceRequest{}
+	req.SetUri(getChangeVpcUri())
 	req.SetMethod(http.PUT)
 	req.SetBody(reqBody)
 

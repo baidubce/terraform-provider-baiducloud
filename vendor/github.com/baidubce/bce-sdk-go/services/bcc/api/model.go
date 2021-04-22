@@ -23,16 +23,17 @@ import (
 type InstanceStatus string
 
 const (
-	InstanceStatusRunning            InstanceStatus = "Running"
-	InstanceStatusStarting           InstanceStatus = "Starting"
-	InstanceStatusStopping           InstanceStatus = "Stopping"
-	InstanceStatusStopped            InstanceStatus = "Stopped"
-	InstanceStatusDeleted            InstanceStatus = "Deleted"
-	InstanceStatusScaling            InstanceStatus = "Scaling"
-	InstanceStatusExpired            InstanceStatus = "Expired"
-	InstanceStatusError              InstanceStatus = "Error"
-	InstanceStatusSnapshotProcessing InstanceStatus = "SnapshotProcessing"
-	InstanceStatusImageProcessing    InstanceStatus = "ImageProcessing"
+	InstanceStatusRunning            	InstanceStatus = "Running"
+	InstanceStatusStarting           	InstanceStatus = "Starting"
+	InstanceStatusStopping           	InstanceStatus = "Stopping"
+	InstanceStatusStopped            	InstanceStatus = "Stopped"
+	InstanceStatusDeleted            	InstanceStatus = "Deleted"
+	InstanceStatusScaling            	InstanceStatus = "Scaling"
+	InstanceStatusExpired            	InstanceStatus = "Expired"
+	InstanceStatusError              	InstanceStatus = "Error"
+	InstanceStatusSnapshotProcessing 	InstanceStatus = "SnapshotProcessing"
+	InstanceStatusImageProcessing    	InstanceStatus = "ImageProcessing"
+	InstanceStatusChangeVpcProcessing   InstanceStatus = "ChangeVpc"
 )
 
 type InstanceType string
@@ -91,46 +92,57 @@ type PaymentTimingType string
 const (
 	PaymentTimingPrePaid  PaymentTimingType = "Prepaid"
 	PaymentTimingPostPaid PaymentTimingType = "Postpaid"
+	// v3
+	PaymentTimingSpotPaid PaymentTimingType = "Spotpaid"
 	PaymentTimingBidding  PaymentTimingType = "bidding"
 )
 
 // Instance define instance model
 type InstanceModel struct {
-	InstanceId            string           `json:"id"`
-	SerialNumber          string           `json:"serialNumber"`
-	InstanceName          string           `json:"name"`
-	Hostname              string           `json:"hostname"`
-	InstanceType          InstanceType     `json:"instanceType"`
-	Description           string           `json:"desc"`
-	Status                InstanceStatus   `json:"status"`
-	PaymentTiming         string           `json:"paymentTiming"`
-	CreationTime          string           `json:"createTime"`
-	ExpireTime            string           `json:"expireTime"`
-	PublicIP              string           `json:"publicIp"`
-	InternalIP            string           `json:"internalIp"`
-	CpuCount              int              `json:"cpuCount"`
-	GpuCard               string           `json:"gpuCard"`
-	FpgaCard              string           `json:"fpgaCard"`
-	CardCount             string           `json:"cardCount"`
-	MemoryCapacityInGB    int              `json:"memoryCapacityInGB"`
-	LocalDiskSizeInGB     int              `json:"localDiskSizeInGB"`
-	ImageId               string           `json:"imageId"`
-	NetworkCapacityInMbps int              `json:"networkCapacityInMbps"`
-	PlacementPolicy       string           `json:"placementPolicy"`
-	ZoneName              string           `json:"zoneName"`
-	SubnetId              string           `json:"subnetId"`
-	VpcId                 string           `json:"vpcId"`
-	AutoRenew             bool             `json:"autoRenew"`
-	KeypairId             string           `json:"keypairId"`
-	KeypairName           string           `json:"keypairName"`
-	DedicatedHostId       string           `json:"dedicatedHostId"`
-	Tags                  []model.TagModel `json:"tags"`
-	Ipv6                  string           `json:"ipv6"`
-	SwitchId              string           `json:"switchId"`
-	HostId                string           `json:"hostId"`
-	DeploysetId           string           `json:"deploysetId"`
-	RackId                string           `json:"rackId"`
-	NicInfo               NicInfo          `json:"nicInfo"`
+	InstanceId            string                 `json:"id"`
+	SerialNumber          string                 `json:"serialNumber"`
+	InstanceName          string                 `json:"name"`
+	Hostname              string                 `json:"hostname"`
+	InstanceType          InstanceType           `json:"instanceType"`
+	Description           string                 `json:"desc"`
+	Status                InstanceStatus         `json:"status"`
+	PaymentTiming         string                 `json:"paymentTiming"`
+	CreationTime          string                 `json:"createTime"`
+	ExpireTime            string                 `json:"expireTime"`
+	PublicIP              string                 `json:"publicIp"`
+	InternalIP            string                 `json:"internalIp"`
+	CpuCount              int                    `json:"cpuCount"`
+	GpuCard               string                 `json:"gpuCard"`
+	FpgaCard              string                 `json:"fpgaCard"`
+	CardCount             string                 `json:"cardCount"`
+	MemoryCapacityInGB    int                    `json:"memoryCapacityInGB"`
+	LocalDiskSizeInGB     int                    `json:"localDiskSizeInGB"`
+	ImageId               string                 `json:"imageId"`
+	NetworkCapacityInMbps int                    `json:"networkCapacityInMbps"`
+	PlacementPolicy       string                 `json:"placementPolicy"`
+	ZoneName              string                 `json:"zoneName"`
+	SubnetId              string                 `json:"subnetId"`
+	VpcId                 string                 `json:"vpcId"`
+	AutoRenew             bool                   `json:"autoRenew"`
+	KeypairId             string                 `json:"keypairId"`
+	KeypairName           string                 `json:"keypairName"`
+	DedicatedHostId       string                 `json:"dedicatedHostId"`
+	Tags                  []model.TagModel       `json:"tags"`
+	Ipv6                  string                 `json:"ipv6"`
+	SwitchId              string                 `json:"switchId"`
+	HostId                string                 `json:"hostId"`
+	DeploysetId           string                 `json:"deploysetId"`
+	RackId                string                 `json:"rackId"`
+	NicInfo               NicInfo                `json:"nicInfo"`
+	DeploySetList         []DeploySetSimpleModel `json:"deploysetList"`
+}
+
+type DeploySetSimpleModel struct {
+	Strategy    string `json:"strategy"`
+	Name        string `json:"name"`
+	Desc        string `json:"desc"`
+	DeploySetId string `json:"deploysetId"`
+	Concurrency int    `json:"concurrency"`
 }
 
 type GetAllStocksResult struct {
@@ -202,10 +214,22 @@ type EphemeralDisk struct {
 	FreeSizeInGB int         `json:"freeSizeInGB"`
 }
 
+type EphemeralDiskV3 struct {
+	StorageType  StorageTypeV3 `json:"storageType"`
+	SizeInGB     int           `json:"sizeInGB"`
+	FreeSizeInGB int           `json:"freeSizeInGB"`
+}
+
 type CreateCdsModel struct {
 	CdsSizeInGB int         `json:"cdsSizeInGB"`
 	StorageType StorageType `json:"storageType"`
 	SnapShotId  string      `json:"snapshotId,omitempty"`
+}
+
+type CreateCdsModelV3 struct {
+	CdsSizeInGB int           `json:"cdsSizeInGB"`
+	StorageType StorageTypeV3 `json:"storageType"`
+	SnapShotId  string        `json:"snapshotId,omitempty"`
 }
 
 type DiskInfo struct {
@@ -258,6 +282,7 @@ type CreateInstanceArgs struct {
 	InternalIps           []string         `json:"internalIps,omitempty"`
 	ClientToken           string           `json:"-"`
 	RequestToken          string           `json:"requestToken"`
+	DeployIdList          []string         `json:"deployIdList"`
 }
 
 type CreateInstanceStockArgs struct {
@@ -341,7 +366,74 @@ type CreateInstanceBySpecArgs struct {
 	DeployId              string           `json:"deployId,omitempty"`
 	ClientToken           string           `json:"-"`
 	RequestToken          string           `json:"requestToken"`
+	DeployIdList          []string         `json:"deployIdList"`
 }
+
+type CreateInstanceV3Args struct {
+	InstanceSpec          string                `json:"instanceSpec,omitempty"`
+	SystemVolume          SystemVolume          `json:"systemVolume,omitempty"`
+	DataVolumes           []DataVolume          `json:"dataVolumes,omitempty"`
+	PurchaseCount         int                   `json:"purchaseCount,omitempty"`
+	InstanceName          string                `json:"instanceName,omitempty"`
+	HostName              string                `json:"hostName,omitempty"`
+	AutoSeqSuffix         bool                  `json:"autoSeqSuffix,omitempty"`
+	HostNameDomain        bool                  `json:"hostNameDomain,omitempty"`
+	Password              string                `json:"password,omitempty"`
+	Billing               Billing               `json:"billing"`
+	ZoneName              string                `json:"zoneName,omitempty"`
+	SubnetId              string                `json:"subnetId,omitempty"`
+	SecurityGroupIds      []string              `json:"securityGroupIds,omitempty"`
+	AssociatedResourceTag bool                  `json:"associatedResourceTag,omitempty"`
+	Tags                  []model.TagModel      `json:"tags,omitempty"`
+	KeypairId             string                `json:"keypairId,omitempty"`
+	AutoRenewTime         int                   `json:"autoRenewTime,omitempty"`
+	CdsAutoRenew          bool                  `json:"cdsAutoRenew,omitempty"`
+	AutoSnapshotPolicyId  string                `json:"autoSnapshotPolicyId,omitempty"`
+	PrivateIpAddresses    []string              `json:"privateIpAddresses,omitempty"`
+	DeploymentSetId       string                `json:"deploymentSetId,omitempty"`
+	ImageId               string                `json:"imageId,omitempty"`
+	UserData              string                `json:"userData,omitempty"`
+	InstanceMarketOptions InstanceMarketOptions `json:"instanceMarketOptions,omitempty"`
+	Ipv6                  bool                  `json:"ipv6,omitempty"`
+	DedicatedHostId       string                `json:"dedicatedHostId,omitempty"`
+	InternetAccessible    InternetAccessible    `json:"internetAccessible,omitempty"`
+	ClientToken           string                `json:"-"`
+	RequestToken          string                `json:"requestToken"`
+}
+
+type CreateInstanceV3Result struct {
+	InstanceIds []string `json:"instanceIds"`
+}
+
+type SystemVolume struct {
+	StorageType StorageTypeV3 `json:"storageType,omitempty"`
+	VolumeSize  int           `json:"volumeSize,omitempty"`
+}
+
+type DataVolume struct {
+	StorageType StorageTypeV3 `json:"storageType,omitempty"`
+	VolumeSize  int           `json:"volumeSize,omitempty"`
+	SnapshotId  string        `json:"snapshotId,omitempty"`
+	EncryptKey  string        `json:"encryptKey,omitempty"`
+}
+
+type InstanceMarketOptions struct {
+	SpotOption string `json:"spotOption,omitempty"`
+	SpotPrice  string `json:"spotPrice,omitempty"`
+}
+
+type InternetAccessible struct {
+	InternetMaxBandwidthOut int                `json:"internetMaxBandwidthOut,omitempty"`
+	InternetChargeType      InternetChargeType `json:"internetChargeType,omitempty"`
+}
+
+type InternetChargeType string
+
+const (
+	BandwidthPrepaid        InternetChargeType = "BANDWIDTH_PREPAID"
+	TrafficPostpaidByHour   InternetChargeType = "TRAFFIC_POSTPAID_BY_HOUR"
+	BandwidthPostpaidByHour InternetChargeType = "BANDWIDTH_POSTPAID_BY_HOUR"
+)
 
 type CreateInstanceBySpecResult struct {
 	InstanceIds []string `json:"instanceIds"`
@@ -493,6 +585,12 @@ type DeleteInstanceWithRelateResourceArgs struct {
 	BccRecycleFlag        bool `json:"bccRecycleFlag"`
 }
 
+type InstanceChangeVpcArgs struct {
+	InstanceId string `json:"instanceId"`
+	SubnetId   string `json:"subnetId"`
+	Reboot     bool   `json:"reboot"`
+}
+
 type InstanceChangeSubnetArgs struct {
 	InstanceId string `json:"instanceId"`
 	SubnetId   string `json:"subnetId"`
@@ -638,7 +736,7 @@ type VolumeModel struct {
 type VolumeModelV3 struct {
 	Id                   string                   `json:"volumeId"`
 	Name                 string                   `json:"volumeName"`
-	VolumeSizeInGB       int                      `json:"volumeSizeInGB"`
+	VolumeSize           int                      `json:"volumeSizeInGB"`
 	VolumeStatus         VolumeStatusV3           `json:"volumeStatus"`
 	VolumeType           VolumeTypeV3             `json:"volumeType"`
 	StorageType          StorageTypeV3            `json:"storageType"`
@@ -694,7 +792,7 @@ type CreateCDSVolumeV3Args struct {
 	SnapshotId           string        `json:"snapshotId,omitempty"`
 	ZoneName             string        `json:"zoneName,omitempty"`
 	PurchaseCount        int           `json:"purchaseCount,omitempty"`
-	VolumeSizeInGB       int           `json:"volumeSizeInGB,omitempty"`
+	VolumeSize           int           `json:"volumeSizeInGB,omitempty"`
 	StorageType          StorageTypeV3 `json:"storageType,omitempty"`
 	Billing              *Billing      `json:"billing"`
 	EncryptKey           string        `json:"encryptKey"`
@@ -1136,6 +1234,18 @@ type DeploySetResult struct {
 	DeploySetId  string                    `json:"shortId"`
 	Concurrency  int                       `json:"concurrency"`
 	InstanceList []AzIntstanceStatisDetail `json:"azIntstanceStatisList"`
+}
+
+type UpdateInstanceDeployArgs struct {
+	ClientToken  string   `json:"-"`
+	InstanceId   string   `json:"instanceId,omitempty"`
+	DeploySetIds []string `json:"deploysetIdList,omitempty"`
+}
+
+type DelInstanceDeployArgs struct {
+	ClientToken string   `json:"-"`
+	InstanceIds []string `json:"instanceIdList,omitempty"`
+	DeploySetId string   `json:"deployId,omitempty"`
 }
 
 type AzIntstanceStatisDetail struct {
