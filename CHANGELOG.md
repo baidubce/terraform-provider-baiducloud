@@ -1,4 +1,5 @@
-## 1.11.2 (Unreleased)
+## 1.12.0 (Unreleased)
+## 1.11.2 (April 22, 2021)
 
 NOTES:
 - provider: Fix go mod vendor for new bce-sdk-go v0.9.62
