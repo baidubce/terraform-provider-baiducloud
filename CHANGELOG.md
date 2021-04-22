@@ -1,4 +1,5 @@
-## 1.11.1 (Unreleased)
+## 1.12.0 (Unreleased)
+## 1.11.1 (April 22, 2021)
 
 BUG FIXES:
 - provider: Fix wrong argument verify when resize eip
