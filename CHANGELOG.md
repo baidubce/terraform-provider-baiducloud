@@ -1,4 +1,5 @@
-## 1.11.3 (Unreleased)
+## 1.12.0 (Unreleased)
+## 1.11.3 (April 23, 2021)
 
 NOTES:
 - provider: Remove ValidateFunc for argument bandwidth_in_mbps of eip
