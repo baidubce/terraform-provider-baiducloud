@@ -93,11 +93,10 @@ func resourceBaiduCloudEip() *schema.Resource {
 				ValidateFunc: validation.StringInSlice([]string{"Prepaid", "Postpaid"}, false),
 			},
 			"billing_method": {
-				Type:         schema.TypeString,
-				Description:  "Eip billing method, support ByTraffic or ByBandwidth",
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice([]string{"ByTraffic", "ByBandwidth"}, false),
+				Type:        schema.TypeString,
+				Description: "Eip billing method, support ByTraffic or ByBandwidth",
+				Required:    true,
+				ForceNew:    true,
 			},
 			"create_time": {
 				Type:        schema.TypeString,
