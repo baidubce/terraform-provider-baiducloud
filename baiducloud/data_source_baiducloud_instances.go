@@ -23,6 +23,109 @@ import (
 )
 
 func dataSourceBaiduCloudInstances() *schema.Resource {
+	diskSchema := map[string]*schema.Schema{
+		"cds_id": {
+			Type:        schema.TypeString,
+			Description: "The id of the ephemeral disk.",
+			Computed:    true,
+		},
+		"name": {
+			Type:        schema.TypeString,
+			Description: "The name of the ephemeral disk.",
+			Computed:    true,
+		},
+		"description": {
+			Type:        schema.TypeString,
+			Description: "CDS volume description",
+			Optional:    true,
+		},
+		"status": {
+			Type:        schema.TypeString,
+			Description: "The status of the ephemeral disk.",
+			Computed:    true,
+		},
+		"type": {
+			Type:        schema.TypeString,
+			Description: "CDS disk type",
+			Computed:    true,
+		},
+		"is_system_volume": {
+			Type:        schema.TypeBool,
+			Description: "CDS disk is system volume or not",
+			Computed:    true,
+		},
+		"create_time": {
+			Type:        schema.TypeString,
+			Description: "CDS volume create time",
+			Computed:    true,
+		},
+		"expire_time": {
+			Type:        schema.TypeString,
+			Description: "CDS volume expire time",
+			Computed:    true,
+		},
+		"payment_timing": {
+			Type:        schema.TypeString,
+			Description: "payment method, support Prepaid or Postpaid",
+			Computed:    true,
+		},
+		"snapshot_num": {
+			Type:        schema.TypeString,
+			Description: "CDS disk snapshot num",
+			Computed:    true,
+		},
+		"source_snapshot_id": {
+			Type:        schema.TypeString,
+			Description: "CDS disk create source snapshot id",
+			Computed:    true,
+		},
+		"region_id": {
+			Type:        schema.TypeString,
+			Description: "CDS disk region id",
+			Computed:    true,
+		},
+		"attachments": {
+			Type:        schema.TypeList,
+			Description: "CDS volume attachments",
+			Computed:    true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"volume_id": {
+						Type:        schema.TypeString,
+						Description: "CDS attachment volume id",
+						Computed:    true,
+					},
+					"instance_id": {
+						Type:        schema.TypeString,
+						Description: "CDS attachment instance id",
+						Computed:    true,
+					},
+					"device": {
+						Type:        schema.TypeString,
+						Description: "CDS attachment device path",
+						Computed:    true,
+					},
+					"serial": {
+						Type:        schema.TypeString,
+						Description: "CDS attachment serial",
+						Computed:    true,
+					},
+				},
+			},
+		},
+		"disk_size_in_gb": {
+			Type:        schema.TypeInt,
+			Description: "The size(GB) of CDS.",
+			Computed:    true,
+		},
+		"storage_type": {
+			Type:         schema.TypeString,
+			Description:  "Storage type of the CDS.",
+			Computed:     true,
+			Default:      api.StorageTypeCloudHP1,
+			ValidateFunc: validateStorageType(),
+		},
+	}
 	return &schema.Resource{
 		Read: dataSourceBaiduCloudInstancesRead,
 
@@ -147,18 +250,23 @@ func dataSourceBaiduCloudInstances() *schema.Resource {
 							Description: "The ephemeral disks of the instance.",
 							Computed:    true,
 							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"size_in_gb": {
-										Type:        schema.TypeInt,
-										Description: "The size(GB) of the ephemeral disk.",
-										Computed:    true,
-									},
-									"storage_type": {
-										Type:        schema.TypeString,
-										Description: "The storage type of the ephemeral disk.",
-										Computed:    true,
-									},
-								},
+								Schema: diskSchema,
+							},
+						},
+						"cds_disks": {
+							Type:        schema.TypeList,
+							Description: "CDS disks of the instance.",
+							Computed:    true,
+							Elem: &schema.Resource{
+								Schema: diskSchema,
+							},
+						},
+						"system_disk": {
+							Type:        schema.TypeMap,
+							Description: "System disk of the instance.",
+							Computed:    true,
+							Elem: &schema.Resource{
+								Schema: diskSchema,
 							},
 						},
 						"image_id": {
