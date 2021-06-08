@@ -172,7 +172,7 @@ func (s *BccService) ResizeCDSVolume(volumeId string, newSize int, volumeType ap
 		ClientToken:    buildClientToken(),
 	}
 	action := "Resize CDS volume " + volumeId
-	
+
 	_, err := s.client.WithBccClient(func(client *bcc.Client) (i interface{}, e error) {
 		return nil, client.ResizeCDSVolume(volumeId, args)
 	})
