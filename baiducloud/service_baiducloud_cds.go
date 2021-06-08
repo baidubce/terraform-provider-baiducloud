@@ -165,13 +165,14 @@ func (s *BccService) ModifyChargeTypeCDSVolume(volumeId string, args *api.Modify
 	return nil
 }
 
-func (s *BccService) ResizeCDSVolume(volumeId string, newSize int) error {
+func (s *BccService) ResizeCDSVolume(volumeId string, newSize int, volumeType api.StorageType) error {
 	args := &api.ResizeCSDVolumeArgs{
 		NewCdsSizeInGB: newSize,
+		NewVolumeType:  volumeType,
 		ClientToken:    buildClientToken(),
 	}
 	action := "Resize CDS volume " + volumeId
-
+	
 	_, err := s.client.WithBccClient(func(client *bcc.Client) (i interface{}, e error) {
 		return nil, client.ResizeCDSVolume(volumeId, args)
 	})
@@ -187,9 +188,9 @@ func (s *BccService) ResizeCDSVolume(volumeId string, newSize int) error {
 
 	stateConf := buildStateConf(
 		CDSProcessingStatus,
-		[]string{string(api.VolumeStatusAVAILABLE)},
+		[]string{string(api.VolumeStatusAVAILABLE), string(api.VolumeStatusINUSE)},
 		DefaultTimeout,
-		s.CDSVolumeStateRefreshFunc(volumeId, append(CDSFailedStatus, string(api.VolumeStatusINUSE))))
+		s.CDSVolumeStateRefreshFunc(volumeId, CDSFailedStatus))
 	if _, err := stateConf.WaitForState(); err != nil {
 		return WrapError(err)
 	}
@@ -259,6 +260,29 @@ func (s *BccService) FlattenVolumeAttachmentModelToMap(attachments []api.VolumeA
 			"device":      attach.Device,
 			"serial":      attach.Serial,
 		})
+	}
+
+	return result
+}
+
+func (s *BccService) FlattenCDSVolumeModelToMapForInstance(cdsList []api.VolumeModel) []map[string]interface{} {
+	result := make([]map[string]interface{}, 0, len(cdsList))
+
+	for _, c := range cdsList {
+		cdsMap := map[string]interface{}{
+			"cds_id":          c.Id,
+			"name":            c.Name,
+			"disk_size_in_gb": c.DiskSizeInGB,
+			"payment_timing":  c.PaymentTiming,
+			"create_time":     c.CreateTime,
+			"expire_time":     c.ExpireTime,
+			"status":          c.Status,
+			"type":            c.Type,
+			"storage_type":    c.StorageType,
+			"description":     c.Desc,
+			"snapshot_num":    c.SnapshotNum,
+		}
+		result = append(result, cdsMap)
 	}
 
 	return result

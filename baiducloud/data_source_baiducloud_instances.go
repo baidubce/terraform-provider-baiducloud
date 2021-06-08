@@ -49,11 +49,6 @@ func dataSourceBaiduCloudInstances() *schema.Resource {
 			Description: "CDS disk type",
 			Computed:    true,
 		},
-		"is_system_volume": {
-			Type:        schema.TypeBool,
-			Description: "CDS disk is system volume or not",
-			Computed:    true,
-		},
 		"create_time": {
 			Type:        schema.TypeString,
 			Description: "CDS volume create time",
@@ -74,56 +69,15 @@ func dataSourceBaiduCloudInstances() *schema.Resource {
 			Description: "CDS disk snapshot num",
 			Computed:    true,
 		},
-		"source_snapshot_id": {
-			Type:        schema.TypeString,
-			Description: "CDS disk create source snapshot id",
-			Computed:    true,
-		},
-		"region_id": {
-			Type:        schema.TypeString,
-			Description: "CDS disk region id",
-			Computed:    true,
-		},
-		"attachments": {
-			Type:        schema.TypeList,
-			Description: "CDS volume attachments",
-			Computed:    true,
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"volume_id": {
-						Type:        schema.TypeString,
-						Description: "CDS attachment volume id",
-						Computed:    true,
-					},
-					"instance_id": {
-						Type:        schema.TypeString,
-						Description: "CDS attachment instance id",
-						Computed:    true,
-					},
-					"device": {
-						Type:        schema.TypeString,
-						Description: "CDS attachment device path",
-						Computed:    true,
-					},
-					"serial": {
-						Type:        schema.TypeString,
-						Description: "CDS attachment serial",
-						Computed:    true,
-					},
-				},
-			},
-		},
 		"disk_size_in_gb": {
 			Type:        schema.TypeInt,
 			Description: "The size(GB) of CDS.",
 			Computed:    true,
 		},
 		"storage_type": {
-			Type:         schema.TypeString,
-			Description:  "Storage type of the CDS.",
-			Computed:     true,
-			Default:      api.StorageTypeCloudHP1,
-			ValidateFunc: validateStorageType(),
+			Type:        schema.TypeString,
+			Description: "Storage type of the CDS.",
+			Computed:    true,
 		},
 	}
 	return &schema.Resource{
@@ -261,8 +215,8 @@ func dataSourceBaiduCloudInstances() *schema.Resource {
 								Schema: diskSchema,
 							},
 						},
-						"system_disk": {
-							Type:        schema.TypeMap,
+						"system_disks": {
+							Type:        schema.TypeList,
 							Description: "System disk of the instance.",
 							Computed:    true,
 							Elem: &schema.Resource{
