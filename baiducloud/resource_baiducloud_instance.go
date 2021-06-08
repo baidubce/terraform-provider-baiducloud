@@ -439,8 +439,13 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 			return resource.NonRetryableError(err)
 		}
 		addDebug(action, raw)
-		response, _ := raw.(*api.CreateInstanceResult)
-		d.SetId(response.InstanceIds[0])
+		if createBySpec {
+			response, _ := raw.(*api.CreateInstanceBySpecResult)
+			d.SetId(response.InstanceIds[0])
+		} else {
+			response, _ := raw.(*api.CreateInstanceResult)
+			d.SetId(response.InstanceIds[0])
+		}
 		return nil
 	})
 	if err != nil {
