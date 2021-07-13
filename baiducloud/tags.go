@@ -17,6 +17,18 @@ func tagsSchema() *schema.Schema {
 	}
 }
 
+func normalTagsSchema() *schema.Schema {
+	return &schema.Schema{
+		Type:        schema.TypeMap,
+		Description: "Tags, support modify",
+		Optional:    true,
+		ForceNew:    false,
+		Elem: &schema.Schema{
+			Type: schema.TypeString,
+		},
+	}
+}
+
 func tagsComputedSchema() *schema.Schema {
 	return &schema.Schema{
 		Type:        schema.TypeMap,
