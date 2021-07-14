@@ -182,11 +182,11 @@ func resourceBaiduCloudBbcInstance() *schema.Resource {
 			},
 			"root_disk_size_in_gb": {
 				Type:         schema.TypeInt,
-				Description:  "System disk size(GB) of the instance to be created. The value range is [20,500]GB, Default to 20GB, and more than 20GB is charged according to the cloud disk price. Note that the specified system disk size needs to meet the minimum disk space limit of the mirror used.",
+				Description:  "System disk size(GB) of the instance to be created. The value range is [20,100]GB, Default to 20GB, and more than 20GB is charged according to the cloud disk price. Note that the specified system disk size needs to meet the minimum disk space limit of the mirror used.",
 				Optional:     true,
 				ForceNew:     true,
 				Default:      20,
-				ValidateFunc: validation.IntBetween(20, 500),
+				ValidateFunc: validation.IntBetween(20, 100),
 			},
 			"public_ip": {
 				Type:        schema.TypeString,
@@ -504,7 +504,8 @@ func resourceBaiduCloudBbcInstanceDelete(d *schema.ResourceData, meta interface{
 
 func buildBaiduCloudBbcInstanceArgs(d *schema.ResourceData, meta interface{}) (*bbc.CreateInstanceArgs, error) {
 	request := &bbc.CreateInstanceArgs{
-		ClientToken: buildClientToken(),
+		ClientToken:   buildClientToken(),
+		PurchaseCount: 1,
 	}
 
 	if imageID, ok := d.GetOk("image_id"); ok {

@@ -91,7 +91,7 @@ func dataSourceBaiduCloudBbcFlavorRead(d *schema.ResourceData, meta interface{})
 	client := meta.(*connectivity.BaiduClient)
 	bbcService := BbcService{client}
 	action := "Query All Flavors"
-	flavorMap := make([]map[string]interface{}, 0, 0)
+	flavorMap := make([]map[string]interface{}, 0)
 	if v, ok := d.GetOk("flavor_id"); ok {
 		result, err := bbcService.GetFlavorDetail(v.(string))
 		if err != nil {
