@@ -31,6 +31,7 @@ $ terraform import baiducloud_bbc_instance.my-server id
 package baiducloud
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/baidubce/bce-sdk-go/bce"
@@ -54,9 +55,9 @@ func resourceBaiduCloudBbcInstance() *schema.Resource {
 		},
 
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(10 * time.Minute),
-			Update: schema.DefaultTimeout(10 * time.Minute),
-			Delete: schema.DefaultTimeout(20 * time.Minute),
+			Create: schema.DefaultTimeout(40 * time.Minute),
+			Update: schema.DefaultTimeout(40 * time.Minute),
+			Delete: schema.DefaultTimeout(40 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -93,40 +94,42 @@ func resourceBaiduCloudBbcInstance() *schema.Resource {
 				Computed:    true,
 			},
 			"billing": {
-				Type:        schema.TypeMap,
+				Type:        schema.TypeList,
 				Description: "Billing information of the instance.",
+				MaxItems:    1,
+				MinItems:    1,
 				Required:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"payment_timing": {
 							Type:         schema.TypeString,
 							Description:  "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.",
-							Required:     true,
+							Optional:     true,
 							Default:      bbc.PaymentTimingPostPaid,
 							ValidateFunc: validatePaymentTiming(),
 						},
 						"reservation": {
-							Type:             schema.TypeMap,
-							Description:      "Reservation of the instance.",
-							Optional:         true,
-							DiffSuppressFunc: postPaidDiffSuppressFunc,
+							Type:        schema.TypeMap,
+							Description: "Reservation of the instance.",
+							Optional:    true,
+							//DiffSuppressFunc: postPaidDiffSuppressFunc,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"reservation_length": {
-										Type:             schema.TypeInt,
-										Description:      "The reservation length that you will pay for your resource. It is valid when payment_timing is Prepaid. Valid values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36].",
-										Required:         true,
-										Default:          1,
-										ValidateFunc:     validateReservationLength(),
-										DiffSuppressFunc: postPaidDiffSuppressFunc,
+										Type:         schema.TypeInt,
+										Description:  "The reservation length that you will pay for your resource. It is valid when payment_timing is Prepaid. Valid values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36].",
+										Required:     true,
+										Default:      1,
+										ValidateFunc: validateReservationLength(),
+										//DiffSuppressFunc: postPaidDiffSuppressFunc,
 									},
 									"reservation_time_unit": {
-										Type:             schema.TypeString,
-										Description:      "The reservation time unit that you will pay for your resource. It is valid when payment_timing is Prepaid. The value can only be month currently, which is also the default value.",
-										Required:         true,
-										Default:          "Month",
-										ValidateFunc:     validateReservationUnit(),
-										DiffSuppressFunc: postPaidDiffSuppressFunc,
+										Type:         schema.TypeString,
+										Description:  "The reservation time unit that you will pay for your resource. It is valid when payment_timing is Prepaid. The value can only be month currently, which is also the default value.",
+										Required:     true,
+										Default:      "Month",
+										ValidateFunc: validateReservationUnit(),
+										//DiffSuppressFunc: postPaidDiffSuppressFunc,
 									},
 								},
 							},
@@ -363,7 +366,9 @@ func resourceBaiduCloudBbcInstanceRead(d *schema.ResourceData, meta interface{})
 	d.Set("tags", flattenTagsToMap(response.Tags))
 
 	billingMap := map[string]interface{}{"payment_timing": response.PaymentTiming}
-	d.Set("billing", billingMap)
+	billings := []interface{}{}
+	billings = append(billings, billingMap)
+	d.Set("billing", billings)
 
 	// Computed
 	d.Set("description", response.Desc)
@@ -456,7 +461,7 @@ func resourceBaiduCloudBbcInstanceUpdate(d *schema.ResourceData, meta interface{
 
 	d.Partial(false)
 
-	return resourceBaiduCloudInstanceRead(d, meta)
+	return resourceBaiduCloudBbcInstanceRead(d, meta)
 }
 
 func resourceBaiduCloudBbcInstanceDelete(d *schema.ResourceData, meta interface{}) error {
@@ -532,7 +537,8 @@ func buildBaiduCloudBbcInstanceArgs(d *schema.ResourceData, meta interface{}) (*
 	}
 
 	if v, ok := d.GetOk("billing"); ok {
-		billing := v.(map[string]interface{})
+		billings := v.([]interface{})
+		billing := billings[0].(map[string]interface{})
 		billingRequest := bbc.Billing{
 			PaymentTiming: bbc.PaymentTimingType(""),
 			Reservation:   bbc.Reservation{},
@@ -545,7 +551,16 @@ func buildBaiduCloudBbcInstanceArgs(d *schema.ResourceData, meta interface{}) (*
 			if r, ok := billing["reservation"]; ok {
 				reservation := r.(map[string]interface{})
 				if reservationLength, ok := reservation["reservation_length"]; ok {
-					billingRequest.Reservation.Length = reservationLength.(int)
+					switch reservationLength.(type) {
+					case int:
+						billingRequest.Reservation.Length = reservationLength.(int)
+					case string:
+						length, err := strconv.ParseInt(reservationLength.(string), 10, 64)
+						if err != nil {
+							return request, WrapErrorf(err, DefaultErrorMsg, "baiducloud_bbc_instance", "parse reservation_length failed", BCESDKGoERROR)
+						}
+						billingRequest.Reservation.Length = int(length)
+					}
 				}
 				if reservationTimeUnit, ok := reservation["reservation_time_unit"]; ok {
 					billingRequest.Reservation.TimeUnit = reservationTimeUnit.(string)
