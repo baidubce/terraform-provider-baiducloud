@@ -12,6 +12,7 @@ import (
 type ServiceCode string
 
 const (
+	BBCCode    = ServiceCode("BBC")
 	BCCCode    = ServiceCode("BCC")
 	VPCCode    = ServiceCode("VPC")
 	EIPCode    = ServiceCode("EIP")

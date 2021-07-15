@@ -201,6 +201,10 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_cce_kubeconfig":                 dataSourceBaiduCloudCceKubeConfig(),
 			"baiducloud_rdss":                           dataSourceBaiduCloudRdss(),
 			"baiducloud_dtss":                           dataSourceBaiduCloudDtss(),
+			"baiducloud_bbc_instances":                  dataSourceBaiduCloudBbcInstances(),
+			"baiducloud_bbc_images":                     dataSourceBaiduCloudBbcImages(),
+			"baiducloud_bbc_flavors":                    dataSourceBaiduCloudBbcFlavors(),
+			"baiducloud_bbc_raids":                      dataSourceBaiduCloudBbcRaids(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -245,6 +249,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_iam_policy":                  resourceBaiduCloudIamPolicy(),
 			"baiducloud_iam_user_policy_attachment":  resourceBaiduCloudIamUserPolicyAttachment(),
 			"baiducloud_iam_group_policy_attachment": resourceBaiduCloudIamGroupPolicyAttachment(),
+			"baiducloud_bbc_instance":                resourceBaiduCloudBbcInstance(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -290,6 +295,8 @@ func init() {
 		"rds_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom RDS endpoints.",
 
 		"dts_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom DTS endpoints.",
+
+		"bbc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BBC endpoints.",
 	}
 }
 
@@ -364,6 +371,12 @@ func endpointsSchema() *schema.Schema {
 					Optional:    true,
 					Default:     "",
 					Description: descriptions["dts_endpoint"],
+				},
+				"bbc": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["bbc_endpoint"],
 				},
 			},
 		},
@@ -446,6 +459,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints[connectivity.CCEv2Code] = strings.TrimSpace(endpoints["ccev2"].(string))
 		config.ConfigEndpoints[connectivity.RDSCode] = strings.TrimSpace(endpoints["rds"].(string))
 		config.ConfigEndpoints[connectivity.DTSCode] = strings.TrimSpace(endpoints["dts"].(string))
+		config.ConfigEndpoints[connectivity.BBCCode] = strings.TrimSpace(endpoints["bbc"].(string))
 	}
 
 	client, err := config.Client()

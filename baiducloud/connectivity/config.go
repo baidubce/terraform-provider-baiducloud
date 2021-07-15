@@ -13,7 +13,7 @@ type Config struct {
 	AccessKey string
 	SecretKey string
 	Region    Region
-
+	
 	// assume role
 	AssumeRoleRoleName  string
 	AssumeRoleAccountId string

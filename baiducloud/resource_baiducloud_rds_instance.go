@@ -7,7 +7,7 @@ Example Usage
 
 ```hcl
 resource "baiducloud_rds_instance" "default" {
-    billing = {
+    billing {
         payment_timing        = "Postpaid"
     }
     engine_version            = "5.6"
@@ -29,6 +29,7 @@ $ terraform import baiducloud_rds_instance.default id
 package baiducloud
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/baidubce/bce-sdk-go/bce"
@@ -140,6 +141,32 @@ func resourceBaiduCloudRdsInstance() *schema.Resource {
 					},
 				},
 			},
+			"security_ips": {
+				Type:        schema.TypeList,
+				Description: "Security ip list",
+				Optional:    true,
+				Computed:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"parameters": {
+				Type: schema.TypeList,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"value": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+					},
+				},
+				Optional: true,
+				Computed: true,
+			},
 			"zone_names": {
 				Type:        schema.TypeList,
 				Description: "Zone name list",
@@ -205,46 +232,27 @@ func resourceBaiduCloudRdsInstance() *schema.Resource {
 				Computed:    true,
 			},
 			"billing": {
-				Type:        schema.TypeMap,
-				Description: "Billing information of the Rds.",
+				Type:        schema.TypeList,
+				Description: "Billing information of the instance.",
+				MaxItems:    1,
+				MinItems:    1,
 				Required:    true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"payment_timing": {
-							Type:         schema.TypeString,
-							Description:  "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.",
-							Required:     true,
-							Default:      "Postpaid",
-							ValidateFunc: validatePaymentTiming(),
-						},
-						"reservation": {
-							Type:             schema.TypeMap,
-							Description:      "Reservation of the Rds.",
-							Optional:         true,
-							DiffSuppressFunc: postPaidDiffSuppressFunc,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"reservation_length": {
-										Type:             schema.TypeInt,
-										Description:      "The reservation length that you will pay for your resource. It is valid when payment_timing is Prepaid. Valid values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36].",
-										Required:         true,
-										Default:          1,
-										ValidateFunc:     validateReservationLength(),
-										DiffSuppressFunc: postPaidDiffSuppressFunc,
-									},
-									"reservation_time_unit": {
-										Type:             schema.TypeString,
-										Description:      "The reservation time unit that you will pay for your resource. It is valid when payment_timing is Prepaid. The value can only be month currently, which is also the default value.",
-										Required:         true,
-										Default:          "Month",
-										ValidateFunc:     validateReservationUnit(),
-										DiffSuppressFunc: postPaidDiffSuppressFunc,
-									},
-								},
-							},
-						},
-					},
-				},
+				Elem:        createBillingSchema(),
+			},
+			"auto_renew_time_unit": {
+				Type:         schema.TypeString,
+				Description:  "Time unit of automatic renewal, the value can be month or year. The default value is empty, indicating no automatic renewal. It is valid only when the payment_timing is Prepaid.",
+				Optional:     true,
+				ForceNew:     true,
+				ValidateFunc: validation.StringInSlice([]string{"month", "year"}, false),
+			},
+			"auto_renew_time_length": {
+				Type:         schema.TypeInt,
+				Description:  "The time length of automatic renewal. It is valid when payment_timing is Prepaid, and the value should be 1-9 when the auto_renew_time_unit is month and 1-3 when the auto_renew_time_unit is year. Default to 1.",
+				Optional:     true,
+				ForceNew:     true,
+				Default:      1,
+				ValidateFunc: validation.IntBetween(1, 9),
 			},
 			"payment_timing": {
 				Type:        schema.TypeString,
@@ -296,11 +304,21 @@ func resourceBaiduCloudRdsInstanceCreate(d *schema.ResourceData, meta interface{
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_rds_instance", action, BCESDKGoERROR)
 	}
 
+	// set instance parameters
+	if err := updateRdsParameters(d, meta, d.Id()); err != nil {
+		return err
+	}
+	// update instance security ips
+	if err := updateRdsSecurityIps(d, meta, d.Id()); err != nil {
+		return err
+	}
+
 	return resourceBaiduCloudRdsInstanceRead(d, meta)
 }
 
 func resourceBaiduCloudRdsInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
+	rdsService := RdsService{client}
 
 	instanceID := d.Id()
 	action := "Query RDS Instance " + instanceID
@@ -337,26 +355,20 @@ func resourceBaiduCloudRdsInstanceRead(d *schema.ResourceData, meta interface{})
 	d.Set("region", result.Region)
 	d.Set("instance_type", result.InstanceType)
 	d.Set("payment_timing", result.PaymentTiming)
+	setBilling(d, result.PaymentTiming)
 	d.Set("zone_names", result.ZoneNames)
 	d.Set("vpc_id", result.VpcId)
 	d.Set("port", result.Endpoint.Port)
 	d.Set("address", result.Endpoint.Address)
 	d.Set("v_net_ip", result.Endpoint.VnetIp)
 	d.Set("volume_capacity", result.VolumeCapacity)
-	d.Set("subnets", transRdsSubnetsToSchema(result.Subnets))
+	d.Set("subnets", rdsService.TransRdsSubnetsToSchema(result.Subnets))
 
-	return nil
-}
-
-func transRdsSubnetsToSchema(subnets []rds.Subnet) []map[string]string {
-	subnetList := []map[string]string{}
-	for _, subnet := range subnets {
-		subnetMap := make(map[string]string)
-		subnetMap["subnet_id"] = subnet.SubnetId
-		subnetMap["zone_name"] = subnet.ZoneName
-		subnetList = append(subnetList, subnetMap)
+	ipResult, err := rdsService.ListSecurityIps(instanceID)
+	if err == nil {
+		d.Set("security_ips", ipResult.SecurityIps)
 	}
-	return subnetList
+	return nil
 }
 
 func resourceBaiduCloudRdsInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -366,6 +378,16 @@ func resourceBaiduCloudRdsInstanceUpdate(d *schema.ResourceData, meta interface{
 
 	// resize instance
 	if err := resizeRds(d, meta, instanceID); err != nil {
+		return err
+	}
+
+	// update instance parameters
+	if err := updateRdsParameters(d, meta, instanceID); err != nil {
+		return err
+	}
+
+	// update instance security ips
+	if err := updateRdsSecurityIps(d, meta, instanceID); err != nil {
 		return err
 	}
 
@@ -410,7 +432,8 @@ func buildBaiduCloudRdsInstanceArgs(d *schema.ResourceData, meta interface{}) (*
 	}
 
 	if v, ok := d.GetOk("billing"); ok {
-		billing := v.(map[string]interface{})
+		billings := v.([]interface{})
+		billing := billings[0].(map[string]interface{})
 		billingRequest := rds.Billing{
 			PaymentTiming: "",
 			Reservation:   rds.Reservation{},
@@ -419,14 +442,31 @@ func buildBaiduCloudRdsInstanceArgs(d *schema.ResourceData, meta interface{}) (*
 			paymentTiming := p.(string)
 			billingRequest.PaymentTiming = paymentTiming
 		}
-		if billingRequest.PaymentTiming == "Postpaid" {
+		if billingRequest.PaymentTiming == "Prepaid" {
 			if r, ok := billing["reservation"]; ok {
 				reservation := r.(map[string]interface{})
 				if reservationLength, ok := reservation["reservation_length"]; ok {
-					billingRequest.Reservation.ReservationLength = reservationLength.(int)
+					switch reservationLength.(type) {
+					case int:
+						billingRequest.Reservation.ReservationLength = reservationLength.(int)
+					case string:
+						length, err := strconv.ParseInt(reservationLength.(string), 10, 64)
+						if err != nil {
+							return request, WrapErrorf(err, DefaultErrorMsg, "baiducloud_rds_instance", "parse reservation_length failed", BCESDKGoERROR)
+						}
+						billingRequest.Reservation.ReservationLength = int(length)
+					}
 				}
 				if reservationTimeUnit, ok := reservation["reservation_time_unit"]; ok {
 					billingRequest.Reservation.ReservationTimeUnit = reservationTimeUnit.(string)
+				}
+			}
+			// if the field is set, then auto-renewal is effective.
+			if v, ok := d.GetOk("auto_renew_time_unit"); ok {
+				request.AutoRenewTimeUnit = v.(string)
+
+				if v, ok := d.GetOk("auto_renew_time_length"); ok {
+					request.AutoRenewTime = v.(int)
 				}
 			}
 		}
@@ -534,5 +574,68 @@ func resizeRds(d *schema.ResourceData, meta interface{}, instanceID string) erro
 		d.SetPartial("volume_capacity")
 	}
 
+	return nil
+}
+
+func updateRdsParameters(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	action := "Update rds parameters for " + instanceID
+	client := meta.(*connectivity.BaiduClient)
+	rdsService := RdsService{client}
+	if d.HasChange("parameters") {
+		result, err := rdsService.ListParameters(instanceID)
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_rds_instance", action, BCESDKGoERROR)
+		}
+		_, n := d.GetChange("parameters")
+		parameters := n.([]interface{})
+		kvparams := make([]rds.KVParameter, 0)
+		for _, param := range parameters {
+			paramMap := param.(map[string]interface{})
+			kvparams = append(kvparams, rds.KVParameter{
+				Name:  paramMap["name"].(string),
+				Value: paramMap["value"].(string),
+			})
+		}
+		args := &rds.UpdateParameterArgs{
+			Parameters: kvparams,
+		}
+		_, er := client.WithRdsClient(func(rdsClient *rds.Client) (i interface{}, e error) {
+			return nil, rdsClient.UpdateParameter(instanceID, result.Etag, args)
+		})
+		if er != nil {
+			return WrapErrorf(er, DefaultErrorMsg, "baiducloud_rds_instance", action, BCESDKGoERROR)
+		}
+		d.SetPartial("parameters")
+
+	}
+	return nil
+}
+
+func updateRdsSecurityIps(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	action := "Update rds security ips for " + instanceID
+	client := meta.(*connectivity.BaiduClient)
+	rdsService := RdsService{client}
+	if d.HasChange("security_ips") {
+		result, err := rdsService.ListSecurityIps(instanceID)
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_rds_instance", action, BCESDKGoERROR)
+		}
+		_, n := d.GetChange("security_ips")
+		ips := n.([]interface{})
+		ipsStr := make([]string, len(ips))
+		for i, v := range ips {
+			ipsStr[i] = v.(string)
+		}
+		args := &rds.UpdateSecurityIpsArgs{
+			SecurityIps: ipsStr,
+		}
+		_, er := client.WithRdsClient(func(rdsClient *rds.Client) (i interface{}, e error) {
+			return nil, rdsClient.UpdateSecurityIps(instanceID, result.Etag, args)
+		})
+		if er != nil {
+			return WrapErrorf(er, DefaultErrorMsg, "baiducloud_rds_instance", action, BCESDKGoERROR)
+		}
+		d.SetPartial("security_ips")
+	}
 	return nil
 }

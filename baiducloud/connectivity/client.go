@@ -1,10 +1,13 @@
 package connectivity
 
 import (
+	"os"
 	"sync"
 
 	"github.com/baidubce/bce-sdk-go/auth"
+	"github.com/baidubce/bce-sdk-go/bce"
 	"github.com/baidubce/bce-sdk-go/services/appblb"
+	"github.com/baidubce/bce-sdk-go/services/bbc"
 	"github.com/baidubce/bce-sdk-go/services/bcc"
 	"github.com/baidubce/bce-sdk-go/services/bos"
 	"github.com/baidubce/bce-sdk-go/services/cce"
@@ -30,6 +33,7 @@ type BaiduClient struct {
 
 	Credentials *auth.BceCredentials
 
+	bbcConn    *bbc.Client
 	bccConn    *bcc.Client
 	vpcConn    *vpc.Client
 	eipConn    *eip.Client
@@ -115,6 +119,30 @@ func (client *BaiduClient) WithCommonClient(serviceCode ServiceCode) *BaiduClien
 
 	return client
 }
+func (client *BaiduClient) WithProxy(config *bce.BceClientConfiguration) {
+	proxyUrl := os.Getenv("HTTP_PROXY")
+	if len(proxyUrl) > 0 {
+		config.ProxyUrl = proxyUrl
+	}
+}
+func (client *BaiduClient) WithBbcClient(do func(*bbc.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the BBC client if necessary
+	if client.bbcConn == nil {
+		client.WithCommonClient(BBCCode)
+		bbcClient, err := bbc.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		client.WithProxy(bbcClient.Config)
+		bbcClient.Config.Credentials = client.Credentials
+		client.bbcConn = bbcClient
+	}
+
+	return do(client.bbcConn)
+}
 
 func (client *BaiduClient) WithBccClient(do func(*bcc.Client) (interface{}, error)) (interface{}, error) {
 	goSdkMutex.Lock()
@@ -127,6 +155,7 @@ func (client *BaiduClient) WithBccClient(do func(*bcc.Client) (interface{}, erro
 		if err != nil {
 			return nil, err
 		}
+		client.WithProxy(bccClient.Config)
 		bccClient.Config.Credentials = client.Credentials
 
 		client.bccConn = bccClient
@@ -146,6 +175,7 @@ func (client *BaiduClient) WithVpcClient(do func(*vpc.Client) (interface{}, erro
 		if err != nil {
 			return nil, err
 		}
+		client.WithProxy(vpcClient.Config)
 		vpcClient.Config.Credentials = client.Credentials
 
 		client.vpcConn = vpcClient
@@ -165,6 +195,7 @@ func (client *BaiduClient) WithEipClient(do func(*eip.Client) (interface{}, erro
 		if err != nil {
 			return nil, err
 		}
+		client.WithProxy(eipClient.Config)
 		eipClient.Config.Credentials = client.Credentials
 
 		client.eipConn = eipClient
@@ -184,6 +215,7 @@ func (client *BaiduClient) WithAppBLBClient(do func(*appblb.Client) (interface{}
 		if err != nil {
 			return nil, err
 		}
+		client.WithProxy(appBlbClient.Config)
 		appBlbClient.Config.Credentials = client.Credentials
 
 		client.appBlbConn = appBlbClient
@@ -203,6 +235,7 @@ func (client *BaiduClient) WithBosClient(do func(*bos.Client) (interface{}, erro
 		if err != nil {
 			return nil, err
 		}
+		client.WithProxy(bosClient.Config)
 		bosClient.Config.Credentials = client.Credentials
 
 		client.bosConn = bosClient
@@ -222,6 +255,7 @@ func (client *BaiduClient) WithCertClient(do func(*cert.Client) (interface{}, er
 		if err != nil {
 			return nil, err
 		}
+		client.WithProxy(certClient.Config)
 		certClient.Config.Credentials = client.Credentials
 
 		client.certConn = certClient
@@ -241,6 +275,7 @@ func (client *BaiduClient) WithCFCClient(do func(*cfc.Client) (interface{}, erro
 		if err != nil {
 			return nil, err
 		}
+		client.WithProxy(cfcClient.Config)
 		cfcClient.Config.Credentials = client.Credentials
 
 		client.cfcConn = cfcClient
@@ -260,6 +295,7 @@ func (client *BaiduClient) WithScsClient(do func(*scs.Client) (interface{}, erro
 		if err != nil {
 			return nil, err
 		}
+		client.WithProxy(scsClient.Config)
 		scsClient.Config.Credentials = client.Credentials
 
 		client.scsConn = scsClient
@@ -279,6 +315,7 @@ func (client *BaiduClient) WithCCEClient(do func(*cce.Client) (interface{}, erro
 		if err != nil {
 			return nil, err
 		}
+		client.WithProxy(cceClient.Config)
 		cceClient.Config.Credentials = client.Credentials
 
 		client.cceConn = cceClient
@@ -298,6 +335,7 @@ func (client *BaiduClient) WithCCEv2Client(do func(*ccev2.Client) (interface{}, 
 		if err != nil {
 			return nil, err
 		}
+		client.WithProxy(ccev2Client.Config)
 		ccev2Client.Config.Credentials = client.Credentials
 
 		client.ccev2Conn = ccev2Client
@@ -317,6 +355,7 @@ func (client *BaiduClient) WithRdsClient(do func(*rds.Client) (interface{}, erro
 		if err != nil {
 			return nil, err
 		}
+		client.WithProxy(rdsClient.Config)
 		rdsClient.Config.Credentials = client.Credentials
 
 		client.rdsConn = rdsClient
@@ -337,6 +376,7 @@ func (client *BaiduClient) WithDtsClient(do func(*dts.Client) (interface{}, erro
 		if err != nil {
 			return nil, err
 		}
+		client.WithProxy(dtsClient.Config)
 		client.dtsConn = dtsClient
 	}
 
@@ -355,6 +395,7 @@ func (client *BaiduClient) WithIamClient(do func(*iam.Client) (interface{}, erro
 		if err != nil {
 			return nil, err
 		}
+		client.WithProxy(iamClient.Config)
 		client.iamConn = iamClient
 	}
 

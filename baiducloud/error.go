@@ -37,6 +37,11 @@ const (
 	OperationDenied      = "OperationDenied"
 	ReleaseWhileCreating = "Instance.ReleaseWhileCreating"
 
+	// bbc error
+	BadRequest          = "BadRequest"
+	InstanceNameInvalid = "Instance.NameInvalid"
+	NoSuchObject        = "NoSuchObject"
+
 	// not found error
 	InstanceNotFound           = "InstanceNotFound"
 	EipNotFound                = "EipNotFound"
@@ -61,6 +66,8 @@ const GetFailTargetStatus = "Get Fail target status: %s."
 var (
 	// bcc error
 	BccNotFound = []string{"InvalidInstanceId.NotFound", "Forbidden.InstanceNotFound"}
+	// bbc error
+	BbcNotFound = []string{"InvalidInstanceId.NotFound", "Forbidden.InstanceNotFound"}
 
 	// nat gateway error
 	NatGatewayNotFound = []string{"NoSuchNat"}
