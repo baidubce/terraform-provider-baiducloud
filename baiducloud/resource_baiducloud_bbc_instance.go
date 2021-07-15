@@ -14,7 +14,7 @@ resource "baiducloud_bbc_instance" "my-server" {
   subnet_id = ""
   security_group = ""
   availability_zone = "cn-bj-a"
-  billing = {
+  billing {
     payment_timing = "Postpaid"
   }
 }
@@ -99,43 +99,7 @@ func resourceBaiduCloudBbcInstance() *schema.Resource {
 				MaxItems:    1,
 				MinItems:    1,
 				Required:    true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"payment_timing": {
-							Type:         schema.TypeString,
-							Description:  "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.",
-							Optional:     true,
-							Default:      bbc.PaymentTimingPostPaid,
-							ValidateFunc: validatePaymentTiming(),
-						},
-						"reservation": {
-							Type:        schema.TypeMap,
-							Description: "Reservation of the instance.",
-							Optional:    true,
-							//DiffSuppressFunc: postPaidDiffSuppressFunc,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"reservation_length": {
-										Type:         schema.TypeInt,
-										Description:  "The reservation length that you will pay for your resource. It is valid when payment_timing is Prepaid. Valid values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36].",
-										Required:     true,
-										Default:      1,
-										ValidateFunc: validateReservationLength(),
-										//DiffSuppressFunc: postPaidDiffSuppressFunc,
-									},
-									"reservation_time_unit": {
-										Type:         schema.TypeString,
-										Description:  "The reservation time unit that you will pay for your resource. It is valid when payment_timing is Prepaid. The value can only be month currently, which is also the default value.",
-										Required:     true,
-										Default:      "Month",
-										ValidateFunc: validateReservationUnit(),
-										//DiffSuppressFunc: postPaidDiffSuppressFunc,
-									},
-								},
-							},
-						},
-					},
-				},
+				Elem:        createBillingSchema(),
 			},
 			"cds_disks": {
 				Type:        schema.TypeList,
@@ -365,10 +329,7 @@ func resourceBaiduCloudBbcInstanceRead(d *schema.ResourceData, meta interface{})
 
 	d.Set("tags", flattenTagsToMap(response.Tags))
 
-	billingMap := map[string]interface{}{"payment_timing": response.PaymentTiming}
-	billings := []interface{}{}
-	billings = append(billings, billingMap)
-	d.Set("billing", billings)
+	setBilling(d, response.PaymentTiming)
 
 	// Computed
 	d.Set("description", response.Desc)
@@ -470,13 +431,14 @@ func resourceBaiduCloudBbcInstanceDelete(d *schema.ResourceData, meta interface{
 
 	instanceId := d.Id()
 	action := "Delete BBC Instance " + instanceId
-	args := &bbc.DeleteInstanceIngorePaymentArgs{
-		InstanceId:         instanceId,
-		RelatedReleaseFlag: true, //true or false
-	}
+	//args := &bbc.DeleteInstanceIngorePaymentArgs{
+	//		InstanceId:         instanceId,
+	//		RelatedReleaseFlag: true, //true or false
+	//	}
 	err := resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
-		raw, err := client.WithBbcClient(func(bbcClient *bbc.Client) (interface{}, error) {
-			return bbcClient.DeleteInstanceIngorePayment(args)
+		_, err := client.WithBbcClient(func(bbcClient *bbc.Client) (interface{}, error) {
+			// return bbcClient.DeleteInstanceIngorePayment(args)
+			return nil, bbcClient.DeleteInstance(instanceId)
 		})
 		if err != nil {
 			if IsExceptedErrors(err, []string{ReleaseWhileCreating, bce.EINTERNAL_ERROR}) {
@@ -484,7 +446,6 @@ func resourceBaiduCloudBbcInstanceDelete(d *schema.ResourceData, meta interface{
 			}
 			return resource.NonRetryableError(err)
 		}
-		addDebug(action, raw)
 		return nil
 	})
 	if err != nil {

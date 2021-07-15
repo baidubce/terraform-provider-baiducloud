@@ -7,7 +7,7 @@ Example Usage
 
 ```hcl
 resource "baiducloud_rds_readonly_instance" "default" {
-    billing = {
+    billing {
         payment_timing        = "Postpaid"
     }
     source_instance_id        = baiducloud_rds_instance.default.instance_id
@@ -28,6 +28,7 @@ $ terraform import baiducloud_rds_readonly_instance.default id
 package baiducloud
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/baidubce/bce-sdk-go/bce"
@@ -191,46 +192,12 @@ func resourceBaiduCloudRdsReadOnlyInstance() *schema.Resource {
 				Computed:    true,
 			},
 			"billing": {
-				Type:        schema.TypeMap,
-				Description: "Billing information of the Rds.",
+				Type:        schema.TypeList,
+				Description: "Billing information of the instance.",
+				MaxItems:    1,
+				MinItems:    1,
 				Required:    true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"payment_timing": {
-							Type:         schema.TypeString,
-							Description:  "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.",
-							Required:     true,
-							Default:      "Postpaid",
-							ValidateFunc: validatePaymentTiming(),
-						},
-						"reservation": {
-							Type:             schema.TypeMap,
-							Description:      "Reservation of the Rds.",
-							Optional:         true,
-							DiffSuppressFunc: postPaidDiffSuppressFunc,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"reservation_length": {
-										Type:             schema.TypeInt,
-										Description:      "The reservation length that you will pay for your resource. It is valid when payment_timing is Prepaid. Valid values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36].",
-										Required:         true,
-										Default:          1,
-										ValidateFunc:     validateReservationLength(),
-										DiffSuppressFunc: postPaidDiffSuppressFunc,
-									},
-									"reservation_time_unit": {
-										Type:             schema.TypeString,
-										Description:      "The reservation time unit that you will pay for your resource. It is valid when payment_timing is Prepaid. The value can only be month currently, which is also the default value.",
-										Required:         true,
-										Default:          "Month",
-										ValidateFunc:     validateReservationUnit(),
-										DiffSuppressFunc: postPaidDiffSuppressFunc,
-									},
-								},
-							},
-						},
-					},
-				},
+				Elem:        createBillingSchema(),
 			},
 			"payment_timing": {
 				Type:        schema.TypeString,
@@ -325,6 +292,7 @@ func resourceBaiduCloudRdsReadOnlyInstanceRead(d *schema.ResourceData, meta inte
 	d.Set("region", result.Region)
 	d.Set("instance_type", result.InstanceType)
 	d.Set("payment_timing", result.PaymentTiming)
+	setBilling(d, result.PaymentTiming)
 	d.Set("zone_names", result.ZoneNames)
 	d.Set("vpc_id", result.VpcId)
 	d.Set("port", result.Endpoint.Port)
@@ -385,7 +353,8 @@ func buildBaiduCloudRdsReadOnlyInstanceArgs(d *schema.ResourceData, meta interfa
 	}
 
 	if v, ok := d.GetOk("billing"); ok {
-		billing := v.(map[string]interface{})
+		billings := v.([]interface{})
+		billing := billings[0].(map[string]interface{})
 		billingRequest := rds.Billing{
 			PaymentTiming: "",
 			Reservation:   rds.Reservation{},
@@ -394,11 +363,20 @@ func buildBaiduCloudRdsReadOnlyInstanceArgs(d *schema.ResourceData, meta interfa
 			paymentTiming := p.(string)
 			billingRequest.PaymentTiming = paymentTiming
 		}
-		if billingRequest.PaymentTiming == "Postpaid" {
+		if billingRequest.PaymentTiming == "Prepaid" {
 			if r, ok := billing["reservation"]; ok {
 				reservation := r.(map[string]interface{})
 				if reservationLength, ok := reservation["reservation_length"]; ok {
-					billingRequest.Reservation.ReservationLength = reservationLength.(int)
+					switch reservationLength.(type) {
+					case int:
+						billingRequest.Reservation.ReservationLength = reservationLength.(int)
+					case string:
+						length, err := strconv.ParseInt(reservationLength.(string), 10, 64)
+						if err != nil {
+							return request, WrapErrorf(err, DefaultErrorMsg, "baiducloud_rds_readonly_instance", "parse reservation_length failed", BCESDKGoERROR)
+						}
+						billingRequest.Reservation.ReservationLength = int(length)
+					}
 				}
 				if reservationTimeUnit, ok := reservation["reservation_time_unit"]; ok {
 					billingRequest.Reservation.ReservationTimeUnit = reservationTimeUnit.(string)
