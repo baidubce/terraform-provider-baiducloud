@@ -27,7 +27,7 @@ func TestAccBaiduCloudCFCTrigger_HttpTrigger(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCfcHttpTriggerConfig(),
+				Config: testAccCfcHttpTriggerConfig(BaiduCloudTestResourceTypeNameCfcTrigger),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "source_type", "http"),
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "resource_path", "/test"),
@@ -38,7 +38,7 @@ func TestAccBaiduCloudCFCTrigger_HttpTrigger(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCfcHttpTriggerConfigUpdate(),
+				Config: testAccCfcHttpTriggerConfigUpdate(BaiduCloudTestResourceTypeNameCfcTrigger),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "source_type", "http"),
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "resource_path", "/test2"),
@@ -62,7 +62,7 @@ func TestAccBaiduCloudCFCTrigger_CDNTrigger(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCfcCDNTriggerConfig(),
+				Config: testAccCfcCDNTriggerConfig(BaiduCloudTestResourceTypeNameCfcTrigger),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "source_type", "cdn"),
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "cdn_event_type", "CachedObjectsBlocked"),
@@ -72,7 +72,7 @@ func TestAccBaiduCloudCFCTrigger_CDNTrigger(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCfcCDNTriggerConfigUpdate(),
+				Config: testAccCfcCDNTriggerConfigUpdate(BaiduCloudTestResourceTypeNameCfcTrigger),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "source_type", "cdn"),
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "cdn_event_type", "CachedObjectsPushed"),
@@ -95,7 +95,7 @@ func TestAccBaiduCloudCFCTrigger_BOSTrigger(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCfcBOSTriggerConfig(),
+				Config: testAccCfcBOSTriggerConfig(BaiduCloudTestResourceTypeNameCfcTrigger),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "source_type", "bos"),
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "name", "hehehehe"),
@@ -106,7 +106,7 @@ func TestAccBaiduCloudCFCTrigger_BOSTrigger(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCfcBOSTriggerConfigUpdate(),
+				Config: testAccCfcBOSTriggerConfigUpdate(BaiduCloudTestResourceTypeNameCfcTrigger),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "source_type", "bos"),
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "name", "hehehehe"),
@@ -130,7 +130,7 @@ func TestAccBaiduCloudCFCTrigger_DuerOSTrigger(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCfcDuerOSTriggerConfig(),
+				Config: testAccCfcDuerOSTriggerConfig(BaiduCloudTestResourceTypeNameCfcTrigger),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "source_type", "dueros"),
 					resource.TestCheckResourceAttrSet(testAccCFCTriggerResourceName, "relation_id"),
@@ -151,7 +151,7 @@ func TestAccBaiduCloudCFCTrigger_CrontabTrigger(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCfcCrontabTriggerConfig(),
+				Config: testAccCfcCrontabTriggerConfig(BaiduCloudTestResourceTypeNameCfcTrigger),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "source_type", "crontab"),
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "name", "hahahaha"),
@@ -162,7 +162,7 @@ func TestAccBaiduCloudCFCTrigger_CrontabTrigger(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCfcCrontabTriggerConfigUpdate(),
+				Config: testAccCfcCrontabTriggerConfigUpdate(BaiduCloudTestResourceTypeNameCfcTrigger),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "source_type", "crontab"),
 					resource.TestCheckResourceAttr(testAccCFCTriggerResourceName, "name", "hahahaha"),
@@ -212,11 +212,11 @@ func testAccCFCTriggerDestory(s *terraform.State) error {
 	return nil
 }
 
-func testAccCfcHttpTriggerConfig() string {
+func testAccCfcHttpTriggerConfig(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
   function_name  = "%s"
-  description    = "terraform create"
+  description    = "created by terraform"
   handler        = "index.handler"
   memory_size    = 128
   runtime        = "nodejs12"
@@ -224,22 +224,21 @@ resource "baiducloud_cfc_function" "default" {
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
-resource "%s" "%s" {
+resource "baiducloud_cfc_trigger" "default" {
   source_type   = "http"
   target        = baiducloud_cfc_function.default.function_brn
   resource_path = "/test"
   method        = ["GET","PUT"]
   auth_type     = "iam"
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"CFC",
-		testAccCFCTriggerResourceType, BaiduCloudTestResourceName)
+`, name)
 }
 
-func testAccCfcHttpTriggerConfigUpdate() string {
+func testAccCfcHttpTriggerConfigUpdate(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
   function_name  = "%s"
-  description    = "terraform create"
+  description    = "created by terraform"
   handler        = "index.handler"
   memory_size    = 128
   runtime        = "nodejs12"
@@ -247,22 +246,21 @@ resource "baiducloud_cfc_function" "default" {
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
-resource "%s" "%s" {
+resource "baiducloud_cfc_trigger" "default" {
   source_type   = "http"
   target        = baiducloud_cfc_function.default.function_brn
   resource_path = "/test2"
   method        = ["GET","PUT","POST"]
   auth_type     = "iam"
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"CFC",
-		testAccCFCTriggerResourceType, BaiduCloudTestResourceName)
+`, name)
 }
 
-func testAccCfcCDNTriggerConfig() string {
+func testAccCfcCDNTriggerConfig(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
   function_name  = "%s"
-  description    = "terraform create"
+  description    = "created by terraform"
   handler        = "index.handler"
   memory_size    = 128
   runtime        = "nodejs12"
@@ -270,21 +268,22 @@ resource "baiducloud_cfc_function" "default" {
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
-resource "%s" "%s" {
+resource "baiducloud_cfc_trigger" "default" {
   source_type    = "cdn"
   target         = baiducloud_cfc_function.default.function_brn
-  cdn_event_type = "CachedObjectsBlocked"
-  status         = "disabled"
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"CFC",
-		testAccCFCTriggerResourceType, BaiduCloudTestResourceName)
+`, name)
 }
 
-func testAccCfcCDNTriggerConfigUpdate() string {
+//TODO cfc 版本适应
+//cdn_event_type = "CachedObjectsBlocked"
+//status         = "disabled"
+
+func testAccCfcCDNTriggerConfigUpdate(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
   function_name  = "%s"
-  description    = "terraform create"
+  description    = "created by terraform"
   handler        = "index.handler"
   memory_size    = 128
   runtime        = "nodejs12"
@@ -292,17 +291,16 @@ resource "baiducloud_cfc_function" "default" {
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
-resource "%s" "%s" {
+resource "baiducloud_cfc_trigger" "default" {
   source_type    = "cdn"
   target         = baiducloud_cfc_function.default.function_brn
   cdn_event_type = "CachedObjectsPushed"
   status         = "enabled"
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"CFC",
-		testAccCFCTriggerResourceType, BaiduCloudTestResourceName)
+`, name)
 }
 
-func testAccCfcBOSTriggerConfig() string {
+func testAccCfcBOSTriggerConfig(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_bos_bucket" "default" {
   bucket = "%s"
@@ -311,7 +309,7 @@ resource "baiducloud_bos_bucket" "default" {
 
 resource "baiducloud_cfc_function" "default" {
   function_name  = "%s"
-  description    = "terraform create"
+  description    = "created by terraform"
   handler        = "index.handler"
   memory_size    = 128
   runtime        = "nodejs12"
@@ -319,7 +317,7 @@ resource "baiducloud_cfc_function" "default" {
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
-resource "%s" "%s" {
+resource "baiducloud_cfc_trigger" "default" {
   source_type    = "bos"
   bucket         = baiducloud_bos_bucket.default.bucket
   target         = baiducloud_cfc_function.default.function_brn
@@ -328,12 +326,10 @@ resource "%s" "%s" {
   bos_event_type = ["PutObject", "PostObject"]
   resource       = "/undefined"
 }
-`, BaiduCloudTestBucketResourceAttrNamePrefix+"bossss",
-		BaiduCloudTestResourceAttrNamePrefix+"CFC",
-		testAccCFCTriggerResourceType, BaiduCloudTestResourceName)
+`, name+"-bucket-new", name)
 }
 
-func testAccCfcBOSTriggerConfigUpdate() string {
+func testAccCfcBOSTriggerConfigUpdate(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_bos_bucket" "default" {
   bucket = "%s"
@@ -342,7 +338,7 @@ resource "baiducloud_bos_bucket" "default" {
 
 resource "baiducloud_cfc_function" "default" {
   function_name  = "%s"
-  description    = "terraform create"
+  description    = "created by terraform"
   handler        = "index.handler"
   memory_size    = 128
   runtime        = "nodejs12"
@@ -350,7 +346,7 @@ resource "baiducloud_cfc_function" "default" {
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
-resource "%s" "%s" {
+resource "baiducloud_cfc_trigger" "default" {
   source_type    = "bos"
   bucket         = baiducloud_bos_bucket.default.bucket
   target         = baiducloud_cfc_function.default.function_brn
@@ -359,16 +355,14 @@ resource "%s" "%s" {
   bos_event_type = ["PostObject"]
   resource       = "/undefined"
 }
-`, BaiduCloudTestBucketResourceAttrNamePrefix+"bossss",
-		BaiduCloudTestResourceAttrNamePrefix+"CFC",
-		testAccCFCTriggerResourceType, BaiduCloudTestResourceName)
+`, name+"-bucket-new", name)
 }
 
-func testAccCfcDuerOSTriggerConfig() string {
+func testAccCfcDuerOSTriggerConfig(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
   function_name  = "%s"
-  description    = "terraform create"
+  description    = "created by terraform"
   handler        = "index.handler"
   memory_size    = 128
   runtime        = "nodejs12"
@@ -376,19 +370,18 @@ resource "baiducloud_cfc_function" "default" {
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
-resource "%s" "%s" {
+resource "baiducloud_cfc_trigger" "default" {
   source_type = "dueros"
   target      = baiducloud_cfc_function.default.function_brn
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"CFC",
-		testAccCFCTriggerResourceType, BaiduCloudTestResourceName)
+`, name)
 }
 
-func testAccCfcCrontabTriggerConfig() string {
+func testAccCfcCrontabTriggerConfig(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
   function_name  = "%s"
-  description    = "terraform create"
+  description    = "created by terraform"
   handler        = "index.handler"
   memory_size    = 128
   runtime        = "nodejs12"
@@ -396,22 +389,21 @@ resource "baiducloud_cfc_function" "default" {
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
-resource "%s" "%s" {
+resource "baiducloud_cfc_trigger" "default" {
   source_type         = "crontab"
   target              = baiducloud_cfc_function.default.function_brn
   name                = "hahahaha"
   enabled             = "Disabled"
   schedule_expression = "cron(* * * * *)"
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"CFC",
-		testAccCFCTriggerResourceType, BaiduCloudTestResourceName)
+`, name)
 }
 
-func testAccCfcCrontabTriggerConfigUpdate() string {
+func testAccCfcCrontabTriggerConfigUpdate(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_cfc_function" "default" {
   function_name  = "%s"
-  description    = "terraform create"
+  description    = "created by terraform"
   handler        = "index.handler"
   memory_size    = 128
   runtime        = "nodejs12"
@@ -419,13 +411,12 @@ resource "baiducloud_cfc_function" "default" {
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
-resource "%s" "%s" {
+resource "baiducloud_cfc_trigger" "default" {
   source_type         = "crontab"
   target              = baiducloud_cfc_function.default.function_brn
   name                = "hahahaha"
   enabled             = "Enabled"
   schedule_expression = "cron(0 10 * * ?)"
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"CFC",
-		testAccCFCTriggerResourceType, BaiduCloudTestResourceName)
+`, name)
 }

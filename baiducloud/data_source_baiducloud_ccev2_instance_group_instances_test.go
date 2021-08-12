@@ -20,7 +20,7 @@ func TestAccBaiduCloudCCEv2InstanceGroupInstancesDataSource(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCcev2InstanceGroupInstancesDataSourceConfig(),
+				Config: testAccCcev2InstanceGroupInstancesDataSourceConfig(BaiduCloudTestResourceTypeNameCcev2InstanceGroup),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccCcev2InstanceGroupInstancesSourceName),
 					resource.TestCheckResourceAttrSet(testAccCcev2InstanceGroupInstancesSourceName, "total_count"),
@@ -30,9 +30,12 @@ func TestAccBaiduCloudCCEv2InstanceGroupInstancesDataSource(t *testing.T) {
 	})
 }
 
-func testAccCcev2InstanceGroupInstancesDataSourceConfig() string {
+func testAccCcev2InstanceGroupInstancesDataSourceConfig(name string) string {
 	return fmt.Sprintf(
 		`
+variable "name" {
+  default = "%s"
+}
 variable "vpc_cidr" {
   default = "192.168.0.0/16"
 }
@@ -46,32 +49,32 @@ variable "cluster_ip_service_cidr" {
   default = "172.31.0.0/16"
 }
 resource "baiducloud_vpc" "default" {
-  name        = "%s"
-  description = "test-BaiduAcc_test-vpc-tf-auto"
+  name        = var.name
+  description = "created by terraform"
   cidr        = "192.168.0.0/16"
 }
-data "baiducloud_zones" "defaultA" {
-  name_regex = ".*a$"
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
 }
-resource "baiducloud_subnet" "defaultA" {
-  name        = "%s"
-  zone_name   = data.baiducloud_zones.defaultA.zones.0.zone_name
+resource "baiducloud_subnet" "default" {
+  name        = var.name
+  zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.1.0/24"
   vpc_id      = baiducloud_vpc.default.id
-  description = "test-subnet-tf-auto"
+  description = "created by terraform"
 }
 resource "baiducloud_security_group" "default" {
-  name   = "%s"
+  name   = var.name
   vpc_id = baiducloud_vpc.default.id
 }
-resource "baiducloud_security_group_rule" "default" {
+resource "baiducloud_security_group_rule" "ingress" {
   security_group_id = baiducloud_security_group.default.id
   remark            = "remark"
   protocol          = "all"
   port_range        = "1-65535"
   direction         = "ingress"
 }
-resource "baiducloud_security_group_rule" "default2" {
+resource "baiducloud_security_group_rule" "egress" {
   security_group_id = baiducloud_security_group.default.id
   remark            = "remark"
   protocol          = "all"
@@ -80,7 +83,7 @@ resource "baiducloud_security_group_rule" "default2" {
 }
 resource "baiducloud_ccev2_cluster" "default_managed" {
   cluster_spec  {
-    cluster_name = "%s"
+    cluster_name = var.name
     k8s_version = "1.16.8"
     runtime_type = "docker"
     vpc_id = baiducloud_vpc.default.id
@@ -88,14 +91,14 @@ resource "baiducloud_ccev2_cluster" "default_managed" {
       master_type = "managed"
       cluster_ha = 1
       exposed_public = false
-      cluster_blb_vpc_subnet_id = baiducloud_subnet.defaultA.id
+      cluster_blb_vpc_subnet_id = baiducloud_subnet.default.id
       managed_cluster_master_option {
         master_vpc_subnet_zone = "zoneA"
       }
     }
     container_network_config  {
       mode = "kubenet"
-      lb_service_vpc_subnet_id = baiducloud_subnet.defaultA.id
+      lb_service_vpc_subnet_id = baiducloud_subnet.default.id
       cluster_pod_cidr = var.cluster_pod_cidr
       cluster_ip_service_cidr = var.cluster_ip_service_cidr
     }
@@ -110,14 +113,14 @@ data "baiducloud_images" "default" {
   name_regex = "7.5.*"
   os_name    = "CentOS"
 }
-resource "baiducloud_ccev2_instance_group" "ccev2_instance_group_1" {
+resource "baiducloud_ccev2_instance_group" "default" {
   spec {
     cluster_id = baiducloud_ccev2_cluster.default_managed.id
     replicas = 1
-    instance_group_name = "%s"
+    instance_group_name = var.name
     instance_template {
       cce_instance_id = ""
-      instance_name = "%s"
+      instance_name = var.name
       cluster_role = "node"
       existed = false
       machine_type = "BCC"
@@ -125,7 +128,7 @@ resource "baiducloud_ccev2_instance_group" "ccev2_instance_group_1" {
 
       vpc_config {
         vpc_id = baiducloud_vpc.default.id
-        vpc_subnet_id = baiducloud_subnet.defaultA.id
+        vpc_subnet_id = baiducloud_subnet.default.id
         security_group_id = baiducloud_security_group.default.id
         available_zone = "zoneA"
       }
@@ -153,17 +156,10 @@ resource "baiducloud_ccev2_instance_group" "ccev2_instance_group_1" {
 }
 data "baiducloud_ccev2_instance_group_instances" "default" {
   cluster_id = baiducloud_ccev2_cluster.default_managed.id
-  instance_group_id = baiducloud_ccev2_instance_group.ccev2_instance_group_1.id
+  instance_group_id = baiducloud_ccev2_instance_group.default.id
   page_no = 0
   page_size = 0
 }
-`,
-		BaiduCloudTestResourceAttrNamePrefix+"_test-vpc-tf-auto",
-		BaiduCloudTestResourceAttrNamePrefix+"_test-subnet-tf-auto",
-		BaiduCloudTestResourceAttrNamePrefix+"_test-security-group-tf-auto",
-		BaiduCloudTestResourceAttrNamePrefix+"_ccev2_cluster_1",
-		BaiduCloudTestResourceAttrNamePrefix+"_ccev2_ig_1",
-		BaiduCloudTestResourceAttrNamePrefix+"_ccev2_ig_1_ins",
-	)
+`, name)
 
 }

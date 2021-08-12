@@ -22,10 +22,10 @@ func TestAccBaiduCloudNatGatewaysDataSource(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccNatGatewaysDataSourceConfigForNat(),
+				Config: testAccNatGatewaysDataSourceConfigForNat(BaiduCloudTestResourceTypeNameNatGateway),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccNatGatewaysDataSourceName),
-					resource.TestCheckResourceAttr(testAccNatGatewaysDataSourceName, testAccNatGatewaysDataSourceAttrKeyPrefix+"name", testAccNatGatewayResourceAttrName),
+					resource.TestCheckResourceAttr(testAccNatGatewaysDataSourceName, testAccNatGatewaysDataSourceAttrKeyPrefix+"name", BaiduCloudTestResourceTypeNameNatGateway),
 					resource.TestCheckResourceAttr(testAccNatGatewaysDataSourceName, testAccNatGatewaysDataSourceAttrKeyPrefix+"spec", "medium"),
 					resource.TestCheckResourceAttrSet(testAccNatGatewaysDataSourceName, testAccNatGatewaysDataSourceAttrKeyPrefix+"id"),
 					resource.TestCheckResourceAttrSet(testAccNatGatewaysDataSourceName, testAccNatGatewaysDataSourceAttrKeyPrefix+"vpc_id"),
@@ -35,10 +35,10 @@ func TestAccBaiduCloudNatGatewaysDataSource(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccNatGatewaysDataSourceConfigForAll(),
+				Config: testAccNatGatewaysDataSourceConfigForAll(BaiduCloudTestResourceTypeNameNatGateway),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccNatGatewaysDataSourceName),
-					resource.TestCheckResourceAttr(testAccNatGatewaysDataSourceName, testAccNatGatewaysDataSourceAttrKeyPrefix+"name", testAccNatGatewayResourceAttrName),
+					resource.TestCheckResourceAttr(testAccNatGatewaysDataSourceName, testAccNatGatewaysDataSourceAttrKeyPrefix+"name", BaiduCloudTestResourceTypeNameNatGateway),
 					resource.TestCheckResourceAttr(testAccNatGatewaysDataSourceName, testAccNatGatewaysDataSourceAttrKeyPrefix+"spec", "medium"),
 					resource.TestCheckResourceAttrSet(testAccNatGatewaysDataSourceName, testAccNatGatewaysDataSourceAttrKeyPrefix+"id"),
 					resource.TestCheckResourceAttrSet(testAccNatGatewaysDataSourceName, testAccNatGatewaysDataSourceAttrKeyPrefix+"vpc_id"),
@@ -51,24 +51,30 @@ func TestAccBaiduCloudNatGatewaysDataSource(t *testing.T) {
 	})
 }
 
-func testAccNatGatewaysDataSourceConfigForNat() string {
+func testAccNatGatewaysDataSourceConfigForNat(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = var.name
   cidr = "192.168.0.0/16"
 }
 
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 resource "baiducloud_subnet" "default" {
-  name      = "%s"
+  name      = var.name
   zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.1.0/24"
   vpc_id    = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_nat_gateway" "default" {
-  name   = "%s"
+  name   = var.name
   vpc_id = baiducloud_vpc.default.id
   spec = "medium"
   billing = {
@@ -82,30 +88,36 @@ data "baiducloud_nat_gateways" "default" {
 
   filter {
     name = "name"
-    values = ["test-BaiduAcc*"]
+    values = ["tf-test-acc*"]
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"Subnet", testAccNatGatewayResourceAttrName)
+`, name)
 }
 
-func testAccNatGatewaysDataSourceConfigForAll() string {
+func testAccNatGatewaysDataSourceConfigForAll(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = var.name
   cidr = "192.168.0.0/16"
 }
 
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 resource "baiducloud_subnet" "default" {
-  name      = "%s"
+  name      = var.name
   zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.1.0/24"
   vpc_id    = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_nat_gateway" "default" {
-  name    = "%s"
+  name    = var.name
   vpc_id  = baiducloud_vpc.default.id
   spec    = "medium"
   billing = {
@@ -122,5 +134,5 @@ data "baiducloud_nat_gateways" "default" {
     values = ["medium"]
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"Subnet", testAccNatGatewayResourceAttrName)
+`, name)
 }

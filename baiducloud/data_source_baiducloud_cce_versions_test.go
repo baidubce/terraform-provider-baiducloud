@@ -1,9 +1,8 @@
 package baiducloud
 
 import (
-	"testing"
-
 	"github.com/hashicorp/terraform/helper/resource"
+	"testing"
 )
 
 const (
@@ -12,7 +11,7 @@ const (
 )
 
 //lintignore:AT003
-func TestAccBaiduCloudCceVersionsDataSource(t *testing.T) {
+func testAccBaiduCloudCceVersionsDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)

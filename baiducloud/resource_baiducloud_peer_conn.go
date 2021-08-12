@@ -148,7 +148,7 @@ func resourceBaiduCloudPeerConn() *schema.Resource {
 							Description:  "Payment timing of the billing, which can be Prepaid or Postpaid. The default is Postpaid.",
 							Required:     true,
 							ForceNew:     true,
-							Default:      PAYMENT_TIMING_POSTPAID,
+							Default:      PaymentTimingPostpaid,
 							ValidateFunc: validatePaymentTiming(),
 						},
 						"reservation": {
@@ -411,7 +411,7 @@ func buildBaiduCloudPeerConnArgs(d *schema.ResourceData) *vpc.CreatePeerConnArgs
 			paymentTiming := vpc.PaymentTimingType(p.(string))
 			args.Billing.PaymentTiming = paymentTiming
 		}
-		if args.Billing.PaymentTiming == PAYMENT_TIMING_PREPAID {
+		if args.Billing.PaymentTiming == PaymentTimingPrepai {
 			if r, ok := billing["reservation"]; ok {
 				args.Billing.Reservation = &vpc.Reservation{}
 				reservation := r.(map[string]interface{})

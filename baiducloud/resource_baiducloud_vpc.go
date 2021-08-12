@@ -192,7 +192,7 @@ func resourceBaiduCloudVpcDelete(d *schema.ResourceData, meta interface{}) error
 		})
 		addDebug(action, raw)
 		if err != nil {
-			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR, SUBNET_INUSE_ERROR}) {
+			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR, SubnetInuseError, NotAllowDeleteVpc}) {
 				return resource.RetryableError(err)
 			}
 			return resource.NonRetryableError(err)

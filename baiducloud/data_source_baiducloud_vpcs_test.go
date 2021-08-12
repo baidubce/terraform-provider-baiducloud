@@ -25,7 +25,7 @@ func TestAccBaiduCloudVPCsDataSource(t *testing.T) {
 					testAccCheckBaiduCloudDataSourceId(testAccVPCsDataSourceName),
 					resource.TestCheckResourceAttrSet(testAccVPCsDataSourceName, testAccVPCsDataSourceAttrKeyPrefix+"vpc_id"),
 					resource.TestCheckResourceAttr(testAccVPCsDataSourceName, testAccVPCsDataSourceAttrKeyPrefix+"cidr", "192.168.0.0/24"),
-					resource.TestCheckResourceAttr(testAccVPCsDataSourceName, testAccVPCsDataSourceAttrKeyPrefix+"name", "test-BaiduAccVPC"),
+					resource.TestCheckResourceAttr(testAccVPCsDataSourceName, testAccVPCsDataSourceAttrKeyPrefix+"name", BaiduCloudTestResourceTypeNameVpc),
 					resource.TestCheckResourceAttr(testAccVPCsDataSourceName, testAccVPCsDataSourceAttrKeyPrefix+"description", "created by terraform"),
 					resource.TestCheckResourceAttrSet(testAccVPCsDataSourceName, testAccVPCsDataSourceAttrKeyPrefix+"route_table_id"),
 					resource.TestCheckResourceAttr(testAccVPCsDataSourceName, testAccVPCsDataSourceAttrKeyPrefix+"secondary_cidrs.#", "0"),
@@ -39,7 +39,7 @@ func TestAccBaiduCloudVPCsDataSource(t *testing.T) {
 
 const testAccVPCsDataSourceConfig = `
 resource "baiducloud_vpc" "default" {
-  name        = "test-BaiduAccVPC"
+  name        = "tf-test-acc-vpc"
   description = "created by terraform"
   cidr        = "192.168.0.0/24"
   tags = {
@@ -52,7 +52,7 @@ data "baiducloud_vpcs" "default" {
 
   filter {
     name = "name"
-    values = ["test-BaiduAcc*"]
+    values = ["tf-test-acc*"]
   }
 }
 `

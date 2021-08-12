@@ -20,13 +20,13 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
-// timeout for common product, bcc e.g.
+// DefaultTimeout timeout for common product, bcc e.g.
 const DefaultTimeout = 180 * time.Second
 const DefaultDebugMsg = "\n*************** %s Response *************** \n%+v\n%s******************************\n\n"
 
 const (
-	PAYMENT_TIMING_POSTPAID = "Postpaid"
-	PAYMENT_TIMING_PREPAID  = "Prepaid"
+	PaymentTimingPostpaid = "Postpaid"
+	PaymentTimingPrepai   = "Prepaid"
 )
 
 func debugOn() bool {

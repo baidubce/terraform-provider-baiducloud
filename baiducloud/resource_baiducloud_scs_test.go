@@ -2,15 +2,14 @@ package baiducloud
 
 import (
 	"fmt"
+	"github.com/baidubce/bce-sdk-go/services/scs"
+	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform/terraform"
 	"log"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/baidubce/bce-sdk-go/services/scs"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/terraform"
 
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 )
@@ -43,7 +42,7 @@ func testSweepScsInstances(region string) error {
 	}
 
 	for _, inst := range instList {
-		if !strings.HasPrefix(inst.InstanceName, BaiduCloudTestResourceAttrNamePrefix) || inst.InstanceStatus != "Running" {
+		if !strings.HasPrefix(inst.InstanceName, BaiduCloudTestResourceTypeName) || inst.InstanceStatus != "Running" {
 			log.Printf("[INFO] Skipping SCS instance: %s (%s)", inst.InstanceID, inst.InstanceName)
 			continue
 		}
@@ -63,8 +62,7 @@ func testSweepScsInstances(region string) error {
 
 func TestAccBaiduCloudScs(t *testing.T) {
 	timeStamp := strconv.FormatInt(time.Now().Unix(), 10)
-	instance_name := BaiduCloudTestResourceAttrNamePrefix + "Scs-" + timeStamp
-	instance_name_new := BaiduCloudTestResourceAttrNamePrefix + "ScsNew-" + timeStamp
+	name := BaiduCloudTestResourceTypeNameScs + "-" + timeStamp
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -74,10 +72,10 @@ func TestAccBaiduCloudScs(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccScsConfig(instance_name),
+				Config: testAccScsConfig(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccScsResourceName),
-					resource.TestCheckResourceAttr(testAccScsResourceName, "instance_name", instance_name),
+					resource.TestCheckResourceAttr(testAccScsResourceName, "instance_name", name),
 					resource.TestCheckResourceAttr(testAccScsResourceName, "billing.payment_timing", "Postpaid"),
 					resource.TestCheckResourceAttr(testAccScsResourceName, "port", "6379"),
 					resource.TestCheckResourceAttr(testAccScsResourceName, "cluster_type", "master_slave"),
@@ -93,15 +91,15 @@ func TestAccBaiduCloudScs(t *testing.T) {
 				ImportStateVerifyIgnore: []string{"instance_status"},
 			},
 			{
-				Config: testAccScsConfigUpdate(instance_name_new),
+				Config: testAccScsConfigUpdate(BaiduCloudTestResourceTypeNameScs),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccScsResourceName),
-					resource.TestCheckResourceAttr(testAccScsResourceName, "instance_name", instance_name_new),
+					resource.TestCheckResourceAttr(testAccScsResourceName, "instance_name", BaiduCloudTestResourceTypeNameScs+"-update"),
 					resource.TestCheckResourceAttr(testAccScsResourceName, "billing.payment_timing", "Postpaid"),
 					resource.TestCheckResourceAttr(testAccScsResourceName, "cluster_type", "master_slave"),
 					resource.TestCheckResourceAttr(testAccScsResourceName, "engine_version", "3.2"),
 					resource.TestCheckResourceAttr(testAccScsResourceName, "replication_num", "1"),
-					resource.TestCheckResourceAttr(testAccScsResourceName, "shard_num", "1"),
+					resource.TestCheckResourceAttr(testAccScsResourceName, "shard_num", "2"),
 					resource.TestCheckResourceAttr(testAccScsResourceName, "node_type", "cache.n1.micro"),
 				),
 			},
@@ -126,7 +124,7 @@ func testAccScsDestory(s *terraform.State) error {
 			return WrapError(err)
 		}
 
-		deletingStatus := []string{"Pausing", "Paused", "Deleted", "Deleting"}
+		deletingStatus := []string{"Pausing", "Paused", "Deleted", "Deleting", "isolated"}
 		if IsExpectValue(result.InstanceStatus, deletingStatus) {
 			continue
 		}
@@ -152,7 +150,7 @@ func IsExpectValue(value string, expectList []string) bool {
 
 func testAccScsConfig(name string) string {
 	return fmt.Sprintf(`
-resource "%s" "%s" {
+resource "baiducloud_scs" "default" {
     instance_name           = "%s"
 	billing = {
     	payment_timing 		= "Postpaid"
@@ -166,12 +164,12 @@ resource "%s" "%s" {
 	shard_num 				= 1
 	proxy_num 				= 0
 }
-`, testAccScsResourceType, BaiduCloudTestResourceName, name)
+`, name)
 }
 
 func testAccScsConfigUpdate(name string) string {
 	return fmt.Sprintf(`
-resource "%s" "%s" {
+resource "baiducloud_scs" "default" {
     instance_name           = "%s"
 	billing = {
     	payment_timing 		= "Postpaid"
@@ -182,8 +180,8 @@ resource "%s" "%s" {
 	node_type 				= "cache.n1.micro"
 	cluster_type 			= "master_slave"
 	replication_num 		= 1
-	shard_num 				= 1
+	shard_num 				= 2
 	proxy_num 				= 0
 }
-`, testAccScsResourceType, BaiduCloudTestResourceName, name)
+`, name+"-update")
 }

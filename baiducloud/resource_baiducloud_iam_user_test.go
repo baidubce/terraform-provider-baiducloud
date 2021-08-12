@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/baidubce/bce-sdk-go/services/iam"
 	"github.com/baidubce/bce-sdk-go/services/iam/api"
-	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
@@ -15,9 +14,7 @@ import (
 
 const (
 	testAccIamUserResourceType = "baiducloud_iam_user"
-	testAccIamUserPrefix       = "test_BaiduAcc"
 	testAccIamUserResourceName = testAccIamUserResourceType + "." + BaiduCloudTestResourceName
-	testAccIamUserDescription  = "test_description"
 )
 
 func init() {
@@ -44,7 +41,7 @@ func testSweepIamUsers(region string) error {
 
 	result, _ := raw.(*api.ListUserResult)
 	for _, user := range result.Users {
-		if !strings.HasPrefix(user.Name, testAccIamUserPrefix) {
+		if !strings.HasPrefix(user.Name, BaiduCloudTestResourceTypeNameUnderLine) {
 			continue
 		}
 		log.Printf("[INFO] Deleting user: %s", user.Name)
@@ -57,9 +54,9 @@ func testSweepIamUsers(region string) error {
 	}
 	return nil
 }
+
 func TestAccBaiduCloudIamUser(t *testing.T) {
-	name := acctest.RandomWithPrefix(testAccIamUserPrefix)
-	nameUpdate := acctest.RandomWithPrefix(testAccIamUserPrefix)
+
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -69,11 +66,11 @@ func TestAccBaiduCloudIamUser(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccIamUserConfig(name),
+				Config: testAccIamUserConfig(BaiduCloudTestResourceTypeNameUnderLine),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccIamUserResourceName),
-					resource.TestCheckResourceAttr(testAccIamUserResourceName, "name", name),
-					resource.TestCheckResourceAttr(testAccIamUserResourceName, "description", testAccIamUserDescription),
+					resource.TestCheckResourceAttr(testAccIamUserResourceName, "name", BaiduCloudTestResourceTypeNameUnderLine),
+					resource.TestCheckResourceAttr(testAccIamUserResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttrSet(testAccIamUserResourceName, "unique_id"),
 				),
 			},
@@ -83,25 +80,16 @@ func TestAccBaiduCloudIamUser(t *testing.T) {
 				ImportStateVerifyIgnore: []string{"force_destroy"},
 			},
 			{
-				Config: testAccIamUserConfig(nameUpdate),
+				Config: testAccIamUserConfig(BaiduCloudTestResourceTypeNameUnderLine + "_update"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccIamUserResourceName),
-					resource.TestCheckResourceAttr(testAccIamUserResourceName, "name", nameUpdate),
-					resource.TestCheckResourceAttr(testAccIamUserResourceName, "description", testAccIamUserDescription),
+					resource.TestCheckResourceAttr(testAccIamUserResourceName, "name", BaiduCloudTestResourceTypeNameUnderLine+"_update"),
+					resource.TestCheckResourceAttr(testAccIamUserResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttrSet(testAccIamUserResourceName, "unique_id"),
 				),
 			},
 		},
 	})
-}
-
-func testAccIamUserConfig(name string) string {
-	return fmt.Sprintf(`
-resource "%s" "%s" {
-  name = "%s"
-  description = "%s"
-  force_destroy    = true
-}`, testAccIamUserResourceType, BaiduCloudTestResourceName, name, testAccIamUserDescription)
 }
 
 func testAccIamUserDestroy(s *terraform.State) error {
@@ -126,4 +114,13 @@ func testAccIamUserDestroy(s *terraform.State) error {
 	}
 
 	return nil
+}
+
+func testAccIamUserConfig(name string) string {
+	return fmt.Sprintf(`
+resource "baiducloud_iam_user" "default" {
+  name = "%s"
+  description = "created by terraform"
+  force_destroy    = true
+}`, name)
 }

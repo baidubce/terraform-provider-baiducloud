@@ -14,9 +14,8 @@ import (
 )
 
 const (
-	testAccVPCResourceType     = "baiducloud_vpc"
-	testAccVPCResourceName     = testAccVPCResourceType + "." + BaiduCloudTestResourceName
-	testAccVPCResourceAttrName = BaiduCloudTestResourceAttrNamePrefix + "VPC"
+	testAccVPCResourceType = "baiducloud_vpc"
+	testAccVPCResourceName = testAccVPCResourceType + "." + BaiduCloudTestResourceName
 )
 
 func init() {
@@ -27,7 +26,7 @@ func init() {
 			testAccInstanceResourceType,
 			testAccAppBLBResourceType,
 			testAccPeerConnResourceType,
-			testAccCceResourceType,
+			testAccCcev2ClusterResourceType,
 		},
 	})
 }
@@ -47,7 +46,7 @@ func testSweepVPCs(region string) error {
 	}
 
 	for _, v := range vpcList {
-		if !strings.HasPrefix(v.Name, BaiduCloudTestResourceAttrNamePrefix) {
+		if !strings.HasPrefix(v.Name, BaiduCloudTestResourceTypeName) {
 			log.Printf("[INFO] Skipping VPC: %s (%s)", v.VPCID, v.Name)
 			continue
 		}
@@ -96,11 +95,11 @@ func TestAccBaiduCloudVPC(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccVPCConfig(),
+				Config: testAccVPCConfig(BaiduCloudTestResourceTypeNameVpc),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccVPCResourceName),
-					resource.TestCheckResourceAttr(testAccVPCResourceName, "name", testAccVPCResourceAttrName),
-					resource.TestCheckResourceAttr(testAccVPCResourceName, "description", "vpc create"),
+					resource.TestCheckResourceAttr(testAccVPCResourceName, "name", BaiduCloudTestResourceTypeNameVpc),
+					resource.TestCheckResourceAttr(testAccVPCResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttr(testAccVPCResourceName, "cidr", "192.168.0.0/24"),
 					resource.TestCheckResourceAttrSet(testAccVPCResourceName, "route_table_id"),
 					resource.TestCheckResourceAttr(testAccVPCResourceName, "secondary_cidrs.#", "0"),
@@ -112,11 +111,11 @@ func TestAccBaiduCloudVPC(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccVPCConfigUpdate(),
+				Config: testAccVPCConfigUpdate(BaiduCloudTestResourceTypeNameVpc),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccVPCResourceName),
-					resource.TestCheckResourceAttr(testAccVPCResourceName, "name", testAccVPCResourceAttrName+"Update"),
-					resource.TestCheckResourceAttr(testAccVPCResourceName, "description", "vpc update"),
+					resource.TestCheckResourceAttr(testAccVPCResourceName, "name", BaiduCloudTestResourceTypeNameVpc+"-update"),
+					resource.TestCheckResourceAttr(testAccVPCResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttr(testAccVPCResourceName, "cidr", "192.168.0.0/24"),
 					resource.TestCheckResourceAttrSet(testAccVPCResourceName, "route_table_id"),
 					resource.TestCheckResourceAttr(testAccVPCResourceName, "secondary_cidrs.#", "0"),
@@ -148,26 +147,26 @@ func testAccVPCDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccVPCConfig() string {
+func testAccVPCConfig(name string) string {
 	return fmt.Sprintf(`
-resource "%s" "%s" {
+resource "baiducloud_vpc" "default" {
   name        = "%s"
-  description = "vpc create"
+  description = "created by terraform"
   cidr        = "192.168.0.0/24"
   tags = {
 	"tagKey" = "tagValue"
   }
-}`, testAccVPCResourceType, BaiduCloudTestResourceName, testAccVPCResourceAttrName)
+}`, name)
 }
 
-func testAccVPCConfigUpdate() string {
+func testAccVPCConfigUpdate(name string) string {
 	return fmt.Sprintf(`
-resource "%s" "%s" {
+resource "baiducloud_vpc" "default" {
   name        = "%s"
-  description = "vpc update"
+  description = "created by terraform"
   cidr        = "192.168.0.0/24"
   tags = {
 	"tagKey" = "tagValue"
   }
-}`, testAccVPCResourceType, BaiduCloudTestResourceName, testAccVPCResourceAttrName+"Update")
+}`, name+"-update")
 }

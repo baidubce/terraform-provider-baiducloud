@@ -27,10 +27,10 @@ func TestAccBaiduCloudSecurityGroup(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccSecurityGroupConfig(),
+				Config: testAccSecurityGroupConfig(BaiduCloudTestResourceTypeNameSecurityGroup),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccSecurityGroupResourceName),
-					resource.TestCheckResourceAttr(testAccSecurityGroupResourceName, "name", BaiduCloudTestResourceAttrNamePrefix+"SecurityGroup"),
+					resource.TestCheckResourceAttr(testAccSecurityGroupResourceName, "name", BaiduCloudTestResourceTypeNameSecurityGroup),
 					resource.TestCheckResourceAttr(testAccSecurityGroupResourceName, "tags.%", "1"),
 					resource.TestCheckResourceAttrSet(testAccSecurityGroupResourceName, "vpc_id"),
 				),
@@ -74,14 +74,14 @@ func testAccSecurityGroupDestory(s *terraform.State) error {
 	return nil
 }
 
-func testAccSecurityGroupConfig() string {
+func testAccSecurityGroupConfig(name string) string {
 	return fmt.Sprintf(`
-resource "%s" "%s" {
+resource "baiducloud_security_group" "default" {
   name        = "%s"
-  description = "Baidu acceptance test"
+  description = "created by terraform"
   tags = {
     "testKey" = "testValue"
   }
 }
-`, testAccSecurityGroupResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"SecurityGroup")
+`, name)
 }

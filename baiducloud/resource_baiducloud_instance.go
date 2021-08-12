@@ -442,7 +442,7 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 
 	stateConf := buildStateConf(
 		[]string{string(api.InstanceStatusStarting)},
-		[]string{string(api.InstanceStatusRunning)},
+		[]string{string(api.InstanceStatusRunning), InstanceStatusDeleted},
 		d.Timeout(schema.TimeoutCreate),
 		bccService.InstanceStateRefresh(d.Id()),
 	)
@@ -1199,7 +1199,7 @@ func updateInstanceSubnet(d *schema.ResourceData, meta interface{}, instanceID s
 		}
 
 		stateConf := buildStateConf(
-			[]string{string(api.InstanceStatusStopping), string(api.InstanceStatusStopped), string(api.InstanceStatusStarting)},
+			[]string{string(api.InstanceStatusStopping), string(api.InstanceStatusStopped), string(api.InstanceStatusStarting), InstanceStateChangeSubnet},
 			[]string{string(api.InstanceStatusRunning)},
 			d.Timeout(schema.TimeoutUpdate),
 			bccService.InstanceStateRefresh(instanceID),

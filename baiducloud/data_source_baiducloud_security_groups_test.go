@@ -21,7 +21,7 @@ func TestAccBaiduCloudSecurityGroupsDataSource(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccSecurityGroupsDataSourceConfig(),
+				Config: testAccSecurityGroupsDataSourceConfig(BaiduCloudTestResourceTypeNameSecurityGroup),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccSecurityGroupsDataSourceName),
 					resource.TestCheckResourceAttr(testAccSecurityGroupsDataSourceName, "security_groups.#", "1"),
@@ -31,17 +31,21 @@ func TestAccBaiduCloudSecurityGroupsDataSource(t *testing.T) {
 	})
 }
 
-func testAccSecurityGroupsDataSourceConfig() string {
+func testAccSecurityGroupsDataSourceConfig(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 resource "baiducloud_vpc" "default" {
-  name        = "%s"
-  description = "test"
+  name        = var.name
+  description = "created by terraform"
   cidr        = "192.168.0.0/24"
 }
 
 resource "baiducloud_security_group" "default" {
-  name        = "%s"
-  description = "Baidu acceptance test"
+  name        = var.name
+  description = "created by terraform"
   vpc_id      = baiducloud_vpc.default.id
 
   tags = {
@@ -54,9 +58,8 @@ data "baiducloud_security_groups" "default" {
 
   filter {
     name = "name"
-    values = ["test-BaiduAcc*"]
+    values = ["tf-test-acc*"]
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC",
-		BaiduCloudTestResourceAttrNamePrefix+"SecurityGroup")
+`, name)
 }

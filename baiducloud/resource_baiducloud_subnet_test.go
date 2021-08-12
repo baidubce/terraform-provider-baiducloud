@@ -11,9 +11,8 @@ import (
 )
 
 const (
-	testAccSubnetResourceType     = "baiducloud_subnet"
-	testAccSubnetResourceName     = testAccSubnetResourceType + "." + BaiduCloudTestResourceName
-	testAccSubnetResourceAttrName = BaiduCloudTestResourceAttrNamePrefix + "Subnet"
+	testAccSubnetResourceType = "baiducloud_subnet"
+	testAccSubnetResourceName = testAccSubnetResourceType + "." + BaiduCloudTestResourceName
 )
 
 //lintignore:AT003
@@ -27,12 +26,12 @@ func TestAccBaiduCloudSubnet(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccSubnetConfig(),
+				Config: testAccSubnetConfig(BaiduCloudTestResourceTypeNameSubnet),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccSubnetResourceName),
-					resource.TestCheckResourceAttr(testAccSubnetResourceName, "name", testAccSubnetResourceAttrName),
+					resource.TestCheckResourceAttr(testAccSubnetResourceName, "name", BaiduCloudTestResourceTypeNameSubnet),
 					resource.TestCheckResourceAttr(testAccSubnetResourceName, "cidr", "192.168.3.0/24"),
-					resource.TestCheckResourceAttr(testAccSubnetResourceName, "description", "test"),
+					resource.TestCheckResourceAttr(testAccSubnetResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttr(testAccSubnetResourceName, "subnet_type", "BCC"),
 					resource.TestCheckResourceAttrSet(testAccSubnetResourceName, "vpc_id"),
 					resource.TestCheckResourceAttrSet(testAccSubnetResourceName, "zone_name"),
@@ -45,12 +44,12 @@ func TestAccBaiduCloudSubnet(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccSubnetConfigUpdate(),
+				Config: testAccSubnetConfigUpdate(BaiduCloudTestResourceTypeNameSubnet),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccSubnetResourceName),
-					resource.TestCheckResourceAttr(testAccSubnetResourceName, "name", testAccSubnetResourceAttrName+"Update"),
+					resource.TestCheckResourceAttr(testAccSubnetResourceName, "name", BaiduCloudTestResourceTypeNameSubnet+"-update"),
 					resource.TestCheckResourceAttr(testAccSubnetResourceName, "cidr", "192.168.3.0/24"),
-					resource.TestCheckResourceAttr(testAccSubnetResourceName, "description", "test update"),
+					resource.TestCheckResourceAttr(testAccSubnetResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttr(testAccSubnetResourceName, "subnet_type", "BCC"),
 					resource.TestCheckResourceAttrSet(testAccSubnetResourceName, "vpc_id"),
 					resource.TestCheckResourceAttrSet(testAccSubnetResourceName, "zone_name"),
@@ -83,50 +82,56 @@ func testAccSubnetDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccSubnetConfig() string {
+func testAccSubnetConfig(name string) string {
 	return fmt.Sprintf(`
-data "baiducloud_zones" "default" {}
+variable "name" {
+  default = "%s"
+}
+
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = var.name
   cidr = "192.168.0.0/16"
 }
 
-resource "%s" "%s" {
-  name        = "%s"
+resource "baiducloud_subnet" "default" {
+  name        = var.name
   zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.3.0/24"
-  description = "test"
+  description = "created by terraform"
   vpc_id      = baiducloud_vpc.default.id
   subnet_type = "BCC"
   tags = {
     "tagKey" = "tagValue"
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC", testAccSubnetResourceType,
-		BaiduCloudTestResourceName, testAccSubnetResourceAttrName)
+`, name)
 }
 
-func testAccSubnetConfigUpdate() string {
+func testAccSubnetConfigUpdate(name string) string {
 	return fmt.Sprintf(`
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 resource "baiducloud_vpc" "default" {
   name = "%s"
   cidr = "192.168.0.0/16"
 }
 
-resource "%s" "%s" {
+resource "baiducloud_subnet" "default" {
   name        = "%s"
   zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.3.0/24"
-  description = "test update"
+  description = "created by terraform"
   vpc_id      = baiducloud_vpc.default.id
   subnet_type = "BCC"
   tags = {
     "tagKey" = "tagValue"
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC", testAccSubnetResourceType,
-		BaiduCloudTestResourceName, testAccSubnetResourceAttrName+"Update")
+`, name, name+"-update")
 }

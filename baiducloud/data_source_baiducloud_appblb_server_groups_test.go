@@ -21,10 +21,10 @@ func TestAccBaiduCloudAppBLBServerGroupsDataSource(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccAppBLBServerGroupDataSourceConfig(),
+				Config: testAccAppBLBServerGroupDataSourceConfig(BaiduCloudTestResourceTypeNameAppblbServerGroup),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccAppBLBServerGroupsDataSourceName),
-					resource.TestCheckResourceAttr(testAccAppBLBServerGroupsDataSourceName, testAccAppBLBServerGroupsDataSourceAttrKeyPrefix+"name", BaiduCloudTestResourceAttrNamePrefix+"ServerGroup"),
+					resource.TestCheckResourceAttr(testAccAppBLBServerGroupsDataSourceName, testAccAppBLBServerGroupsDataSourceAttrKeyPrefix+"name", BaiduCloudTestResourceTypeNameAppblbServerGroup),
 					resource.TestCheckResourceAttr(testAccAppBLBServerGroupsDataSourceName, testAccAppBLBServerGroupsDataSourceAttrKeyPrefix+"port_list.#", "1"),
 					resource.TestCheckResourceAttr(testAccAppBLBServerGroupsDataSourceName, testAccAppBLBServerGroupsDataSourceAttrKeyPrefix+"port_list.0.type", "TCP"),
 					resource.TestCheckResourceAttr(testAccAppBLBServerGroupsDataSourceName, testAccAppBLBServerGroupsDataSourceAttrKeyPrefix+"port_list.0.port", "66"),
@@ -39,9 +39,15 @@ func TestAccBaiduCloudAppBLBServerGroupsDataSource(t *testing.T) {
 	})
 }
 
-func testAccAppBLBServerGroupDataSourceConfig() string {
+func testAccAppBLBServerGroupDataSourceConfig(name string) string {
 	return fmt.Sprintf(`
-data "baiducloud_zones" "default" {}
+variable "name" {
+  default = "%s"
+}
+
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 data "baiducloud_specs" "default" {}
 
@@ -50,27 +56,27 @@ data "baiducloud_images" "default" {
 }
 
 resource "baiducloud_vpc" "default" {
-  name        = "%s"
-  description = "test"
+  name        = "${var.name}"
+  description = "created by terraform"
   cidr        = "192.168.0.0/24"
 }
 
 resource "baiducloud_subnet" "default" {
-  name        = "%s"
+  name        = "${var.name}"
   zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.0.0/24"
   vpc_id      = baiducloud_vpc.default.id
-  description = "test description"
+  description = "created by terraform"
 }
 
 resource "baiducloud_security_group" "default" {
-  name        = "%s"
-  description = "Baidu acceptance test"
+  name        = "${var.name}"
+  description = "created by terraform"
   vpc_id      = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_instance" "default" {
-  name                  = "%s"
+  name                  = "${var.name}"
   image_id              = data.baiducloud_images.default.images.0.id
   availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
   cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
@@ -85,14 +91,14 @@ resource "baiducloud_instance" "default" {
 
 resource "baiducloud_appblb" "default" {
   depends_on  = [baiducloud_instance.default]
-  name        = "%s"
+  name        = "${var.name}"
   vpc_id      = baiducloud_vpc.default.id
   subnet_id   = baiducloud_subnet.default.id
 }
 
 resource "baiducloud_appblb_server_group" "default" {
-  name        = "%s"
-  description = "acceptance test"
+  name        = "${var.name}"
+  description = "created by terraform"
   blb_id      = baiducloud_appblb.default.id
 
   backend_server_list {
@@ -113,13 +119,8 @@ data "baiducloud_appblb_server_groups" "default" {
 
   filter {
     name = "name"
-    values = ["test-BaiduAcc*"]
+    values = ["tf-test-acc*"]
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC",
-		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
-		BaiduCloudTestResourceAttrNamePrefix+"SecurityGroup",
-		BaiduCloudTestResourceAttrNamePrefix+"Instance",
-		BaiduCloudTestResourceAttrNamePrefix+"APPBLB",
-		BaiduCloudTestResourceAttrNamePrefix+"ServerGroup")
+`, name)
 }

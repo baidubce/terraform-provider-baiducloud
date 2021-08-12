@@ -26,12 +26,12 @@ func TestAccBaiduCloudCFCVersion(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCfcVersionConfig(),
+				Config: testAccCfcVersionConfig(BaiduCloudTestResourceTypeNameCfcVersion),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "version", "1"),
-					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "version_description", "test-BaiduAccVersion"),
-					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "function_name", "test-BaiduAccCFC"),
-					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "description", "terraform create"),
+					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "version_description", BaiduCloudTestResourceTypeNameCfcVersion),
+					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "function_name", BaiduCloudTestResourceTypeNameCfcVersion),
+					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "memory_size", "128"),
 					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "handler", "index.handler"),
 					resource.TestCheckResourceAttr(testAccCFCVersionResourceName, "runtime", "nodejs12"),
@@ -76,17 +76,23 @@ func testAccCFCVersionDestory(s *terraform.State) error {
 	return nil
 }
 
-func testAccCfcVersionConfig() string {
+func testAccCfcVersionConfig(name string) string {
 	return fmt.Sprintf(`
-data "baiducloud_zones" "default" {}
+variable "name" {
+  default = "%s"
+}
+
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = var.name
   cidr = "192.168.0.0/16"
 }
 
 resource "baiducloud_subnet" "default" {
-  name        = "%s"
+  name        = var.name
   zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.3.0/24"
   vpc_id      = baiducloud_vpc.default.id
@@ -94,13 +100,13 @@ resource "baiducloud_subnet" "default" {
 }
 
 resource "baiducloud_security_group" "default" {
-  name   = "%s"
+  name   = var.name
   vpc_id = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_cfc_function" "default" {
-  function_name  = "%s"
-  description    = "terraform create"
+  function_name  = var.name
+  description    = "created by terraform"
   handler        = "index.handler"
   memory_size    = 128
   runtime        = "nodejs12"
@@ -112,15 +118,11 @@ resource "baiducloud_cfc_function" "default" {
   }
 }
 
-resource "%s" "%s" {
+resource "baiducloud_cfc_version" "default" {
   function_name       = baiducloud_cfc_function.default.function_name
-  version_description = "%s"
+  version_description = var.name
   code_sha256         = baiducloud_cfc_function.default.code_sha256
   log_type            = "none"
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC",
-		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
-		BaiduCloudTestResourceAttrNamePrefix+"SecurityGroup",
-		BaiduCloudTestResourceAttrNamePrefix+"CFC",
-		testAccCFCVersionResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"Version")
+`, name)
 }

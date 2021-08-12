@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/baidubce/bce-sdk-go/services/iam"
 	"github.com/baidubce/bce-sdk-go/services/iam/api"
-	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
@@ -15,9 +14,7 @@ import (
 
 const (
 	testAccIamPolicyResourceType = "baiducloud_iam_policy"
-	testAccIamPolicyPrefix       = "test_BaiduAcc"
 	testAccIamPolicyResourceName = testAccIamPolicyResourceType + "." + BaiduCloudTestResourceName
-	testAccIamPolicyDescription  = "test_description"
 )
 
 func init() {
@@ -44,7 +41,7 @@ func testSweepIamPolicies(region string) error {
 
 	result, _ := raw.(*api.ListPolicyResult)
 	for _, policy := range result.Policies {
-		if !strings.HasPrefix(policy.Name, testAccIamPolicyPrefix) {
+		if !strings.HasPrefix(policy.Name, BaiduCloudTestResourceTypeNameUnderLine) {
 			continue
 		}
 		log.Printf("[INFO] Deleting policy: %s", policy.Name)
@@ -58,7 +55,7 @@ func testSweepIamPolicies(region string) error {
 	return nil
 }
 func TestAccBaiduCloudIamPolicy(t *testing.T) {
-	name := strings.ReplaceAll(acctest.RandomWithPrefix(testAccIamPolicyPrefix), "-", "_")
+
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -68,11 +65,11 @@ func TestAccBaiduCloudIamPolicy(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccIamPolicyConfig(name),
+				Config: testAccIamPolicyConfig(BaiduCloudTestResourceTypeNameUnderLine),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccIamPolicyResourceName),
-					resource.TestCheckResourceAttr(testAccIamPolicyResourceName, "name", name),
-					resource.TestCheckResourceAttr(testAccIamPolicyResourceName, "description", testAccIamPolicyDescription),
+					resource.TestCheckResourceAttr(testAccIamPolicyResourceName, "name", BaiduCloudTestResourceTypeNameUnderLine),
+					resource.TestCheckResourceAttr(testAccIamPolicyResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttrSet(testAccIamPolicyResourceName, "unique_id"),
 				),
 			},
@@ -83,17 +80,6 @@ func TestAccBaiduCloudIamPolicy(t *testing.T) {
 			},
 		},
 	})
-}
-
-func testAccIamPolicyConfig(name string) string {
-	return fmt.Sprintf(`
-resource "%s" "%s" {
-  name = "%s"
-  description = "%s"
-  document = <<EOF
-  {"accessControlList": [{"region":"bj","service":"bcc","resource":["*"],"permission":["*"],"effect":"Allow"}]}
-  EOF
-}`, testAccIamPolicyResourceType, BaiduCloudTestResourceName, name, testAccIamPolicyDescription)
 }
 
 func testAccIamPolicyDestroy(s *terraform.State) error {
@@ -118,4 +104,15 @@ func testAccIamPolicyDestroy(s *terraform.State) error {
 	}
 
 	return nil
+}
+
+func testAccIamPolicyConfig(name string) string {
+	return fmt.Sprintf(`
+resource "baiducloud_iam_policy" "default" {
+  name = "%s"
+  description = "created by terraform"
+  document = <<EOF
+  {"accessControlList": [{"region":"bj","service":"bcc","resource":["*"],"permission":["*"],"effect":"Allow"}]}
+  EOF
+}`, name)
 }

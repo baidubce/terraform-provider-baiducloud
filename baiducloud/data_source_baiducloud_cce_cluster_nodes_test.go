@@ -2,9 +2,8 @@ package baiducloud
 
 import (
 	"fmt"
-	"testing"
-
 	"github.com/hashicorp/terraform/helper/resource"
+	"testing"
 )
 
 const (
@@ -13,7 +12,7 @@ const (
 )
 
 //lintignore:AT003
-func TestAccBaiduCloudCceClusterDataSource(t *testing.T) {
+func testAccBaiduCloudCceClusterDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -21,7 +20,7 @@ func TestAccBaiduCloudCceClusterDataSource(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCCEClusterNodesDataSourceConfig(),
+				Config: testAccCCEClusterNodesDataSourceConfig(BaiduCloudTestResourceTypeName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccCceClusterNodesDataSourceName),
 				),
@@ -30,10 +29,14 @@ func TestAccBaiduCloudCceClusterDataSource(t *testing.T) {
 	})
 }
 
-func testAccCCEClusterNodesDataSourceConfig() string {
+func testAccCCEClusterNodesDataSourceConfig(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 data "baiducloud_zones" "defaultA" {
-  name_regex = ".*a$"
+  name_regex = ".*e$"
 }
 
 data "baiducloud_images" "default" {
@@ -43,13 +46,13 @@ data "baiducloud_images" "default" {
 }
 
 resource "baiducloud_vpc" "default" {
-  name        = "%s"
+  name        = var.name
   description = "created by terraform"
   cidr        = "192.168.0.0/16"
 }
 
 resource "baiducloud_subnet" "defaultA" {
-  name        = "%s"
+  name        = var.name
   zone_name   = data.baiducloud_zones.defaultA.zones.0.zone_name
   cidr        = "192.168.1.0/24"
   vpc_id      = baiducloud_vpc.default.id
@@ -57,7 +60,7 @@ resource "baiducloud_subnet" "defaultA" {
 }
 
 resource "baiducloud_security_group" "defualt" {
-  name   = "%s"
+  name   = var.name
   vpc_id = baiducloud_vpc.default.id
 }
 
@@ -78,7 +81,7 @@ resource "baiducloud_security_group_rule" "default2" {
 }
 
 resource "baiducloud_cce_cluster" "default" {
-  cluster_name        = "%s"
+  cluster_name        = var.name
   main_available_zone = "zoneA"
   version             = "1.13.10"
   container_net       = "172.16.0.0/16"
@@ -108,6 +111,5 @@ data "baiducloud_cce_cluster_nodes" "default" {
     instance_type       = "10"
     available_zone      = "zoneA"
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"SubnetA",
-		BaiduCloudTestResourceAttrNamePrefix+"SG", BaiduCloudTestResourceAttrNamePrefix+"CCE")
+`, name)
 }

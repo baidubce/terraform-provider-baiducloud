@@ -2,6 +2,7 @@ package baiducloud
 
 import (
 	"fmt"
+	"log"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -15,6 +16,25 @@ const (
 	testAccACLResourceName = testAccACLResourceType + "." + BaiduCloudTestResourceName
 )
 
+func init() {
+	resource.AddTestSweepers(testAccACLResourceType, &resource.Sweeper{
+		Name: testAccACLResourceType,
+		F:    testSweepACLs,
+		Dependencies: []string{
+			testAccInstanceResourceType,
+			testAccAppBLBResourceType,
+			testAccPeerConnResourceType,
+			testAccCcev2ClusterResourceType,
+			testAccVPCResourceType,
+		},
+	})
+}
+
+func testSweepACLs(region string) error {
+	log.Printf("[INFO] Skipping ACL,Nothing to do)")
+	return nil
+}
+
 //lintignore:AT003
 func TestAccBaiduCloudACL(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -26,7 +46,7 @@ func TestAccBaiduCloudACL(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccACLConfig(),
+				Config: testAccACLConfig(BaiduCloudTestResourceTypeNameAcl),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccACLResourceName),
 					resource.TestCheckResourceAttrSet(testAccACLResourceName, "subnet_id"),
@@ -42,7 +62,7 @@ func TestAccBaiduCloudACL(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccACLConfigUpdate(),
+				Config: testAccACLConfigUpdate(BaiduCloudTestResourceTypeNameAcl),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccACLResourceName),
 					resource.TestCheckResourceAttrSet(testAccACLResourceName, "subnet_id"),
@@ -97,17 +117,23 @@ func testAccACLDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccACLConfig() string {
+func testAccACLConfig(name string) string {
 	return fmt.Sprintf(`
-data "baiducloud_zones" "default" {}
+variable "name" {
+  default = "%s"
+}
+
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = "${var.name}"
   cidr = "192.168.0.0/16"
 }
 
 resource "baiducloud_subnet" "default" {
-  name      = "%s"
+  name      = "${var.name}"
   zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.1.0/24"
   vpc_id    = baiducloud_vpc.default.id
@@ -125,20 +151,26 @@ resource "baiducloud_acl" "default" {
   action                 = "allow"
   description            = "created by terraform"
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"Subnet")
+`, name)
 }
 
-func testAccACLConfigUpdate() string {
+func testAccACLConfigUpdate(name string) string {
 	return fmt.Sprintf(`
-data "baiducloud_zones" "default" {}
+variable "name" {
+  default = "%s"
+}
+
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = "${var.name}"
   cidr = "192.168.0.0/16"
 }
 
 resource "baiducloud_subnet" "default" {
-  name = "%s"
+  name = "${var.name}"
   zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.1.0/24"
   vpc_id    = baiducloud_vpc.default.id
@@ -156,5 +188,5 @@ resource "baiducloud_acl" "default" {
   action                 = "allow"
   description            = "updated by terraform"
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"Subnet")
+`, name)
 }

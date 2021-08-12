@@ -41,7 +41,7 @@ func testSweepRdsInstances(region string) error {
 	}
 
 	for _, inst := range instList {
-		if !strings.HasPrefix(inst.InstanceName, BaiduCloudTestResourceAttrNamePrefix) || inst.InstanceStatus != RDSStatusRunning {
+		if !strings.HasPrefix(inst.InstanceName, BaiduCloudTestResourceTypeName) || inst.InstanceStatus != RDSStatusRunning {
 			log.Printf("[INFO] Skipping RDS instance: %s (%s)", inst.InstanceId, inst.InstanceName)
 			continue
 		}
@@ -69,7 +69,7 @@ func TestAccBaiduCloudRdsInstance(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccRdsInstanceConfig(),
+				Config: testAccRdsInstanceConfig(BaiduCloudTestResourceTypeNameRdsInstance),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccRdsInstanceResourceName),
 					resource.TestCheckResourceAttr(testAccRdsInstanceResourceName, "billing.payment_timing", "Postpaid"),
@@ -81,7 +81,7 @@ func TestAccBaiduCloudRdsInstance(t *testing.T) {
 				ImportStateVerifyIgnore: []string{"instance_status"},
 			},
 			{
-				Config: testAccRdsInstanceConfigUpdate(),
+				Config: testAccRdsInstanceConfigUpdate(BaiduCloudTestResourceTypeNameRdsInstance),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccRdsInstanceResourceName),
 					resource.TestCheckResourceAttr(testAccRdsInstanceResourceName, "billing.payment_timing", "Postpaid"),
@@ -119,9 +119,9 @@ func testAccRdsInstanceDestory(s *terraform.State) error {
 	return nil
 }
 
-func testAccRdsInstanceConfig() string {
+func testAccRdsInstanceConfig(name string) string {
 	return fmt.Sprintf(`
-resource "%s" "%s" {
+resource "baiducloud_rds_instance" "default" {
     instance_name             = "%s"
     billing = {
         payment_timing        = "Postpaid"
@@ -132,12 +132,12 @@ resource "%s" "%s" {
     memory_capacity           = 1
     volume_capacity           = 5
 }
-`, testAccRdsInstanceResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"Rds")
+`, name+"-rds")
 }
 
-func testAccRdsInstanceConfigUpdate() string {
+func testAccRdsInstanceConfigUpdate(name string) string {
 	return fmt.Sprintf(`
-resource "%s" "%s" {
+resource "baiducloud_rds_instance" "default" {
     instance_name             = "%s"
     billing = {
         payment_timing        = "Postpaid"
@@ -148,5 +148,5 @@ resource "%s" "%s" {
     memory_capacity           = 2
     volume_capacity           = 5
 }
-`, testAccRdsInstanceResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"Rds")
+`, name+"-rds")
 }

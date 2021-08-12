@@ -1,6 +1,7 @@
 package baiducloud
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -20,7 +21,7 @@ func TestAccBaiduCloudEipsDataSource(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccEipsDataSourceConfig,
+				Config: testAccEipsDataSourceConfig(BaiduCloudTestResourceTypeNameEip),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccEipsDataSourceName),
 					resource.TestCheckResourceAttrSet(testAccEipsDataSourceName, testAccEipsDataSourceAttrKeyPrefix+"eip"),
@@ -32,9 +33,10 @@ func TestAccBaiduCloudEipsDataSource(t *testing.T) {
 	})
 }
 
-const testAccEipsDataSourceConfig = `
+func testAccEipsDataSourceConfig(name string) string {
+	return fmt.Sprintf(`
 resource "baiducloud_eip" "my-eip" {
-  name              = "test-BaiduAccEip"
+  name              = "%s"
   bandwidth_in_mbps = 100
   payment_timing    = "Postpaid"
   billing_method    = "ByTraffic"
@@ -49,7 +51,8 @@ data "baiducloud_eips" "default" {
 
   filter {
     name = "name"
-    values = ["test-BaiduAcc*"]
+    values = ["tf-test-acc*"]
   }
 }
-`
+`, name)
+}

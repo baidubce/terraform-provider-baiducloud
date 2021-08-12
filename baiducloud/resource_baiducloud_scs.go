@@ -176,7 +176,7 @@ func resourceBaiduCloudScs() *schema.Resource {
 							Type:         schema.TypeString,
 							Description:  "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.",
 							Required:     true,
-							Default:      "Postpaid",
+							Default:      PaymentTimingPostpaid,
 							ValidateFunc: validatePaymentTiming(),
 						},
 						"reservation": {
@@ -418,7 +418,7 @@ func resourceBaiduCloudScsDelete(d *schema.ResourceData, meta interface{}) error
 			return instanceId, scsClient.DeleteInstance(instanceId, buildClientToken())
 		})
 		if err != nil {
-			if IsExceptedErrors(err, []string{InvalidInstanceStatus, bce.EINTERNAL_ERROR}) {
+			if IsExceptedErrors(err, []string{InvalidInstanceStatus, bce.EINTERNAL_ERROR, ReleaseInstanceFailed}) {
 				return resource.RetryableError(err)
 			}
 			return resource.NonRetryableError(err)
@@ -438,7 +438,8 @@ func resourceBaiduCloudScsDelete(d *schema.ResourceData, meta interface{}) error
 			SCSStatusStatusDeleting,
 			SCSStatusStatusPausing},
 		[]string{SCSStatusStatusPaused,
-			SCSStatusStatusDeleted},
+			SCSStatusStatusDeleted,
+			SCSSTatusStatusIsolated},
 		d.Timeout(schema.TimeoutDelete),
 		scsService.InstanceStateRefresh(instanceId, []string{}),
 	)
@@ -464,7 +465,7 @@ func buildBaiduCloudScsArgs(d *schema.ResourceData, meta interface{}) (*scs.Crea
 			paymentTiming := p.(string)
 			billingRequest.PaymentTiming = paymentTiming
 		}
-		if billingRequest.PaymentTiming == "Postpaid" {
+		if billingRequest.PaymentTiming == PaymentTimingPostpaid {
 			if r, ok := billing["reservation"]; ok {
 				reservation := r.(map[string]interface{})
 				if reservationLength, ok := reservation["reservation_length"]; ok {

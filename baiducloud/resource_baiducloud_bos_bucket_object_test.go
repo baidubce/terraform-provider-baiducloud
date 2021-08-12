@@ -14,9 +14,8 @@ import (
 )
 
 const (
-	testAccBosBucketObjectResourceType     = "baiducloud_bos_bucket_object"
-	testAccBosBucketObjectResourceName     = testAccBosBucketObjectResourceType + "." + BaiduCloudTestResourceName
-	testAccBosBucketObjectResourceAttrName = BaiduCloudTestResourceAttrNamePrefix + "BosBucketObject"
+	testAccBosBucketObjectResourceType = "baiducloud_bos_bucket_object"
+	testAccBosBucketObjectResourceName = testAccBosBucketObjectResourceType + "." + BaiduCloudTestResourceName
 )
 
 func init() {
@@ -36,32 +35,32 @@ func testSweepBosBucketObjects(region string) error {
 	client := rawClient.(*connectivity.BaiduClient)
 
 	exist, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
-		return bosClient.DoesBucketExist(testAccBosBucketResourceAttrName)
+		return bosClient.DoesBucketExist(BaiduCloudTestResourceTypeNameBosBucketObject + "-bucket-new")
 	})
 	if err != nil {
-		log.Printf("[ERROR] Failed to check if the bucket %s exist %v.", testAccBosBucketResourceAttrName, err)
-		return fmt.Errorf("check bucket %s exist error: %v", testAccBosBucketResourceAttrName, err)
+		log.Printf("[ERROR] Failed to check if the bucket %s exist %v.", BaiduCloudTestResourceTypeName+"-bucket-new", err)
+		return fmt.Errorf("check bucket %s exist error: %v", BaiduCloudTestResourceTypeName+"-bucket-new", err)
 	}
 	if !exist.(bool) {
 		return nil
 	}
 
 	bosService := &BosService{client}
-	objectList, err := bosService.ListAllObjects(testAccBosBucketResourceAttrName, "")
+	objectList, err := bosService.ListAllObjects(BaiduCloudTestResourceTypeNameBosBucketObject+"-bucket-new", "")
 	if err != nil {
 		log.Printf("[ERROR] Failed to list object %v", err)
-		return fmt.Errorf("get %s object list error: %s", testAccBosBucketResourceAttrName, err)
+		return fmt.Errorf("get %s object list error: %s", BaiduCloudTestResourceTypeName+"-bucket-new", err)
 	}
 
 	for _, obj := range objectList {
-		if !strings.HasPrefix(obj.Key, testAccBosBucketObjectResourceAttrName) {
+		if !strings.HasPrefix(obj.Key, BaiduCloudTestResourceTypeName) {
 			log.Printf("[INFO] Skipping Object: %s", obj.Key)
 			continue
 		}
 
 		log.Printf("[INFO] Deleting Object: %s", obj.Key)
 		_, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
-			return nil, bosClient.DeleteObject(testAccBosBucketResourceAttrName, obj.Key)
+			return nil, bosClient.DeleteObject(BaiduCloudTestResourceTypeNameBosBucketObject+"-bucket-new", obj.Key)
 		})
 		if err != nil {
 			log.Printf("[ERROR] Failed to delete object %s", obj.Key)
@@ -82,11 +81,11 @@ func TestAccBaiduCloudBosBucketObject(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccBosBucketObjectConfig(),
+				Config: testAccBosBucketObjectConfig(BaiduCloudTestResourceTypeNameBosBucketObject),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckBaiduCloudDataSourceId(testAccBosBucketObjectResourceName),
-					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "bucket", testAccBosBucketResourceAttrName),
-					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "key", testAccBosBucketObjectResourceAttrName),
+					testAccCheckBaiduCloudDataSourceId(testAccBosBucketResourceName),
+					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "bucket", BaiduCloudTestResourceTypeNameBosBucketObject+"-bucket-new"),
+					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "key", BaiduCloudTestResourceTypeNameBosBucketObject+"-object"),
 					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "content", "hello world"),
 					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "acl", "public-read"),
 					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "cache_control", "no-cache"),
@@ -104,11 +103,11 @@ func TestAccBaiduCloudBosBucketObject(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccBosBucketObjectConfigUpdate(),
+				Config: testAccBosBucketObjectConfigUpdate(BaiduCloudTestResourceTypeNameBosBucketObject),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckBaiduCloudDataSourceId(testAccBosBucketObjectResourceName),
-					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "bucket", testAccBosBucketResourceAttrName),
-					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "key", testAccBosBucketObjectResourceAttrName),
+					testAccCheckBaiduCloudDataSourceId(testAccBosBucketResourceName),
+					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "bucket", BaiduCloudTestResourceTypeNameBosBucketObject+"-bucket-new"),
+					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "key", BaiduCloudTestResourceTypeNameBosBucketObject+"-object"),
 					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "content", "hello world"),
 					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "acl", "private"),
 					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "cache_control", "max-age"),
@@ -138,7 +137,7 @@ func testAccBosBucketObjectDestroy(s *terraform.State) error {
 		}
 
 		_, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
-			return bosClient.GetObjectMeta(testAccBosBucketResourceAttrName, rs.Primary.ID)
+			return bosClient.GetObjectMeta(BaiduCloudTestResourceTypeNameBosBucketObject+"-bucket-new", rs.Primary.ID)
 		})
 		if err != nil {
 			if IsExceptedErrors(err, []string{"Not Found"}) {
@@ -152,7 +151,7 @@ func testAccBosBucketObjectDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccBosBucketObjectConfig() string {
+func testAccBosBucketObjectConfig(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_bos_bucket" "default" {
   bucket = "%s"
@@ -171,10 +170,10 @@ resource "baiducloud_bos_bucket_object" "default" {
     Metab = "metaB"
   }
 }
-`, testAccBosBucketResourceAttrName, testAccBosBucketObjectResourceAttrName)
+`, name+"-bucket-new", name+"-object")
 }
 
-func testAccBosBucketObjectConfigUpdate() string {
+func testAccBosBucketObjectConfigUpdate(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_bos_bucket" "default" {
   bucket = "%s"
@@ -193,5 +192,5 @@ resource "baiducloud_bos_bucket_object" "default" {
     metab = "metaB"
   }
 }
-`, testAccBosBucketResourceAttrName, testAccBosBucketObjectResourceAttrName)
+`, name+"-bucket-new", name+"-object")
 }

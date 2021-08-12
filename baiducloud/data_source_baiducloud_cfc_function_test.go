@@ -18,10 +18,10 @@ func TestAccBaiduCloudCFCFunctionDataSource(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCfcDataSourceConfig(),
+				Config: testAccCfcDataSourceConfig(BaiduCloudTestResourceTypeNameCfcFunction),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(testAccCFCResourceName, "function_name", "test-BaiduAccCFC"),
-					resource.TestCheckResourceAttr(testAccCFCResourceName, "description", "terraform create"),
+					resource.TestCheckResourceAttr(testAccCFCResourceName, "function_name", BaiduCloudTestResourceTypeNameCfcFunction),
+					resource.TestCheckResourceAttr(testAccCFCResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "memory_size", "128"),
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "handler", "index.handler"),
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "runtime", "nodejs12"),
@@ -42,17 +42,23 @@ func TestAccBaiduCloudCFCFunctionDataSource(t *testing.T) {
 	})
 }
 
-func testAccCfcDataSourceConfig() string {
+func testAccCfcDataSourceConfig(name string) string {
 	return fmt.Sprintf(`
-data "baiducloud_zones" "default" {}
+variable "name" {
+  default = "%s"
+}
+
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = var.name
   cidr = "192.168.0.0/16"
 }
 
 resource "baiducloud_subnet" "default" {
-  name        = "%s"
+  name        = var.name
   zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.3.0/24"
   vpc_id      = baiducloud_vpc.default.id
@@ -60,13 +66,13 @@ resource "baiducloud_subnet" "default" {
 }
 
 resource "baiducloud_security_group" "default" {
-  name   = "%s"
+  name   = var.name
   vpc_id = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_cfc_function" "default" {
-  function_name = "%s"
-  description   = "terraform create"
+  function_name = var.name
+  description   = "created by terraform"
   environment = {
     "aaa": "bbb"
     "ccc": "ddd"
@@ -86,8 +92,5 @@ resource "baiducloud_cfc_function" "default" {
 data "baiducloud_cfc_function" "default" {
   function_name = baiducloud_cfc_function.default.function_name
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC",
-		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
-		BaiduCloudTestResourceAttrNamePrefix+"SecurityGroup",
-		BaiduCloudTestResourceAttrNamePrefix+"CFC")
+`, name)
 }

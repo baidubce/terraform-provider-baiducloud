@@ -2,7 +2,6 @@ package baiducloud
 
 import (
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -23,11 +22,11 @@ func TestAccBaiduCloudPeerConnAcceptor(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccPeerConnAcceptorConfig(),
+				Config: testAccPeerConnAcceptorConfig(BaiduCloudTestResourceTypeNamePeerConnAcceptor),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccPeerConnAcceptorResourceName),
 					resource.TestCheckResourceAttr(testAccPeerConnAcceptorResourceName, "bandwidth_in_mbps", "20"),
-					resource.TestCheckResourceAttr(testAccPeerConnAcceptorResourceName, "description", "test peer conn"),
+					resource.TestCheckResourceAttr(testAccPeerConnAcceptorResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttr(testAccPeerConnAcceptorResourceName, "local_if_name", "local-interface"),
 					resource.TestCheckResourceAttrSet(testAccPeerConnResourceName, "local_if_id"),
 					resource.TestCheckResourceAttrSet(testAccPeerConnAcceptorResourceName, "local_vpc_id"),
@@ -45,11 +44,11 @@ func TestAccBaiduCloudPeerConnAcceptor(t *testing.T) {
 				ImportStateVerifyIgnore: []string{"dns_sync"},
 			},
 			{
-				Config: testAccPeerConnAcceptorConfigUpdate(),
+				Config: testAccPeerConnAcceptorConfigUpdate(BaiduCloudTestResourceTypeNamePeerConnAcceptor),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccPeerConnAcceptorResourceName),
 					resource.TestCheckResourceAttr(testAccPeerConnAcceptorResourceName, "bandwidth_in_mbps", "20"),
-					resource.TestCheckResourceAttr(testAccPeerConnAcceptorResourceName, "description", "test peer conn"),
+					resource.TestCheckResourceAttr(testAccPeerConnAcceptorResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttr(testAccPeerConnAcceptorResourceName, "local_if_name", "local-interface"),
 					resource.TestCheckResourceAttrSet(testAccPeerConnResourceName, "local_if_id"),
 					resource.TestCheckResourceAttrSet(testAccPeerConnAcceptorResourceName, "local_vpc_id"),
@@ -66,8 +65,7 @@ func TestAccBaiduCloudPeerConnAcceptor(t *testing.T) {
 	})
 }
 
-func testAccPeerConnAcceptorConfig() string {
-	region := os.Getenv("BAIDUCLOUD_REGION")
+func testAccPeerConnAcceptorConfig(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_vpc" "local-vpc" {
   name     = "%s"
@@ -83,8 +81,8 @@ resource "baiducloud_peer_conn" "default" {
   bandwidth_in_mbps = 20
   local_vpc_id      = baiducloud_vpc.local-vpc.id
   peer_vpc_id       = baiducloud_vpc.peer-vpc.id
-  peer_region       = "%s"
-  description       = "test peer conn"
+  peer_region       = "bj"
+  description       = "created by terraform"
   local_if_name     = "local-interface"
   billing = {
     payment_timing = "Postpaid"
@@ -96,12 +94,10 @@ resource "baiducloud_peer_conn_acceptor" "default" {
   auto_accept  = true
   dns_sync     = false
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC-local",
-		BaiduCloudTestResourceAttrNamePrefix+"VPC-peer", region)
+`, name+"-local", name+"-peer")
 }
 
-func testAccPeerConnAcceptorConfigUpdate() string {
-	region := os.Getenv("BAIDUCLOUD_REGION")
+func testAccPeerConnAcceptorConfigUpdate(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_vpc" "local-vpc" {
   name     = "%s"
@@ -117,8 +113,8 @@ resource "baiducloud_peer_conn" "default" {
   bandwidth_in_mbps = 20
   local_vpc_id      = baiducloud_vpc.local-vpc.id
   peer_vpc_id       = baiducloud_vpc.peer-vpc.id
-  peer_region       = "%s"
-  description       = "test peer conn"
+  peer_region       = "bj"
+  description       = "created by terraform"
   local_if_name     = "local-interface"
   billing = {
     payment_timing = "Postpaid"
@@ -130,6 +126,5 @@ resource "baiducloud_peer_conn_acceptor" "default" {
   auto_accept  = true
   dns_sync     = true
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC-local",
-		BaiduCloudTestResourceAttrNamePrefix+"VPC-peer", region)
+`, name+"-local", name+"-peer")
 }

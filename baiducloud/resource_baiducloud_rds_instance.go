@@ -214,7 +214,7 @@ func resourceBaiduCloudRdsInstance() *schema.Resource {
 							Type:         schema.TypeString,
 							Description:  "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.",
 							Required:     true,
-							Default:      "Postpaid",
+							Default:      PaymentTimingPostpaid,
 							ValidateFunc: validatePaymentTiming(),
 						},
 						"reservation": {
@@ -419,7 +419,7 @@ func buildBaiduCloudRdsInstanceArgs(d *schema.ResourceData, meta interface{}) (*
 			paymentTiming := p.(string)
 			billingRequest.PaymentTiming = paymentTiming
 		}
-		if billingRequest.PaymentTiming == "Postpaid" {
+		if billingRequest.PaymentTiming == PaymentTimingPostpaid {
 			if r, ok := billing["reservation"]; ok {
 				reservation := r.(map[string]interface{})
 				if reservationLength, ok := reservation["reservation_length"]; ok {

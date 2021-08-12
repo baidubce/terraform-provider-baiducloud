@@ -21,11 +21,11 @@ func TestAccBaiduCloudBosBucketObjectsDataSource(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccBosBucketObjectsDataSourceConfig(),
+				Config: testAccBosBucketObjectsDataSourceConfig(BaiduCloudTestResourceTypeNameBosBucketObject),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccBosBucketObjectsDataSourceName),
-					resource.TestCheckResourceAttr(testAccBosBucketObjectsDataSourceName, testAccBosBucketObjectsDataSourceAttrKeyPrefix+"bucket", testAccBosBucketResourceAttrName),
-					resource.TestCheckResourceAttr(testAccBosBucketObjectsDataSourceName, testAccBosBucketObjectsDataSourceAttrKeyPrefix+"key", testAccBosBucketObjectResourceAttrName),
+					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "bucket", BaiduCloudTestResourceTypeNameBosBucketObject+"-bucket-new"),
+					resource.TestCheckResourceAttr(testAccBosBucketObjectResourceName, "key", BaiduCloudTestResourceTypeNameBosBucketObject+"-object"),
 					resource.TestCheckResourceAttr(testAccBosBucketObjectsDataSourceName, testAccBosBucketObjectsDataSourceAttrKeyPrefix+"acl", "public-read"),
 					resource.TestCheckResourceAttr(testAccBosBucketObjectsDataSourceName, testAccBosBucketObjectsDataSourceAttrKeyPrefix+"cache_control", "no-cache"),
 					resource.TestCheckResourceAttr(testAccBosBucketObjectsDataSourceName, testAccBosBucketObjectsDataSourceAttrKeyPrefix+"content_disposition", "inline"),
@@ -47,7 +47,7 @@ func TestAccBaiduCloudBosBucketObjectsDataSource(t *testing.T) {
 	})
 }
 
-func testAccBosBucketObjectsDataSourceConfig() string {
+func testAccBosBucketObjectsDataSourceConfig(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_bos_bucket" "default" {
   bucket = "%s"
@@ -68,7 +68,7 @@ resource "baiducloud_bos_bucket_object" "default" {
 }
 
 data "baiducloud_bos_bucket_objects" "default" {
-  bucket = "%s"
+  bucket = baiducloud_bos_bucket.default.bucket
   prefix = baiducloud_bos_bucket_object.default.key
 
   filter {
@@ -80,6 +80,5 @@ data "baiducloud_bos_bucket_objects" "default" {
     values = ["COLD"]
   }
 }
-`, testAccBosBucketResourceAttrName, testAccBosBucketObjectResourceAttrName,
-		testAccBosBucketResourceAttrName)
+`, name+"-bucket-new", name+"-object")
 }

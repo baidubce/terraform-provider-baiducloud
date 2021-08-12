@@ -21,7 +21,7 @@ func TestAccBaiduCloudRdsAccount(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccRdsAccountConfig(),
+				Config: testAccRdsAccountConfig(BaiduCloudTestResourceTypeNameRdsAccount),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccRdsAccountResourceName),
 					resource.TestCheckResourceAttr(testAccRdsAccountResourceName, "account_name", "mysqlaccount"),
@@ -31,7 +31,7 @@ func TestAccBaiduCloudRdsAccount(t *testing.T) {
 	})
 }
 
-func testAccRdsAccountConfig() string {
+func testAccRdsAccountConfig(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_rds_instance" "default" {
     instance_name             = "%s"
@@ -45,12 +45,12 @@ resource "baiducloud_rds_instance" "default" {
     volume_capacity           = 5
 }
 
-resource "%s" "%s" {
+resource "baiducloud_rds_account" "default" {
     instance_id         = baiducloud_rds_instance.default.instance_id
     account_name        = "mysqlaccount"
     password            = "password12"
     account_type        = "Super"
     desc                = "test"
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"Rds_Account", testAccRdsAccountResourceType, BaiduCloudTestResourceName)
+`, name+"-rds-account")
 }

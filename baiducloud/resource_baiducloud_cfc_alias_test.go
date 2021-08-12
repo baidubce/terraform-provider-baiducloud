@@ -28,12 +28,12 @@ func TestAccBaiduCloudCFCAlias(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCfcAliasConfig(),
+				Config: testAccCfcAliasConfig(BaiduCloudTestResourceTypeNameCfcAlias),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(testAccCFCAliasResourceName, "alias_name", "test-BaiduAccAlias"),
-					resource.TestCheckResourceAttr(testAccCFCAliasResourceName, "function_name", "test-BaiduAccCFC"),
+					resource.TestCheckResourceAttr(testAccCFCAliasResourceName, "alias_name", BaiduCloudTestResourceTypeNameCfcAlias),
+					resource.TestCheckResourceAttr(testAccCFCAliasResourceName, "function_name", BaiduCloudTestResourceTypeNameCfcAlias),
 					resource.TestCheckResourceAttr(testAccCFCAliasResourceName, "function_version", "$LATEST"),
-					resource.TestCheckResourceAttr(testAccCFCAliasResourceName, "description", "terraform create alias"),
+					resource.TestCheckResourceAttr(testAccCFCAliasResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttrSet(testAccCFCAliasResourceName, "update_time"),
 					resource.TestCheckResourceAttrSet(testAccCFCAliasResourceName, "create_time"),
 					resource.TestCheckResourceAttrSet(testAccCFCAliasResourceName, "uid"),
@@ -42,12 +42,12 @@ func TestAccBaiduCloudCFCAlias(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCfcAliasConfigUpdate(),
+				Config: testAccCfcAliasConfigUpdate(BaiduCloudTestResourceTypeNameCfcAlias),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(testAccCFCAliasResourceName, "alias_name", "test-BaiduAccAlias"),
-					resource.TestCheckResourceAttr(testAccCFCAliasResourceName, "function_name", "test-BaiduAccCFC"),
+					resource.TestCheckResourceAttr(testAccCFCAliasResourceName, "alias_name", BaiduCloudTestResourceTypeNameCfcAlias),
+					resource.TestCheckResourceAttr(testAccCFCAliasResourceName, "function_name", BaiduCloudTestResourceTypeNameCfcAlias),
 					resource.TestCheckResourceAttr(testAccCFCAliasResourceName, "function_version", "$LATEST"),
-					resource.TestCheckResourceAttr(testAccCFCAliasResourceName, "description", "terraform update alias"),
+					resource.TestCheckResourceAttr(testAccCFCAliasResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttrSet(testAccCFCAliasResourceName, "update_time"),
 					resource.TestCheckResourceAttrSet(testAccCFCAliasResourceName, "create_time"),
 					resource.TestCheckResourceAttrSet(testAccCFCAliasResourceName, "uid"),
@@ -87,11 +87,14 @@ func testAccCFCAliasDestory(s *terraform.State) error {
 	return nil
 }
 
-func testAccCfcAliasConfig() string {
+func testAccCfcAliasConfig(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
 resource "baiducloud_cfc_function" "default" {
-  function_name     = "%s"
-  description       = "terraform create"
+  function_name     = var.name
+  description       = "created by terraform"
   environment = {
     "aaa": "bbb"
     "ccc": "ddd"
@@ -103,21 +106,24 @@ resource "baiducloud_cfc_function" "default" {
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
-resource "%s" "%s" {
+resource "baiducloud_cfc_alias" "default" {
   function_name    = baiducloud_cfc_function.default.function_name
   function_version = baiducloud_cfc_function.default.version
-  alias_name       = "%s"
-  description      = "terraform create alias"
+  alias_name       = var.name
+  description      = "created by terraform"
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"CFC",
-		testAccCFCAliasResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"Alias")
+`, name)
 }
 
-func testAccCfcAliasConfigUpdate() string {
+func testAccCfcAliasConfigUpdate(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 resource "baiducloud_cfc_function" "default" {
-  function_name = "%s"
-  description   = "terraform create"
+  function_name = var.name
+  description   = "created by terraform"
   environment = {
     "aaa": "bbb"
     "ccc": "ddd"
@@ -129,12 +135,11 @@ resource "baiducloud_cfc_function" "default" {
   code_file_name = "testFiles/cfcTestCode.zip"
 }
 
-resource "%s" "%s" {
+resource "baiducloud_cfc_alias" "default" {
   function_name    = baiducloud_cfc_function.default.function_name
   function_version = baiducloud_cfc_function.default.version
-  alias_name       = "%s"
-  description      = "terraform update alias"
+  alias_name       = var.name
+  description      = "created by terraform"
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"CFC",
-		testAccCFCAliasResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"Alias")
+`, name)
 }

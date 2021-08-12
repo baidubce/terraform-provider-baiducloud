@@ -2,9 +2,8 @@ package baiducloud
 
 import (
 	"fmt"
-	"testing"
-
 	"github.com/hashicorp/terraform/helper/resource"
+	"testing"
 )
 
 const (
@@ -12,7 +11,7 @@ const (
 )
 
 //lintignore:AT003
-func TestAccBaiduCloudCceContainerNetDataSource(t *testing.T) {
+func testAccBaiduCloudCceContainerNetDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -34,7 +33,7 @@ func TestAccBaiduCloudCceContainerNetDataSource(t *testing.T) {
 func testAccContainerNetDataSourceConfig() string {
 	return fmt.Sprintf(`
 resource "baiducloud_vpc" "default" {
-  name        = "test-BaiduAccVPC"
+  name        = "tf-test-acc"
   description = "created by terraform"
   cidr = "192.168.0.0/16"
 }

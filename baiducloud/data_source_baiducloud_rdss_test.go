@@ -20,7 +20,7 @@ func TestAccBaiduCloudRdssDataSource(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccRdssDataSourceConfig(),
+				Config: testAccRdssDataSourceConfig(BaiduCloudTestResourceTypeNameRdsInstance),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccRdssDataSourceName),
 					resource.TestCheckResourceAttr(testAccRdssDataSourceName, testAccRdssDataSourceAttrKeyPrefix+"memory_capacity", "1"),
@@ -35,7 +35,7 @@ func TestAccBaiduCloudRdssDataSource(t *testing.T) {
 	})
 }
 
-func testAccRdssDataSourceConfig() string {
+func testAccRdssDataSourceConfig(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_rds_instance" "default" {
     instance_name             = "%s"
@@ -50,11 +50,11 @@ resource "baiducloud_rds_instance" "default" {
 }
 
 data "baiducloud_rdss" "default" {
-    name_regex            = "test-BaiduAcc*"
+    name_regex            = "tf-test-acc*"
     filter {
         name              = "memory_capacity"
         values            = [baiducloud_rds_instance.default.memory_capacity]
     }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"Rdss")
+`, name)
 }

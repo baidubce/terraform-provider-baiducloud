@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/baidubce/bce-sdk-go/services/iam"
 	"github.com/baidubce/bce-sdk-go/services/iam/api"
-	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
@@ -15,9 +14,7 @@ import (
 
 const (
 	testAccIamGroupResourceType = "baiducloud_iam_group"
-	testAccIamGroupPrefix       = "test_BaiduAcc"
 	testAccIamGroupResourceName = testAccIamGroupResourceType + "." + BaiduCloudTestResourceName
-	testAccIamGroupDescription  = "test_description"
 )
 
 func init() {
@@ -44,7 +41,7 @@ func testSweepIamGroups(region string) error {
 
 	result, _ := raw.(*api.ListGroupResult)
 	for _, group := range result.Groups {
-		if !strings.HasPrefix(group.Name, testAccIamGroupPrefix) {
+		if !strings.HasPrefix(group.Name, BaiduCloudTestResourceTypeNameUnderLine) {
 			continue
 		}
 		log.Printf("[INFO] Deleting group: %s", group.Name)
@@ -58,8 +55,7 @@ func testSweepIamGroups(region string) error {
 	return nil
 }
 func TestAccBaiduCloudIamGroup(t *testing.T) {
-	name := strings.ReplaceAll(acctest.RandomWithPrefix(testAccIamGroupPrefix), "-", "_")
-	nameUpdate := strings.ReplaceAll(acctest.RandomWithPrefix(testAccIamGroupPrefix), "-", "_")
+
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -69,11 +65,11 @@ func TestAccBaiduCloudIamGroup(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccIamGroupConfig(name),
+				Config: testAccIamGroupConfig(BaiduCloudTestResourceTypeNameUnderLine),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccIamGroupResourceName),
-					resource.TestCheckResourceAttr(testAccIamGroupResourceName, "name", name),
-					resource.TestCheckResourceAttr(testAccIamGroupResourceName, "description", testAccIamGroupDescription),
+					resource.TestCheckResourceAttr(testAccIamGroupResourceName, "name", BaiduCloudTestResourceTypeNameUnderLine),
+					resource.TestCheckResourceAttr(testAccIamGroupResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttrSet(testAccIamGroupResourceName, "unique_id"),
 				),
 			},
@@ -83,25 +79,16 @@ func TestAccBaiduCloudIamGroup(t *testing.T) {
 				ImportStateVerifyIgnore: []string{"force_destroy"},
 			},
 			{
-				Config: testAccIamGroupConfig(nameUpdate),
+				Config: testAccIamGroupConfig(BaiduCloudTestResourceTypeNameUnderLine),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccIamGroupResourceName),
-					resource.TestCheckResourceAttr(testAccIamGroupResourceName, "name", nameUpdate),
-					resource.TestCheckResourceAttr(testAccIamGroupResourceName, "description", testAccIamGroupDescription),
+					resource.TestCheckResourceAttr(testAccIamGroupResourceName, "name", BaiduCloudTestResourceTypeNameUnderLine),
+					resource.TestCheckResourceAttr(testAccIamGroupResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttrSet(testAccIamGroupResourceName, "unique_id"),
 				),
 			},
 		},
 	})
-}
-
-func testAccIamGroupConfig(name string) string {
-	return fmt.Sprintf(`
-resource "%s" "%s" {
-  name = "%s"
-  description = "%s"
-  force_destroy    = true
-}`, testAccIamGroupResourceType, BaiduCloudTestResourceName, name, testAccIamGroupDescription)
 }
 
 func testAccIamGroupDestroy(s *terraform.State) error {
@@ -126,4 +113,13 @@ func testAccIamGroupDestroy(s *terraform.State) error {
 	}
 
 	return nil
+}
+
+func testAccIamGroupConfig(name string) string {
+	return fmt.Sprintf(`
+resource "baiducloud_iam_group" "default" {
+  name = "%s"
+  description = "created by terraform"
+  force_destroy    = true
+}`, name)
 }

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/baidubce/bce-sdk-go/services/iam"
 	"github.com/baidubce/bce-sdk-go/services/iam/api"
-	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
@@ -43,7 +42,7 @@ func testSweepIamUserPolicyAttachments(region string) error {
 
 	result, _ := raw.(*api.ListUserResult)
 	for _, user := range result.Users {
-		if !strings.HasPrefix(user.Name, testAccIamUserPrefix) {
+		if !strings.HasPrefix(user.Name, BaiduCloudTestResourceTypeNameUnderLine) {
 			continue
 		}
 		log.Printf("[INFO] Deleting user: %s", user.Name)
@@ -67,7 +66,7 @@ func testSweepIamUserPolicyAttachments(region string) error {
 
 	policies, _ := raw.(*api.ListPolicyResult)
 	for _, policy := range policies.Policies {
-		if !strings.HasPrefix(policy.Name, testAccIamPolicyPrefix) {
+		if !strings.HasPrefix(policy.Name, BaiduCloudTestResourceTypeNameUnderLine) {
 			continue
 		}
 		_, err := client.WithIamClient(func(iamClient *iam.Client) (i interface{}, e error) {
@@ -81,8 +80,7 @@ func testSweepIamUserPolicyAttachments(region string) error {
 }
 
 func TestAccBaiduCloudIamUserPolicyAttachment(t *testing.T) {
-	userName := acctest.RandomWithPrefix(testAccIamUserPrefix)
-	policyName := strings.ReplaceAll(acctest.RandomWithPrefix(testAccIamPolicyPrefix), "-", "_")
+
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -92,39 +90,16 @@ func TestAccBaiduCloudIamUserPolicyAttachment(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccIamUserPolicyAttachmentConfig(userName, policyName),
+				Config: testAccIamUserPolicyAttachmentConfig(BaiduCloudTestResourceTypeNameUnderLine),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccIamUserPolicyAttachmentResourceName),
-					resource.TestCheckResourceAttr(testAccIamUserPolicyAttachmentResourceName, "user", userName),
-					resource.TestCheckResourceAttr(testAccIamUserPolicyAttachmentResourceName, "policy", policyName),
+					resource.TestCheckResourceAttr(testAccIamUserPolicyAttachmentResourceName, "user", BaiduCloudTestResourceTypeNameUnderLine),
+					resource.TestCheckResourceAttr(testAccIamUserPolicyAttachmentResourceName, "policy", BaiduCloudTestResourceTypeNameUnderLine),
 					resource.TestCheckResourceAttr(testAccIamUserPolicyAttachmentResourceName, "policy_type", api.POLICY_TYPE_CUSTOM),
 				),
 			},
 		},
 	})
-}
-
-func testAccIamUserPolicyAttachmentConfig(userName, policyName string) string {
-	return fmt.Sprintf(`
-resource "%s" "%s" {
-  name = "%s"
-  force_destroy = true
-}
-resource "%s" "%s" {
-  name = "%s"
-  document = <<EOF
-  {"accessControlList": [{"region":"bj","service":"bcc","resource":["*"],"permission":["*"],"effect":"Allow"}]}
-  EOF
-}
-resource "%s" "%s" {
-  user = "${%s}"
-  policy = "${%s}"
-}
-`,
-		testAccIamUserResourceType, BaiduCloudTestResourceName, userName,
-		testAccIamPolicyResourceType, BaiduCloudTestResourceName, policyName,
-		testAccIamUserPolicyAttachmentResourceType, BaiduCloudTestResourceName, testAccIamUserResourceName+".name",
-		testAccIamPolicyResourceName+".name")
 }
 
 func testAccIamUserPolicyAttachmentDestroy(s *terraform.State) error {
@@ -159,4 +134,27 @@ func testAccIamUserPolicyAttachmentDestroy(s *terraform.State) error {
 		}
 	}
 	return nil
+}
+
+func testAccIamUserPolicyAttachmentConfig(name string) string {
+	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
+resource "baiducloud_iam_user" "default" {
+  name = var.name
+  force_destroy = true
+}
+resource "baiducloud_iam_policy" "default" {
+  name = var.name
+  document = <<EOF
+  {"accessControlList": [{"region":"bj","service":"bcc","resource":["*"],"permission":["*"],"effect":"Allow"}]}
+  EOF
+}
+resource "baiducloud_iam_user_policy_attachment" "default" {
+  user = baiducloud_iam_user.default.name
+  policy = baiducloud_iam_policy.default.name
+}
+`, name)
 }

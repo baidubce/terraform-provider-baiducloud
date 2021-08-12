@@ -15,10 +15,8 @@ import (
 )
 
 const (
-	testAccBosBucketResourceType               = "baiducloud_bos_bucket"
-	BaiduCloudTestBucketResourceAttrNamePrefix = "test-baiduacc-"
-	testAccBosBucketResourceName               = testAccBosBucketResourceType + "." + BaiduCloudTestResourceName
-	testAccBosBucketResourceAttrName           = BaiduCloudTestBucketResourceAttrNamePrefix + "bucket"
+	testAccBosBucketResourceType = "baiducloud_bos_bucket"
+	testAccBosBucketResourceName = testAccBosBucketResourceType + "." + BaiduCloudTestResourceName
 )
 
 func init() {
@@ -43,13 +41,10 @@ func testSweepBosBuckets(region string) error {
 		return fmt.Errorf("list buckets error: %v", err)
 	}
 
-	result, _ := raw.(*api.ListBucketsResult)
-	if err != nil {
-		return fmt.Errorf("get buckets error: %v", err)
-	}
+	result := raw.(*api.ListBucketsResult)
 
 	for _, buc := range result.Buckets {
-		if !strings.HasPrefix(buc.Name, BaiduCloudTestBucketResourceAttrNamePrefix) {
+		if !strings.HasPrefix(buc.Name, BaiduCloudTestResourceTypeName) {
 			log.Printf("[INFO] Skipping bucket: %s", buc.Name)
 			continue
 		}
@@ -77,20 +72,20 @@ func TestAccBaiduCloudBosBucket(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccBosBucketConfig(),
+				Config: testAccBosBucketConfig(BaiduCloudTestResourceTypeNameBosBucket),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccBosBucketResourceName),
-					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "bucket", testAccBosBucketResourceAttrName),
+					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "bucket", BaiduCloudTestResourceTypeNameBosBucket+"-bucket-new"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "acl", "public-read-write"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.#", "1"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.0.id", "test-rc"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.0.status", "enabled"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.0.resource.#", "1"),
-					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.0.destination.0.bucket", BaiduCloudTestBucketResourceAttrNamePrefix+"bucket-peer"),
+					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.0.destination.0.bucket", BaiduCloudTestResourceTypeNameBosBucket+"-bucket-peer"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.0.replicate_deletes", "disabled"),
-					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "force_destroy", "false"),
+					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "force_destroy", "true"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "logging.#", "1"),
-					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "logging.0.target_bucket", testAccBosBucketResourceAttrName),
+					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "logging.0.target_bucket", BaiduCloudTestResourceTypeNameBosBucket+"-bucket-new"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "logging.0.target_prefix", "logs/"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "lifecycle_rule.#", "1"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "lifecycle_rule.0.id", "test-lr"),
@@ -121,20 +116,20 @@ func TestAccBaiduCloudBosBucket(t *testing.T) {
 				ImportStateVerifyIgnore: []string{"force_destroy"},
 			},
 			{
-				Config: testAccBosBucketConfigUpdate(),
+				Config: testAccBosBucketConfigUpdate(BaiduCloudTestResourceTypeNameBosBucket),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccBosBucketResourceName),
-					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "bucket", testAccBosBucketResourceAttrName),
+					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "bucket", BaiduCloudTestResourceTypeNameBosBucket+"-bucket-new"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "acl", "public-read"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.#", "1"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.0.id", "test-rc"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.0.status", "enabled"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.0.resource.#", "1"),
-					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.0.destination.0.bucket", BaiduCloudTestBucketResourceAttrNamePrefix+"bucket-peer"),
+					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.0.destination.0.bucket", BaiduCloudTestResourceTypeNameBosBucket+"-bucket-peer"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.0.replicate_deletes", "enabled"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "force_destroy", "true"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "logging.#", "1"),
-					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "logging.0.target_bucket", testAccBosBucketResourceAttrName),
+					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "logging.0.target_bucket", BaiduCloudTestResourceTypeNameBosBucket+"-bucket-new"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "logging.0.target_prefix", "logs-update/"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "lifecycle_rule.#", "1"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "lifecycle_rule.0.id", "test-lr"),
@@ -159,10 +154,10 @@ func TestAccBaiduCloudBosBucket(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccBosBucketConfigUpdate02(),
+				Config: testAccBosBucketConfigUpdate02(BaiduCloudTestResourceTypeNameBosBucket),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccBosBucketResourceName),
-					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "bucket", testAccBosBucketResourceAttrName),
+					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "bucket", BaiduCloudTestResourceTypeNameBosBucket+"-bucket-new"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "acl", "public-read"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "replication_configuration.#", "0"),
 					resource.TestCheckResourceAttr(testAccBosBucketResourceName, "logging.#", "0"),
@@ -209,159 +204,155 @@ func testAccBosBucketDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccBosBucketConfig() string {
+func testAccBosBucketConfig(name string) string {
 	return fmt.Sprintf(`
-resource "baiducloud_bos_bucket" "my-bucket" {
+resource "baiducloud_bos_bucket" "peer" {
   bucket = "%s"
   acl    = "public-read-write"
 }
 
 resource "baiducloud_bos_bucket" "default" {
-  bucket = "%s"
-  acl    = "public-read-write"
-
-  replication_configuration {
-    id       = "test-rc"
-    status   = "enabled"
-    resource = ["%s"]
-    destination {
-      bucket = baiducloud_bos_bucket.my-bucket.bucket
-    }
-	replicate_history {
-	  bucket        = baiducloud_bos_bucket.my-bucket.bucket
-	  storage_class = "COLD"
-	}
-    replicate_deletes = "disabled"
-  }
-
-  force_destroy = false
+ bucket = "%s"
+ acl    = "public-read-write"
 
   logging {
     target_bucket = "%s"
     target_prefix = "logs/"
   }
 
-  lifecycle_rule {
-    id       = "test-lr"
-    status   =  "enabled"
-    resource = ["%s"]
-    condition {
-      time {
-        date_greater_than = "2029-12-31T00:00:00Z"
-      }
-    }
-    action {
-      name = "DeleteObject"
-    }
-  }
-
-  storage_class = "COLD"
-
-  server_side_encryption_rule = "AES256"
-
-  website{
-    index_document = "index.html"
-    error_document = "err.html"
-  }
-
-  cors_rule {
-    allowed_origins = ["https://www.baidu.com"]
-    allowed_methods = ["GET"]
-    max_age_seconds = 1800
-  }
-
-  copyright_protection {
-    resource = ["%s"]
-  }
-}
-`, BaiduCloudTestBucketResourceAttrNamePrefix+"bucket-peer", testAccBosBucketResourceAttrName,
-		testAccBosBucketResourceAttrName+"/*", testAccBosBucketResourceAttrName,
-		testAccBosBucketResourceAttrName+"/*", testAccBosBucketResourceAttrName+"/*",
-	)
-}
-
-func testAccBosBucketConfigUpdate() string {
-	return fmt.Sprintf(`
-resource "baiducloud_bos_bucket" "my-bucket" {
-  bucket = "%s"
-  acl    = "public-read-write"
-}
-
-resource "baiducloud_bos_bucket" "default" {
-  bucket = "%s"
-  acl    = "public-read"
-
   replication_configuration {
     id       = "test-rc"
     status   = "enabled"
     resource = ["%s"]
     destination {
-      bucket = baiducloud_bos_bucket.my-bucket.bucket
+      bucket = baiducloud_bos_bucket.peer.bucket
     }
-	replicate_history {
-	  bucket        = baiducloud_bos_bucket.my-bucket.bucket
-	  storage_class = "COLD"
-	}
-    replicate_deletes = "enabled"
+	//replicate_history {
+	//  bucket        = baiducloud_bos_bucket.peer.bucket
+	//  storage_class = "COLD"
+	//}
+    replicate_deletes = "disabled"
   }
 
   force_destroy = true
 
-  logging {
-    target_bucket = "%s"
-    target_prefix = "logs-update/"
-  }
+ lifecycle_rule {
+   id       = "test-lr"
+   status   =  "enabled"
+   resource = ["%s"]
+   condition {
+     time {
+       date_greater_than = "2029-12-31T00:00:00Z"
+     }
+   }
+   action {
+     name = "DeleteObject"
+   }
+ }
 
-  lifecycle_rule {
-    id       = "test-lr"
-    status   =  "disabled"
-    resource = ["%s"]
-    condition {
-      time {
-        date_greater_than = "$(lastModified)+P7D"
-      }
-    }
-    action {
-      name = "DeleteObject"
-    }
-  }
+ storage_class = "COLD"
 
-  storage_class = "STANDARD"
+ server_side_encryption_rule = "AES256"
 
-  server_side_encryption_rule = "AES256"
+ website{
+   index_document = "index.html"
+   error_document = "err.html"
+ }
 
-  website{
-    index_document = "index02.html"
-    error_document = "err02.html"
-  }
-
-  cors_rule {
-    allowed_origins = ["https://www.baidu.com"]
-    allowed_methods = ["POST"]
-    max_age_seconds = 1800
-  }
+ cors_rule {
+   allowed_origins = ["https://www.baidu.com"]
+   allowed_methods = ["GET"]
+   max_age_seconds = 1800
+ }
 
   copyright_protection {
     resource = ["%s"]
   }
 }
-`, BaiduCloudTestBucketResourceAttrNamePrefix+"bucket-peer", testAccBosBucketResourceAttrName,
-		testAccBosBucketResourceAttrName+"/*", testAccBosBucketResourceAttrName,
-		testAccBosBucketResourceAttrName+"/*", testAccBosBucketResourceAttrName+"/update*",
+`, name+"-bucket-peer", name+"-bucket-new", name+"-bucket-new",
+		name+"-bucket-new"+"/*", name+"-bucket-new"+"/*", name+"-bucket-new"+"/*",
 	)
 }
 
-func testAccBosBucketConfigUpdate02() string {
+func testAccBosBucketConfigUpdate(name string) string {
 	return fmt.Sprintf(`
-resource "baiducloud_bos_bucket" "my-bucket" {
-  bucket = "%s"
-  acl    = "public-read-write"
+resource "baiducloud_bos_bucket" "peer" {
+ bucket = "%s"
+ acl    = "public-read-write"
 }
 
 resource "baiducloud_bos_bucket" "default" {
-  bucket = "%s"
-  acl    = "public-read"
+ bucket = "%s"
+ acl    = "public-read"
+
+ logging {
+   target_bucket = "%s"
+   target_prefix = "logs-update/"
+ }
+
+ replication_configuration {
+   id       = "test-rc"
+   status   = "enabled"
+   resource = ["%s"]
+   destination {
+     bucket = baiducloud_bos_bucket.peer.bucket
+   }
+   //replicate_history {
+   // bucket        = baiducloud_bos_bucket.peer.bucket
+   // storage_class = "COLD"
+   //}
+   replicate_deletes = "enabled"
+ }
+
+ force_destroy = true
+
+ lifecycle_rule {
+   id       = "test-lr"
+   status   =  "disabled"
+   resource = ["%s"]
+   condition {
+     time {
+       date_greater_than = "$(lastModified)+P7D"
+     }
+   }
+   action {
+     name = "DeleteObject"
+   }
+ }
+
+ storage_class = "STANDARD"
+
+ server_side_encryption_rule = "AES256"
+
+ website{
+   index_document = "index02.html"
+   error_document = "err02.html"
+ }
+
+ cors_rule {
+   allowed_origins = ["https://www.baidu.com"]
+   allowed_methods = ["POST"]
+   max_age_seconds = 1800
+ }
+
+ copyright_protection {
+   resource = ["%s"]
+ }
 }
-`, BaiduCloudTestBucketResourceAttrNamePrefix+"bucket-peer", testAccBosBucketResourceAttrName,
-	)
+`, name+"-bucket-peer", name+"-bucket-new", name+"-bucket-new",
+		name+"-bucket-new"+"/*", name+"-bucket-new"+"/*", name+"-bucket-new"+"/update*")
+}
+
+func testAccBosBucketConfigUpdate02(name string) string {
+	return fmt.Sprintf(`
+resource "baiducloud_bos_bucket" "peer" {
+ bucket = "%s"
+ acl    = "public-read-write"
+}
+
+resource "baiducloud_bos_bucket" "default" {
+ bucket = "%s"
+ acl    = "public-read"
+}
+`, name+"-bucket-peer", name+"-bucket-new")
 }

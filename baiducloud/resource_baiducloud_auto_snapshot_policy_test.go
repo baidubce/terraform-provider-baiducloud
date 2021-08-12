@@ -41,7 +41,7 @@ func testSweepAutoSnapshotPolicys(region string) error {
 	}
 
 	for _, asp := range aspList {
-		if !strings.HasPrefix(asp.Name, BaiduCloudTestResourceAttrNamePrefix) {
+		if !strings.HasPrefix(asp.Name, BaiduCloudTestResourceTypeName) {
 			log.Printf("[INFO] Skipping AutoSnapshotPolicy: %s (%s)", asp.Name, asp.Id)
 			continue
 		}
@@ -69,10 +69,10 @@ func TestAccBaiduCloudAutoSnapshotPolicy(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccAutoSnapshotPolicyConfig(),
+				Config: testAccAutoSnapshotPolicyConfig(BaiduCloudTestResourceTypeNameAutoSnapshotPolicy),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccAutoSnapshotPolicyResourceName),
-					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "name", BaiduCloudTestResourceAttrNamePrefix+"ASP"),
+					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "name", BaiduCloudTestResourceTypeNameAutoSnapshotPolicy),
 					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "time_points.#", "2"),
 					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "repeat_weekdays.#", "2"),
 					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "retention_days", "-1"),
@@ -86,10 +86,10 @@ func TestAccBaiduCloudAutoSnapshotPolicy(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccAutoSnapshotPolicyConfigUpdate(),
+				Config: testAccAutoSnapshotPolicyConfigUpdate(BaiduCloudTestResourceTypeNameAutoSnapshotPolicy),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccAutoSnapshotPolicyResourceName),
-					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "name", BaiduCloudTestResourceAttrNamePrefix+"ASP"),
+					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "name", BaiduCloudTestResourceTypeNameAutoSnapshotPolicy),
 					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "time_points.#", "3"),
 					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "repeat_weekdays.#", "1"),
 					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "retention_days", "2"),
@@ -100,10 +100,10 @@ func TestAccBaiduCloudAutoSnapshotPolicy(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccAutoSnapshotPolicyConfig(),
+				Config: testAccAutoSnapshotPolicyConfig(BaiduCloudTestResourceTypeNameAutoSnapshotPolicy),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccAutoSnapshotPolicyResourceName),
-					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "name", BaiduCloudTestResourceAttrNamePrefix+"ASP"),
+					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "name", BaiduCloudTestResourceTypeNameAutoSnapshotPolicy),
 					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "time_points.#", "2"),
 					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "repeat_weekdays.#", "2"),
 					resource.TestCheckResourceAttr(testAccAutoSnapshotPolicyResourceName, "retention_days", "-1"),
@@ -140,29 +140,35 @@ func testAccAutoSnapshotPolicyDestory(s *terraform.State) error {
 	return nil
 }
 
-func testAccAutoSnapshotPolicyConfig() string {
+func testAccAutoSnapshotPolicyConfig(name string) string {
 	return fmt.Sprintf(`
-resource "%s" "%s" {
+resource "baiducloud_auto_snapshot_policy" "default" {
   name            = "%s"
   time_points     = [0, 22]
   repeat_weekdays = [0, 3]
   retention_days  = -1
 }
-`, testAccAutoSnapshotPolicyResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"ASP")
+`, name)
 }
 
-func testAccAutoSnapshotPolicyConfigUpdate() string {
+func testAccAutoSnapshotPolicyConfigUpdate(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 data "baiducloud_specs" "default" {}
 
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 data "baiducloud_images" "default" {
   image_type = "System"
 }
 
 resource "baiducloud_instance" "default" {
-  name                  = "%s"
+  name                  = "${var.name}"
   image_id              = data.baiducloud_images.default.images.0.id
   availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
   cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
@@ -174,10 +180,11 @@ resource "baiducloud_instance" "default" {
 
 resource "baiducloud_cds" "default" {
   depends_on      = [baiducloud_instance.default]
-  name            = "%s"
-  description     = ""
+  name            = "${var.name}"
+  description     = "created by terraform"
   disk_size_in_gb = 5
   payment_timing  = "Postpaid"
+  zone_name       = data.baiducloud_zones.default.zones.0.zone_name
 }
 
 resource "baiducloud_cds_attachment" "default" {
@@ -185,13 +192,12 @@ resource "baiducloud_cds_attachment" "default" {
   instance_id = baiducloud_instance.default.id
 }
 
-resource "%s" "%s" {
-  name            = "%s"
+resource "baiducloud_auto_snapshot_policy" "default" {
+  name            = "${var.name}"
   time_points     = [0, 20, 22]
   repeat_weekdays = [0]
   retention_days  = 2
   volume_ids      = [baiducloud_cds_attachment.default.id]
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"BCC", BaiduCloudTestResourceAttrNamePrefix+"CDS",
-		testAccAutoSnapshotPolicyResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"ASP")
+`, name)
 }

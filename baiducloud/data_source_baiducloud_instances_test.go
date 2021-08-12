@@ -21,10 +21,10 @@ func TestAccBaiduCloudInstancesDataSource(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccInstancesDataSourceConfig(),
+				Config: testAccInstancesDataSourceConfig(BaiduCloudTestResourceTypeNameInstance),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccInstancesDataSourceName),
-					resource.TestCheckResourceAttr(testAccInstancesDataSourceName, testAccInstancesDataSourceAttrKeyPrefix+"name", BaiduCloudTestResourceAttrNamePrefix+"BCC"),
+					resource.TestCheckResourceAttr(testAccInstancesDataSourceName, testAccInstancesDataSourceAttrKeyPrefix+"name", BaiduCloudTestResourceTypeNameInstance),
 					resource.TestCheckResourceAttr(testAccInstancesDataSourceName, testAccInstancesDataSourceAttrKeyPrefix+"tags.%", "1"),
 					resource.TestCheckResourceAttr(testAccInstancesDataSourceName, testAccInstancesDataSourceAttrKeyPrefix+"tags.testKey", "testValue"),
 					resource.TestCheckResourceAttrSet(testAccInstancesDataSourceName, testAccInstancesDataSourceAttrKeyPrefix+"image_id"),
@@ -47,11 +47,13 @@ func TestAccBaiduCloudInstancesDataSource(t *testing.T) {
 	})
 }
 
-func testAccInstancesDataSourceConfig() string {
+func testAccInstancesDataSourceConfig(name string) string {
 	return fmt.Sprintf(`
 data "baiducloud_specs" "default" {}
 
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 data "baiducloud_images" "default" {}
 
@@ -76,8 +78,8 @@ data "baiducloud_instances" "default" {
 
   filter {
     name = "name"
-    values = ["test-BaiduAcc*"]
+    values = ["tf-test-acc*"]
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"BCC")
+`, name)
 }

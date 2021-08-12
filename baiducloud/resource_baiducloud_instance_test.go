@@ -45,7 +45,7 @@ func testSweepInstances(region string) error {
 	}
 
 	for _, inst := range instList {
-		if !strings.HasPrefix(inst.InstanceName, BaiduCloudTestResourceAttrNamePrefix) {
+		if !strings.HasPrefix(inst.InstanceName, BaiduCloudTestResourceTypeName) {
 			log.Printf("[INFO] Skipping BCC instance: %s (%s)", inst.InstanceId, inst.InstanceName)
 			continue
 		}
@@ -73,11 +73,11 @@ func TestAccBaiduCloudInstance(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccInstanceConfig(),
+				Config: testAccInstanceConfig(BaiduCloudTestResourceTypeNameInstance),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccInstanceResourceName),
-					resource.TestCheckResourceAttr(testAccInstanceResourceName, "name", BaiduCloudTestResourceAttrNamePrefix+"BCC"),
-					resource.TestCheckResourceAttr(testAccInstanceResourceName, "description", "terraform test instance"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "name", BaiduCloudTestResourceTypeNameInstance),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "image_id"),
 					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "availability_zone"),
 					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "cpu_count"),
@@ -105,11 +105,11 @@ func TestAccBaiduCloudInstance(t *testing.T) {
 				ImportStateVerifyIgnore: []string{"auto_renew_time_length", "cds_auto_renew", "delete_cds_snapshot_flag", "related_release_flag"},
 			},
 			{
-				Config: testAccInstanceConfigUpdate(),
+				Config: testAccInstanceConfigUpdate(BaiduCloudTestResourceTypeNameInstance),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccInstanceResourceName),
-					resource.TestCheckResourceAttr(testAccInstanceResourceName, "name", BaiduCloudTestResourceAttrNamePrefix+"BCC-update"),
-					resource.TestCheckResourceAttr(testAccInstanceResourceName, "description", "terraform test update instance"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "name", BaiduCloudTestResourceTypeNameInstance+"-update"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "image_id"),
 					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "availability_zone"),
 					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "cpu_count"),
@@ -130,11 +130,11 @@ func TestAccBaiduCloudInstance(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccInstanceActionUpdate(),
+				Config: testAccInstanceActionUpdate(BaiduCloudTestResourceTypeNameInstance),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccInstanceResourceName),
-					resource.TestCheckResourceAttr(testAccInstanceResourceName, "name", BaiduCloudTestResourceAttrNamePrefix+"BCC-update"),
-					resource.TestCheckResourceAttr(testAccInstanceResourceName, "description", "terraform test update instance"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "name", BaiduCloudTestResourceTypeNameInstance+"-update"),
+					resource.TestCheckResourceAttr(testAccInstanceResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "image_id"),
 					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "availability_zone"),
 					resource.TestCheckResourceAttrSet(testAccInstanceResourceName, "cpu_count"),
@@ -180,36 +180,42 @@ func testAccInstanceDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccInstanceConfig() string {
+func testAccInstanceConfig(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 data "baiducloud_specs" "default" {}
 
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 data "baiducloud_images" "default" {}
 
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = var.name
   cidr = "192.168.0.0/16"
 }
 
 resource "baiducloud_subnet" "default" {
-  name      = "%s"
+  name      = var.name
   zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.1.0/24"
   vpc_id    = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_security_group" "default" {
-  name        = "%s"
-  description = "security group created by terraform"
+  name        = var.name
+  description = "created by terraform"
   vpc_id      = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_instance" "default" {
   image_id              = data.baiducloud_images.default.images.0.id
-  name                  = "%s"
-  description           = "terraform test instance"
+  name                  = var.name
+  description           = "created by terraform"
   availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
   cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
   memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
@@ -232,62 +238,65 @@ resource "baiducloud_instance" "default" {
     "testKey" = "testValue"
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC",
-		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
-		BaiduCloudTestResourceAttrNamePrefix+"SG",
-		BaiduCloudTestResourceAttrNamePrefix+"BCC")
+`, name)
 }
 
-func testAccInstanceConfigUpdate() string {
+func testAccInstanceConfigUpdate(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 data "baiducloud_specs" "default" {}
 
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 data "baiducloud_images" "default" {}
 
 resource "baiducloud_eip" "default" {
-  name              = "%s"
+  name              = var.name
   bandwidth_in_mbps = 1
   payment_timing    = "Postpaid"
   billing_method    = "ByTraffic"
 }
 
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = var.name
   cidr = "192.168.0.0/16"
 }
 
 resource "baiducloud_subnet" "default" {
-  name      = "%s"
+  name      = "${var.name}-01"
   zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.1.0/24"
   vpc_id    = baiducloud_vpc.default.id
 }
 
-resource "baiducloud_security_group" "default" {
-  name        = "%s"
-  description = "security group created by terraform"
-  vpc_id      = baiducloud_vpc.default.id
-}
-
 resource "baiducloud_subnet" "default02" {
-  name      = "%s"
+  name      = "${var.name}-02"
   zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.2.0/24"
   vpc_id    = baiducloud_vpc.default.id
 }
 
+resource "baiducloud_security_group" "default" {
+  name        = "${var.name}-01"
+  description = "created by terraform"
+  vpc_id      = baiducloud_vpc.default.id
+}
+
 resource "baiducloud_security_group" "default02" {
-  name        = "%s"
-  description = "security group created by terraform"
+  name        = "${var.name}-02"
+  description = "created by terraform"
   vpc_id      = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_instance" "default" {
   image_id              = data.baiducloud_images.default.images.0.id
-  name                  = "%s"
-  description           = "terraform test update instance"
+  name                  = "${var.name}-update"
+  description           = "created by terraform"
   availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
   cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
   memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
@@ -317,65 +326,65 @@ resource "baiducloud_eip_association" "default" {
   instance_type = "BCC"
   instance_id   = baiducloud_instance.default.id
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"EIP",
-		BaiduCloudTestResourceAttrNamePrefix+"VPC",
-		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
-		BaiduCloudTestResourceAttrNamePrefix+"SG",
-		BaiduCloudTestResourceAttrNamePrefix+"Subnet02",
-		BaiduCloudTestResourceAttrNamePrefix+"SG02",
-		BaiduCloudTestResourceAttrNamePrefix+"BCC-update")
+`, name)
 }
 
-func testAccInstanceActionUpdate() string {
+func testAccInstanceActionUpdate(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 data "baiducloud_specs" "default" {}
 
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 data "baiducloud_images" "default" {}
 
 resource "baiducloud_eip" "default" {
-  name              = "%s"
+  name              = var.name
   bandwidth_in_mbps = 1
   payment_timing    = "Postpaid"
   billing_method    = "ByTraffic"
 }
 
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = var.name
   cidr = "192.168.0.0/16"
 }
 
 resource "baiducloud_subnet" "default" {
-  name      = "%s"
+  name      = "${var.name}-01"
   zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.1.0/24"
   vpc_id    = baiducloud_vpc.default.id
 }
 
-resource "baiducloud_security_group" "default" {
-  name        = "%s"
-  description = "security group created by terraform"
-  vpc_id      = baiducloud_vpc.default.id
-}
-
 resource "baiducloud_subnet" "default02" {
-  name      = "%s"
+  name      = "${var.name}-02"
   zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.2.0/24"
   vpc_id    = baiducloud_vpc.default.id
 }
 
+resource "baiducloud_security_group" "default" {
+  name        = "${var.name}-01"
+  description = "created by terraform"
+  vpc_id      = baiducloud_vpc.default.id
+}
+
 resource "baiducloud_security_group" "default02" {
-  name        = "%s"
-  description = "security group created by terraform"
+  name        = "${var.name}-02"
+  description = "created by terraform"
   vpc_id      = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_instance" "default" {
   image_id              = data.baiducloud_images.default.images.0.id
-  name                  = "%s"
-  description           = "terraform test update instance"
+  name                  = "${var.name}-update"
+  description           = "created by terraform"
   availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
   cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
   memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
@@ -407,11 +416,5 @@ resource "baiducloud_eip_association" "default" {
   instance_type = "BCC"
   instance_id   = baiducloud_instance.default.id
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"EIP",
-		BaiduCloudTestResourceAttrNamePrefix+"VPC",
-		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
-		BaiduCloudTestResourceAttrNamePrefix+"SG",
-		BaiduCloudTestResourceAttrNamePrefix+"Subnet02",
-		BaiduCloudTestResourceAttrNamePrefix+"SG02",
-		BaiduCloudTestResourceAttrNamePrefix+"BCC-update")
+`, name)
 }

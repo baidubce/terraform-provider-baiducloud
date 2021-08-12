@@ -16,8 +16,7 @@ output "acls" {
 package baiducloud
 
 import (
-	"fmt"
-
+	"errors"
 	"github.com/baidubce/bce-sdk-go/services/vpc"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -149,7 +148,7 @@ func dataSourceBaiduCloudAclsRead(d *schema.ResourceData, meta interface{}) erro
 	action := "Query ACL " + vpcID + "_" + subnetID
 
 	if vpcID == "" && subnetID == "" {
-		err := fmt.Errorf("The VPC ID and Subnet ID cannot be empty at the same time.")
+		err := errors.New("the VPC ID and Subnet ID cannot be empty at the same time")
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_acls", action, BCESDKGoERROR)
 	}
 

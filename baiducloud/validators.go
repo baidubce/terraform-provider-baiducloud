@@ -19,7 +19,7 @@ func validateReservationUnit() schema.SchemaValidateFunc {
 }
 
 func validatePaymentTiming() schema.SchemaValidateFunc {
-	return validation.StringInSlice([]string{PAYMENT_TIMING_POSTPAID, PAYMENT_TIMING_PREPAID}, false)
+	return validation.StringInSlice([]string{PaymentTimingPostpaid, PaymentTimingPrepai}, false)
 }
 
 func validatePort() schema.SchemaValidateFunc {

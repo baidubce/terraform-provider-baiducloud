@@ -14,15 +14,18 @@ import (
 )
 
 const (
-	testAccAppBLBResourceType     = "baiducloud_appblb"
-	testAccAppBLBResourceName     = testAccAppBLBResourceType + "." + BaiduCloudTestResourceName
-	testAccAppBLBResourceAttrName = BaiduCloudTestResourceAttrNamePrefix + "APPBLB"
+	testAccAppBLBResourceType = "baiducloud_appblb"
+	testAccAppBLBResourceName = testAccAppBLBResourceType + "." + BaiduCloudTestResourceName
 )
 
 func init() {
 	resource.AddTestSweepers(testAccAppBLBResourceType, &resource.Sweeper{
 		Name: testAccAppBLBResourceType,
 		F:    testSweepAppBLBs,
+		Dependencies: []string{
+			testAccInstanceResourceType,
+			testAccVPCResourceType,
+		},
 	})
 }
 
@@ -43,7 +46,7 @@ func testSweepAppBLBs(region string) error {
 	for _, blb := range appblbList {
 		name := blb.Name
 		blbId := blb.BlbId
-		if !strings.HasPrefix(name, BaiduCloudTestResourceAttrNamePrefix) {
+		if !strings.HasPrefix(name, BaiduCloudTestResourceTypeName) {
 			log.Printf("[INFO] Skipping APPBLB: %s (%s)", name, blbId)
 			continue
 		}
@@ -71,10 +74,10 @@ func TestAccBaiduCloudAppBLB(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccAppBLBConfig(),
+				Config: testAccAppBLBConfig(BaiduCloudTestResourceTypeNameAppblb),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccAppBLBResourceName),
-					resource.TestCheckResourceAttr(testAccAppBLBResourceName, "name", testAccAppBLBResourceAttrName),
+					resource.TestCheckResourceAttr(testAccAppBLBResourceName, "name", BaiduCloudTestResourceTypeNameAppblb),
 					resource.TestCheckResourceAttr(testAccAppBLBResourceName, "tags.%", "1"),
 					resource.TestCheckResourceAttr(testAccAppBLBResourceName, "cidr", "192.168.0.0/24"),
 					resource.TestCheckResourceAttr(testAccAppBLBResourceName, "subnet_cidr", "192.168.0.0/24"),
@@ -91,11 +94,11 @@ func TestAccBaiduCloudAppBLB(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccAppBLBConfigUpdate(),
+				Config: testAccAppBLBConfigUpdate(BaiduCloudTestResourceTypeNameAppblb),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccAppBLBResourceName),
-					resource.TestCheckResourceAttr(testAccAppBLBResourceName, "name", testAccAppBLBResourceAttrName+"Update"),
-					resource.TestCheckResourceAttr(testAccAppBLBResourceName, "description", "test update"),
+					resource.TestCheckResourceAttr(testAccAppBLBResourceName, "name", BaiduCloudTestResourceTypeNameAppblb+"-update"),
+					resource.TestCheckResourceAttr(testAccAppBLBResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttr(testAccAppBLBResourceName, "tags.%", "1"),
 					resource.TestCheckResourceAttr(testAccAppBLBResourceName, "cidr", "192.168.0.0/24"),
 					resource.TestCheckResourceAttr(testAccAppBLBResourceName, "subnet_cidr", "192.168.0.0/24"),
@@ -132,18 +135,24 @@ func testAccAppBLBDestory(s *terraform.State) error {
 	return nil
 }
 
-func testAccAppBLBConfig() string {
+func testAccAppBLBConfig(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 data "baiducloud_specs" "default" {}
 
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 data "baiducloud_images" "default" {
   image_type = "System"
 }
 
 resource "baiducloud_instance" "default" {
-  name                  = "%s"
+  name                  = "${var.name}"
   image_id              = data.baiducloud_images.default.images.0.id
   availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
   cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
@@ -154,23 +163,23 @@ resource "baiducloud_instance" "default" {
 }
 
 resource "baiducloud_vpc" "default" {
-  name        = "%s"
-  description = "test"
+  name        = "${var.name}"
+  description = "created by terraform"
   cidr        = "192.168.0.0/24"
 }
 
 resource "baiducloud_subnet" "default" {
-  name        = "%s"
+  name        = "${var.name}"
   zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.0.0/24"
   vpc_id      = baiducloud_vpc.default.id
-  description = "test description"
+  description = "created by terraform"
 }
 
-resource "%s" "%s" {
+resource "baiducloud_appblb" "default" {
   depends_on  = [baiducloud_instance.default]
-  name        = "%s"
-  description = ""
+  name        = "${var.name}"
+  description = "created by terraform"
   vpc_id      = baiducloud_vpc.default.id
   subnet_id   = baiducloud_subnet.default.id
 
@@ -178,24 +187,27 @@ resource "%s" "%s" {
     "testKey" = "testValue"
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"BCC",
-		BaiduCloudTestResourceAttrNamePrefix+"VPC",
-		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
-		testAccAppBLBResourceType, BaiduCloudTestResourceName, testAccAppBLBResourceAttrName)
+`, name)
 }
 
-func testAccAppBLBConfigUpdate() string {
+func testAccAppBLBConfigUpdate(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 data "baiducloud_specs" "default" {}
 
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 data "baiducloud_images" "default" {
   image_type = "System"
 }
 
 resource "baiducloud_instance" "default" {
-  name                  = "%s"
+  name                  = "${var.name}"
   image_id              = data.baiducloud_images.default.images.0.id
   availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
   cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
@@ -206,30 +218,36 @@ resource "baiducloud_instance" "default" {
 }
 
 resource "baiducloud_vpc" "default" {
-  name        = "%s"
-  description = "test"
+  name        = "${var.name}"
+  description = "created by terraform"
   cidr        = "192.168.0.0/24"
 }
 
 resource "baiducloud_subnet" "default" {
-  name        = "%s"
+  name        = "${var.name}"
   zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.0.0/24"
   vpc_id      = baiducloud_vpc.default.id
-  description = "test description"
+  description = "created by terraform"
 }
 
 resource "baiducloud_eip" "default" {
-  name              = "%s"
+  name              = "${var.name}"
   bandwidth_in_mbps = 1
   payment_timing    = "Postpaid"
   billing_method    = "ByTraffic"
 }
 
-resource "%s" "%s" {
+resource "baiducloud_eip_association" "default" {
+  eip           = baiducloud_eip.default.id
+  instance_type = "BLB"
+  instance_id   = baiducloud_appblb.default.id
+}
+
+resource "baiducloud_appblb" "default" {
   depends_on  = [baiducloud_instance.default]
   name        = "%s"
-  description = "test update"
+  description = "created by terraform"
   vpc_id      = baiducloud_vpc.default.id
   subnet_id   = baiducloud_subnet.default.id
 
@@ -237,16 +255,5 @@ resource "%s" "%s" {
     "testKey" = "testValue"
   }
 }
-
-resource "baiducloud_eip_association" "default" {
-  eip           = baiducloud_eip.default.id
-  instance_type = "BLB"
-  instance_id   = %s.%s.id
-}
-`, BaiduCloudTestResourceAttrNamePrefix+"BCC",
-		BaiduCloudTestResourceAttrNamePrefix+"VPC",
-		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
-		BaiduCloudTestResourceAttrNamePrefix+"EIP",
-		testAccAppBLBResourceType, BaiduCloudTestResourceName, testAccAppBLBResourceAttrName+"Update",
-		testAccAppBLBResourceType, BaiduCloudTestResourceName)
+`, name, name+"-update")
 }

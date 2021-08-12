@@ -3,7 +3,6 @@ package baiducloud
 import (
 	"fmt"
 	"log"
-	"os"
 	"strings"
 	"testing"
 
@@ -41,7 +40,7 @@ func testSweepPeerConns(region string) error {
 	}
 
 	for _, peerconn := range peerconnList {
-		if !strings.HasPrefix(peerconn.Description, BaiduCloudTestResourceAttrNamePrefix) {
+		if !strings.HasPrefix(peerconn.Description, BaiduCloudTestResourceTypeName) {
 			log.Printf("[INFO] Skipping PeerConn: %s", peerconn.PeerConnId)
 			continue
 		}
@@ -73,11 +72,11 @@ func TestAccBaiduCloudPeerConn(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccPeerConnConfig(),
+				Config: testAccPeerConnConfig(BaiduCloudTestResourceTypeNamePeerConn),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccPeerConnResourceName),
 					resource.TestCheckResourceAttr(testAccPeerConnResourceName, "bandwidth_in_mbps", "20"),
-					resource.TestCheckResourceAttr(testAccPeerConnResourceName, "description", BaiduCloudTestResourceAttrNamePrefix+"PeerConn"),
+					resource.TestCheckResourceAttr(testAccPeerConnResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttr(testAccPeerConnResourceName, "local_if_name", "local-interface"),
 					resource.TestCheckResourceAttrSet(testAccPeerConnResourceName, "local_if_id"),
 					resource.TestCheckResourceAttrSet(testAccPeerConnResourceName, "local_vpc_id"),
@@ -99,11 +98,11 @@ func TestAccBaiduCloudPeerConn(t *testing.T) {
 				ImportStateVerifyIgnore: []string{"dns_sync"},
 			},
 			{
-				Config: testAccPeerConnConfigUpdate(),
+				Config: testAccPeerConnConfigUpdate(BaiduCloudTestResourceTypeNamePeerConn),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccPeerConnResourceName),
 					resource.TestCheckResourceAttr(testAccPeerConnResourceName, "bandwidth_in_mbps", "30"),
-					resource.TestCheckResourceAttr(testAccPeerConnResourceName, "description", BaiduCloudTestResourceAttrNamePrefix+"PeerConnUpdate"),
+					resource.TestCheckResourceAttr(testAccPeerConnResourceName, "description", "created by terraform"),
 					resource.TestCheckResourceAttr(testAccPeerConnResourceName, "local_if_name", "local-interface-update"),
 					resource.TestCheckResourceAttrSet(testAccPeerConnResourceName, "local_if_id"),
 					resource.TestCheckResourceAttrSet(testAccPeerConnResourceName, "local_vpc_id"),
@@ -145,8 +144,7 @@ func testAccPeerConnDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccPeerConnConfig() string {
-	region := os.Getenv("BAIDUCLOUD_REGION")
+func testAccPeerConnConfig(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_vpc" "local-vpc" {
   name = "%s"
@@ -162,22 +160,19 @@ resource "baiducloud_peer_conn" "default" {
   bandwidth_in_mbps = 20
   local_vpc_id      = baiducloud_vpc.local-vpc.id
   peer_vpc_id       = baiducloud_vpc.peer-vpc.id
-  peer_region       = "%s"
+  peer_region       = "bj"
   peer_if_name      = "peer-interface"
-  description       = "%s"
+  description       = "created by terraform"
   local_if_name     = "local-interface"
   dns_sync = true
   billing = {
     payment_timing = "Postpaid"
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC-local",
-		BaiduCloudTestResourceAttrNamePrefix+"VPC-peer", region,
-		BaiduCloudTestResourceAttrNamePrefix+"PeerConn")
+`, name+"-local", name+"-peer")
 }
 
-func testAccPeerConnConfigUpdate() string {
-	region := os.Getenv("BAIDUCLOUD_REGION")
+func testAccPeerConnConfigUpdate(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_vpc" "local-vpc" {
   name = "%s"
@@ -193,16 +188,14 @@ resource "baiducloud_peer_conn" "default" {
   bandwidth_in_mbps = 30
   local_vpc_id      = baiducloud_vpc.local-vpc.id
   peer_vpc_id       = baiducloud_vpc.peer-vpc.id
-  peer_region       = "%s"
+  peer_region       = "bj"
   peer_if_name      = "peer-interface"
-  description       = "%s"
+  description       = "created by terraform"
   local_if_name     = "local-interface-update"
   dns_sync          = false
   billing = {
     payment_timing = "Postpaid"
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC-local",
-		BaiduCloudTestResourceAttrNamePrefix+"VPC-peer", region,
-		BaiduCloudTestResourceAttrNamePrefix+"PeerConnUpdate")
+`, name+"-local", name+"-peer")
 }

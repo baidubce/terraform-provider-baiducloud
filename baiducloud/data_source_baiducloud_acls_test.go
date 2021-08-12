@@ -22,7 +22,7 @@ func TestAccBaiduCloudACLsDataSource(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccACLsDataSourceConfigBySubnet(),
+				Config: testAccACLsDataSourceConfigBySubnet(BaiduCloudTestResourceTypeNameAcl),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccACLsDataSourceName),
 					resource.TestCheckResourceAttrSet(testAccACLsDataSourceName, testAccACLsDataSourceAttrKeyPrefix+"acl_id"),
@@ -39,7 +39,7 @@ func TestAccBaiduCloudACLsDataSource(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccACLsDataSourceConfigByVPC(),
+				Config: testAccACLsDataSourceConfigByVPC(BaiduCloudTestResourceTypeNameAcl),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccACLsDataSourceName),
 					resource.TestCheckResourceAttrSet(testAccACLsDataSourceName, testAccACLsDataSourceAttrKeyPrefix+"acl_id"),
@@ -59,17 +59,23 @@ func TestAccBaiduCloudACLsDataSource(t *testing.T) {
 	})
 }
 
-func testAccACLsDataSourceConfigBySubnet() string {
+func testAccACLsDataSourceConfigBySubnet(name string) string {
 	return fmt.Sprintf(`
-data "baiducloud_zones" "default" {}
+variable "name" {
+  default = "%s"
+}
+
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = "${var.name}"
   cidr = "192.168.0.0/16"
 }
 
 resource "baiducloud_subnet" "default" {
-  name = "%s"
+  name = "${var.name}"
   zone_name = "${data.baiducloud_zones.default.zones.0.zone_name}"
   cidr = "192.168.1.0/24"
   vpc_id = "${baiducloud_vpc.default.id}"
@@ -97,20 +103,27 @@ data "baiducloud_acls" "default" {
     values = ["ingress"]
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"Subnet")
+`, name)
 }
 
-func testAccACLsDataSourceConfigByVPC() string {
+func testAccACLsDataSourceConfigByVPC(name string) string {
 	return fmt.Sprintf(`
-data "baiducloud_zones" "default" {}
+
+variable "name" {
+  default = "%s"
+}
+
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = "${var.name}"
   cidr = "192.168.0.0/16"
 }
 
 resource "baiducloud_subnet" "default" {
-  name = "%s"
+  name = "${var.name}"
   zone_name = "${data.baiducloud_zones.default.zones.0.zone_name}"
   cidr = "192.168.1.0/24"
   vpc_id = "${baiducloud_vpc.default.id}"
@@ -138,5 +151,5 @@ data "baiducloud_acls" "default" {
     values = ["allow"]
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"Subnet")
+`, name)
 }

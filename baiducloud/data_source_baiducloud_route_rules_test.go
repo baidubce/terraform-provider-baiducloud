@@ -22,7 +22,7 @@ func TestAccBaiduCloudRouteRulesDataSource(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccRouteRulesDataSourceConfig(),
+				Config: testAccRouteRulesDataSourceConfig(BaiduCloudTestResourceTypeNameRouteRule),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccRouteRulesDataSourceName),
 					resource.TestCheckResourceAttrSet(testAccRouteRulesDataSourceName, testAccRouteRulesDataSourceAttrKeyPrefix+"route_rule_id"),
@@ -31,40 +31,46 @@ func TestAccBaiduCloudRouteRulesDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(testAccRouteRulesDataSourceName, testAccRouteRulesDataSourceAttrKeyPrefix+"source_address", "192.168.0.0/24"),
 					resource.TestCheckResourceAttr(testAccRouteRulesDataSourceName, testAccRouteRulesDataSourceAttrKeyPrefix+"destination_address", "192.168.1.0/24"),
 					resource.TestCheckResourceAttr(testAccRouteRulesDataSourceName, testAccRouteRulesDataSourceAttrKeyPrefix+"next_hop_type", "custom"),
-					resource.TestCheckResourceAttr(testAccRouteRulesDataSourceName, testAccRouteRulesDataSourceAttrKeyPrefix+"description", "baiducloud route rule created by terraform"),
+					resource.TestCheckResourceAttr(testAccRouteRulesDataSourceName, testAccRouteRulesDataSourceAttrKeyPrefix+"description", "created by terraform"),
 				),
 			},
 		},
 	})
 }
 
-func testAccRouteRulesDataSourceConfig() string {
+func testAccRouteRulesDataSourceConfig(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 data "baiducloud_specs" "default" {}
 
 data "baiducloud_images" "default" {}
 
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
+
+resource "baiducloud_vpc" "default" {
+  name = var.name
+  cidr = "192.168.0.0/16"
+}
 
 data "baiducloud_security_groups" "default" {
   vpc_id = baiducloud_vpc.default.id
 }
 
-resource "baiducloud_vpc" "default" {
-  name = "%s"
-  cidr = "192.168.0.0/16"
-}
-
 resource "baiducloud_subnet" "default" {
-  name        = "%s"
+  name        = var.name
   zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.1.0/24"
-  description = "subnet created by terraform"
+  description = "created by terraform"
   vpc_id      = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_instance" "default" {
-  name                  = "%s"
+  name                  = var.name
   image_id              = data.baiducloud_images.default.images.0.id
   cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
   memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
@@ -76,25 +82,23 @@ resource "baiducloud_instance" "default" {
   security_groups   = [data.baiducloud_security_groups.default.security_groups.0.id]
 }
 
-resource "%s" "%s" {
+resource "baiducloud_route_rule" "default" {
   route_table_id      = baiducloud_vpc.default.route_table_id
   source_address      = "192.168.0.0/24"
   destination_address = "192.168.1.0/24"
   next_hop_type       = "custom"
   next_hop_id         = baiducloud_instance.default.id
-  description         = "baiducloud route rule created by terraform"
+  description         = "created by terraform"
 }
 
 data "baiducloud_route_rules" "default" {
   route_table_id = baiducloud_vpc.default.route_table_id
-  route_rule_id  = %s.%s.id
+  route_rule_id  = baiducloud_route_rule.default.id
 
   filter {
     name = "next_hop_type"
     values = ["custom"]
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"Subnet",
-		BaiduCloudTestResourceAttrNamePrefix+"BCC", testAccRouteRuleResourceType, BaiduCloudTestResourceName,
-		testAccRouteRuleResourceType, BaiduCloudTestResourceName)
+`, name)
 }

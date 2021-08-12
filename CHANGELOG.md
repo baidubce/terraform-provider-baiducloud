@@ -1,4 +1,5 @@
-## 1.12.0 (Unreleased)
+	## 1.13.0 (Unreleased)
+## 1.12.0 (August 12, 2021)
 ## 1.11.3 (April 23, 2021)
 
 NOTES:

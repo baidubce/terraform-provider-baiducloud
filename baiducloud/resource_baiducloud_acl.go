@@ -153,7 +153,7 @@ func resourceBaiduCloudAclRead(d *schema.ResourceData, meta interface{}) error {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_acl", action, BCESDKGoERROR)
 	}
 	if len(aclRules) == 0 {
-		return WrapErrorf(fmt.Errorf("There is no ACL Rule for Subnet %s.", subnetId), DefaultErrorMsg, "baiducloud_acl", action, BCESDKGoERROR)
+		return WrapErrorf(fmt.Errorf("there is no ACL Rule for Subnet %s", subnetId), DefaultErrorMsg, "baiducloud_acl", action, BCESDKGoERROR)
 	}
 	for _, aclRule := range aclRules {
 		if aclRule.SubnetId == subnetId && aclRule.Position == position {

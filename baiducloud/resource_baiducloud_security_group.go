@@ -163,7 +163,7 @@ func resourceBaiduCloudSecurityGroupDelete(d *schema.ResourceData, meta interfac
 			return securityGroupID, bccClient.DeleteSecurityGroup(securityGroupID)
 		})
 		if err != nil {
-			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR, SECURITYGROUP_INUSE_ERROR}) {
+			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR, SecuritygroupInuseError, SecurityGroupInstancesAssociatedSecurityGroupCanNotBeDeleted}) {
 				return resource.RetryableError(err)
 			}
 			return resource.NonRetryableError(err)

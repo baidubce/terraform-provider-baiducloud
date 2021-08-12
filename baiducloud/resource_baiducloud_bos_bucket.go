@@ -704,7 +704,7 @@ func resourceBaiduCloudBosBucketDelete(d *schema.ResourceData, meta interface{})
 	bucket := d.Id()
 	action := "Delete Bucket " + bucket
 
-	errRetry := resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+	rf := func() *resource.RetryError {
 		_, errDelete := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
 			return nil, bosClient.DeleteBucket(bucket)
 		})
@@ -749,7 +749,10 @@ func resourceBaiduCloudBosBucketDelete(d *schema.ResourceData, meta interface{})
 		}
 
 		return nil
-	})
+	}
+
+	errRetry := resource.Retry(d.Timeout(schema.TimeoutDelete), rf)
+
 	if errRetry != nil {
 		return WrapErrorf(errRetry, DefaultErrorMsg, "baiducloud_bos_bucket", action, BCESDKGoERROR)
 	}

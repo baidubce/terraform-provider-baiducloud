@@ -18,12 +18,12 @@ const (
 	testAccCceResourceName = testAccCceResourceType + "." + BaiduCloudTestResourceName
 )
 
-func init() {
-	resource.AddTestSweepers(testAccCceResourceType, &resource.Sweeper{
-		Name: testAccCceResourceType,
-		F:    testSweepCce,
-	})
-}
+//func init() {
+//	resource.AddTestSweepers(testAccCceResourceType, &resource.Sweeper{
+//		Name: testAccCceResourceType,
+//		F:    testSweepCce,
+//	})
+//}
 
 func testSweepCce(region string) error {
 	rawClient, err := sharedClientForRegion(region)
@@ -42,7 +42,7 @@ func testSweepCce(region string) error {
 
 	cceList := raw.(*cce.ListClusterResult)
 	for _, c := range cceList.Clusters {
-		if !strings.HasPrefix(c.ClusterName, BaiduCloudTestResourceAttrNamePrefix) {
+		if !strings.HasPrefix(c.ClusterName, BaiduCloudTestResourceTypeName) {
 			log.Printf("[INFO] Skipping CCE Cluster: %s (%s)", c.ClusterName, c.ClusterUuid)
 			continue
 		}
@@ -72,7 +72,7 @@ func testSweepCce(region string) error {
 }
 
 //lintignore:AT003
-func TestAccBaiduCloudCce(t *testing.T) {
+func testAccBaiduCloudCce(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -82,13 +82,13 @@ func TestAccBaiduCloudCce(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCceMasterConfig(),
+				Config: testAccCceMasterConfig(BaiduCloudTestResourceTypeName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccCceResourceName),
 				),
 			},
 			{
-				Config: testAccCceMasterUpdateConfig(),
+				Config: testAccCceMasterUpdateConfig(BaiduCloudTestResourceTypeName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccCceResourceName),
 				),
@@ -127,10 +127,14 @@ func testAccCceDestory(s *terraform.State) error {
 	return nil
 }
 
-func testAccCceMasterConfig() string {
+func testAccCceMasterConfig(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 data "baiducloud_zones" "defaultA" {
-  name_regex = ".*a$"
+  name_regex = ".*e$"
 }
 
 data "baiducloud_zones" "defaultB" {
@@ -144,13 +148,13 @@ data "baiducloud_images" "default" {
 }
 
 resource "baiducloud_vpc" "default" {
-  name        = "%s"
+  name        = "${var.name}"
   description = "created by terraform"
   cidr        = "192.168.0.0/16"
 }
 
 resource "baiducloud_subnet" "defaultA" {
-  name        = "%s"
+  name        = "${var.name}-01"
   zone_name   = data.baiducloud_zones.defaultA.zones.0.zone_name
   cidr        = "192.168.1.0/24"
   vpc_id      = baiducloud_vpc.default.id
@@ -158,7 +162,7 @@ resource "baiducloud_subnet" "defaultA" {
 }
 
 resource "baiducloud_subnet" "defaultB" {
-  name        = "%s"
+  name        = "${var.name}-02"
   zone_name   = data.baiducloud_zones.defaultB.zones.0.zone_name
   cidr        = "192.168.2.0/24"
   vpc_id      = baiducloud_vpc.default.id
@@ -166,7 +170,7 @@ resource "baiducloud_subnet" "defaultB" {
 }
 
 resource "baiducloud_security_group" "defualt" {
-  name   = "%s"
+  name   = var.name
   vpc_id = baiducloud_vpc.default.id
 }
 
@@ -191,7 +195,7 @@ data "baiducloud_cce_versions" "default" {
 }
 
 resource "baiducloud_cce_cluster" "default" {
-  cluster_name        = "%s"
+  cluster_name        = var.name
   main_available_zone = "zoneA"
   version             = data.baiducloud_cce_versions.default.versions.0
   container_net       = "172.16.0.0/16"
@@ -250,15 +254,17 @@ resource "baiducloud_cce_cluster" "default" {
     product_type      = "postpay"
     image_id          = data.baiducloud_images.default.images.0.id
   }
-}`, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"SubnetA",
-		BaiduCloudTestResourceAttrNamePrefix+"SubnetB", BaiduCloudTestResourceAttrNamePrefix+"SG",
-		BaiduCloudTestResourceAttrNamePrefix+"CCE")
+}`, name)
 }
 
-func testAccCceMasterUpdateConfig() string {
+func testAccCceMasterUpdateConfig(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 data "baiducloud_zones" "defaultA" {
-  name_regex = ".*a$"
+  name_regex = ".*e$"
 }
 
 data "baiducloud_zones" "defaultB" {
@@ -272,13 +278,13 @@ data "baiducloud_images" "default" {
 }
 
 resource "baiducloud_vpc" "default" {
-  name        = "%s"
+  name        = var.name
   description = "created by terraform"
   cidr        = "192.168.0.0/16"
 }
 
 resource "baiducloud_subnet" "defaultA" {
-  name        = "%s"
+  name        = "${var.name}-01"
   zone_name   = data.baiducloud_zones.defaultA.zones.0.zone_name
   cidr        = "192.168.1.0/24"
   vpc_id      = baiducloud_vpc.default.id
@@ -286,7 +292,7 @@ resource "baiducloud_subnet" "defaultA" {
 }
 
 resource "baiducloud_subnet" "defaultB" {
-  name        = "%s"
+  name        = "${var.name}-02"
   zone_name   = data.baiducloud_zones.defaultB.zones.0.zone_name
   cidr        = "192.168.2.0/24"
   vpc_id      = baiducloud_vpc.default.id
@@ -294,7 +300,7 @@ resource "baiducloud_subnet" "defaultB" {
 }
 
 resource "baiducloud_security_group" "defualt" {
-  name   = "%s"
+  name   = var.name
   vpc_id = baiducloud_vpc.default.id
 }
 
@@ -319,7 +325,7 @@ data "baiducloud_cce_versions" "default" {
 }
 
 resource "baiducloud_cce_cluster" "default" {
- cluster_name        = "%s"
+ cluster_name        = var.name
   main_available_zone = "zoneA"
   version             = data.baiducloud_cce_versions.default.versions.0
   container_net       = "172.16.0.0/16"
@@ -381,7 +387,5 @@ resource "baiducloud_cce_cluster" "default" {
     image_id          = data.baiducloud_images.default.images.0.id
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC", BaiduCloudTestResourceAttrNamePrefix+"SubnetA",
-		BaiduCloudTestResourceAttrNamePrefix+"SubnetB", BaiduCloudTestResourceAttrNamePrefix+"SG",
-		BaiduCloudTestResourceAttrNamePrefix+"CCE")
+`, name)
 }

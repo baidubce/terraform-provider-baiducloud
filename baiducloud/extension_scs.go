@@ -16,4 +16,5 @@ const (
 	SCSStatusStatusExpire         = "Expire"
 	SCSStatusStatusFlushing       = "Flushing"
 	SCSStatusStatusFlushFailed    = "Flush failed"
+	SCSSTatusStatusIsolated       = "isolated"
 )

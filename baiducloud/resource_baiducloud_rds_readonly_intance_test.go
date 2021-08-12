@@ -41,7 +41,7 @@ func testSweepRdsReadOnlyInstances(region string) error {
 	}
 
 	for _, inst := range instList {
-		if !strings.HasPrefix(inst.InstanceName, BaiduCloudTestResourceAttrNamePrefix) || inst.InstanceStatus != "Running" {
+		if !strings.HasPrefix(inst.InstanceName, BaiduCloudTestResourceTypeName) || inst.InstanceStatus != "Running" {
 			log.Printf("[INFO] Skipping RDS instance: %s (%s)", inst.InstanceId, inst.InstanceName)
 			continue
 		}
@@ -69,7 +69,7 @@ func TestAccBaiduCloudRdsReadOnlyInstance(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccRdsReadOnlyInstanceConfig(),
+				Config: testAccRdsReadOnlyInstanceConfig(BaiduCloudTestResourceTypeNameRdsReadonlyInstance),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccRdsReadOnlyInstanceResourceName),
 					resource.TestCheckResourceAttr(testAccRdsReadOnlyInstanceResourceName, "billing.payment_timing", "Postpaid"),
@@ -112,7 +112,7 @@ func testAccRdsReadOnlyInstanceDestory(s *terraform.State) error {
 	return nil
 }
 
-func testAccRdsReadOnlyInstanceConfig() string {
+func testAccRdsReadOnlyInstanceConfig(name string) string {
 	return fmt.Sprintf(`
 resource "baiducloud_rds_instance" "default" {
     instance_name              = "%s"
@@ -126,7 +126,7 @@ resource "baiducloud_rds_instance" "default" {
     volume_capacity            = 5
 }
 
-resource "%s" "%s" {
+resource "baiducloud_rds_readonly_instance" "default" {
     instance_name              = "%s"
     billing = {
         payment_timing         = "Postpaid"
@@ -136,5 +136,5 @@ resource "%s" "%s" {
     memory_capacity            = 1
     volume_capacity            = 5
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"Rds_Master", testAccRdsReadOnlyInstanceResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"Rds_ReadOnly")
+`, name+"-rds-master", name+"-rds-read-only")
 }

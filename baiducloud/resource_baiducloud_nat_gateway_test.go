@@ -11,9 +11,8 @@ import (
 )
 
 const (
-	testAccNatGatewayResourceType     = "baiducloud_nat_gateway"
-	testAccNatGatewayResourceName     = testAccNatGatewayResourceType + "." + BaiduCloudTestResourceName
-	testAccNatGatewayResourceAttrName = BaiduCloudTestResourceAttrNamePrefix + "NatGateway"
+	testAccNatGatewayResourceType = "baiducloud_nat_gateway"
+	testAccNatGatewayResourceName = testAccNatGatewayResourceType + "." + BaiduCloudTestResourceName
 )
 
 //lintignore:AT003
@@ -27,10 +26,10 @@ func TestAccBaiduCloudNatGateway(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccNatGatewayConfig(),
+				Config: testAccNatGatewayConfig(BaiduCloudTestResourceTypeNameNatGateway),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccNatGatewayResourceName),
-					resource.TestCheckResourceAttr(testAccNatGatewayResourceName, "name", testAccNatGatewayResourceAttrName),
+					resource.TestCheckResourceAttr(testAccNatGatewayResourceName, "name", BaiduCloudTestResourceTypeNameNatGateway),
 					resource.TestCheckResourceAttr(testAccNatGatewayResourceName, "spec", "medium"),
 					resource.TestCheckResourceAttrSet(testAccNatGatewayResourceName, "id"),
 					resource.TestCheckResourceAttrSet(testAccNatGatewayResourceName, "vpc_id"),
@@ -43,10 +42,10 @@ func TestAccBaiduCloudNatGateway(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccNatGatewayConfigUpdate(),
+				Config: testAccNatGatewayConfigUpdate(BaiduCloudTestResourceTypeNameNatGateway),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccNatGatewayResourceName),
-					resource.TestCheckResourceAttr(testAccNatGatewayResourceName, "name", testAccNatGatewayResourceAttrName+"-update"),
+					resource.TestCheckResourceAttr(testAccNatGatewayResourceName, "name", BaiduCloudTestResourceTypeNameNatGateway+"-update"),
 					resource.TestCheckResourceAttr(testAccNatGatewayResourceName, "spec", "medium"),
 					resource.TestCheckResourceAttrSet(testAccNatGatewayResourceName, "id"),
 					resource.TestCheckResourceAttrSet(testAccNatGatewayResourceName, "vpc_id"),
@@ -79,24 +78,30 @@ func testAccNatGatewayDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccNatGatewayConfig() string {
+func testAccNatGatewayConfig(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = var.name
   cidr = "192.168.0.0/16"
 }
 
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 resource "baiducloud_subnet" "default" {
-  name      = "%s"
+  name      = var.name
   zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.1.0/24"
   vpc_id    = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_nat_gateway" "default" {
-  name   = "%s"
+  name   = var.name
   vpc_id = baiducloud_vpc.default.id
   spec   = "medium"
   billing = {
@@ -104,29 +109,33 @@ resource "baiducloud_nat_gateway" "default" {
   }
   depends_on = [baiducloud_subnet.default]
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC",
-		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
-		testAccNatGatewayResourceAttrName)
+`, name)
 }
 
-func testAccNatGatewayConfigUpdate() string {
+func testAccNatGatewayConfigUpdate(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = var.name
   cidr = "192.168.0.0/16"
 }
 
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 resource "baiducloud_subnet" "default" {
-  name      = "%s"
+  name      = var.name
   zone_name = data.baiducloud_zones.default.zones.0.zone_name
   cidr      = "192.168.1.0/24"
   vpc_id    = baiducloud_vpc.default.id
 }
 
 resource "baiducloud_eip" "default" {
-  name              = "%s"
+  name              = var.name
   bandwidth_in_mbps = 1
   payment_timing    = "Postpaid"
   billing_method    = "ByTraffic"
@@ -147,8 +156,5 @@ resource "baiducloud_eip_association" "default" {
   instance_type = "NAT"
   instance_id   = baiducloud_nat_gateway.default.id
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC",
-		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
-		BaiduCloudTestResourceAttrNamePrefix+"EIP",
-		testAccNatGatewayResourceAttrName+"-update")
+`, name, name+"-update")
 }

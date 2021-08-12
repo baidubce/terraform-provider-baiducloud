@@ -21,10 +21,10 @@ func TestAccBaiduCloudAutoSnapshotPoliciesDataSource(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccAutoSnapshotPoliciesDataSourceConfig(),
+				Config: testAccAutoSnapshotPoliciesDataSourceConfig(BaiduCloudTestResourceTypeNameAutoSnapshotPolicy),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccAutoSnapshotPoliciesDataSourceName),
-					resource.TestCheckResourceAttr(testAccAutoSnapshotPoliciesDataSourceName, testAccAutoSnapshotPoliciesDataSourceAttrKeyPrefix+"name", BaiduCloudTestResourceAttrNamePrefix+"ASP"),
+					resource.TestCheckResourceAttr(testAccAutoSnapshotPoliciesDataSourceName, testAccAutoSnapshotPoliciesDataSourceAttrKeyPrefix+"name", BaiduCloudTestResourceTypeNameAutoSnapshotPolicy),
 					resource.TestCheckResourceAttr(testAccAutoSnapshotPoliciesDataSourceName, testAccAutoSnapshotPoliciesDataSourceAttrKeyPrefix+"time_points.#", "2"),
 					resource.TestCheckResourceAttr(testAccAutoSnapshotPoliciesDataSourceName, testAccAutoSnapshotPoliciesDataSourceAttrKeyPrefix+"time_points.0", "0"),
 					resource.TestCheckResourceAttr(testAccAutoSnapshotPoliciesDataSourceName, testAccAutoSnapshotPoliciesDataSourceAttrKeyPrefix+"time_points.1", "22"),
@@ -41,18 +41,24 @@ func TestAccBaiduCloudAutoSnapshotPoliciesDataSource(t *testing.T) {
 	})
 }
 
-func testAccAutoSnapshotPoliciesDataSourceConfig() string {
+func testAccAutoSnapshotPoliciesDataSourceConfig(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 data "baiducloud_specs" "default" {}
 
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 data "baiducloud_images" "default" {
   image_type = "System"
 }
 
 resource "baiducloud_instance" "default" {
-  name                  = "%s"
+  name                  = "${var.name}"
   image_id              = data.baiducloud_images.default.images.0.id
   availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
   cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
@@ -64,10 +70,11 @@ resource "baiducloud_instance" "default" {
 
 resource "baiducloud_cds" "default" {
   depends_on      = [baiducloud_instance.default]
-  name            = "%s"
-  description     = ""
+  name            = "${var.name}"
+  description     = "created by terraform"
   disk_size_in_gb = 5
   payment_timing  = "Postpaid"
+  zone_name       = data.baiducloud_zones.default.zones.0.zone_name
 }
 
 resource "baiducloud_cds_attachment" "default" {
@@ -76,7 +83,7 @@ resource "baiducloud_cds_attachment" "default" {
 }
 
 resource "baiducloud_auto_snapshot_policy" "default" {
-  name            = "%s"
+  name            = "${var.name}"
   time_points     = [0, 22]
   repeat_weekdays = [0, 3]
   retention_days  = -1
@@ -89,10 +96,8 @@ data "baiducloud_auto_snapshot_policies" "default" {
 
   filter {
     name = "name"
-    values = ["test-BaiduAcc*"]
+    values = ["tf-test-acc*"]
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"BCC",
-		BaiduCloudTestResourceAttrNamePrefix+"CDS",
-		BaiduCloudTestResourceAttrNamePrefix+"ASP")
+`, name)
 }

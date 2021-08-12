@@ -26,7 +26,7 @@ func TestAccBaiduCloudSubnetsDataSource(t *testing.T) {
 					testAccCheckBaiduCloudDataSourceId(testAccSubnetsDataSourceName),
 					resource.TestCheckResourceAttrSet(testAccSubnetsDataSourceName, testAccSubnetsDataSourceAttrKeyPrefix+"subnet_id"),
 					resource.TestCheckResourceAttr(testAccSubnetsDataSourceName, testAccSubnetsDataSourceAttrKeyPrefix+"cidr", "192.168.1.0/24"),
-					resource.TestCheckResourceAttr(testAccSubnetsDataSourceName, testAccSubnetsDataSourceAttrKeyPrefix+"name", "test-BaiduAccSubnet"),
+					resource.TestCheckResourceAttr(testAccSubnetsDataSourceName, testAccSubnetsDataSourceAttrKeyPrefix+"name", BaiduCloudTestResourceTypeNameSubnet),
 					resource.TestCheckResourceAttrSet(testAccSubnetsDataSourceName, testAccSubnetsDataSourceAttrKeyPrefix+"zone_name"),
 					resource.TestCheckResourceAttrSet(testAccSubnetsDataSourceName, testAccSubnetsDataSourceAttrKeyPrefix+"vpc_id"),
 					resource.TestCheckResourceAttrSet(testAccSubnetsDataSourceName, testAccSubnetsDataSourceAttrKeyPrefix+"subnet_type"),
@@ -41,16 +41,18 @@ func TestAccBaiduCloudSubnetsDataSource(t *testing.T) {
 }
 
 const testAccSubnetsDataSourceConfig = `
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 resource "baiducloud_vpc" "default" {
-  name        = "test-BaiduAccVPC"
-  description = "test baidu Acc"
+  name        = "tf-test-acc"
+  description = "created by terraform"
   cidr        = "192.168.0.0/16"
 }
 
 resource "baiducloud_subnet" "default" {
-  name        = "test-BaiduAccSubnet"
+  name        = "tf-test-acc-subnet"
   zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.1.0/24"
   description = "created by terraform"
@@ -65,7 +67,7 @@ data "baiducloud_subnets" "default" {
 
   filter {
     name = "name"
-    values = ["test-filter", "test-BaiduAcc*"]
+    values = ["test-filter", "tf-test-acc*"]
   }
 
   filter {

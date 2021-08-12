@@ -32,8 +32,8 @@ func TestAccBaiduCloudCCEv2ContainerCidrDataSource(t *testing.T) {
 
 const testAccCceContainerCidrDataSourceConfig = `
 resource "baiducloud_vpc" "default" {
-  name        = "test-vpc-tf-auto"
-  description = "test-vpc-tf-auto"
+  name        = "tf-test-acc-container-cidr"
+  description = "created by terraform"
   cidr        = "192.168.0.0/16"
 }
 data "baiducloud_ccev2_container_cidr" "default" {

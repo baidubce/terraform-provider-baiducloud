@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/baidubce/bce-sdk-go/services/iam"
 	"github.com/baidubce/bce-sdk-go/services/iam/api"
-	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
@@ -20,8 +19,9 @@ const (
 
 func init() {
 	resource.AddTestSweepers(testAccIamGroupMembershipResourceType, &resource.Sweeper{
-		Name: testAccIamGroupMembershipResourceType,
-		F:    testSweepIamGroupMemberships,
+		Name:         testAccIamGroupMembershipResourceType,
+		F:            testSweepIamGroupMemberships,
+		Dependencies: []string{testAccIamGroupResourceType},
 	})
 }
 
@@ -43,7 +43,7 @@ func testSweepIamGroupMemberships(region string) error {
 
 	result, _ := raw.(*api.ListGroupResult)
 	for _, group := range result.Groups {
-		if !strings.HasPrefix(group.Name, testAccIamGroupPrefix) {
+		if !strings.HasPrefix(group.Name, BaiduCloudTestResourceTypeName) {
 			continue
 		}
 		log.Printf("[INFO] Deleting group: %s", group.Name)
@@ -67,7 +67,7 @@ func testSweepIamGroupMemberships(region string) error {
 
 	users, _ := raw.(*api.ListUserResult)
 	for _, user := range users.Users {
-		if !strings.HasPrefix(user.Name, testAccIamUserPrefix) {
+		if !strings.HasPrefix(user.Name, BaiduCloudTestResourceTypeNameUnderLine) {
 			continue
 		}
 		if err := iamService.ClearUserGroupMembership(user.Name); err != nil {
@@ -84,9 +84,6 @@ func testSweepIamGroupMemberships(region string) error {
 }
 
 func TestAccBaiduCloudIamGroupMembership(t *testing.T) {
-	groupName := strings.ReplaceAll(acctest.RandomWithPrefix(testAccIamGroupPrefix), "-", "_")
-	userName1 := acctest.RandomWithPrefix(testAccIamUserPrefix) + "_1"
-	userName2 := acctest.RandomWithPrefix(testAccIamUserPrefix) + "_2"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -97,26 +94,26 @@ func TestAccBaiduCloudIamGroupMembership(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccIamGroupMembership1UserConfig(groupName, userName1, userName2),
+				Config: testAccIamGroupMembership1UserConfig(BaiduCloudTestResourceTypeNameUnderLine),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccIamGroupMembershipResourceName),
-					resource.TestCheckResourceAttr(testAccIamGroupMembershipResourceName, "group", groupName),
+					resource.TestCheckResourceAttr(testAccIamGroupMembershipResourceName, "group", BaiduCloudTestResourceTypeNameUnderLine),
 					resource.TestCheckResourceAttr(testAccIamGroupMembershipResourceName, "users.#", "1"),
 				),
 			},
 			{
-				Config: testAccIamGroupMembership2UserConfig(groupName, userName1, userName2),
+				Config: testAccIamGroupMembership2UserConfig(BaiduCloudTestResourceTypeNameUnderLine),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccIamGroupMembershipResourceName),
-					resource.TestCheckResourceAttr(testAccIamGroupMembershipResourceName, "group", groupName),
+					resource.TestCheckResourceAttr(testAccIamGroupMembershipResourceName, "group", BaiduCloudTestResourceTypeNameUnderLine),
 					resource.TestCheckResourceAttr(testAccIamGroupMembershipResourceName, "users.#", "2"),
 				),
 			},
 			{
-				Config: testAccIamGroupMembership1UserConfig(groupName, userName2, userName1),
+				Config: testAccIamGroupMembership1UserConfig(BaiduCloudTestResourceTypeNameUnderLine),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccIamGroupMembershipResourceName),
-					resource.TestCheckResourceAttr(testAccIamGroupMembershipResourceName, "group", groupName),
+					resource.TestCheckResourceAttr(testAccIamGroupMembershipResourceName, "group", BaiduCloudTestResourceTypeNameUnderLine),
 					resource.TestCheckResourceAttr(testAccIamGroupMembershipResourceName, "users.#", "1"),
 				),
 			},
@@ -124,60 +121,46 @@ func TestAccBaiduCloudIamGroupMembership(t *testing.T) {
 	})
 }
 
-func testAccIamGroupMembership1UserConfig(groupName, userName1, userName2 string) string {
+func testAccIamGroupMembership1UserConfig(name string) string {
 	return fmt.Sprintf(`
-resource "%s" "%s" {
+resource "baiducloud_iam_group" "default" {
   name = "%s"
   force_destroy = true
 }
-resource "%s" "%s" {
+resource "baiducloud_iam_user" "default01" {
   name = "%s"
   force_destroy = true
 }
-resource "%s" "%s" {
+resource "baiducloud_iam_user" "default02" {
   name = "%s"
   force_destroy = true
 }
-resource "%s" "%s" {
-  group = "${%s}"
-  users = ["${%s}"]
+resource "baiducloud_iam_group_membership" "default" {
+  group = baiducloud_iam_group.default.name
+  users = [baiducloud_iam_user.default01.name]
 }
-`,
-		testAccIamGroupResourceType, BaiduCloudTestResourceName, groupName,
-		testAccIamUserResourceType, BaiduCloudTestResourceName+"_"+userName1, userName1,
-		testAccIamUserResourceType, BaiduCloudTestResourceName+"_"+userName2, userName2,
-		testAccIamGroupMembershipResourceType, BaiduCloudTestResourceName, testAccIamGroupResourceName+".name",
-		getTestAccIamUserResourceNameAttr(userName1))
+`, name, name+"_01", name+"_02")
 }
 
-func testAccIamGroupMembership2UserConfig(groupName, userName1, userName2 string) string {
+func testAccIamGroupMembership2UserConfig(name string) string {
 	return fmt.Sprintf(`
-resource "%s" "%s" {
+resource "baiducloud_iam_group" "default" {
   name = "%s"
   force_destroy = true
 }
-resource "%s" "%s" {
+resource "baiducloud_iam_user" "default01" {
   name = "%s"
   force_destroy = true
 }
-resource "%s" "%s" {
+resource "baiducloud_iam_user" "default02" {
   name = "%s"
   force_destroy = true
 }
-resource "%s" "%s" {
-  group = "${%s}"
-  users = ["${%s}", "${%s}"]
+resource "baiducloud_iam_group_membership" "default" {
+  group = baiducloud_iam_group.default.name
+  users = [baiducloud_iam_user.default01.name,baiducloud_iam_user.default02.name]
 }
-`,
-		testAccIamGroupResourceType, BaiduCloudTestResourceName, groupName,
-		testAccIamUserResourceType, BaiduCloudTestResourceName+"_"+userName1, userName1,
-		testAccIamUserResourceType, BaiduCloudTestResourceName+"_"+userName2, userName2,
-		testAccIamGroupMembershipResourceType, BaiduCloudTestResourceName, testAccIamGroupResourceName+".name",
-		getTestAccIamUserResourceNameAttr(userName1), getTestAccIamUserResourceNameAttr(userName2))
-}
-
-func getTestAccIamUserResourceNameAttr(name string) string {
-	return testAccIamUserResourceName + "_" + name + ".name"
+`, name, name+"_01", name+"_02")
 }
 
 func testAccIamGroupMembershipDestroy(s *terraform.State) error {

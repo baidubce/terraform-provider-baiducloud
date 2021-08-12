@@ -1,9 +1,8 @@
 package baiducloud
 
 const (
-	// subnet in used, can not be deleted
-	SUBNET_INUSE_ERROR = "SUBNET_INUSE"
-
-	// security group in used, can not be deleted
-	SECURITYGROUP_INUSE_ERROR = "SECURITYGROUP_INUSE"
+	// SubnetInuseError subnet in used, can not be deleted
+	SubnetInuseError = "SUBNET_INUSE"
+	// SecuritygroupInuseError security group in used, can not be deleted
+	SecuritygroupInuseError = "SECURITYGROUP_INUSE"
 )

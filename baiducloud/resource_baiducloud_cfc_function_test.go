@@ -41,7 +41,7 @@ func testSweepCFCFunctions(region string) error {
 
 	for _, f := range functions {
 		name := f.FunctionName
-		if !strings.HasPrefix(f.FunctionName, BaiduCloudTestResourceAttrNamePrefix) {
+		if !strings.HasPrefix(f.FunctionName, BaiduCloudTestResourceTypeName) {
 			log.Printf("[INFO] Skipping CFC Function: %s ", name)
 			continue
 		}
@@ -71,10 +71,10 @@ func TestAccBaiduCloudCFCFunction(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCfcConfig(),
+				Config: testAccCfcConfig(BaiduCloudTestResourceTypeNameCfcFunction),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(testAccCFCResourceName, "function_name", "test-BaiduAccCFC"),
-					resource.TestCheckResourceAttr(testAccCFCResourceName, "description", "terraform create"),
+					resource.TestCheckResourceAttr(testAccCFCResourceName, "function_name", BaiduCloudTestResourceTypeNameCfcFunction),
+					resource.TestCheckResourceAttr(testAccCFCResourceName, "description", "created-by-terraform"),
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "memory_size", "128"),
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "handler", "index.handler"),
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "runtime", "nodejs12"),
@@ -98,10 +98,10 @@ func TestAccBaiduCloudCFCFunction(t *testing.T) {
 				ImportStateVerifyIgnore: []string{"code_file_name", "code_bos_bucket", "code_bos_object", "code_file_dir", "reserved_concurrent_executions", "code_storage.location"},
 			},
 			{
-				Config: testAccCfcConfigUpdate(),
+				Config: testAccCfcConfigUpdate(BaiduCloudTestResourceTypeNameCfcFunction),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(testAccCFCResourceName, "function_name", "test-BaiduAccCFC"),
-					resource.TestCheckResourceAttr(testAccCFCResourceName, "description", "terraform update"),
+					resource.TestCheckResourceAttr(testAccCFCResourceName, "function_name", BaiduCloudTestResourceTypeNameCfcFunction),
+					resource.TestCheckResourceAttr(testAccCFCResourceName, "description", "created-by-terraform"),
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "memory_size", "256"),
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "handler", "index.handler2"),
 					resource.TestCheckResourceAttr(testAccCFCResourceName, "runtime", "python2"),
@@ -145,17 +145,23 @@ func testAccCFCFunctionDestory(s *terraform.State) error {
 	return nil
 }
 
-func testAccCfcConfig() string {
+func testAccCfcConfig(name string) string {
 	return fmt.Sprintf(`
-data "baiducloud_zones" "default" {}
+variable "name" {
+  default = "%s"
+}
+
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 resource "baiducloud_vpc" "default" {
-  name = "%s"
+  name = var.name
   cidr = "192.168.0.0/16"
 }
 
 resource "baiducloud_subnet" "default" {
-  name        = "%s"
+  name        = var.name
   zone_name   = data.baiducloud_zones.default.zones.0.zone_name
   cidr        = "192.168.3.0/24"
   vpc_id      = baiducloud_vpc.default.id
@@ -163,13 +169,13 @@ resource "baiducloud_subnet" "default" {
 }
 
 resource "baiducloud_security_group" "default" {
-  name   = "%s"
+  name   = var.name
   vpc_id = baiducloud_vpc.default.id
 }
 
-resource "%s" "%s" {
-  function_name     = "%s"
-  description       = "terraform create"
+resource "baiducloud_cfc_function" "default" {
+  function_name     = var.name
+  description       = "created-by-terraform"
   environment = {
     "aaa": "bbb"
     "ccc": "ddd"
@@ -185,17 +191,14 @@ resource "%s" "%s" {
     security_group_ids = [baiducloud_security_group.default.id]
   }
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"VPC",
-		BaiduCloudTestResourceAttrNamePrefix+"Subnet",
-		BaiduCloudTestResourceAttrNamePrefix+"SecurityGroup",
-		testAccCFCResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"CFC")
+`, name)
 }
 
-func testAccCfcConfigUpdate() string {
+func testAccCfcConfigUpdate(name string) string {
 	return fmt.Sprintf(`
-resource "%s" "%s" {
+resource "baiducloud_cfc_function" "default" {
   function_name     = "%s"
-  description       = "terraform update"
+  description       = "created-by-terraform"
   environment = {
     "aaa": "bbb"
   }
@@ -205,5 +208,5 @@ resource "%s" "%s" {
   time_out       = 5
   code_file_dir  = "testFiles/cfcTestCode"
 }
-`, testAccCFCResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"CFC")
+`, name)
 }

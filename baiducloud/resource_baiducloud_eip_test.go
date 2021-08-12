@@ -48,7 +48,7 @@ func testSweepEips(region string) error {
 	for _, e := range eipList {
 		name := e.Name
 		ip := e.Eip
-		if !strings.HasPrefix(e.Name, BaiduCloudTestResourceAttrNamePrefix) {
+		if !strings.HasPrefix(e.Name, BaiduCloudTestResourceTypeName) {
 			log.Printf("[INFO] Skipping EIP: %s (%s)", name, ip)
 			continue
 		}
@@ -76,10 +76,10 @@ func TestAccBaiduCloudEip(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccEipConfig(),
+				Config: testAccEipConfig(BaiduCloudTestResourceTypeNameEip),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccEipResourceName),
-					resource.TestCheckResourceAttr(testAccEipResourceName, "name", "test-BaiduAccEIP"),
+					resource.TestCheckResourceAttr(testAccEipResourceName, "name", BaiduCloudTestResourceTypeNameEip),
 					resource.TestCheckResourceAttr(testAccEipResourceName, "bandwidth_in_mbps", "1"),
 					resource.TestCheckResourceAttr(testAccEipResourceName, "billing_method", "ByTraffic"),
 					resource.TestCheckResourceAttr(testAccEipResourceName, "payment_timing", "Postpaid"),
@@ -93,10 +93,10 @@ func TestAccBaiduCloudEip(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccEipConfigUpdate(),
+				Config: testAccEipConfigUpdate(BaiduCloudTestResourceTypeNameEip),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccEipResourceName),
-					resource.TestCheckResourceAttr(testAccEipResourceName, "name", "test-BaiduAccEIP"),
+					resource.TestCheckResourceAttr(testAccEipResourceName, "name", BaiduCloudTestResourceTypeNameEip),
 					resource.TestCheckResourceAttr(testAccEipResourceName, "bandwidth_in_mbps", "2"),
 					resource.TestCheckResourceAttr(testAccEipResourceName, "billing_method", "ByTraffic"),
 					resource.TestCheckResourceAttr(testAccEipResourceName, "payment_timing", "Postpaid"),
@@ -130,9 +130,9 @@ func testAccEIPDestory(s *terraform.State) error {
 	return nil
 }
 
-func testAccEipConfig() string {
+func testAccEipConfig(name string) string {
 	return fmt.Sprintf(`
-resource "%s" "%s" {
+resource "baiducloud_eip" "default" {
   name               = "%s"
   bandwidth_in_mbps  = 1
   payment_timing     = "Postpaid"
@@ -143,12 +143,12 @@ resource "%s" "%s" {
     "testKey" = "testValue"
   }
 }
-`, testAccEipResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"EIP")
+`, name)
 }
 
-func testAccEipConfigUpdate() string {
+func testAccEipConfigUpdate(name string) string {
 	return fmt.Sprintf(`
-resource "%s" "%s" {
+resource "baiducloud_eip" "default" {
   name              = "%s"
   bandwidth_in_mbps = 2
   payment_timing    = "Postpaid"
@@ -158,5 +158,5 @@ resource "%s" "%s" {
     "testKey" = "testValue"
   }
 }
-`, testAccEipResourceType, BaiduCloudTestResourceName, BaiduCloudTestResourceAttrNamePrefix+"EIP")
+`, name)
 }

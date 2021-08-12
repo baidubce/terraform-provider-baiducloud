@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/baidubce/bce-sdk-go/services/iam"
 	"github.com/baidubce/bce-sdk-go/services/iam/api"
-	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
@@ -20,8 +19,9 @@ const (
 
 func init() {
 	resource.AddTestSweepers(testAccIamGroupPolicyAttachmentResourceType, &resource.Sweeper{
-		Name: testAccIamGroupPolicyAttachmentResourceType,
-		F:    testSweepIamGroupPolicyAttachments,
+		Name:         testAccIamGroupPolicyAttachmentResourceType,
+		F:            testSweepIamGroupPolicyAttachments,
+		Dependencies: []string{testAccIamGroupResourceType},
 	})
 }
 
@@ -43,7 +43,7 @@ func testSweepIamGroupPolicyAttachments(region string) error {
 
 	result, _ := raw.(*api.ListGroupResult)
 	for _, group := range result.Groups {
-		if !strings.HasPrefix(group.Name, testAccIamGroupPrefix) {
+		if !strings.HasPrefix(group.Name, BaiduCloudTestResourceTypeNameUnderLine) {
 			continue
 		}
 		log.Printf("[INFO] Deleting group: %s", group.Name)
@@ -67,7 +67,7 @@ func testSweepIamGroupPolicyAttachments(region string) error {
 
 	policies, _ := raw.(*api.ListPolicyResult)
 	for _, policy := range policies.Policies {
-		if !strings.HasPrefix(policy.Name, testAccIamPolicyPrefix) {
+		if !strings.HasPrefix(policy.Name, BaiduCloudTestResourceTypeNameUnderLine) {
 			continue
 		}
 		_, err := client.WithIamClient(func(iamClient *iam.Client) (i interface{}, e error) {
@@ -81,8 +81,6 @@ func testSweepIamGroupPolicyAttachments(region string) error {
 }
 
 func TestAccBaiduCloudIamGroupPolicyAttachment(t *testing.T) {
-	groupName := strings.ReplaceAll(acctest.RandomWithPrefix(testAccIamGroupPrefix), "-", "_")
-	policyName := strings.ReplaceAll(acctest.RandomWithPrefix(testAccIamPolicyPrefix), "-", "_")
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -92,39 +90,16 @@ func TestAccBaiduCloudIamGroupPolicyAttachment(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccIamGroupPolicyAttachmentConfig(groupName, policyName),
+				Config: testAccIamGroupPolicyAttachmentConfig(BaiduCloudTestResourceTypeNameUnderLine),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccIamGroupPolicyAttachmentResourceName),
-					resource.TestCheckResourceAttr(testAccIamGroupPolicyAttachmentResourceName, "group", groupName),
-					resource.TestCheckResourceAttr(testAccIamGroupPolicyAttachmentResourceName, "policy", policyName),
+					resource.TestCheckResourceAttr(testAccIamGroupPolicyAttachmentResourceName, "group", BaiduCloudTestResourceTypeNameUnderLine),
+					resource.TestCheckResourceAttr(testAccIamGroupPolicyAttachmentResourceName, "policy", BaiduCloudTestResourceTypeNameUnderLine),
 					resource.TestCheckResourceAttr(testAccIamGroupPolicyAttachmentResourceName, "policy_type", api.POLICY_TYPE_CUSTOM),
 				),
 			},
 		},
 	})
-}
-
-func testAccIamGroupPolicyAttachmentConfig(groupName, policyName string) string {
-	return fmt.Sprintf(`
-resource "%s" "%s" {
-  name = "%s"
-  force_destroy = true
-}
-resource "%s" "%s" {
-  name = "%s"
-  document = <<EOF
-  {"accessControlList": [{"region":"bj","service":"bcc","resource":["*"],"permission":["*"],"effect":"Allow"}]}
-  EOF
-}
-resource "%s" "%s" {
-  group = "${%s}"
-  policy = "${%s}"
-}
-`,
-		testAccIamGroupResourceType, BaiduCloudTestResourceName, groupName,
-		testAccIamPolicyResourceType, BaiduCloudTestResourceName, policyName,
-		testAccIamGroupPolicyAttachmentResourceType, BaiduCloudTestResourceName, testAccIamGroupResourceName+".name",
-		testAccIamPolicyResourceName+".name")
 }
 
 func testAccIamGroupPolicyAttachmentDestroy(s *terraform.State) error {
@@ -159,4 +134,27 @@ func testAccIamGroupPolicyAttachmentDestroy(s *terraform.State) error {
 		}
 	}
 	return nil
+}
+
+func testAccIamGroupPolicyAttachmentConfig(name string) string {
+	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
+resource "baiducloud_iam_group" "default" {
+  name = var.name
+  force_destroy = true
+}
+resource "baiducloud_iam_policy" "default" {
+  name = var.name
+  document = <<EOF
+  {"accessControlList": [{"region":"bj","service":"bcc","resource":["*"],"permission":["*"],"effect":"Allow"}]}
+  EOF
+}
+resource "baiducloud_iam_group_policy_attachment" "default" {
+  group = baiducloud_iam_group.default.name
+  policy = baiducloud_iam_policy.default.name
+}
+`, name)
 }

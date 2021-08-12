@@ -196,7 +196,7 @@ func resourceBaiduCloudSubnetDelete(d *schema.ResourceData, meta interface{}) er
 		})
 		addDebug(action, nil)
 		if err != nil {
-			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR, SUBNET_INUSE_ERROR}) {
+			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR, SubnetInuseError, ResourceNeedRelease, NotAllowOperateSubnet}) {
 				return resource.RetryableError(err)
 			}
 			return resource.NonRetryableError(err)

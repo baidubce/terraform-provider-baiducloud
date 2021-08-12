@@ -39,7 +39,7 @@ func testSweepSnapshots(region string) error {
 	}
 
 	for _, sp := range spList {
-		if !strings.HasPrefix(sp.Name, BaiduCloudTestResourceAttrNamePrefix) {
+		if !strings.HasPrefix(sp.Name, BaiduCloudTestResourceTypeName) {
 			log.Printf("[INFO] Skipping Snapshot: %s (%s)", sp.Name, sp.Id)
 			continue
 		}
@@ -67,10 +67,10 @@ func TestAccBaiduCloudSnapshot(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccSnapshotConfig(),
+				Config: testAccSnapshotConfig(BaiduCloudTestResourceTypeNameSnapshot),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccSnapshotResourceName),
-					resource.TestCheckResourceAttr(testAccSnapshotResourceName, "name", BaiduCloudTestResourceAttrNamePrefix+"Snapshot"),
+					resource.TestCheckResourceAttr(testAccSnapshotResourceName, "name", BaiduCloudTestResourceTypeNameSnapshot),
 					resource.TestCheckResourceAttr(testAccSnapshotResourceName, "size_in_gb", "5"),
 					resource.TestCheckResourceAttr(testAccSnapshotResourceName, "status", "Available"),
 					resource.TestCheckResourceAttrSet(testAccSnapshotResourceName, "create_time"),
@@ -114,18 +114,24 @@ func testAccSnapshotDestory(s *terraform.State) error {
 	return nil
 }
 
-func testAccSnapshotConfig() string {
+func testAccSnapshotConfig(name string) string {
 	return fmt.Sprintf(`
+variable "name" {
+  default = "%s"
+}
+
 data "baiducloud_specs" "default" {}
 
-data "baiducloud_zones" "default" {}
+data "baiducloud_zones" "default" {
+  name_regex = ".*e$"
+}
 
 data "baiducloud_images" "default" {
   image_type = "System"
 }
 
 resource "baiducloud_instance" "default" {
-  name                  = "%s"
+  name                  = var.name
   image_id              = data.baiducloud_images.default.images.0.id
   availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
   cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
@@ -137,20 +143,17 @@ resource "baiducloud_instance" "default" {
 
 resource "baiducloud_cds" "default" {
   depends_on      = [baiducloud_instance.default]
-  name            = "%s"
-  description     = ""
+  name            = var.name
+  description     = "created by terraform"
   disk_size_in_gb = 5
   payment_timing  = "Postpaid"
+  zone_name     = data.baiducloud_zones.default.zones.0.zone_name
 }
 
-resource "%s" "%s" {
-  name        = "%s"
-  description = "Baidu acceptance test"
+resource "baiducloud_snapshot" "default" {
+  name        = var.name
+  description = "created by terraform"
   volume_id   = baiducloud_cds.default.id
 }
-`, BaiduCloudTestResourceAttrNamePrefix+"BCC",
-		BaiduCloudTestResourceAttrNamePrefix+"CDS",
-		testAccSnapshotResourceType,
-		BaiduCloudTestResourceName,
-		BaiduCloudTestResourceAttrNamePrefix+"Snapshot")
+`, name)
 }

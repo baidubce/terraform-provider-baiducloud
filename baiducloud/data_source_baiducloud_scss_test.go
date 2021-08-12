@@ -2,11 +2,10 @@ package baiducloud
 
 import (
 	"fmt"
+	"github.com/hashicorp/terraform/helper/resource"
 	"strconv"
 	"testing"
 	"time"
-
-	"github.com/hashicorp/terraform/helper/resource"
 )
 
 const (
@@ -16,7 +15,7 @@ const (
 
 func TestAccBaiduCloudScssDataSource(t *testing.T) {
 	timeStamp := strconv.FormatInt(time.Now().Unix(), 10)
-	name := BaiduCloudTestResourceAttrNamePrefix + "Scss-" + timeStamp
+	name := BaiduCloudTestResourceTypeNameScs + "-" + timeStamp
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -46,17 +45,17 @@ resource "baiducloud_scs" "default" {
     billing = {
    		payment_timing 		= "Postpaid"
     }
-    purchase_count 			= 1
+    purchase_count 			= 2
  	port 					= 6379
 	engine_version 			= "3.2"
 	node_type 				= "cache.n1.micro"
 	cluster_type 			= "master_slave"
-	replication_num 		= 1
+	replication_num 		= 2
 	shard_num 				= 1
 	proxy_num 				= 0
 }
 data "baiducloud_scss" "default" {
-    name_regex        = "test-BaiduAccScss-*"
+    name_regex        = "tf-test-acc*"
 	filter {
 		name = "cluster_type"
 	 	values = [baiducloud_scs.default.cluster_type]

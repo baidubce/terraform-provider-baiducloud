@@ -14,12 +14,12 @@ import (
 )
 
 const (
-	testAccCcev2ClusterResource = "baiducloud_ccev2_cluster"
+	testAccCcev2ClusterResourceType = "baiducloud_ccev2_cluster"
 )
 
 func init() {
-	resource.AddTestSweepers(testAccCcev2ClusterResource, &resource.Sweeper{
-		Name: testAccCcev2ClusterResource,
+	resource.AddTestSweepers(testAccCcev2ClusterResourceType, &resource.Sweeper{
+		Name: testAccCcev2ClusterResourceType,
 		F:    testSweepCcev2Cluster,
 	})
 }
@@ -48,7 +48,7 @@ func testSweepCcev2Cluster(region string) error {
 
 	clusterList := raw.(*ccev2.ListClustersResponse).ClusterPage.ClusterList
 	for _, c := range clusterList {
-		if !strings.HasPrefix(c.Spec.ClusterName, BaiduCloudTestResourceAttrNamePrefix) {
+		if !strings.HasPrefix(c.Spec.ClusterName, BaiduCloudTestResourceTypeName) {
 			log.Printf("[INFO] Skipping CCEv2 Cluster: %s (%s)", c.Spec.ClusterName, c.Spec.ClusterID)
 			continue
 		}
@@ -86,9 +86,9 @@ func TestAccBaiduCloudCCEv2ClusterResource(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCcev2ClusterConfig(),
+				Config: testAccCcev2ClusterConfig(BaiduCloudTestResourceTypeNameCcev2Cluster),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckBaiduCloudDataSourceId("baiducloud_ccev2_cluster.default_managed"),
+					testAccCheckBaiduCloudDataSourceId("baiducloud_ccev2_cluster.default"),
 				),
 			},
 		},
@@ -98,7 +98,7 @@ func TestAccBaiduCloudCCEv2ClusterResource(t *testing.T) {
 func testAccCcev2ClusterDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*connectivity.BaiduClient)
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != testAccCcev2ClusterResource {
+		if rs.Type != testAccCcev2ClusterResourceType {
 			continue
 		}
 		raw, err := client.WithCCEv2Client(func(client *ccev2.Client) (i interface{}, e error) {
@@ -122,11 +122,12 @@ func testAccCcev2ClusterDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCcev2ClusterConfig() string {
+func testAccCcev2ClusterConfig(name string) string {
 	return fmt.Sprintf(`
-variable "cluster_name" {
+variable "name" {
   default = "%s"
 }
+
 variable "cluster_pod_cidr" {
   default = "172.28.0.0/16"
 }
@@ -135,41 +136,41 @@ variable "cluster_ip_service_cidr" {
   default = "172.31.0.0/16"
 }
 resource "baiducloud_vpc" "default" {
-  name        = "%s"
-  description = "test-BaiduAcc_test-vpc-tf-auto"
+  name        = "${var.name}"
+  description = "created by terraform"
   cidr        = "192.168.0.0/16"
 }
 data "baiducloud_zones" "defaultA" {
-  name_regex = ".*a$"
+  name_regex = ".*e$"
 }
-resource "baiducloud_subnet" "defaultA" {
-  name        = "%s"
+resource "baiducloud_subnet" "default" {
+  name        = "${var.name}"
   zone_name   = data.baiducloud_zones.defaultA.zones.0.zone_name
   cidr        = "192.168.1.0/24"
   vpc_id      = baiducloud_vpc.default.id
-  description = "test-subnet-tf-auto"
+  description = "created by terraform"
 }
 resource "baiducloud_security_group" "default" {
-  name   = "%s"
+  name   = "${var.name}"
   vpc_id = baiducloud_vpc.default.id
 }
-resource "baiducloud_security_group_rule" "default" {
+resource "baiducloud_security_group_rule" "ingress" {
   security_group_id = baiducloud_security_group.default.id
   remark            = "remark"
   protocol          = "all"
   port_range        = "1-65535"
   direction         = "ingress"
 }
-resource "baiducloud_security_group_rule" "default2" {
+resource "baiducloud_security_group_rule" "egress" {
   security_group_id = baiducloud_security_group.default.id
   remark            = "remark"
   protocol          = "all"
   port_range        = "1-65535"
   direction         = "egress"
 }
-resource "baiducloud_ccev2_cluster" "default_managed" {
+resource "baiducloud_ccev2_cluster" "default" {
   cluster_spec  {
-    cluster_name = var.cluster_name
+    cluster_name = var.name
     k8s_version = "1.16.8"
     runtime_type = "docker"
     vpc_id = baiducloud_vpc.default.id
@@ -178,14 +179,14 @@ resource "baiducloud_ccev2_cluster" "default_managed" {
       master_type = "managed"
       cluster_ha = 1
       exposed_public = false
-      cluster_blb_vpc_subnet_id = baiducloud_subnet.defaultA.id
+      cluster_blb_vpc_subnet_id = baiducloud_subnet.default.id
       managed_cluster_master_option {
         master_vpc_subnet_zone = "zoneA"
       }
     }
     container_network_config  {
       mode = "kubenet"
-      lb_service_vpc_subnet_id = baiducloud_subnet.defaultA.id
+      lb_service_vpc_subnet_id = baiducloud_subnet.default.id
       cluster_pod_cidr = var.cluster_pod_cidr
       cluster_ip_service_cidr = var.cluster_ip_service_cidr
     }
@@ -195,9 +196,5 @@ resource "baiducloud_ccev2_cluster" "default_managed" {
     }
   }
 }
-`,
-		BaiduCloudTestResourceAttrNamePrefix+"_ccev2_cluster_1",
-		BaiduCloudTestResourceAttrNamePrefix+"_test-vpc-tf-auto",
-		BaiduCloudTestResourceAttrNamePrefix+"_test-subnet-tf-auto",
-		BaiduCloudTestResourceAttrNamePrefix+"_test-security-group-tf-auto")
+`, name)
 }

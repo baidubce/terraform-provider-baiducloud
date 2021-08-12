@@ -21,10 +21,10 @@ func TestAccBaiduCloudBosBucketsDataSource(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccBosBucketsDataSourceConfig(),
+				Config: testAccBosBucketsDataSourceConfig(BaiduCloudTestResourceTypeNameBosBucket),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccBosBucketsDataSourceName),
-					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"bucket", testAccBosBucketResourceAttrName),
+					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"bucket", BaiduCloudTestResourceTypeNameBosBucket+"-bucket-new"),
 					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"acl", "public-read-write"),
 					resource.TestCheckResourceAttrSet(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"location"),
 					resource.TestCheckResourceAttrSet(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"creation_date"),
@@ -34,10 +34,10 @@ func TestAccBaiduCloudBosBucketsDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"replication_configuration.0.id", "test-rc"),
 					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"replication_configuration.0.status", "enabled"),
 					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"replication_configuration.0.resource.#", "1"),
-					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"replication_configuration.0.destination.0.bucket", BaiduCloudTestBucketResourceAttrNamePrefix+"bucket-peer"),
+					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"replication_configuration.0.destination.0.bucket", BaiduCloudTestResourceTypeNameBosBucket+"-bucket-peer"),
 					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"replication_configuration.0.replicate_deletes", "disabled"),
 					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"logging.#", "1"),
-					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"logging.0.target_bucket", testAccBosBucketResourceAttrName),
+					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"logging.0.target_bucket", BaiduCloudTestResourceTypeNameBosBucket+"-bucket-new"),
 					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"logging.0.target_prefix", "logs/"),
 					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"lifecycle_rule.#", "1"),
 					resource.TestCheckResourceAttr(testAccBosBucketsDataSourceName, testAccBosBucketsDataSourceAttrKeyPrefix+"lifecycle_rule.0.id", "test-lr"),
@@ -62,9 +62,9 @@ func TestAccBaiduCloudBosBucketsDataSource(t *testing.T) {
 	})
 }
 
-func testAccBosBucketsDataSourceConfig() string {
+func testAccBosBucketsDataSourceConfig(name string) string {
 	return fmt.Sprintf(`
-resource "baiducloud_bos_bucket" "my-bucket" {
+resource "baiducloud_bos_bucket" "peer" {
   bucket = "%s"
   acl    = "public-read-write"
 }
@@ -73,22 +73,22 @@ resource "baiducloud_bos_bucket" "default" {
   bucket = "%s"
   acl    = "public-read-write"
 
+  logging {
+    target_bucket = "%s"
+    target_prefix = "logs/"
+  }
+
   replication_configuration {
     id       = "test-rc"
     status   = "enabled"
     resource = ["%s"]
     destination {
-      bucket = baiducloud_bos_bucket.my-bucket.bucket
+      bucket = baiducloud_bos_bucket.peer.bucket
     }
     replicate_deletes = "disabled"
   }
 
   force_destroy = true
-
-  logging {
-    target_bucket = "%s"
-    target_prefix = "logs/"
-  }
 
   lifecycle_rule {
     id       = "test-lr"
@@ -132,8 +132,6 @@ data "baiducloud_bos_buckets" "default" {
     values = ["public-read-write"]
   }
 }
-`, BaiduCloudTestBucketResourceAttrNamePrefix+"bucket-peer", testAccBosBucketResourceAttrName,
-		testAccBosBucketResourceAttrName+"/*", testAccBosBucketResourceAttrName,
-		testAccBosBucketResourceAttrName+"/*", testAccBosBucketResourceAttrName+"/*",
-	)
+`, name+"-bucket-peer", name+"-bucket-new", name+"-bucket-new",
+		name+"-bucket-new"+"/*", name+"-bucket-new"+"/*", name+"-bucket-new"+"/*")
 }
