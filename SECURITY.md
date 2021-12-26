@@ -7,14 +7,14 @@ currently being supported with security updates.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| v1.12.0   | :x:              |
-| v1.11.3   | :x:              |
-| v1.11.2   | :x:              |
-| v1.11.1   | :x:              |
-| v1.11.0   | :x:              |
-| v1.10.3   | :x:              |
-| v1.10.2   | :x:              |
-| v1.10.1   | :x:              |
+| v1.12.0   | :white_check_mark:              |
+| v1.11.3   | :white_check_mark:              |
+| v1.11.2   | :white_check_mark:              |
+| v1.11.1   | :white_check_mark:              |
+| v1.11.0   | :white_check_mark:              |
+| v1.10.3   | :white_check_mark:              |
+| v1.10.2   | :white_check_mark:              |
+| v1.10.1   | :white_check_mark:              |
 | < v1.10.0   | :x:              |
 
 ## Reporting a Vulnerability
