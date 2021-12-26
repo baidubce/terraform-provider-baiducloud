@@ -7,10 +7,15 @@ currently being supported with security updates.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| v1.12.0   | :x:              |
+| v1.11.3   | :x:              |
+| v1.11.2   | :x:              |
+| v1.11.1   | :x:              |
+| v1.11.0   | :x:              |
+| v1.10.3   | :x:              |
+| v1.10.2   | :x:              |
+| v1.10.1   | :x:              |
+| < v1.10.0   | :x:              |
 
 ## Reporting a Vulnerability
 
