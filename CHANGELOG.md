@@ -1,6 +1,11 @@
 	## 1.14.0 (Unreleased)
-	## 1.13.0 (May 23, 2022)
+
+## 1.12.1 (May 23, 2022)
+NOTES:
+- Repair SCS Document
+
 ## 1.12.0 (August 12, 2021)
+
 NOTES:
 - Repair and delete the security group and check whether deletion is allowed
 - When repairing and deleting VPC, check whether deletion is allowed
