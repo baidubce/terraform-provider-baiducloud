@@ -24,7 +24,7 @@ resource "baiducloud_scs" "default" {
 	port = 6379
 	engine_version = "3.2"
 	node_type = "cache.n1.micro"
-	architecture_type = "master_slave"
+	cluster_type = "master_slave"
 	replication_num = 1
 	shard_num = 1
 }
