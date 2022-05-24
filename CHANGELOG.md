@@ -1,4 +1,8 @@
 	## 1.13.0 (Unreleased)
+## 1.12.4 (May 24, 2022)
+NOTES:
+- add terraform-registry-manifest.json
+
 ## 1.12.3 (May 24, 2022)
 NOTES:
 - update tag
