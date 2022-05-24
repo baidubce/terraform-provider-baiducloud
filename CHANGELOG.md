@@ -1,4 +1,7 @@
-	## 1.14.0 (Unreleased)
+	## 1.13.0 (Unreleased)
+## 1.12.2 (May 24, 2022)
+NOTES:
+- update Release
 
 ## 1.12.1 (May 23, 2022)
 NOTES:
