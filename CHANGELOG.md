@@ -1,4 +1,10 @@
 	## 1.13.0 (Unreleased)
+## 1.12.5 (May 26, 2022)
+NOTES:
+- Add nat_snat_rule
+- Update go sdk
+- Update eip
+
 ## 1.12.4 (May 24, 2022)
 NOTES:
 - add terraform-registry-manifest.json
