@@ -1,6 +1,7 @@
 package baiducloud
 
 import (
+	"encoding/json"
 	"github.com/baidubce/bce-sdk-go/bce"
 	"github.com/baidubce/bce-sdk-go/services/dts"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -143,7 +144,7 @@ func (e *DtsService) ListAllDtss(listArgs *dts.ListDtsArgs) ([]dts.DtsTaskMeta, 
 		response := raw.(*dts.ListDtsResult)
 		result = append(result, response.Task...)
 
-		isTruncated, err := strconv.ParseBool(response.IsTruncated)
+		isTruncated := response.IsTruncated
 		if isTruncated {
 			listArgs.MaxKeys = response.MaxKeys
 			listArgs.Marker = response.Marker
@@ -224,11 +225,8 @@ func flattenIncrementToMap(dynamicInfo dts.DynamicInfo) map[string]string {
 	increment := dynamicInfo.Increment
 	result := make(map[string]string)
 
-	for _, e := range increment {
-		for k, v := range e {
-			result[k] = v
-		}
-	}
+	data, _ := json.Marshal(increment)
+	json.Unmarshal(data, &result)
 
 	return result
 }

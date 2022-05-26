@@ -65,6 +65,11 @@ func resourceBaiduCloudEip() *schema.Resource {
 				ForceNew:     true,
 				ValidateFunc: validation.StringLenBetween(1, 65),
 			},
+			"route_type": {
+				Type:        schema.TypeString,
+				Description: "EIP route type",
+				Optional:    true,
+			},
 			"bandwidth_in_mbps": {
 				Type:        schema.TypeInt,
 				Description: "Eip bandwidth(Mbps), if payment_timing is Prepaid or billing_method is ByBandWidth, support between 1 and 200, if billing_method is ByTraffic, support between 1 and 1000",
@@ -93,11 +98,10 @@ func resourceBaiduCloudEip() *schema.Resource {
 				ValidateFunc: validation.StringInSlice([]string{PaymentTimingPrepai, PaymentTimingPostpaid}, false),
 			},
 			"billing_method": {
-				Type:         schema.TypeString,
-				Description:  "Eip billing method, support ByTraffic or ByBandwidth",
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice([]string{"ByTraffic", "ByBandwidth"}, false),
+				Type:        schema.TypeString,
+				Description: "Eip billing method, support ByTraffic or ByBandwidth",
+				Required:    true,
+				ForceNew:    true,
 			},
 			"create_time": {
 				Type:        schema.TypeString,
@@ -305,6 +309,10 @@ func resourceBaiduCloudEipDelete(d *schema.ResourceData, meta interface{}) error
 
 func buildBaiduCloudCreateEipArgs(d *schema.ResourceData) *eip.CreateEipArgs {
 	request := &eip.CreateEipArgs{}
+
+	if v, ok := d.GetOk("route_type"); ok && v.(string) != "" {
+		request.RouteType = v.(string)
+	}
 
 	if v, ok := d.GetOk("name"); ok && v.(string) != "" {
 		request.Name = v.(string)

@@ -82,6 +82,7 @@ VPC Resources
   baiducloud_route_rule
   baiducloud_acl
   baiducloud_nat_gateway
+  baiducloud_nat_snat_rule
   baiducloud_peer_conn
   baiducloud_peer_conn_acceptor
 
@@ -171,6 +172,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_route_rules":                    dataSourceBaiduCloudRouteRules(),
 			"baiducloud_acls":                           dataSourceBaiduCloudAcls(),
 			"baiducloud_nat_gateways":                   dataSourceBaiduCloudNatGateways(),
+			"baiducloud_nat_snat_rules":                 dataSourceBaiduCloudNatSnatRules(),
 			"baiducloud_peer_conns":                     dataSourceBaiduCloudPeerConns(),
 			"baiducloud_bos_buckets":                    dataSourceBaiduCloudBosBuckets(),
 			"baiducloud_bos_bucket_objects":             dataSourceBaiduCloudBosBucketObjects(),
@@ -218,6 +220,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_eip_association":             resourceBaiduCloudEipAssociation(),
 			"baiducloud_acl":                         resourceBaiduCloudAcl(),
 			"baiducloud_nat_gateway":                 resourceBaiduCloudNatGateway(),
+			"baiducloud_nat_snat_rule":               resourceBaiduCloudNatSnatRule(),
 			"baiducloud_appblb":                      resourceBaiduCloudAppBLB(),
 			"baiducloud_peer_conn":                   resourceBaiduCloudPeerConn(),
 			"baiducloud_peer_conn_acceptor":          resourceBaiduCloudPeerConnAcceptor(),

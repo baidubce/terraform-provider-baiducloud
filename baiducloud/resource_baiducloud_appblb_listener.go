@@ -724,10 +724,6 @@ func buildBaiduCloudCreateAppBlbHTTPSListenerArgs(d *schema.ResourceData, meta i
 		return nil, fmt.Errorf("HTTPS Listener require cert, but not set")
 	}
 
-	if v, ok := d.GetOk("ie6_compatible"); ok {
-		result.Ie6Compatible = v.(bool)
-	}
-
 	if v, ok := d.GetOk("encryption_type"); ok {
 		result.EncryptionType = v.(string)
 	}
@@ -765,10 +761,6 @@ func buildBaiduCloudCreateAppBlbSSLListenerArgs(d *schema.ResourceData, meta int
 	}
 	if len(result.CertIds) <= 0 {
 		return nil, fmt.Errorf("SSL Listener require cert, but not set")
-	}
-
-	if v, ok := d.GetOk("ie6_compatible"); ok {
-		result.Ie6Compatible = v.(bool)
 	}
 
 	if v, ok := d.GetOk("encryption_type"); ok {
@@ -978,14 +970,6 @@ func buildBaiduCloudUpdateAppBlbHTTPSListenerArgs(d *schema.ResourceData, meta i
 		return false, nil, fmt.Errorf("HTTPS Listener require cert, but not set")
 	}
 
-	if v, ok := d.GetOk("ie6_compatible"); ok {
-		if !update {
-			update = d.HasChange("ie6_compatible")
-		}
-
-		result.Ie6Compatible = v.(bool)
-	}
-
 	if v, ok := d.GetOk("encryption_type"); ok {
 		if !update {
 			update = d.HasChange("encryption_type")
@@ -1045,14 +1029,6 @@ func buildBaiduCloudUpdateAppBlbSSLListenerArgs(d *schema.ResourceData, meta int
 	}
 	if len(result.CertIds) <= 0 {
 		return false, nil, fmt.Errorf("SSL Listener require cert, but not set")
-	}
-
-	if v, ok := d.GetOk("ie6_compatible"); ok {
-		if !update {
-			update = d.HasChange("ie6_compatible")
-		}
-
-		result.Ie6Compatible = v.(bool)
 	}
 
 	if v, ok := d.GetOk("encryption_type"); ok {

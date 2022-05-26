@@ -26,6 +26,7 @@ const (
 	BaiduCloudTestResourceTypeNameEipAssociation      = BaiduCloudTestResourceTypeName + "-" + "eip-association"
 	BaiduCloudTestResourceTypeNameInstance            = BaiduCloudTestResourceTypeName + "-" + "instance"
 	BaiduCloudTestResourceTypeNameNatGateway          = BaiduCloudTestResourceTypeName + "-" + "nat-gateway"
+	BaiduCloudTestResourceTypeNameNatSnatRule         = BaiduCloudTestResourceTypeName + "-" + "nat-snat-rule"
 	BaiduCloudTestResourceTypeNamePeerConn            = BaiduCloudTestResourceTypeName + "-" + "peer-conn"
 	BaiduCloudTestResourceTypeNamePeerConnAcceptor    = BaiduCloudTestResourceTypeName + "-" + "peer-conn-acceptor"
 	BaiduCloudTestResourceTypeNameRdsAccount          = BaiduCloudTestResourceTypeName + "-" + "rds-account"
