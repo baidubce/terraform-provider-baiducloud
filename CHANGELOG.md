@@ -1,4 +1,9 @@
 	## 1.13.0 (Unreleased)
+## 1.12.6 (June 01, 2022)
+NOTES:
+- BCC add user_data
+- Repair markdown
+
 ## 1.12.5 (May 26, 2022)
 NOTES:
 - Add nat_snat_rule
