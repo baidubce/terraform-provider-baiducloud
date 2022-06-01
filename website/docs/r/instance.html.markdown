@@ -59,6 +59,7 @@ The following arguments are supported:
 * `security_groups` - (Optional) Security groups of the instance.
 * `subnet_id` - (Optional) The subnet ID of VPC. The default subnet will be used when it is empty. The instance will restart after changing the subnet.
 * `tags` - (Optional, ForceNew) Tags, do not support modify
+* `user_data` - (Optional) User Data
 
 The `billing` object supports the following:
 

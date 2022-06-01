@@ -33,6 +33,7 @@ The following arguments are supported:
 * `name` - (Optional, ForceNew) Eip name, length must be between 1 and 65 bytes
 * `reservation_length` - (Optional) Eip Prepaid billing reservation length, only useful when payment_timing is Prepaid
 * `reservation_time_unit` - (Optional) Eip Prepaid billing reservation time unit, only useful when payment_timing is Prepaid
+* `route_type` - (Optional) EIP route type
 * `tags` - (Optional, ForceNew) Tags, do not support modify
 
 ## Attributes Reference
