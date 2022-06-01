@@ -371,6 +371,11 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Default:      INSTANCE_ACTION_START,
 				ValidateFunc: validation.StringInSlice([]string{INSTANCE_ACTION_START, INSTANCE_ACTION_STOP}, false),
 			},
+			"user_data": {
+				Type:        schema.TypeString,
+				Description: "User Data",
+				Optional:    true,
+			},
 			"tags": tagsSchema(),
 		},
 	}
@@ -815,6 +820,10 @@ func buildBaiduCloudInstanceArgs(d *schema.ResourceData, meta interface{}) (*api
 		request.RelationTag = relationTag.(bool)
 	}
 
+	if userData, ok := d.GetOk("user_data"); ok {
+		request.UserData = userData.(string)
+	}
+
 	if v, ok := d.GetOk("tags"); ok {
 		request.Tags = tranceTagMapToModel(v.(map[string]interface{}))
 	}
@@ -935,6 +944,10 @@ func buildBaiduCloudInstanceBySpecArgs(d *schema.ResourceData, meta interface{})
 
 	if relationTag, ok := d.GetOk("relation_tag"); ok && relationTag.(bool) {
 		request.RelationTag = relationTag.(bool)
+	}
+
+	if userData, ok := d.GetOk("user_data"); ok {
+		request.UserData = userData.(string)
 	}
 
 	if v, ok := d.GetOk("tags"); ok {
