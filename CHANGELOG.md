@@ -1,4 +1,8 @@
 	## 1.13.0 (Unreleased)
+## 1.12.7 (June 30, 2022)
+NOTES:
+- Improve BCC purchasing efficiency
+
 ## 1.12.6 (June 01, 2022)
 NOTES:
 - BCC add user_data
