@@ -2,6 +2,7 @@
 Use this resource to get information about a BCC instance.
 
 ~> **NOTE:** The terminate operation of bcc does NOT take effect immediately，maybe takes for several minites.
+~> **NOTE:** It is recommended to set the maximum parallelism number to 18, otherwise it may cause errors ("There are too many connections")
 
 Example Usage
 
@@ -29,16 +30,15 @@ $ terraform import baiducloud_instance.my-server id
 package baiducloud
 
 import (
-	"time"
-
 	"github.com/baidubce/bce-sdk-go/bce"
 	"github.com/baidubce/bce-sdk-go/services/bcc"
 	"github.com/baidubce/bce-sdk-go/services/bcc/api"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
-
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
+	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/rateLimit"
+	"time"
 )
 
 func resourceBaiduCloudInstance() *schema.Resource {
@@ -382,6 +382,9 @@ func resourceBaiduCloudInstance() *schema.Resource {
 }
 
 func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) error {
+
+	action := "Create BCC Instance"
+
 	client := meta.(*connectivity.BaiduClient)
 	bccService := BccService{client}
 
@@ -397,7 +400,7 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 		securityGroups = groups.(*schema.Set).List()
 	}
 
-	var err error
+	//var err error
 	if createBySpec {
 		createInstanceArgs, err := buildBaiduCloudInstanceBySpecArgs(d, meta)
 		if err != nil {
@@ -420,15 +423,17 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 		createArgs = createInstanceArgs
 	}
 
-	action := "Create BCC Instance"
+	err := ratelimit.Check(action)
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+	}
 
 	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 		raw, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
 			if createBySpec {
 				return bccClient.CreateInstanceBySpec(createArgs.(*api.CreateInstanceBySpecArgs))
-			} else {
-				return bccClient.CreateInstance(createArgs.(*api.CreateInstanceArgs))
 			}
+			return bccClient.CreateInstance(createArgs.(*api.CreateInstanceArgs))
 		})
 		if err != nil {
 			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
@@ -441,6 +446,8 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 		d.SetId(response.InstanceIds[0])
 		return nil
 	})
+	ratelimit.CheckEnd()
+
 	if err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
 	}
@@ -451,7 +458,7 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 		d.Timeout(schema.TimeoutCreate),
 		bccService.InstanceStateRefresh(d.Id()),
 	)
-	if _, err := stateConf.WaitForState(); err != nil {
+	if _, err = stateConf.WaitForState(); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
 	}
 
@@ -544,6 +551,7 @@ func resourceBaiduCloudInstanceRead(d *schema.ResourceData, meta interface{}) er
 		return bccClient.ListSecurityGroup(args)
 	})
 	addDebug(action, raw)
+
 	if err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
 	}

@@ -1,8 +1,6 @@
 package connectivity
 
 import (
-	"sync"
-
 	"github.com/baidubce/bce-sdk-go/auth"
 	"github.com/baidubce/bce-sdk-go/services/appblb"
 	"github.com/baidubce/bce-sdk-go/services/bcc"
@@ -20,6 +18,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/sts/api"
 	"github.com/baidubce/bce-sdk-go/services/vpc"
 	"github.com/baidubce/bce-sdk-go/util/log"
+	"sync"
 )
 
 // BaiduClient of BaiduCloud
@@ -118,20 +117,19 @@ func (client *BaiduClient) WithCommonClient(serviceCode ServiceCode) *BaiduClien
 
 func (client *BaiduClient) WithBccClient(do func(*bcc.Client) (interface{}, error)) (interface{}, error) {
 	goSdkMutex.Lock()
-	defer goSdkMutex.Unlock()
-
 	// Initialize the BCC client if necessary
 	if client.bccConn == nil {
 		client.WithCommonClient(BCCCode)
 		bccClient, err := bcc.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
 		if err != nil {
+			goSdkMutex.Unlock()
 			return nil, err
 		}
 		bccClient.Config.Credentials = client.Credentials
 
 		client.bccConn = bccClient
 	}
-
+	goSdkMutex.Unlock()
 	return do(client.bccConn)
 }
 

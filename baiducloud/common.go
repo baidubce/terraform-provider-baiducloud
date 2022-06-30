@@ -41,12 +41,12 @@ func debugOn() bool {
 func addDebug(action, content interface{}) {
 	if debugOn() {
 		trace := "[DEBUG TRACE]:\n"
-		for skip := 1; skip < 5; skip++ {
+		for skip := 1; skip < 3; skip++ {
 			_, filepath, line, _ := runtime.Caller(skip)
 			trace += fmt.Sprintf("%s:%d\n", filepath, line)
 		}
 
-		fmt.Printf(DefaultDebugMsg, action, content, trace)
+		//fmt.Printf(DefaultDebugMsg, action, content, trace)
 		log.Printf(DefaultDebugMsg, action, content, trace)
 	}
 }

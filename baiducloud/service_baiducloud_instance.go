@@ -20,6 +20,7 @@ func (s *BccService) InstanceStateRefresh(instanceId string) resource.StateRefre
 		raw, err := s.client.WithBccClient(func(bccClient *bcc.Client) (i interface{}, e error) {
 			return bccClient.GetInstanceDetail(instanceId)
 		})
+
 		addDebug(action, raw)
 		if err != nil {
 			if NotFoundError(err) {
