@@ -11,7 +11,8 @@ description: |-
 Use this resource to get information about a BCC instance.
 
 ~> **NOTE:** The terminate operation of bcc does NOT take effect immediately，maybe takes for several minites.
-~> **NOTE:** It is recommended to set the maximum parallelism number to 18, otherwise it may cause errors ("There are too many connections")
+
+~> **NOTE:** It is recommended to set the maximum parallelism number to 18, otherwise it may cause errors ("There are too many connections").
 
 ## Example Usage
 
