@@ -1,4 +1,8 @@
 	## 1.13.0 (Unreleased)
+## 1.12.9 (June 30, 2022)
+NOTES:
+- ADD bcc max parallelism note
+
 ## 1.12.8 (June 30, 2022)
 NOTES:
 - Repair bcc instance markdown
