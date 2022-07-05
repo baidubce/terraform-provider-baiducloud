@@ -95,7 +95,7 @@ func resourceBaiduCloudEip() *schema.Resource {
 				Description:  "Eip payment timing, support Prepaid and Postpaid",
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice([]string{PaymentTimingPrepai, PaymentTimingPostpaid}, false),
+				ValidateFunc: validation.StringInSlice([]string{PaymentTimingPrepaid, PaymentTimingPostpaid}, false),
 			},
 			"billing_method": {
 				Type:        schema.TypeString,
@@ -248,7 +248,7 @@ func resourceBaiduCloudEipUpdate(d *schema.ResourceData, meta interface{}) error
 		d.SetPartial("bandwidth_in_mbps")
 	}
 
-	if d.Get("billing_method").(string) == PaymentTimingPrepai &&
+	if d.Get("billing_method").(string) == PaymentTimingPrepaid &&
 		(d.HasChange("auto_renew_time") || d.HasChange("auto_renew_time_unit")) {
 		isStart, args := buildUpdateAutoRenewArgs(d)
 		if isStart {

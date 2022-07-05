@@ -411,7 +411,7 @@ func buildBaiduCloudPeerConnArgs(d *schema.ResourceData) *vpc.CreatePeerConnArgs
 			paymentTiming := vpc.PaymentTimingType(p.(string))
 			args.Billing.PaymentTiming = paymentTiming
 		}
-		if args.Billing.PaymentTiming == PaymentTimingPrepai {
+		if args.Billing.PaymentTiming == PaymentTimingPrepaid {
 			if r, ok := billing["reservation"]; ok {
 				args.Billing.Reservation = &vpc.Reservation{}
 				reservation := r.(map[string]interface{})

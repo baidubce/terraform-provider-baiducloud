@@ -26,7 +26,7 @@ const DefaultDebugMsg = "\n*************** %s Response *************** \n%+v\n%s
 
 const (
 	PaymentTimingPostpaid = "Postpaid"
-	PaymentTimingPrepai   = "Prepaid"
+	PaymentTimingPrepaid  = "Prepaid"
 )
 
 func debugOn() bool {
