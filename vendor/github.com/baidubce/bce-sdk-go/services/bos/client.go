@@ -35,13 +35,13 @@ import (
 const (
 	DEFAULT_SERVICE_DOMAIN = bce.DEFAULT_REGION + ".bcebos.com"
 	DEFAULT_MAX_PARALLEL   = 10
-	MULTIPART_ALIGN        = 1 << 20        // 1MB
-	MIN_MULTIPART_SIZE     = 1 << 20        // 1MB
-	DEFAULT_MULTIPART_SIZE = 12 * (1 << 20) // 12MB
+	MULTIPART_ALIGN        = 1 << 20         // 1MB
+	MIN_MULTIPART_SIZE     = 100 * (1 << 10) // 100 KB
+	DEFAULT_MULTIPART_SIZE = 12 * (1 << 20)  // 12MB
 
 	MAX_PART_NUMBER        = 10000
-	MAX_SINGLE_PART_SIZE   = 5 * (1 << 30) // 5GB
-	MAX_SINGLE_OBJECT_SIZE = 5 * (1 << 40) // 5TB
+	MAX_SINGLE_PART_SIZE   = 5 * (1 << 30)    // 5GB
+	MAX_SINGLE_OBJECT_SIZE = 48.8 * (1 << 40) // 48.8TB
 )
 
 // Client of BOS service is a kind of BceClient, so derived from BceClient
@@ -90,12 +90,12 @@ func NewClientWithConfig(config *BosClientConfiguration) (*Client, error) {
 		HeadersToSign: auth.DEFAULT_HEADERS_TO_SIGN,
 		ExpireSeconds: auth.DEFAULT_EXPIRE_SECONDS}
 	defaultConf := &bce.BceClientConfiguration{
-		Endpoint:    endpoint,
-		Region:      bce.DEFAULT_REGION,
-		UserAgent:   bce.DEFAULT_USER_AGENT,
-		Credentials: credentials,
-		SignOption:  defaultSignOptions,
-		Retry:       bce.DEFAULT_RETRY_POLICY,
+		Endpoint:                  endpoint,
+		Region:                    bce.DEFAULT_REGION,
+		UserAgent:                 bce.DEFAULT_USER_AGENT,
+		Credentials:               credentials,
+		SignOption:                defaultSignOptions,
+		Retry:                     bce.DEFAULT_RETRY_POLICY,
 		ConnectionTimeoutInMillis: bce.DEFAULT_CONNECTION_TIMEOUT_IN_MILLIS,
 		RedirectDisabled:          config.RedirectDisabled}
 	v1Signer := &auth.BceV1Signer{}
@@ -844,6 +844,25 @@ func (c *Client) PutObjectFromString(bucket, object, content string,
 func (c *Client) PutObjectFromFile(bucket, object, fileName string,
 	args *api.PutObjectArgs) (string, error) {
 	body, err := bce.NewBodyFromFile(fileName)
+	if err != nil {
+		return "", err
+	}
+	return api.PutObject(c, bucket, object, body, args)
+}
+
+// PutObjectFromStream - upload a new object or rewrite the existed object from stream
+//
+// PARAMS:
+//     - bucket: the name of the bucket to store the object
+//     - object: the name of the object
+//     - fileName: the local file full path name
+//     - args: the optional arguments
+// RETURNS:
+//     - string: etag of the uploaded object
+//     - error: the uploaded error if any occurs
+func (c *Client) PutObjectFromStream(bucket, object string, reader io.Reader,
+	args *api.PutObjectArgs) (string, error) {
+	body, err := bce.NewBodyFromSizedReader(reader, -1)
 	if err != nil {
 		return "", err
 	}
@@ -1612,6 +1631,12 @@ func (c *Client) GeneratePresignedUrl(bucket, object string, expireInSeconds int
 		expireInSeconds, method, headers, params)
 }
 
+func (c *Client) GeneratePresignedUrlPathStyle(bucket, object string, expireInSeconds int, method string,
+	headers, params map[string]string) string {
+	return api.GeneratePresignedUrlPathStyle(c.Config, c.Signer, bucket, object,
+		expireInSeconds, method, headers, params)
+}
+
 // BasicGeneratePresignedUrl - basic interface to generate an authorization url with expire time
 //
 // PARAMS:
@@ -1883,6 +1908,7 @@ func (c *Client) parallelPartUpload(bucket string, object string, filename strin
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
 	// 分块大小按MULTIPART_ALIGN=1MB对齐
 	partSize := (c.MultipartSize +
 		MULTIPART_ALIGN - 1) / MULTIPART_ALIGN * MULTIPART_ALIGN

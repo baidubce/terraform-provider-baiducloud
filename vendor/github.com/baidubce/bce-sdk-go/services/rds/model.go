@@ -38,6 +38,7 @@ type CreateRdsArgs struct {
 	Tags              []model.TagModel `json:"tags,omitempty"`
 	AutoRenewTimeUnit string           `json:"autoRenewTimeUnit,omitempty"`
 	AutoRenewTime     int              `json:"autoRenewTime,omitempty"`
+	BgwGroupId        string           `json:"bgwGroupId,omitempty"`
 }
 
 type Billing struct {
@@ -121,6 +122,7 @@ type Instance struct {
 	Topology           Topology     `json:"topology"`
 	Task               string       `json:"task"`
 	PaymentTiming      string       `json:"paymentTiming"`
+	BgwGroupId         string       `json:"bgwGroupId"`
 }
 
 type ListRdsResult struct {
@@ -150,7 +152,7 @@ type BackupPolicy struct {
 	BackupDays    string `json:"backupDays"`
 	BackupTime    string `json:"backupTime"`
 	Persistent    bool   `json:"persistent"`
-	ExpireInDays  string `json:"expireInDays"`
+	ExpireInDays  int    `json:"expireInDays"`
 	FreeSpaceInGB int    `json:"freeSpaceInGb"`
 }
 
@@ -213,6 +215,13 @@ type ModifyPublicAccessArgs struct {
 	PublicAccess bool `json:"publicAccess"`
 }
 
+type ModifyBackupPolicyArgs struct {
+	BackupDays   string `json:"backupDays"`
+	BackupTime   string `json:"backupTime"`
+	Persistent   bool   `json:"persistent"`
+	ExpireInDays int    `json:"expireInDays"`
+}
+
 type GetBackupListArgs struct {
 	Marker  string
 	MaxKeys int
@@ -220,11 +229,13 @@ type GetBackupListArgs struct {
 
 type Snapshot struct {
 	SnapshotId          string `json:"backupId"`
-	SnapshotSizeInBytes string `json:"backupSize"`
+	SnapshotSizeInBytes int64  `json:"backupSize"`
 	SnapshotType        string `json:"backupType"`
 	SnapshotStatus      string `json:"backupStatus"`
 	SnapshotStartTime   string `json:"backupStartTime"`
 	SnapshotEndTime     string `json:"backupEndTime"`
+	DownloadUrl         string `json:"downloadUrl"`
+	DownloadExpires     string `json:"downloadExpires"`
 }
 
 type GetBackupListResult struct {

@@ -240,6 +240,7 @@ type AppBLBModel struct {
 	Layer4ClusterId string           `json:"layer4ClusterId"`
 	Layer7ClusterId string           `json:"layer7ClusterId"`
 	Tags            []model.TagModel `json:"tags"`
+	EipRouteType	string			 `json:"eipRouteType"`
 }
 
 type DescribeLoadBalancersResult struct {
@@ -249,6 +250,11 @@ type DescribeLoadBalancersResult struct {
 
 type ListenerModel struct {
 	Port string `json:"port"`
+	Type string `json:"type"`
+}
+
+type PortTypeModel struct {
+	Port int `json:"port"`
 	Type string `json:"type"`
 }
 
@@ -268,6 +274,7 @@ type DescribeLoadBalancerDetailResult struct {
 	Layer7ClusterId string           `json:"layer7ClusterId"`
 	Listener        []ListenerModel  `json:"listener"`
 	Tags            []model.TagModel `json:"tags"`
+	EipRouteType	string			 `json:"eipRouteType"`
 }
 
 type CreateAppTCPListenerArgs struct {
@@ -278,9 +285,10 @@ type CreateAppTCPListenerArgs struct {
 }
 
 type CreateAppUDPListenerArgs struct {
-	ListenerPort uint16 `json:"listenerPort"`
-	Scheduler    string `json:"scheduler"`
-	ClientToken  string `json:"-"`
+	UdpSessionTimeout   int    `json:"udpSessionTimeout,omitempty"`
+	ListenerPort        uint16 `json:"listenerPort"`
+	Scheduler    		string `json:"scheduler"`
+	ClientToken  		string `json:"-"`
 }
 
 type CreateAppHTTPListenerArgs struct {
@@ -307,9 +315,9 @@ type CreateAppHTTPSListenerArgs struct {
 	XForwardedFor         bool     `json:"xForwardedFor,omitempty"`
 	ServerTimeout         int      `json:"serverTimeout,omitempty"`
 	CertIds               []string `json:"certIds"`
-	Ie6Compatible         bool     `json:"ie6Compatible,omitempty"`
 	EncryptionType        string   `json:"encryptionType,omitempty"`
 	EncryptionProtocols   []string `json:"encryptionProtocols,omitempty"`
+	AppliedCiphers        string   `json:"appliedCiphers,omitempty"`
 	DualAuth              bool     `json:"dualAuth,omitempty"`
 	ClientCertIds         []string `json:"clientCertIds,omitempty"`
 }
@@ -319,9 +327,9 @@ type CreateAppSSLListenerArgs struct {
 	ListenerPort        uint16   `json:"listenerPort"`
 	Scheduler           string   `json:"scheduler"`
 	CertIds             []string `json:"certIds"`
-	Ie6Compatible       bool     `json:"ie6Compatible,omitempty"`
 	EncryptionType      string   `json:"encryptionType,omitempty"`
 	EncryptionProtocols []string `json:"encryptionProtocols,omitempty"`
+	AppliedCiphers      string   `json:"appliedCiphers,omitempty"`
 	DualAuth            bool     `json:"dualAuth,omitempty"`
 	ClientCertIds       []string `json:"clientCertIds,omitempty"`
 }
@@ -331,6 +339,7 @@ type UpdateAppListenerArgs struct {
 	ListenerPort      uint16 `json:"-"`
 	Scheduler         string `json:"scheduler,omitempty"`
 	TcpSessionTimeout int    `json:"tcpSessionTimeout,omitempty"`
+	UdpSessionTimeout int    `json:"udpSessionTimeout,omitempty"`
 }
 
 type UpdateAppTCPListenerArgs struct {
@@ -365,9 +374,9 @@ type UpdateAppHTTPSListenerArgs struct {
 	XForwardedFor         bool     `json:"xForwardedFor,omitempty"`
 	ServerTimeout         int      `json:"serverTimeout,omitempty"`
 	CertIds               []string `json:"certIds"`
-	Ie6Compatible         bool     `json:"ie6Compatible,omitempty"`
 	EncryptionType        string   `json:"encryptionType,omitempty"`
 	EncryptionProtocols   []string `json:"encryptionProtocols,omitempty"`
+	AppliedCiphers        string   `json:"appliedCiphers,omitempty"`
 	DualAuth              bool     `json:"dualAuth,omitempty"`
 	ClientCertIds         []string `json:"clientCertIds,omitempty"`
 }
@@ -377,9 +386,9 @@ type UpdateAppSSLListenerArgs struct {
 	ListenerPort        uint16   `json:"-"`
 	Scheduler           string   `json:"scheduler"`
 	CertIds             []string `json:"certIds"`
-	Ie6Compatible       bool     `json:"ie6Compatible,omitempty"`
 	EncryptionType      string   `json:"encryptionType,omitempty"`
 	EncryptionProtocols []string `json:"encryptionProtocols,omitempty"`
+	AppliedCiphers      string   `json:"appliedCiphers,omitempty"`
 	DualAuth            bool     `json:"dualAuth,omitempty"`
 	ClientCertIds       []string `json:"clientCertIds,omitempty"`
 }
@@ -388,6 +397,7 @@ type AppListenerModel struct {
 	Port              uint16 `json:"listenerPort"`
 	Scheduler         string `json:"scheduler"`
 	TcpSessionTimeout int    `json:"tcpSessionTimeout"`
+	UdpSessionTimeout int    `json:"udpSessionTimeout"`
 }
 
 type AppTCPListenerModel struct {
@@ -420,9 +430,9 @@ type AppHTTPSListenerModel struct {
 	XForwardedFor         bool     `json:"xForwardedFor"`
 	ServerTimeout         int      `json:"serverTimeout"`
 	CertIds               []string `json:"certIds"`
-	Ie6Compatible         bool     `json:"ie6Compatible"`
 	EncryptionType        string   `json:"encryptionType"`
 	EncryptionProtocols   []string `json:"encryptionProtocols"`
+	AppliedCiphers        string   `json:"appliedCiphers"`
 	DualAuth              bool     `json:"dualAuth"`
 	ClientCertIds         []string `json:"clientCertIds"`
 }
@@ -431,11 +441,33 @@ type AppSSLListenerModel struct {
 	ListenerPort        uint16   `json:"listenerPort"`
 	Scheduler           string   `json:"scheduler"`
 	CertIds             []string `json:"certIds"`
-	Ie6Compatible       bool     `json:"ie6Compatible"`
 	EncryptionType      string   `json:"encryptionType"`
 	EncryptionProtocols []string `json:"encryptionProtocols"`
+	AppliedCiphers      string   `json:"appliedCiphers"`
 	DualAuth            bool     `json:"dualAuth"`
 	ClientCertIds       []string `json:"clientCertIds"`
+}
+
+type AppAllListenerModel struct {
+	ListenerPort          uint16   `json:"listenerPort"`
+	ListenerType          string   `json:"listenerType"`
+	Scheduler             string   `json:"scheduler"`
+	TcpSessionTimeout     int      `json:"tcpSessionTimeout"`
+	UdpSessionTimeout     int      `json:"udpSessionTimeout"`
+	KeepSession           bool     `json:"keepSession"`
+	KeepSessionType       string   `json:"keepSessionType"`
+	KeepSessionTimeout    int      `json:"keepSessionTimeout"`
+	KeepSessionCookieName string   `json:"keepSessionCookieName"`
+	XForwardedFor         bool     `json:"xForwardedFor"`
+	xForwardedProto       bool     `json:"xForwardedProto"`
+	ServerTimeout         int      `json:"serverTimeout"`
+	RedirectPort          int      `json:"redirectPort"`
+	CertIds               []string `json:"certIds"`
+	EncryptionType        string   `json:"encryptionType"`
+	EncryptionProtocols   []string `json:"encryptionProtocols"`
+	AppliedCiphers        string   `json:"appliedCiphers"`
+	DualAuth              bool     `json:"dualAuth"`
+	ClientCertIds         []string `json:"clientCertIds"`
 }
 
 type DescribeAppListenerArgs struct {
@@ -469,9 +501,15 @@ type DescribeAppSSLListenersResult struct {
 	DescribeResultMeta
 }
 
+type DescribeAppAllListenersResult struct {
+	ListenerList []AppAllListenerModel `json:"listenerList"`
+	DescribeResultMeta
+}
+
 type DeleteAppListenersArgs struct {
 	ClientToken string   `json:"-"`
 	PortList    []uint16 `json:"portList"`
+	PortTypeList    []PortTypeModel `json:"portTypeList"`
 }
 
 type AppRule struct {
@@ -481,10 +519,10 @@ type AppRule struct {
 
 type AppPolicy struct {
 	Description      string `json:"desc"`
-	AppServerGroupId string `json:"appServerGroupId"`
-	AppIpGroupId     string `json:"appIpGroupId"`
-	AppIpGroupName   string `json:"appIpGroupName"`
-	GroupType        string `json:"groupType"`
+	AppServerGroupId string `json:"appServerGroupId,omitempty"`
+	AppIpGroupId     string `json:"appIpGroupId,omitempty"`
+	AppIpGroupName   string `json:"appIpGroupName,omitempty"`
+	GroupType        string `json:"groupType,omitempty"`
 
 	BackendPort uint16    `json:"backendPort,omitempty"`
 	Priority    int       `json:"priority"`
@@ -500,10 +538,12 @@ type CreatePolicysArgs struct {
 	ClientToken  string      `json:"-"`
 	ListenerPort uint16      `json:"listenerPort"`
 	AppPolicyVos []AppPolicy `json:"appPolicyVos"`
+	Type         string      `json:"type"`
 }
 
 type DescribePolicysArgs struct {
 	Port    uint16
+	Type    string
 	Marker  string
 	MaxKeys int
 }
@@ -517,6 +557,7 @@ type DeletePolicysArgs struct {
 	ClientToken  string   `json:"-"`
 	Port         uint16   `json:"port"`
 	PolicyIdList []string `json:"policyIdList"`
+	Type         string      `json:"type"`
 }
 
 type CreateAppIpGroupArgs struct {

@@ -52,6 +52,7 @@ func (c *Client) CreateRds(args *CreateRdsArgs) (*CreateResult, error) {
 		WithMethod(http.POST).
 		WithURL(getRdsUri()).
 		WithQueryParamFilter("clientToken", args.ClientToken).
+		WithHeader(http.CONTENT_TYPE, bce.DEFAULT_CONTENT_TYPE).
 		WithBody(args).
 		WithResult(result).
 		Do()
@@ -84,7 +85,8 @@ func (c *Client) CreateReadReplica(args *CreateReadReplicaArgs) (*CreateResult, 
 		WithMethod(http.POST).
 		WithURL(getRdsUri()).
 		WithQueryParamFilter("clientToken", args.ClientToken).
-		WithQueryParam("readReplica","").
+		WithQueryParam("readReplica", "").
+		WithHeader(http.CONTENT_TYPE, bce.DEFAULT_CONTENT_TYPE).
 		WithBody(args).
 		WithResult(result).
 		Do()
@@ -117,7 +119,8 @@ func (c *Client) CreateRdsProxy(args *CreateRdsProxyArgs) (*CreateResult, error)
 		WithMethod(http.POST).
 		WithURL(getRdsUri()).
 		WithQueryParamFilter("clientToken", args.ClientToken).
-		WithQueryParam("rdsproxy","").
+		WithQueryParam("rdsproxy", "").
+		WithHeader(http.CONTENT_TYPE, bce.DEFAULT_CONTENT_TYPE).
 		WithBody(args).
 		WithResult(result).
 		Do()
@@ -201,6 +204,7 @@ func (c *Client) ResizeRds(instanceId string, args *ResizeRdsArgs) error {
 		WithMethod(http.PUT).
 		WithURL(getRdsUriWithInstanceId(instanceId)).
 		WithQueryParam("resize", "").
+		WithHeader(http.CONTENT_TYPE, bce.DEFAULT_CONTENT_TYPE).
 		WithBody(args).
 		Do()
 }
@@ -212,7 +216,7 @@ func (c *Client) ResizeRds(instanceId string, args *ResizeRdsArgs) error {
 //     - args: the arguments to create a account
 // RETURNS:
 //     - error: nil if success otherwise the specific error
-func (c *Client) CreateAccount(instanceId string, args *CreateAccountArgs)  error {
+func (c *Client) CreateAccount(instanceId string, args *CreateAccountArgs) error {
 	if args == nil {
 		return fmt.Errorf("unset args")
 	}
@@ -235,6 +239,7 @@ func (c *Client) CreateAccount(instanceId string, args *CreateAccountArgs)  erro
 		WithMethod(http.POST).
 		WithURL(getRdsUriWithInstanceId(instanceId)+"/account").
 		WithQueryParamFilter("clientToken", args.ClientToken).
+		WithHeader(http.CONTENT_TYPE, bce.DEFAULT_CONTENT_TYPE).
 		WithBody(args).
 		Do()
 }
@@ -250,7 +255,7 @@ func (c *Client) ListAccount(instanceId string) (*ListAccountResult, error) {
 	result := &ListAccountResult{}
 	err := bce.NewRequestBuilder(c).
 		WithMethod(http.GET).
-		WithURL(getRdsUriWithInstanceId(instanceId)+"/account").
+		WithURL(getRdsUriWithInstanceId(instanceId) + "/account").
 		WithResult(result).
 		Do()
 
@@ -265,11 +270,11 @@ func (c *Client) ListAccount(instanceId string) (*ListAccountResult, error) {
 // RETURNS:
 //     - *Account: the account's meta
 //     - error: nil if success otherwise the specific error
-func (c *Client) GetAccount(instanceId,accountName string) (*Account, error) {
+func (c *Client) GetAccount(instanceId, accountName string) (*Account, error) {
 	result := &Account{}
 	err := bce.NewRequestBuilder(c).
 		WithMethod(http.GET).
-		WithURL(getRdsUriWithInstanceId(instanceId)+"/account/"+accountName).
+		WithURL(getRdsUriWithInstanceId(instanceId) + "/account/" + accountName).
 		WithResult(result).
 		Do()
 
@@ -320,6 +325,7 @@ func (c *Client) UpdateInstanceName(instanceId string, args *UpdateInstanceNameA
 		WithMethod(http.PUT).
 		WithURL(getRdsUriWithInstanceId(instanceId)).
 		WithQueryParam("rename", "").
+		WithHeader(http.CONTENT_TYPE, bce.DEFAULT_CONTENT_TYPE).
 		WithBody(args).
 		Do()
 }
@@ -338,6 +344,7 @@ func (c *Client) ModifySyncMode(instanceId string, args *ModifySyncModeArgs) err
 		WithMethod(http.PUT).
 		WithURL(getRdsUriWithInstanceId(instanceId)).
 		WithQueryParam("modifySyncMode", "").
+		WithHeader(http.CONTENT_TYPE, bce.DEFAULT_CONTENT_TYPE).
 		WithBody(args).
 		Do()
 }
@@ -356,6 +363,7 @@ func (c *Client) ModifyEndpoint(instanceId string, args *ModifyEndpointArgs) err
 		WithMethod(http.PUT).
 		WithURL(getRdsUriWithInstanceId(instanceId)).
 		WithQueryParam("modifyEndpoint", "").
+		WithHeader(http.CONTENT_TYPE, bce.DEFAULT_CONTENT_TYPE).
 		WithBody(args).
 		Do()
 }
@@ -374,6 +382,26 @@ func (c *Client) ModifyPublicAccess(instanceId string, args *ModifyPublicAccessA
 		WithMethod(http.PUT).
 		WithURL(getRdsUriWithInstanceId(instanceId)).
 		WithQueryParam("modifyPublicAccess", "").
+		WithHeader(http.CONTENT_TYPE, bce.DEFAULT_CONTENT_TYPE).
+		WithBody(args).
+		Do()
+}
+
+// ModifyBackupPolicy - modify backup policy
+//
+// PARAMS:
+//     - cli: the client agent which can perform sending request
+//     - instanceId: id of the instance
+//     - args: the arguments to modify public access
+// RETURNS:
+//     - error: nil if success otherwise the specific error
+func (c *Client) ModifyBackupPolicy(instanceId string, args *ModifyBackupPolicyArgs) error {
+
+	return bce.NewRequestBuilder(c).
+		WithMethod(http.PUT).
+		WithURL(getRdsUriWithInstanceId(instanceId)).
+		WithQueryParam("modifyBackupPolicy", "").
+		WithHeader(http.CONTENT_TYPE, bce.DEFAULT_CONTENT_TYPE).
 		WithBody(args).
 		Do()
 }
@@ -399,9 +427,29 @@ func (c *Client) GetBackupList(instanceId string, args *GetBackupListArgs) (*Get
 	result := &GetBackupListResult{}
 	err := bce.NewRequestBuilder(c).
 		WithMethod(http.GET).
-		WithURL(getRdsUriWithInstanceId(instanceId) + "/backup").
+		WithURL(getRdsUriWithInstanceId(instanceId)+"/backup").
 		WithQueryParamFilter("marker", args.Marker).
 		WithQueryParamFilter("maxKeys", strconv.Itoa(args.MaxKeys)).
+		WithResult(result).
+		Do()
+
+	return result, err
+}
+
+// GetBackupDetail - get backup detail of the instance's backup
+//
+// PARAMS:
+//     - cli: the client agent which can perform sending request
+//     - instanceId: id of the instance
+//     - backupId: id of the backup
+// RETURNS:
+//     - *Snapshot: result of the backup detail
+//     - error: nil if success otherwise the specific error
+func (c *Client) GetBackupDetail(instanceId string, backupId string) (*Snapshot, error) {
+	result := &Snapshot{}
+	err := bce.NewRequestBuilder(c).
+		WithMethod(http.GET).
+		WithURL(getRdsUriWithInstanceId(instanceId) + "/backup/" + backupId).
 		WithResult(result).
 		Do()
 
@@ -417,7 +465,7 @@ func (c *Client) GetBackupList(instanceId string, args *GetBackupListArgs) (*Get
 //     - error: nil if success otherwise the specific error
 func (c *Client) GetZoneList() (*GetZoneListResult, error) {
 	result := &GetZoneListResult{}
-	err :=  bce.NewRequestBuilder(c).
+	err := bce.NewRequestBuilder(c).
 		WithMethod(http.GET).
 		WithURL(URI_PREFIX + "/zone").
 		WithResult(result).
@@ -442,7 +490,7 @@ func (c *Client) ListSubnets(args *ListSubnetsArgs) (*ListSubnetsResult, error) 
 	result := &ListSubnetsResult{}
 	err := bce.NewRequestBuilder(c).
 		WithMethod(http.GET).
-		WithURL(URI_PREFIX + "/subnet").
+		WithURL(URI_PREFIX+"/subnet").
 		WithQueryParamFilter("vpcId", args.VpcId).
 		WithQueryParamFilter("zoneName", args.ZoneName).
 		WithResult(result).
@@ -462,7 +510,7 @@ func (c *Client) GetSecurityIps(instanceId string) (*GetSecurityIpsResult, error
 	result := &GetSecurityIpsResult{}
 	err := bce.NewRequestBuilder(c).
 		WithMethod(http.GET).
-		WithURL(getRdsUriWithInstanceId(instanceId)+"/securityIp").
+		WithURL(getRdsUriWithInstanceId(instanceId) + "/securityIp").
 		WithResult(result).
 		Do()
 
@@ -479,12 +527,13 @@ func (c *Client) GetSecurityIps(instanceId string) (*GetSecurityIpsResult, error
 //     - error: nil if success otherwise the specific error
 func (c *Client) UpdateSecurityIps(instanceId, Etag string, args *UpdateSecurityIpsArgs) error {
 
-	headers := map[string]string{"x-bce-if-match":Etag}
+	headers := map[string]string{"x-bce-if-match": Etag}
 
 	return bce.NewRequestBuilder(c).
 		WithMethod(http.PUT).
 		WithURL(getRdsUriWithInstanceId(instanceId)+"/securityIp").
 		WithHeaders(headers).
+		WithHeader(http.CONTENT_TYPE, bce.DEFAULT_CONTENT_TYPE).
 		WithBody(args).
 		Do()
 }
@@ -500,7 +549,7 @@ func (c *Client) ListParameters(instanceId string) (*ListParametersResult, error
 	result := &ListParametersResult{}
 	err := bce.NewRequestBuilder(c).
 		WithMethod(http.GET).
-		WithURL(getRdsUriWithInstanceId(instanceId)+"/parameter").
+		WithURL(getRdsUriWithInstanceId(instanceId) + "/parameter").
 		WithResult(result).
 		Do()
 
@@ -517,12 +566,13 @@ func (c *Client) ListParameters(instanceId string) (*ListParametersResult, error
 //     - error: nil if success otherwise the specific error
 func (c *Client) UpdateParameter(instanceId, Etag string, args *UpdateParameterArgs) error {
 
-	headers := map[string]string{"x-bce-if-match":Etag}
+	headers := map[string]string{"x-bce-if-match": Etag}
 
 	return bce.NewRequestBuilder(c).
 		WithMethod(http.PUT).
 		WithURL(getRdsUriWithInstanceId(instanceId)+"/parameter").
 		WithHeaders(headers).
+		WithHeader(http.CONTENT_TYPE, bce.DEFAULT_CONTENT_TYPE).
 		WithBody(args).
 		Do()
 }
@@ -538,7 +588,29 @@ func (c *Client) AutoRenew(args *AutoRenewArgs) error {
 	return bce.NewRequestBuilder(c).
 		WithMethod(http.PUT).
 		WithURL(getRdsUri()).
-		WithQueryParam("autoRenew","").
+		WithQueryParam("autoRenew", "").
+		WithHeader(http.CONTENT_TYPE, bce.DEFAULT_CONTENT_TYPE).
 		WithBody(args).
 		Do()
+}
+
+func (c *Client) Request(method, uri string, body interface{}) (interface{}, error) {
+	res := struct{}{}
+	req := bce.NewRequestBuilder(c).
+		WithMethod(method).
+		WithURL(uri).
+		WithHeader(http.CONTENT_TYPE, bce.DEFAULT_CONTENT_TYPE)
+	var err error
+	if body != nil {
+		err = req.
+			WithBody(body).
+			WithResult(res).
+			Do()
+	} else {
+		err = req.
+			WithResult(res).
+			Do()
+	}
+
+	return res, err
 }

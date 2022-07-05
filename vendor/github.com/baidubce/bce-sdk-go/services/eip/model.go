@@ -37,6 +37,7 @@ type CreateEipArgs struct {
 	Tags              []model.TagModel `json:"tags"`
 	AutoRenewTimeUnit string           `json:"autoRenewTimeUnit,omitempty"`
 	AutoRenewTime     int              `json:"autoRenewTime,omitempty"`
+	RouteType         string           `json:"routeType,omitempty"`
 	ClientToken       string           `json:"-"`
 }
 
@@ -75,6 +76,7 @@ type ListEipResult struct {
 type EipModel struct {
 	Name            string           `json:"name"`
 	Eip             string           `json:"eip"`
+	EipId           string           `json:"eipId"`
 	Status          string           `json:"status"`
 	EipInstanceType string           `json:"eipInstanceType"`
 	InstanceType    string           `json:"instanceType"`
@@ -87,6 +89,34 @@ type EipModel struct {
 	CreateTime      string           `json:"createTime"`
 	ExpireTime      string           `json:"expireTime"`
 	Tags            []model.TagModel `json:"tags"`
+}
+
+type ListRecycleEipArgs struct {
+	Eip     string
+	Name    string
+	Marker  string
+	MaxKeys int
+}
+
+type ListRecycleEipResult struct {
+	Marker      string            `json:"marker"`
+	MaxKeys     int               `json:"maxKeys"`
+	NextMarker  string            `json:"nextMarker"`
+	IsTruncated bool              `json:"isTruncated"`
+	EipList     []RecycleEipModel `json:"eipList"`
+}
+
+type RecycleEipModel struct {
+	Name                string `json:"name"`
+	Eip                 string `json:"eip"`
+	EipId               string `json:"eipId"`
+	Status              string `json:"status"`
+	RouteType           string `json:"routeType"`
+	BandWidthInMbps     int    `json:"bandwidthInMbps"`
+	PaymentTiming       string `json:"paymentTiming"`
+	BillingMethod       string `json:"billingMethod"`
+	RecycleTime         string `json:"recycleTime"`
+	ScheduledDeleteTime string `json:"scheduledDeleteTime"`
 }
 
 type PurchaseReservedEipArgs struct {
@@ -124,4 +154,56 @@ type ClusterDetail struct {
 	NetworkOutBps int64  `json:"networkOutBps"`
 	NetworkInPps  int64  `json:"networkInPps"`
 	NetworkOutPps int64  `json:"networkOutPps"`
+}
+
+type Package struct {
+	Id           string `json:"id,omitempty"`
+	DeductPolicy string `json:"deductPolicy,omitempty"`
+	PackageType  string `json:"packageType,omitempty"`
+	Status       string `json:"status,omitempty"`
+	Capacity     string `json:"capacity,omitempty"`
+	UsedCapacity string `json:"usedCapacity,omitempty"`
+	ActiveTime   string `json:"activeTime"`
+	ExpireTime   string `json:"expireTime"`
+	CreateTime   string `json:"createTime"`
+}
+
+type CreateEipTpArgs struct {
+	ReservationLength int    `json:"reservationLength,omitempty"`
+	Capacity          string `json:"capacity,omitempty"`
+	DeductPolicy      string `json:"deductPolicy,omitempty"`
+	PackageType       string `json:"packageType,omitempty"`
+	ClientToken       string `json:"-"`
+}
+
+type CreateEipTpResult struct {
+	Id string `json:"id,omitempty"`
+}
+
+type ListEipTpArgs struct {
+	Id           string `json:"id,omitempty"`
+	DeductPolicy string `json:"deductPolicy,omitempty"`
+	Status       string `json:"status,omitempty"`
+	Marker       string `json:"marker"`
+	MaxKeys      int    `json:"maxKeys"`
+}
+
+type ListEipTpResult struct {
+	Marker      string    `json:"marker"`
+	MaxKeys     int       `json:"maxKeys"`
+	NextMarker  string    `json:"nextMarker"`
+	IsTruncated bool      `json:"isTruncated"`
+	PackageList []Package `json:"packageList"`
+}
+
+type EipTpDetail struct {
+	Id           string `json:"id,omitempty"`
+	DeductPolicy string `json:"deductPolicy,omitempty"`
+	PackageType  string `json:"packageType,omitempty"`
+	Status       string `json:"status,omitempty"`
+	Capacity     string `json:"capacity,omitempty"`
+	UsedCapacity string `json:"usedCapacity,omitempty"`
+	ActiveTime   string `json:"activeTime,omitempty"`
+	ExpireTime   string `json:"expireTime,omitempty"`
+	CreateTime   string `json:"createTime,omitempty"`
 }

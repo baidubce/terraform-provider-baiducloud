@@ -38,6 +38,10 @@ const (
 
 	REQUEST_INSTANCEGROUP_REPLICAS_URL = "/replicas"
 
+	REQUEST_INSTANCEGROUP_SCALE_UP_URL = "/scaleup"
+
+	REQUEST_INSTANCEGROUP_SCALE_DOWN_URL = "/scaledown"
+
 	REQUEST_QUOTA_URL = "/quota"
 
 	REQUEST_NODE_URL = "/node"
@@ -55,6 +59,10 @@ const (
 	REQUEST_AUTOSCALER = "/autoscaler"
 
 	REQUEST_KUBECONFIG = "/kubeconfig/%s/%s"
+
+	REQUEST_TASK_URL = "/task"
+
+	REQUEST_TASK_LIST_URL = "/tasks"
 )
 
 var _ Interface = &Client{}
@@ -115,6 +123,14 @@ func getInstanceGroupAutoScalerURI(clusterID, instanceGroupID string) string {
 	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_INSTANCEGROUP_URL + "/" + instanceGroupID + REQUEST_INSTANCEGROUP_AUTOSCALER_URL
 }
 
+func getScaleUpInstanceGroupURI(clusterID, instanceGroupID string) string {
+	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_INSTANCEGROUP_URL + "/" + instanceGroupID + REQUEST_INSTANCEGROUP_SCALE_UP_URL
+}
+
+func getScaleDownInstanceGroupURI(clusterID, instanceGroupID string) string {
+	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_INSTANCEGROUP_URL + "/" + instanceGroupID + REQUEST_INSTANCEGROUP_SCALE_DOWN_URL
+}
+
 func getInstanceGroupReplicasURI(clusterID, instanceGroupID string) string {
 	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_INSTANCEGROUP_URL + "/" + instanceGroupID + REQUEST_INSTANCEGROUP_REPLICAS_URL
 }
@@ -149,6 +165,30 @@ func getAutoscalerURI(clusterID string) string {
 
 func getKubeconfigURI(clusterID string, kubeConfigType KubeConfigType) string {
 	return URI_PREFIX + fmt.Sprintf(REQUEST_KUBECONFIG, clusterID, kubeConfigType)
+}
+
+func getTaskWithIDURI(taskType types.TaskType, taskID string) string {
+	return URI_PREFIX + REQUEST_TASK_URL + "/" + string(taskType) + "/" + taskID
+}
+
+func getTaskListURI(taskType types.TaskType) string {
+	return URI_PREFIX + REQUEST_TASK_LIST_URL + "/" + string(taskType)
+}
+
+func genGetInstanceCRDURI(clusterID, cceInstanceID string) string {
+	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_INSTANCE_URL + "/" + cceInstanceID + "/crd"
+}
+
+func genUpdateInstanceCRDURI(clusterID string) string {
+	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_INSTANCE_URL + "/crd"
+}
+
+func genGetClusterCRDURI(clusterID string) string {
+	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + "/crd"
+}
+
+func genUpdateClusterCRDURI(clusterID string) string {
+	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + "/crd"
 }
 
 func encodeUserScriptInInstanceSet(instancesSets []*InstanceSet) error {

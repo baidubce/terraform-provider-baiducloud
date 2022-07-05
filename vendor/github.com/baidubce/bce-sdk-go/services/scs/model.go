@@ -36,21 +36,30 @@ type Subnet struct {
 }
 
 type CreateInstanceArgs struct {
-	Billing           Billing  `json:"billing"`
-	PurchaseCount     int      `json:"purchaseCount"`
-	InstanceName      string   `json:"instanceName"`
-	NodeType          string   `json:"nodeType"`
-	ShardNum          int      `json:"shardNum"`
-	ProxyNum          int      `json:"proxyNum"`
-	ClusterType       string   `json:"clusterType"`
-	ReplicationNum    int      `json:"replicationNum"`
-	Port              int      `json:"port"`
-	EngineVersion     string   `json:"engineVersion"`
-	VpcID             string   `json:"vpcId"`
-	Subnets           []Subnet `json:"subnets,omitempty"`
-	AutoRenewTimeUnit string   `json:"autoRenewTimeUnit,omitempty"`
-	AutoRenewTime     int      `json:"autoRenewTime,omitempty"`
-	ClientToken       string   `json:"-"`
+	Billing           Billing          `json:"billing"`
+	PurchaseCount     int              `json:"purchaseCount"`
+	InstanceName      string           `json:"instanceName"`
+	NodeType          string           `json:"nodeType"`
+	ShardNum          int              `json:"shardNum"`
+	ProxyNum          int              `json:"proxyNum"`
+	ClusterType       string           `json:"clusterType"`
+	ReplicationNum    int              `json:"replicationNum"`
+	ReplicationInfo   []Replication    `json:"replicationInfo"`
+	Port              int              `json:"port"`
+	Engine            int              `json:"engine,omitempty"`
+	EngineVersion     string           `json:"engineVersion"`
+	DiskFlavor        int              `json:"diskFlavor,omitempty"`
+	DiskType          string           `json:"diskType,omitempty"`
+	VpcID             string           `json:"vpcId"`
+	Subnets           []Subnet         `json:"subnets,omitempty"`
+	AutoRenewTimeUnit string           `json:"autoRenewTimeUnit,omitempty"`
+	AutoRenewTime     int              `json:"autoRenewTime,omitempty"`
+	BgwGroupId        string           `json:"bgwGroupId,omitempty"`
+	ClientToken       string           `json:"-"`
+	ClientAuth        string           `json:"clientAuth"`
+	StoreType         int              `json:"storeType"`
+	EnableReadOnly    int              `json:"enableReadOnly,omitempty"`
+	Tags              []model.TagModel `json:"tags"`
 }
 
 type CreateInstanceResult struct {
@@ -91,7 +100,25 @@ type ListInstancesResult struct {
 type ResizeInstanceArgs struct {
 	NodeType    string `json:"nodeType"`
 	ShardNum    int    `json:"shardNum"`
+	IsDefer     bool   `json:"isDefer"`
 	ClientToken string `json:"-"`
+	DiskFlavor  int    `json:"diskFlavor"`
+	DiskType    string `json:"diskType"`
+}
+
+type ReplicationArgs struct {
+	ResizeType      string        `json:"resizeType"`
+	ReplicationInfo []Replication `json:"replicationInfo"`
+	ClientToken     string        `json:"-"`
+}
+
+type Replication struct {
+	AvailabilityZone string `json:"availabilityZone"`
+	SubnetId         string `json:"subnetId"`
+	IsMaster         int    `json:"isMaster"`
+}
+type RestartInstanceArgs struct {
+	IsDefer bool `json:"isDefer"`
 }
 
 type GetInstanceDetailResult struct {
@@ -114,6 +141,16 @@ type GetInstanceDetailResult struct {
 	Subnets            []Subnet         `json:"subnets"`
 	AutoRenew          string           `json:"autoRenew"`
 	Tags               []model.TagModel `json:"tags"`
+	ShardNum           int              `json:"shardNum"`
+	ReplicationNum     int              `json:"replicationNum"`
+	NodeType           string           `json:"nodeType"`
+	DiskFlavor         int              `json:"diskFlavor"`
+	DiskType           string           `json:"diskType"`
+	StoreType          int              `json:"storeType"`
+	Eip                string           `json:"eip"`
+	PublicDomain       string           `json:"publicDomain"`
+	EnableReadOnly     int              `json:"enableReadOnly"`
+	ReplicationInfo    []Replication    `json:"replicationInfo"`
 }
 
 type UpdateInstanceNameArgs struct {
@@ -387,4 +424,13 @@ type ShardLog struct {
 
 type GetLogArgs struct {
 	ValidSeconds int `json:"validSeconds"`
+}
+type GetMaintainTimeResult struct {
+	CacheClusterShowId string       `json:"cacheClusterShowId"`
+	MaintainTime       MaintainTime `json:"maintainTime"`
+}
+type MaintainTime struct {
+	StartTime string `json:"startTime"`
+	Duration  int    `json:"duration"`
+	Period    []int  `json:"period"`
 }

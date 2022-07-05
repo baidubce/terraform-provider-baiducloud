@@ -89,6 +89,35 @@ func (c *Client) CreateInstance(args *api.CreateInstanceArgs) (*api.CreateInstan
 	return api.CreateInstance(c, args, body)
 }
 
+// CreateInstance - create an instance with the specific parameters and support the passing in of label
+//
+// PARAMS:
+//     - args: the arguments to create instance
+// RETURNS:
+//     - *api.CreateInstanceResult: the result of create Instance, contains new Instance ID
+//     - error: nil if success otherwise the specific error
+func (c *Client) CreateInstanceByLabel(args *api.CreateSpecialInstanceBySpecArgs) (*api.CreateInstanceResult, error) {
+	if len(args.AdminPass) > 0 {
+		cryptedPass, err := api.Aes128EncryptUseSecreteKey(c.Config.Credentials.SecretAccessKey, args.AdminPass)
+		if err != nil {
+			return nil, err
+		}
+
+		args.AdminPass = cryptedPass
+	}
+
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return api.CreateInstanceByLabel(c, args, body)
+}
+
 // CreateInstanceBySpec - create an instance with the specific parameters
 //
 // PARAMS:
@@ -169,6 +198,17 @@ func (c *Client) ListRecycleInstances(args *api.ListRecycleInstanceArgs) (*api.L
 	return api.ListRecycleInstances(c, args)
 }
 
+// ListServersByMarkerV3 - list all instance with the specific parameters
+//
+// PARAMS:
+//     - args: the arguments to list all instance
+// RETURNS:
+//     - *api.LogicMarkerResultResponseV3: the result of list Instance
+//     - error: nil if success otherwise the specific error
+func (c *Client) ListServersByMarkerV3(args *api.ListServerRequestV3Args) (*api.LogicMarkerResultResponseV3, error) {
+	return api.ListServersByMarkerV3(c, args)
+}
+
 // GetInstanceDetail - get a specific instance detail info
 //
 // PARAMS:
@@ -199,6 +239,20 @@ func (c *Client) GetInstanceDetailWithDeploySetAndFailed(instanceId string,
 //     - error: nil if success otherwise the specific error
 func (c *Client) DeleteInstance(instanceId string) error {
 	return api.DeleteInstance(c, instanceId)
+}
+
+// AutoReleaseInstance - set releaseTime of a postpay instance
+//
+// PARAMS:
+//     - instanceId: the specific instance ID
+//     - releaseTime: an UTC string，eg:"2021-05-01T07:58:09Z"
+// RETURNS:
+//     - error: nil if success otherwise the specific error
+func (c *Client) AutoReleaseInstance(instanceId string, releaseTime string) error {
+	args := &api.AutoReleaseArgs{
+		ReleaseTime:	releaseTime,
+	}
+	return api.AutoReleaseInstance(c, instanceId, args)
 }
 
 // ResizeInstance - resize a specific instance
@@ -366,6 +420,25 @@ func (c *Client) ChangeInstancePass(instanceId string, args *api.ChangeInstanceP
 	}
 
 	return api.ChangeInstancePass(c, instanceId, body)
+}
+
+// ModifyDeletionProtection - Modify deletion protection of specified instance
+//
+// PARAMS:
+//     - instanceId: id of the instance
+//	   - args: the arguments to modify deletion protection, default 0 for deletable and 1 for deletion protection
+// RETURNS:
+//     - error: nil if success otherwise the specific error
+func (c *Client) ModifyDeletionProtection(instanceId string, args *api.DeletionProtectionArgs) error {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return err
+	}
+	return api.ModifyDeletionProtection(c, instanceId, body)
 }
 
 // ModifyInstanceAttribute - modify an instance's attribute
@@ -942,6 +1015,18 @@ func (c *Client) RemoteCopyImage(imageId string, args *api.RemoteCopyImageArgs) 
 	return api.RemoteCopyImage(c, imageId, args)
 }
 
+
+// RemoteCopyImageReturnImageIds - copy an image from other region
+//
+// PARAMS:
+//     - imageId: the specific image ID
+//     - args: the arguments to remote copy an image
+// RETURNS:
+//     - imageIds of destination region if success otherwise the specific error
+func (c *Client) RemoteCopyImageReturnImageIds(imageId string, args *api.RemoteCopyImageArgs) (*api.RemoteCopyImageResult, error) {
+	return api.RemoteCopyImageReturnImageIds(c, imageId, args)
+}
+
 // CancelRemoteCopyImage - cancel a copy image from other region operation
 //
 // PARAMS:
@@ -1239,17 +1324,17 @@ func (c *Client) GetDeploySet(deploySetId string) (*api.DeploySetResult, error) 
 //     - args: the arguments to update deployset and instance relation
 // RETURNS:
 //     - error: nil if success otherwise the specific error
-//func (c *Client) UpdateInstanceDeploySet(args *api.UpdateInstanceDeployArgs) (error, error) {
-//	jsonBytes, jsonErr := json.Marshal(args)
-//	if jsonErr != nil {
-//		return nil, jsonErr
-//	}
-//	body, err := bce.NewBodyFromBytes(jsonBytes)
-//	if err != nil {
-//		return nil, err
-//	}
-//	return api.UpdateInstanceDeploy(c, args.ClientToken, body), nil
-//}
+func (c *Client) UpdateInstanceDeploySet(args *api.UpdateInstanceDeployArgs) (error, error) {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	return api.UpdateInstanceDeploy(c, args.ClientToken, body), nil
+}
 
 // DelInstanceDeploySet - delete deployset and instance relation
 //
@@ -1257,17 +1342,17 @@ func (c *Client) GetDeploySet(deploySetId string) (*api.DeploySetResult, error) 
 //     - args: the arguments to delete deployset and instance relation
 // RETURNS:
 //     - error: nil if success otherwise the specific error
-//func (c *Client) DelInstanceDeploySet(args *api.DelInstanceDeployArgs) (error, error) {
-//	jsonBytes, jsonErr := json.Marshal(args)
-//	if jsonErr != nil {
-//		return nil, jsonErr
-//	}
-//	body, err := bce.NewBodyFromBytes(jsonBytes)
-//	if err != nil {
-//		return nil, err
-//	}
-//	return api.DelInstanceDeploy(c, args.ClientToken, body), nil
-//}
+func (c *Client) DelInstanceDeploySet(args *api.DelInstanceDeployArgs) (error, error) {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	return api.DelInstanceDeploy(c, args.ClientToken, body), nil
+}
 
 // ResizeInstanceBySpec - resize a specific instance
 //
@@ -1446,6 +1531,19 @@ func (c *Client) GetAvailableDiskInfo(zoneName string) (*api.GetAvailableDiskInf
 	return api.GetAvailableDiskInfo(c, zoneName)
 }
 
+
+// DeletePrepayVolume - delete the volumes for prepay
+//
+// PARAMS:
+//     - cli: the client agent which can perform sending request
+//     - args: the arguments of method
+// RETURNS:
+//     - *VolumeDeleteResultResponse: the result of deleting volumes
+//     - error: nil if success otherwise the specific error
+func (c *Client) DeletePrepayVolume(args *api.VolumePrepayDeleteRequestArgs) (*api.VolumeDeleteResultResponse, error) {
+	return api.DeletePrepayVolume(c, args)
+}
+
 // ListTypeZones - list instanceType zones
 // PARAMS:
 //     - cli: the client agent which can perform sending request
@@ -1513,6 +1611,24 @@ func (c *Client) GetAllStocks() (*api.GetAllStocksResult, error) {
 	return api.GetAllStocks(c)
 }
 
+// GetStockWithDeploySet - get the bcc's stock with deploySet
+//
+// RETURNS:
+//     - *GetStockWithDeploySetResults: the result of the bcc's stock
+//     - error: nil if success otherwise the specific error
+func (c *Client) GetStockWithDeploySet(args *api.GetStockWithDeploySetArgs) (*api.GetStockWithDeploySetResults, error) {
+	return api.GetStockWithDeploySet(c, args)
+}
+
+// GetStockWithSpec - get the bcc's stock with spec
+//
+// RETURNS:
+//     - *GetStockWithSpecResults: the result of the bcc's stock
+//     - error: nil if success otherwise the specific error
+func (c *Client) GetStockWithSpec(args *api.GetStockWithSpecArgs) (*api.GetStockWithSpecResults, error) {
+	return api.GetStockWithSpec(c, args)
+}
+
 func (c *Client) GetInstanceCreateStock(args *api.CreateInstanceStockArgs) (*api.InstanceStockResult, error) {
 	return api.GetInstanceCreateStock(c, args)
 }
@@ -1560,3 +1676,20 @@ func (c *Client) BatchDeleteAutoRenewRules(args *api.BccDeleteAutoRenewArgs) err
 func (c *Client) DeleteInstanceIngorePayment(args *api.DeleteInstanceIngorePaymentArgs) (*api.DeleteInstanceResult, error) {
 	return api.DeleteInstanceIngorePayment(c, args)
 }
+
+// DeleteRecycledInstance - delete a recycled instance
+//
+// PARAMS:
+//     - instanceId: the specific instance ID
+// RETURNS:
+//     - error: nil if success otherwise the specific error
+func (c *Client) DeleteRecycledInstance(instanceId string) error {
+	return api.DeleteRecycledInstance(c, instanceId)
+}
+
+func (c *Client) ListInstanceByInstanceIds(args *api.ListInstanceByInstanceIdArgs) (*api.ListInstancesResult, error) {
+	return api.ListInstanceByInstanceIds(c, args)
+}
+
+
+

@@ -23,17 +23,18 @@ import (
 type InstanceStatus string
 
 const (
-	InstanceStatusRunning            	InstanceStatus = "Running"
-	InstanceStatusStarting           	InstanceStatus = "Starting"
-	InstanceStatusStopping           	InstanceStatus = "Stopping"
-	InstanceStatusStopped            	InstanceStatus = "Stopped"
-	InstanceStatusDeleted            	InstanceStatus = "Deleted"
-	InstanceStatusScaling            	InstanceStatus = "Scaling"
-	InstanceStatusExpired            	InstanceStatus = "Expired"
-	InstanceStatusError              	InstanceStatus = "Error"
-	InstanceStatusSnapshotProcessing 	InstanceStatus = "SnapshotProcessing"
-	InstanceStatusImageProcessing    	InstanceStatus = "ImageProcessing"
-	InstanceStatusChangeVpcProcessing   InstanceStatus = "ChangeVpc"
+	InstanceStatusRunning             InstanceStatus = "Running"
+	InstanceStatusStarting            InstanceStatus = "Starting"
+	InstanceStatusStopping            InstanceStatus = "Stopping"
+	InstanceStatusStopped             InstanceStatus = "Stopped"
+	InstanceStatusDeleted             InstanceStatus = "Deleted"
+	InstanceStatusScaling             InstanceStatus = "Scaling"
+	InstanceStatusExpired             InstanceStatus = "Expired"
+	InstanceStatusError               InstanceStatus = "Error"
+	InstanceStatusSnapshotProcessing  InstanceStatus = "SnapshotProcessing"
+	InstanceStatusImageProcessing     InstanceStatus = "ImageProcessing"
+	InstanceStatusChangeVpcProcessing InstanceStatus = "ChangeVpc"
+	InstanceStatusRecycled			  InstanceStatus = "Recycled"
 )
 
 type InstanceType string
@@ -104,11 +105,13 @@ type InstanceModel struct {
 	InstanceName          string                 `json:"name"`
 	Hostname              string                 `json:"hostname"`
 	InstanceType          InstanceType           `json:"instanceType"`
+	Spec                  string                 `json:"spec"`
 	Description           string                 `json:"desc"`
 	Status                InstanceStatus         `json:"status"`
 	PaymentTiming         string                 `json:"paymentTiming"`
 	CreationTime          string                 `json:"createTime"`
 	ExpireTime            string                 `json:"expireTime"`
+	ReleaseTime           string                 `json:"releaseTime"`
 	PublicIP              string                 `json:"publicIp"`
 	InternalIP            string                 `json:"internalIp"`
 	CpuCount              int                    `json:"cpuCount"`
@@ -135,6 +138,7 @@ type InstanceModel struct {
 	RackId                string                 `json:"rackId"`
 	NicInfo               NicInfo                `json:"nicInfo"`
 	DeploySetList         []DeploySetSimpleModel `json:"deploysetList"`
+	DeletionProtection    int                    `json:"deletionProtection"`
 }
 
 type DeploySetSimpleModel struct {
@@ -154,6 +158,7 @@ type BccStock struct {
 	Spec              string `json:"spec"`
 	SpecId            string `json:"specId"`
 	InventoryQuantity int    `json:"inventoryQuantity"`
+	RootOnLocal       bool   `json:"rootOnLocal"`
 	UpdatedTime       string `json:"updatedTime"`
 	CollectionTime    string `json:"collectionTime"`
 	ZoneName          string `json:"logicalZone"`
@@ -255,6 +260,7 @@ type CreateInstanceArgs struct {
 	EphemeralDisks        []EphemeralDisk  `json:"ephemeralDisks,omitempty"`
 	CreateCdsList         []CreateCdsModel `json:"createCdsList,omitempty"`
 	NetWorkCapacityInMbps int              `json:"networkCapacityInMbps,omitempty"`
+	EipName               string           `json:"eipName,omitempty"`
 	DedicateHostId        string           `json:"dedicatedHostId,omitempty"`
 	PurchaseCount         int              `json:"purchaseCount,omitempty"`
 	Name                  string           `json:"name,omitempty"`
@@ -279,10 +285,12 @@ type CreateInstanceArgs struct {
 	KeypairId             string           `json:"keypairId,omitempty"`
 	AspId                 string           `json:"aspId,omitempty"`
 	InternetChargeType    string           `json:"internetChargeType,omitempty"`
+	UserData              string           `json:"userData,omitempty"`
 	InternalIps           []string         `json:"internalIps,omitempty"`
 	ClientToken           string           `json:"-"`
 	RequestToken          string           `json:"requestToken"`
 	DeployIdList          []string         `json:"deployIdList"`
+	DetetionProtection    int              `json:"deletionProtection"`
 }
 
 type CreateInstanceStockArgs struct {
@@ -300,6 +308,24 @@ type ResizeInstanceStockArgs struct {
 	CpuCount           int             `json:"cpuCount"`
 	MemoryCapacityInGB int             `json:"memoryCapacityInGB"`
 	InstanceId         string          `json:"instanceId"`
+}
+
+type GetStockWithDeploySetArgs struct {
+	Spec         string   `json:"spec"`
+	DeploySetIds []string `json:"deploySetIds"`
+}
+
+type GetStockWithDeploySetResults struct {
+	BccStocks []BccStock `json:"bccStocks"`
+}
+
+type GetStockWithSpecArgs struct {
+	Spec         string   `json:"spec"`
+	DeploySetIds []string `json:"deploySetIds"`
+}
+
+type GetStockWithSpecResults struct {
+	BccStocks []BccStock `json:"bccStocks"`
 }
 
 type InstanceStockResult struct {
@@ -344,6 +370,7 @@ type CreateInstanceBySpecArgs struct {
 	EphemeralDisks        []EphemeralDisk  `json:"ephemeralDisks,omitempty"`
 	CreateCdsList         []CreateCdsModel `json:"createCdsList,omitempty"`
 	NetWorkCapacityInMbps int              `json:"networkCapacityInMbps,omitempty"`
+	EipName               string           `json:"eipName,omitempty"`
 	InternetChargeType    string           `json:"internetChargeType,omitempty"`
 	PurchaseCount         int              `json:"purchaseCount,omitempty"`
 	Name                  string           `json:"name,omitempty"`
@@ -364,9 +391,69 @@ type CreateInstanceBySpecArgs struct {
 	AspId                 string           `json:"aspId"`
 	InternalIps           []string         `json:"internalIps,omitempty"`
 	DeployId              string           `json:"deployId,omitempty"`
+	UserData              string           `json:"userData,omitempty"`
 	ClientToken           string           `json:"-"`
 	RequestToken          string           `json:"requestToken"`
 	DeployIdList          []string         `json:"deployIdList"`
+	DetetionProtection    int              `json:"deletionProtection"`
+}
+
+const (
+	LabelOperatorEqual    LabelOperator = "equal"
+	LabelOperatorNotEqual LabelOperator = "not_equal"
+	LabelOperatorExist    LabelOperator = "exist"
+	LabelOperatorNotExist LabelOperator = "not_exist"
+)
+
+type LabelOperator string
+
+type LabelConstraint struct {
+	Key      string        `json:"labelKey,omitempty"`
+	Value    string        `json:"labelValue,omitempty"`
+	Operator LabelOperator `json:"operatorName,omitempty"`
+}
+
+// --- 创建 BCC 的新接口的参数和返回值
+
+type CreateSpecialInstanceBySpecArgs struct {
+	ImageId               string           `json:"imageId"`
+	Spec                  string           `json:"spec"`
+	RootDiskSizeInGb      int              `json:"rootDiskSizeInGb,omitempty"`
+	RootDiskStorageType   StorageType      `json:"rootDiskStorageType,omitempty"`
+	EphemeralDisks        []EphemeralDisk  `json:"ephemeralDisks,omitempty"`
+	CreateCdsList         []CreateCdsModel `json:"createCdsList,omitempty"`
+	NetWorkCapacityInMbps int              `json:"networkCapacityInMbps,omitempty"`
+	InternetChargeType    string           `json:"internetChargeType,omitempty"`
+	PurchaseCount         int              `json:"purchaseCount,omitempty"`
+	Name                  string           `json:"name,omitempty"`
+	Hostname              string           `json:"hostname,omitempty"`
+	IsOpenHostnameDomain  bool             `json:"isOpenHostnameDomain,omitempty"`
+	UserData              string           `json:"userData,omitempty"`
+	AutoSeqSuffix         bool             `json:"autoSeqSuffix,omitempty"`
+	AdminPass             string           `json:"adminPass,omitempty"`
+	Billing               Billing          `json:"billing"`
+	ZoneName              string           `json:"zoneName,omitempty"`
+	SubnetId              string           `json:"subnetId,omitempty"`
+	SecurityGroupId       string           `json:"securityGroupId,omitempty"`
+	RelationTag           bool             `json:"relationTag,omitempty"`
+	Tags                  []model.TagModel `json:"tags,omitempty"`
+	KeypairId             string           `json:"keypairId"`
+	AutoRenewTimeUnit     string           `json:"autoRenewTimeUnit"`
+	AutoRenewTime         int              `json:"autoRenewTime"`
+	CdsAutoRenew          bool             `json:"cdsAutoRenew"`
+	AspId                 string           `json:"aspId"`
+	InternalIps           []string         `json:"internalIps,omitempty"`
+	DeployId              string           `json:"deployId,omitempty"`
+	ClientToken           string           `json:"-"`
+	RequestToken          string           `json:"requestToken"`
+	DeployIdList          []string         `json:"deployIdList"`
+	DetetionProtection    int              `json:"deletionProtection"`
+	// CreateInstanceBySpecArgs 的基础上增加的参数
+	LabelConstraints []LabelConstraint `json:"labelConstraints,omitempty"`
+}
+
+type CreateSpecialInstanceBySpecResult struct {
+	InstanceIds []string `json:"instanceIds"`
 }
 
 type CreateInstanceV3Args struct {
@@ -391,6 +478,7 @@ type CreateInstanceV3Args struct {
 	AutoSnapshotPolicyId  string                `json:"autoSnapshotPolicyId,omitempty"`
 	PrivateIpAddresses    []string              `json:"privateIpAddresses,omitempty"`
 	DeploymentSetId       string                `json:"deploymentSetId,omitempty"`
+	DeployIdList          []string              `json:"deployIdList"`
 	ImageId               string                `json:"imageId,omitempty"`
 	UserData              string                `json:"userData,omitempty"`
 	InstanceMarketOptions InstanceMarketOptions `json:"instanceMarketOptions,omitempty"`
@@ -466,6 +554,35 @@ type ListRecycleInstanceArgs struct {
 	RecycleEnd    string `json:"recycleEnd,omitempty"`
 }
 
+type ListServerRequestV3Args struct {
+	Marker            string         `json:"marker,omitempty"`
+	MaxKeys           int            `json:"maxKeys,omitempty"`
+	InstanceId        string         `json:"instanceId,omitempty"`
+	InstanceName      string         `json:"instanceName,omitempty"`
+	PrivateIpAddress  string         `json:"privateIpAddress,omitempty"`
+	PublicIpAddress   string         `json:"publicIpAddress,omitempty"`
+	VpcName           string         `json:"vpcName,omitempty"`
+	SubnetName        string         `json:"subnetName,omitempty"`
+	SubnetId          string         `json:"subnetId,omitempty"`
+	DedicatedHostId   string         `json:"dedicatedHostId,omitempty"`
+	ZoneName          string         `json:"zoneName,omitempty"`
+	AutoRenew         bool           `json:"autoRenew,omitempty"`
+	KeypairId         string         `json:"keypairId,omitempty"`
+	KeypairName       string         `json:"keypairName,omitempty"`
+	DeploymentSetId   string         `json:"deploymentSetId,omitempty"`
+	DeploymentSetName string         `json:"deploymentSetName,omitempty"`
+	ResGroupId        string         `json:"resGroupId,omitempty"`
+	Tag               model.TagModel `json:"tag,omitempty"`
+}
+
+type LogicMarkerResultResponseV3 struct {
+	Marker      string            `json:"marker"`
+	IsTruncated bool              `json:"isTruncated"`
+	NextMarker  string            `json:"nextMarker"`
+	MaxKeys     int               `json:"maxKeys"`
+	Instances   []InstanceModelV3 `json:"instances"`
+}
+
 type ListRecycleInstanceResult struct {
 	Marker      string                 `json:"marker"`
 	IsTruncated bool                   `json:"isTruncated"`
@@ -474,16 +591,88 @@ type ListRecycleInstanceResult struct {
 	Instances   []RecycleInstanceModel `json:"instances"`
 }
 
+type InstanceModelV3 struct {
+	InstanceId            string             `json:"instanceId"`
+	InstanceName          string             `json:"instanceName"`
+	HostId                string             `json:"hostId"`
+	HostName              string             `json:"hostName"`
+	InstanceSpec          string             `json:"instanceSpec"`
+	Status                InstanceStatus     `json:"status"`
+	Description           string             `json:"description"`
+	PaymentTiming         string             `json:"paymentTiming"`
+	CreateTime            string             `json:"createTime"`
+	ExpireTime            string             `json:"expireTime"`
+	ReleaseTime           string             `json:"releaseTime"`
+	PrivateIpAddress      string             `json:"privateIpAddress"`
+	PublicIpAddress       string             `json:"publicIpAddress"`
+	Cpu                   int                `json:"cpu"`
+	Memory                int                `json:"memory"`
+	GpuCard               string             `json:"gpuCard"`
+	FpgaCard              string             `json:"fpgaCard"`
+	CardCount             int                `json:"cardCount"`
+	DataVolumes           []DataVolumeV3     `json:"dataVolumes"`
+	ImageId               string             `json:"imageId"`
+	NetworkCapacityInMbps InternetAccessible `json:"networkCapacityInMbps"`
+	ZoneName              string             `json:"zoneName"`
+	SubnetId              string             `json:"subnetId"`
+	VpcId                 string             `json:"vpcId"`
+	AutoRenew             bool               `json:"autoRenew"`
+	KeypairId             string             `json:"keypairId"`
+	KeypairName           string             `json:"keypairName"`
+	HypervisorDedicatedId string             `json:"hypervisorDedicatedId"`
+	Ipv6                  string             `json:"ipv6"`
+	Tags                  []model.TagModel   `json:"tags"`
+	DeployId              []string           `json:"deployId"`
+	SerialNumber          string             `json:"serialNumber"`
+	SwitchId              string             `json:"switchId"`
+	RackId                string             `json:"rackId"`
+	NicInfo               NicInfoV3          `json:"nicInfo"`
+	OsName                string             `json:"osName"`
+	OsType                string             `json:"osType"`
+}
+
+type NicInfoV3 struct {
+	MacAddress     string      `json:"macAddress"`
+	EniId          string      `json:"eniId"`
+	Type           string      `json:"type"`
+	Ips            []IpModelV3 `json:"ips"`
+	SecurityGroups []string    `json:"securityGroups"`
+}
+
+type IpModelV3 struct {
+	Primary   bool   `json:"primary"`
+	PrivateIp string `json:"privateIp"`
+}
+
+type DataVolumeV3 struct {
+	VolumeId       string `json:"volumeId"`
+	VolumeType     string `json:"volumeType"`
+	VolumeSizeInGb int    `json:"volumeSizeInGb"`
+	StorageType    string `json:"storageType"`
+	SnapshotId     string `json:"snapshotId"`
+	EncryptKey     string `json:"encryptKey"`
+}
+
 type RecycleInstanceModel struct {
-	InstanceId    string   `json:"id"`
-	SerialNumber  string   `json:"serialNumber"`
-	InstanceName  string   `json:"name"`
-	RecycleTime   string   `json:"recycleTime"`
-	DeleteTime    string   `json:"deleteTime"`
-	PaymentTiming string   `json:"paymentTiming"`
-	ServiceName   string   `json:"serviceName"`
-	ServiceType   string   `json:"serviceType"`
-	ConfigItems   []string `json:"configItems"`
+	InstanceId    	string   							`json:"id"`
+	SerialNumber  	string   							`json:"serialNumber"`
+	InstanceName  	string   							`json:"name"`
+	RecycleTime   	string   							`json:"recycleTime"`
+	DeleteTime    	string   							`json:"deleteTime"`
+	PaymentTiming 	string   							`json:"paymentTiming"`
+	ServiceName   	string   							`json:"serviceName"`
+	ServiceType   	string   							`json:"serviceType"`
+	ConfigItems   	[]string 							`json:"configItems"`
+	ConfigItem		RecycleInstanceModelConfigItem		`json:"configItem"`
+}
+
+type RecycleInstanceModelConfigItem struct {
+	Cpu			int 	`json:"cpu"`
+	Memory		int		`json:"memory"`
+	Type		string	`json:"type"`
+	SpecId		string	`json:"specId"`
+	Spec		string	`json:"spec"`
+	ZoneName	string	`json:"zoneName"`
 }
 
 type ModifyInstanceHostnameArgs struct {
@@ -496,11 +685,16 @@ type GetInstanceDetailResult struct {
 	Instance InstanceModel `json:"instance"`
 }
 
+type AutoReleaseArgs struct {
+	ReleaseTime string `json:"releaseTime"`
+}
+
 type ResizeInstanceArgs struct {
 	CpuCount           int             `json:"cpuCount"`
 	MemoryCapacityInGB int             `json:"memoryCapacityInGB"`
 	EphemeralDisks     []EphemeralDisk `json:"ephemeralDisks,omitempty"`
 	Spec               string          `json:"spec"`
+	LiveResize         bool            `json:"liveResize"`
 	ClientToken        string          `json:"-"`
 }
 
@@ -583,17 +777,20 @@ type DeleteInstanceWithRelateResourceArgs struct {
 	RelatedReleaseFlag    bool `json:"relatedReleaseFlag"`
 	DeleteCdsSnapshotFlag bool `json:"deleteCdsSnapshotFlag"`
 	BccRecycleFlag        bool `json:"bccRecycleFlag"`
+	DeleteRelatedEnisFlag bool `json:"deleteRelatedEnisFlag"`
 }
 
 type InstanceChangeVpcArgs struct {
 	InstanceId string `json:"instanceId"`
 	SubnetId   string `json:"subnetId"`
+	InternalIp string `json:"internalIp"`
 	Reboot     bool   `json:"reboot"`
 }
 
 type InstanceChangeSubnetArgs struct {
 	InstanceId string `json:"instanceId"`
 	SubnetId   string `json:"subnetId"`
+	InternalIp string `json:"internalIp"`
 	Reboot     bool   `json:"reboot"`
 }
 
@@ -730,6 +927,8 @@ type VolumeModel struct {
 	SourceSnapshotId   string                   `json:"sourceSnapshotId"`
 	SnapshotNum        string                   `json:"snapshotNum"`
 	Tags               []model.TagModel         `json:"tags"`
+	EnableAutoRenew    bool                     `json:"enableAutoRenew"`
+	AutoRenewTime      int                      `json:"autoRenewTime"`
 	Encrypted          bool                     `json:"encrypted"`
 }
 
@@ -783,6 +982,8 @@ type CreateCDSVolumeArgs struct {
 	StorageType   StorageType `json:"storageType,omitempty"`
 	Billing       *Billing    `json:"billing"`
 	EncryptKey    string      `json:"encryptKey"`
+	RenewTimeUnit string      `json:"renewTimeUnit"`
+	RenewTime     int         `json:"renewTime"`
 	ClientToken   string      `json:"-"`
 }
 
@@ -797,6 +998,9 @@ type CreateCDSVolumeV3Args struct {
 	Billing              *Billing      `json:"billing"`
 	EncryptKey           string        `json:"encryptKey"`
 	AutoSnapshotPolicyId string        `json:"autoSnapshotPolicyId"`
+	InstanceId           string        `json:"instanceId"`
+	RenewTimeUnit        string        `json:"renewTimeUnit"`
+	RenewTime            int           `json:"renewTime"`
 	ClientToken          string        `json:"-"`
 }
 
@@ -1009,6 +1213,17 @@ type RemoteCopyImageArgs struct {
 	DestRegion []string `json:"destRegion"`
 }
 
+type RemoteCopyImageResult struct {
+	RemoteCopyImages []RemoteCopyImageModel `json:"result"`
+}
+
+type RemoteCopyImageModel struct {
+	Region  string `json:"region"`
+	ImageId string `json:"imageId"`
+	ErrMsg  string `json:"errMsg"`
+	Code    string `json:"code"`
+}
+
 type CreateImageArgs struct {
 	InstanceId  string `json:"instanceId,omitempty"`
 	SnapshotId  string `json:"snapshotId,omitempty"`
@@ -1021,6 +1236,7 @@ type ListImageArgs struct {
 	Marker    string
 	MaxKeys   int
 	ImageType string
+	ImageName string
 }
 
 type OsModel struct {
@@ -1479,6 +1695,7 @@ type DeleteInstanceIngorePaymentArgs struct {
 	RelatedReleaseFlag    bool   `json:"relatedReleaseFlag"`
 	DeleteCdsSnapshotFlag bool   `json:"deleteCdsSnapshotFlag"`
 	DeleteRelatedEnisFlag bool   `json:"deleteRelatedEnisFlag"`
+	DeleteImmediate		  bool   `json:"deleteImmediate"`
 }
 
 type DeleteInstanceModel struct {
@@ -1500,4 +1717,37 @@ type RecoveryInstanceArgs struct {
 
 type RecoveryInstanceModel struct {
 	InstanceId string `json:"instanceId"`
+}
+
+type ListInstanceByInstanceIdArgs struct {
+	Marker      string
+	MaxKeys     int
+	InstanceIds []string `json:"instanceIds"`
+}
+
+type ListInstancesResult struct {
+	Marker      string          `json:"marker"`
+	IsTruncated bool            `json:"isTruncated"`
+	NextMarker  string          `json:"nextMarker"`
+	MaxKeys     int             `json:"maxKeys"`
+	Instances   []InstanceModel `json:"instances"`
+}
+
+type VolumePrepayDeleteRequestArgs struct {
+	VolumeId           string `json:"volumeId"`
+	RelatedReleaseFlag bool   `json:"relatedReleaseFlag"`
+	DeleteImmediate	   bool   `json:"deleteImmediate"`
+}
+
+type VolumeDeleteResultResponse struct {
+	SuccessResources VolumeDeleteResultModel `json:"successResources"`
+	FailResources    VolumeDeleteResultModel `json:"failResources"`
+}
+
+type VolumeDeleteResultModel struct {
+	VolumeIds []string `json:"volumeIds"`
+}
+
+type DeletionProtectionArgs struct {
+	DeletionProtection int `json:"deletionProtection"`
 }

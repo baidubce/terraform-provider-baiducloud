@@ -44,6 +44,10 @@ type InstanceSpec struct {
 	// BBC 选项
 	BBCOption *BBCOption `json:"bbcOption,omitempty"`
 
+	// 是否为竞价实例
+	Bid       bool      `json:"bid,omitempty"`
+	BidOption BidOption `json:"bidOption,omitempty"`
+
 	// VPC 相关配置
 	VPCConfig VPCConfig `json:"vpcConfig,omitempty"`
 
@@ -55,7 +59,7 @@ type InstanceSpec struct {
 	InstanceOS InstanceOS `json:"instanceOS,omitempty"`
 
 	// EIP
-	NeedEIP   bool `json:"needEIP,omitempty"`
+	NeedEIP   bool       `json:"needEIP,omitempty"`
 	EIPOption *EIPOption `json:"eipOption,omitempty"`
 
 	// AdminPassword
@@ -63,7 +67,7 @@ type InstanceSpec struct {
 	SSHKeyID      string `json:"sshKeyID,omitempty"`
 
 	// Charging Type, 通常只支持后付费
-	InstanceChargingType      bccapi.PaymentTimingType `json:"instanceChargingType,omitempty"` // 后付费或预付费
+	InstanceChargingType      bccapi.PaymentTimingType  `json:"instanceChargingType,omitempty"` // 后付费或预付费
 	InstancePreChargingOption InstancePreChargingOption `json:"instancePreChargingOption,omitempty"`
 
 	// 删除节点选项
@@ -73,10 +77,13 @@ type InstanceSpec struct {
 
 	Tags TagList `json:"tags,omitempty"`
 
-	Labels InstanceLabels `json:"labels,omitempty"`
-	Taints InstanceTaints `json:"taints,omitempty"`
+	Labels      InstanceLabels      `json:"labels,omitempty"`
+	Taints      InstanceTaints      `json:"taints,omitempty"`
+	Annotations InstanceAnnotations `json:"annotations,omitempty"`
 
 	CCEInstancePriority int `json:"cceInstancePriority,omitempty"`
+
+	AutoSnapshotID string `json:"autoSnapshotID,omitempty"` // 自动快照策略   ID
 }
 
 // VPCConfig 定义 Instance VPC
@@ -94,6 +101,8 @@ type VPCConfig struct {
 
 // InstanceResource 定义 Instance CPU/MEM/Disk 配置
 type InstanceResource struct {
+	MachineSpec string `json:"machineSpec,omitempty"` // 机器规格，例：bcc.g5.c2m8
+
 	CPU int `json:"cpu,omitempty"` // unit: Core
 	MEM int `json:"mem,omitempty"` // unit: GB
 
@@ -102,7 +111,7 @@ type InstanceResource struct {
 
 	// RootDisk
 	RootDiskType bccapi.StorageType `json:"rootDiskType,omitempty"`
-	RootDiskSize int             `json:"rootDiskSize,omitempty"` // unit: GB
+	RootDiskSize int                `json:"rootDiskSize,omitempty"` // unit: GB
 
 	// GPU 机器必须指定, 其他机器不用
 	LocalDiskSize int `json:"localDiskSize,omitempty"` // unit: GB
@@ -112,22 +121,22 @@ type InstanceResource struct {
 
 	// Only necessary when InstanceType = GPU
 	GPUType  GPUType `json:"gpuType,omitempty"`
-	GPUCount int         `json:"gpuCount,omitempty"`
+	GPUCount int     `json:"gpuCount,omitempty"`
 }
 
 // EIPOption 定义 Instance EIP 相关配置
 type EIPOption struct {
-	EIPName         string            `json:"eipName,omitempty"`
+	EIPName         string        `json:"eipName,omitempty"`
 	EIPChargingType BillingMethod `json:"eipChargeType,omitempty"`
-	EIPBandwidth    int               `json:"eipBandwidth,omitempty"`
+	EIPBandwidth    int           `json:"eipBandwidth,omitempty"`
 }
 
 // InstancePreChargingOption 定义付费相关配置
 type InstancePreChargingOption struct {
-	PurchaseTime      int    `json:"purchaseTime,omitempty"`            //  预付费才生效：单位月，12 = 12 月
-	AutoRenew         bool   `json:"autoRenew,omitempty"`                  // 是否自动续费
+	PurchaseTime      int    `json:"purchaseTime,omitempty"`      //  预付费才生效：单位月，12 = 12 月
+	AutoRenew         bool   `json:"autoRenew,omitempty"`         // 是否自动续费
 	AutoRenewTimeUnit string `json:"autoRenewTimeUnit,omitempty"` // 续费单位：月
-	AutoRenewTime     int    `json:"autoRenewTime,omitempty"`         // 12 = 12 个月
+	AutoRenewTime     int    `json:"autoRenewTime,omitempty"`     // 12 = 12 个月
 }
 
 // DeleteOption 删除节点选项
@@ -139,6 +148,8 @@ type DeleteOption struct {
 
 // BBCOption BBC 相关配置
 type BBCOption struct {
+	Flavor   string `json:"flavor,omitempty"`
+	DiskInfo string `json:"diskInfo,omitempty"`
 	// 是否保留数据
 	ReserveData bool `json:"reserveData,omitempty"`
 	// 磁盘阵列类型 ID
@@ -151,14 +162,26 @@ type BBCOption struct {
 type DeployCustomConfig struct {
 	// Docker相关配置
 	DockerConfig DockerConfig `json:"dockerConfig,omitempty"`
+	// containerd相关配置
+	ContainerdConfig ContainerdConfig `json:"containerdConfig,omitempty"`
 
 	// kubelet数据目录
 	KubeletRootDir string `json:"kubeletRootDir,omitempty"`
 	// 是否开启资源预留
 	EnableResourceReserved bool `json:"EnableResourceReserved,omitempty"`
-	// 资源预留配额,
-	// key:value: cpu: 100m, memory: 1000Mi
+	// k8s进程资源预留配额
+	// key:value: cpu: 50m, memory: 100Mi
 	KubeReserved map[string]string `json:"kubeReserved,omitempty"`
+	// 系统进程资源预留配额
+	// key:value: cpu: 50m, memory: 100Mi
+	SystemReserved map[string]string `json:"systemReserved,omitempty"`
+
+	// RegistryPullQPS, default: 5
+	RegistryPullQPS int `json:"registryPullQPS,omitempty"`
+	// RegistryBurst, default: 10
+	RegistryBurst int `json:"registryBurst,omitempty"`
+	// PodPidsLimit, default: -1
+	PodPidsLimit int `json:"podPidsLimit,omitempty"`
 
 	// 是否封锁节点
 	EnableCordon bool `json:"enableCordon,omitempty"`
@@ -167,8 +190,10 @@ type DeployCustomConfig struct {
 	PreUserScript string `json:"preUserScript,omitempty"`
 	// 部署后执行脚本, 前端 base64编码后传参
 	PostUserScript string `json:"postUserScript,omitempty"`
-}
 
+	// KubeletBindAddressType, kubelet bind address
+	KubeletBindAddressType KubeletBindAddressType `json:"kubeletBindAddressType,omitempty"`
+}
 
 // DockerConfig docker相关配置
 type DockerConfig struct {
@@ -180,6 +205,12 @@ type DockerConfig struct {
 	BIP                string   `json:"dockerBIP,omitempty"`          // docker0网桥网段， default: 169.254.30.1/28
 }
 
+// ContainerdConfig containerd相关配置
+type ContainerdConfig struct {
+	DataRoot           string   `json:"dataRoot,omitempty"`           // 自定义 containerd 数据目录
+	RegistryMirrors    []string `json:"registryMirrors,omitempty"`    // 自定义 RegistryMirrors
+	InsecureRegistries []string `json:"insecureRegistries,omitempty"` // 自定义 InsecureRegistries
+}
 
 // ExistedOption 已有实例相关配置
 type ExistedOption struct {
@@ -205,18 +236,18 @@ const (
 
 // CDSConfig clone from BCC
 type CDSConfig struct {
-	Path        string          `json:"diskPath,omitempty"`
+	Path        string             `json:"diskPath,omitempty"`
 	StorageType bccapi.StorageType `json:"storageType,omitempty"`
-	CDSSize     int             `json:"cdsSize,omitempty"`
-	SnapshotID  string          `json:"snapshotID,omitempty"`
+	CDSSize     int                `json:"cdsSize,omitempty"`
+	SnapshotID  string             `json:"snapshotID,omitempty"`
 }
 
 // MountConfig - 磁盘挂载信息
 type MountConfig struct {
-	Path        string          `json:"diskPath,omitempty"` // "/data"
-	CDSID       string          `json:"cdsID,omitempty"`
-	Device      string          `json:"device,omitempty"` // "/dev/vdb"
-	CDSSize     int             `json:"cdsSize,omitempty"`
+	Path        string             `json:"diskPath,omitempty"` // "/data"
+	CDSID       string             `json:"cdsID,omitempty"`
+	Device      string             `json:"device,omitempty"` // "/dev/vdb"
+	CDSSize     int                `json:"cdsSize,omitempty"`
 	StorageType bccapi.StorageType `json:"storageType,omitempty"`
 }
 
@@ -233,13 +264,13 @@ const (
 
 // InstanceOS defines the OS of BCC
 type InstanceOS struct {
-	ImageType  bccapi.ImageType `json:"imageType,omitempty"` // 镜像类型
-	ImageName  string             `json:"imageName,omitempty"` // 镜像名字: ubuntu-14.04.1-server-amd64-201506171832
-	OSType     OSType    `json:"osType,omitempty"`       // e.g. linux
-	OSName     OSName    `json:"osName,omitempty"`       // e.g. Ubuntu
-	OSVersion  string             `json:"osVersion,omitempty"` // e.g. 14.04.1 LTS
-	OSArch     string             `json:"osArch,omitempty"`       // e.g. x86_64 (64bit)
-	OSBuild    string             `json:"osBuild,omitempty"`     // e.g. 2015061700
+	ImageType bccapi.ImageType `json:"imageType,omitempty"` // 镜像类型
+	ImageName string           `json:"imageName,omitempty"` // 镜像名字: ubuntu-14.04.1-server-amd64-201506171832
+	OSType    OSType           `json:"osType,omitempty"`    // e.g. linux
+	OSName    OSName           `json:"osName,omitempty"`    // e.g. Ubuntu
+	OSVersion string           `json:"osVersion,omitempty"` // e.g. 14.04.1 LTS
+	OSArch    string           `json:"osArch,omitempty"`    // e.g. x86_64 (64bit)
+	OSBuild   string           `json:"osBuild,omitempty"`   // e.g. 2015061700
 }
 
 // InstancePhase CCE InstancePhase
@@ -271,6 +302,37 @@ const (
 	InstancePhaseDeleteFailed InstancePhase = "delete_failed"
 )
 
+// KubeletBindAddressType - kubelet bind address 类型
+type KubeletBindAddressType string
+
+const (
+	// KubeletBindAddressTypeAll - 0.0.0.0
+	KubeletBindAddressTypeAll KubeletBindAddressType = "all"
+
+	// KubeletBindAddressTypeLocal - 127.0.0.1
+	KubeletBindAddressTypeLocal KubeletBindAddressType = "local"
+
+	// KubeletBindAddressTypeHostIP - 主网卡 IP
+	KubeletBindAddressTypeHostIP KubeletBindAddressType = "hostip"
+)
+
+type BidOption struct {
+	// BidMode 竞价模式
+	BidMode BidMode `json:"bidMode,omitempty"`
+
+	// BidPrice 用户的出价, 仅在 BidMode=BidModeCustomPrice 模式下生效
+	BidPrice string `json:"bidPrice,omitempty"`
+
+	// BidTime 竞价超时时间, 单位: minute, 超时会取消该竞价实例订单
+	BidTimeout int `json:"bidTimeout,omitempty"`
+
+	// BidReleaseEIP 竞价实例被动释放时, 是否联动释放实例 EIP
+	BidReleaseEIP bool `json:"bidReleaseEIP,omitempty"`
+
+	// BidReleaseEIP 竞价实例被动释放时, 是否联动释放实例 CDS
+	BidReleaseCDS bool `json:"bidReleaseCDS,omitempty"`
+}
+
 type CDSConfigList []CDSConfig
 
 type TagList []Tag
@@ -278,3 +340,17 @@ type TagList []Tag
 type InstanceLabels map[string]string
 
 type InstanceTaints []Taint
+
+type InstanceAnnotations map[string]string
+
+type BBCFlavorID string
+
+type BidMode string
+
+const (
+	// BidModeMarketPrice 跟随市场价出价
+	BidModeMarketPrice BidMode = "MARKET_PRICE_BID"
+
+	// BidModeCustomPrice 用户自定义出价
+	BidModeCustomPrice BidMode = "CUSTOM_BID"
+)

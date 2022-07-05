@@ -31,6 +31,8 @@ type Interface interface {
 	GetInstance(args *GetInstanceArgs) (*GetInstanceResponse, error)
 	DeleteInstances(args *DeleteInstancesArgs) (*DeleteInstancesResponse, error)
 	ListInstancesByPage(args *ListInstancesByPageArgs) (*ListInstancesResponse, error)
+	CreateScaleUpInstanceGroupTask(args *CreateScaleUpInstanceGroupTaskArgs) (*CreateTaskResp, error)
+	CreateScaleDownInstanceGroupTask(args *CreateScaleDownInstanceGroupTaskArgs) (*CreateTaskResp, error)
 
 	GetClusterQuota() (*GetQuotaResponse, error)
 	GetClusterNodeQuota(clusterID string) (*GetQuotaResponse, error)
@@ -39,6 +41,12 @@ type Interface interface {
 	CheckClusterIPCIDR(args *CheckClusterIPCIDRArgs) (*CheckClusterIPCIDRResponse, error)
 	RecommendContainerCIDR(args *RecommendContainerCIDRArgs) (*RecommendContainerCIDRResponse, error)
 	RecommendClusterIPCIDR(args *RecommendClusterIPCIDRArgs) (*RecommendClusterIPCIDRResponse, error)
+
+	GetTask(args *GetTaskArgs) (*GetTaskResp, error)
+	ListTasks(args *ListTasksArgs) (*ListTaskResp, error)
+
+	GetInstanceCRD(args *GetInstanceCRDArgs) (*GetInstanceCRDResponse, error)
+	UpdateInstanceCRD(args *UpdateInstanceCRDRequest) (*CommonResponse, error)
 }
 
 //CreateCluterArgs为后续支持clientToken预留空间
@@ -71,6 +79,12 @@ type GetInstanceArgs struct {
 	InstanceID string
 }
 
+type GetInstanceCRDArgs struct {
+	ClusterID string
+	// cceInstanceID , cce 节点的唯一标志，不是底层机器的instanceID
+	CCEInstanceID string
+}
+
 type DeleteInstancesArgs struct {
 	ClusterID              string
 	DeleteInstancesRequest *DeleteInstancesRequest
@@ -95,12 +109,13 @@ type InstanceSet struct {
 
 // ListInstancesByPageParams - 分页查询集群实例列表参数
 type ListInstancesByPageParams struct {
-	KeywordType InstanceKeywordType `json:"keywordType"`
-	Keyword     string              `json:"keyword"`
-	OrderBy     InstanceOrderBy     `json:"orderBy"`
-	Order       Order               `json:"order"`
-	PageNo      int                 `json:"pageNo"`
-	PageSize    int                 `json:"pageSize"`
+	KeywordType          InstanceKeywordType `json:"keywordType"`
+	Keyword              string              `json:"keyword"`
+	OrderBy              InstanceOrderBy     `json:"orderBy"`
+	Order                Order               `json:"order"`
+	PageNo               int                 `json:"pageNo"`
+	PageSize             int                 `json:"pageSize"`
+	EnableInternalFields bool                `json:"enableInternalFields"`
 }
 
 // CreateClusterResponse - 创建 Cluster 返回
@@ -139,8 +154,8 @@ type CreateInstancesResponse struct {
 }
 
 type UpdateInstanceArgs struct {
-	ClusterID string
-	InstanceID string
+	ClusterID    string
+	InstanceID   string
 	InstanceSpec *types.InstanceSpec
 }
 
@@ -306,11 +321,31 @@ const (
 // Instance - 节点详情
 // 作为sdk返回结果的Instance
 type Instance struct {
-	Spec   *types.InstanceSpec   `json:"spec"`
-	Status *InstanceStatus `json:"status"`
+	Spec   *types.InstanceSpec `json:"spec"`
+	Status *InstanceStatus     `json:"status"`
 
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
+}
+
+type InstanceCRD struct {
+	ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   types.InstanceSpec `json:"spec,omitempty"`
+	Status InstanceStatus     `json:"status,omitempty"`
+}
+
+type ClusterCRD struct {
+	ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   types.ClusterSpec `json:"spec,omitempty"`
+	Status ClusterStatus     `json:"status,omitempty"`
+}
+
+type ObjectMeta struct {
+	Name         string `json:"name,omitempty"`
+	GenerateName string `json:"generateName,omitempty"`
+	ClusterName  string `json:"clusterName,omitempty"`
 }
 
 // InstanceStatus - Instance Status
@@ -769,4 +804,75 @@ func CheckKubeConfigType(kubeConfigType string) error {
 		return fmt.Errorf("KubeConfigType %s not valid", kubeConfigType)
 	}
 	return nil
+}
+
+type CreateScaleUpInstanceGroupTaskArgs struct {
+	ClusterID       string
+	InstanceGroupID string
+	TargetReplicas  int
+}
+
+type CreateScaleDownInstanceGroupTaskArgs struct {
+	ClusterID            string
+	InstanceGroupID      string
+	InstancesToBeRemoved []string
+}
+
+type CreateTaskResp struct {
+	CommonResponse
+	TaskID string `json:"taskID"`
+}
+
+type GetTaskArgs struct {
+	TaskType types.TaskType
+	TaskID   string
+}
+
+type ListTasksArgs struct {
+	TaskType types.TaskType
+	TargetID string
+	PageNo   int
+	PageSize int
+}
+
+type GetTaskResp struct {
+	CommonResponse
+	Task *types.Task `json:"task"`
+}
+
+type ListTaskResp struct {
+	CommonResponse
+	Page ListTaskPage
+}
+
+type ListTaskPage struct {
+	PageNo     int           `json:"pageNo,omitempty"`
+	PageSize   int           `json:"pageSize,omitempty"`
+	TotalCount int           `json:"totalCount"`
+	Items      []*types.Task `json:"items"`
+}
+
+type UpdateInstanceCRDRequest struct {
+	Instance *InstanceCRD `json:"instance"`
+}
+
+type GetInstanceCRDResponse struct {
+	Instance  *InstanceCRD `json:"instance"`
+	RequestID string       `json:"requestID"`
+}
+
+type GetClusterCRDArgs struct {
+	ClusterID string `json:"clusterID"`
+}
+
+type GetClusterCRDResponse struct {
+	Cluster   *ClusterCRD `json:"cluster"`
+	RequestID string      `json:"requestID"`
+}
+
+type UpdateClusterCRDArgs struct {
+	Cluster *ClusterCRD `json:"cluster"`
+}
+
+type UpdateClusterCRDResponses struct {
 }
