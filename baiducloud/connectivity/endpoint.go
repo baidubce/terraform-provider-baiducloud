@@ -110,6 +110,7 @@ var (
 	// Region BD Service Endpoints
 	RegionBDEndpoints = map[ServiceCode]string{
 		BCCCode: DefaultBDRegionBccEndPoint,
+		VPCCode: DefaultBDRegionBccEndPoint,
 	}
 
 	// Region GZ Service Endpoints
@@ -147,6 +148,7 @@ var (
 	// Region FSH Service Endpoints
 	RegionFSHEndpoints = map[ServiceCode]string{
 		BCCCode: DefaultFSHRegionBccEndPoint,
+		VPCCode: DefaultFSHRegionBccEndPoint,
 	}
 
 	// Region FWH Service Endpoints
@@ -168,11 +170,13 @@ var (
 	// Region HKG Service Endpoints
 	RegionHKGEndpoints = map[ServiceCode]string{
 		BCCCode: DefaultHKGRegionBccEndPoint,
+		VPCCode: DefaultHKGRegionBccEndPoint,
 	}
 
 	// Region SIN Service Endpoints
 	RegionSINEndpoints = map[ServiceCode]string{
 		BCCCode: DefaultSINRegionBccEndPoint,
+		VPCCode: DefaultSINRegionBccEndPoint,
 	}
 )
 
