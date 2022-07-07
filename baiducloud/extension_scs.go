@@ -19,3 +19,11 @@ const (
 	SCSStatusFlushFailed    = "Flush failed"
 	SCSStatusIsolated       = "isolated"
 )
+
+func SCSEngineIntegers() map[string]int {
+	return map[string]int{
+		"memcache": 1,
+		"redis":    2,
+		"PegaDB":   3,
+	}
+}

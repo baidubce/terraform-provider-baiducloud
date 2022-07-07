@@ -127,9 +127,11 @@ func resourceBaiduCloudScs() *schema.Resource {
 				ValidateFunc: validation.StringInSlice([]string{"3.2", "4.0"}, false),
 			},
 			"engine": {
-				Type:        schema.TypeString,
-				Description: "Engine of the instance. Available values are redis, memcache.",
-				Computed:    true,
+				Type:         schema.TypeString,
+				Description:  "Engine of the instance. Valid values: `memcache`, `redis`, `PegaDB`. Defaults to `redis`.",
+				Optional:     true,
+				Default:      "redis",
+				ValidateFunc: validation.StringInSlice([]string{"memcache", "redis", "PegaDB"}, false),
 			},
 			"vpc_id": {
 				Type:        schema.TypeString,
@@ -629,6 +631,10 @@ func buildBaiduCloudScsArgs(d *schema.ResourceData, meta interface{}) (*scs.Crea
 			subnetRequests[id] = cdsRequest
 		}
 		request.Subnets = subnetRequests
+	}
+
+	if engine, ok := d.GetOk("engine"); ok {
+		request.Engine = SCSEngineIntegers()[engine.(string)]
 	}
 
 	if diskFlavor, ok := d.GetOk("disk_flavor"); ok {
