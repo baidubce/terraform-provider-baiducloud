@@ -303,18 +303,18 @@ func resourceBaiduCloudScsCreate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	stateConf := buildStateConf(
-		[]string{SCSStatusStatusCreating},
-		[]string{SCSStatusStatusRunning},
+		[]string{SCSStatusCreating},
+		[]string{SCSStatusRunning},
 		d.Timeout(schema.TimeoutCreate),
 		scsService.InstanceStateRefresh(d.Id(), []string{
-			SCSStatusStatusPausing,
-			SCSStatusStatusPaused,
-			SCSStatusStatusDeleted,
-			SCSStatusStatusDeleting,
-			SCSStatusStatusFailed,
-			SCSStatusStatusModifying,
-			SCSStatusStatusModifyfailed,
-			SCSStatusStatusExpire,
+			SCSStatusPausing,
+			SCSStatusPaused,
+			SCSStatusDeleted,
+			SCSStatusDeleting,
+			SCSStatusFailed,
+			SCSStatusModifying,
+			SCSStatusModifyFailed,
+			SCSStatusExpire,
 		}),
 	)
 	if _, err := stateConf.WaitForState(); err != nil {
@@ -434,12 +434,12 @@ func resourceBaiduCloudScsDelete(d *schema.ResourceData, meta interface{}) error
 	}
 
 	stateConf := buildStateConf(
-		[]string{SCSStatusStatusRunning,
-			SCSStatusStatusDeleting,
-			SCSStatusStatusPausing},
-		[]string{SCSStatusStatusPaused,
-			SCSStatusStatusDeleted,
-			SCSSTatusStatusIsolated},
+		[]string{SCSStatusRunning,
+			SCSStatusDeleting,
+			SCSStatusPausing},
+		[]string{SCSStatusPaused,
+			SCSStatusDeleted,
+			SCSStatusIsolated},
 		d.Timeout(schema.TimeoutDelete),
 		scsService.InstanceStateRefresh(instanceId, []string{}),
 	)
@@ -610,8 +610,8 @@ func updateInstanceNodeType(d *schema.ResourceData, meta interface{}, instanceID
 		}
 
 		stateConf := buildStateConf(
-			[]string{SCSStatusStatusModifying},
-			[]string{SCSStatusStatusRunning},
+			[]string{SCSStatusModifying},
+			[]string{SCSStatusRunning},
 			d.Timeout(schema.TimeoutUpdate),
 			scsService.InstanceStateRefresh(d.Id(), []string{}),
 		)
@@ -654,8 +654,8 @@ func updateInstanceShardNum(d *schema.ResourceData, meta interface{}, instanceID
 		}
 
 		stateConf := buildStateConf(
-			[]string{SCSStatusStatusModifying},
-			[]string{SCSStatusStatusRunning},
+			[]string{SCSStatusModifying},
+			[]string{SCSStatusRunning},
 			d.Timeout(schema.TimeoutCreate),
 			scsService.InstanceStateRefresh(d.Id(), []string{}),
 		)
