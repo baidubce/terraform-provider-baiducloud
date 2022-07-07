@@ -211,6 +211,26 @@ func resourceBaiduCloudScs() *schema.Resource {
 					},
 				},
 			},
+			"payment_timing": {
+				Type:         schema.TypeString,
+				Description:  "Payment timing of billing, Valid values: `Prepaid`, `Postpaid`.",
+				Optional:     true,
+				ValidateFunc: validatePaymentTiming(),
+			},
+			"reservation_length": {
+				Type:             schema.TypeInt,
+				Description:      "Prepaid billing reservation length, only useful when `payment_timing` is `Prepaid`. Valid values: `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `12`, `24`, `36`",
+				Optional:         true,
+				DiffSuppressFunc: postPaidDiffSuppressFunc,
+				ValidateFunc:     validateReservationLength(),
+			},
+			"reservation_time_unit": {
+				Type:             schema.TypeString,
+				Description:      "Prepaid billing reservation time unit, only useful when `payment_timing` is `Prepaid`. Only support `month` now.",
+				Optional:         true,
+				DiffSuppressFunc: postPaidDiffSuppressFunc,
+				ValidateFunc:     validateReservationUnit(),
+			},
 			"auto_renew_time_unit": {
 				Type:        schema.TypeString,
 				Description: "Time unit of automatic renewal, the value can be month or year. The default value is empty, indicating no automatic renewal. It is valid only when the payment_timing is Prepaid.",
@@ -255,11 +275,6 @@ func resourceBaiduCloudScs() *schema.Resource {
 			"used_capacity": {
 				Type:        schema.TypeInt,
 				Description: "Memory capacity(GB) of the instance to be used.",
-				Computed:    true,
-			},
-			"payment_timing": {
-				Type:        schema.TypeString,
-				Description: "SCS payment timing",
 				Computed:    true,
 			},
 			"zone_names": {
@@ -544,6 +559,7 @@ func buildBaiduCloudScsArgs(d *schema.ResourceData, meta interface{}) (*scs.Crea
 		ClientToken: buildClientToken(),
 	}
 
+	// billing is deprecated
 	if v, ok := d.GetOk("billing"); ok {
 		billing := v.(map[string]interface{})
 		billingRequest := scs.Billing{
@@ -554,7 +570,7 @@ func buildBaiduCloudScsArgs(d *schema.ResourceData, meta interface{}) (*scs.Crea
 			paymentTiming := p.(string)
 			billingRequest.PaymentTiming = paymentTiming
 		}
-		if billingRequest.PaymentTiming == PaymentTimingPostpaid {
+		if billingRequest.PaymentTiming == PaymentTimingPrepaid {
 			if r, ok := billing["reservation"]; ok {
 				reservation := r.(map[string]interface{})
 				if reservationLength, ok := reservation["reservation_length"]; ok {
@@ -564,17 +580,38 @@ func buildBaiduCloudScsArgs(d *schema.ResourceData, meta interface{}) (*scs.Crea
 					billingRequest.Reservation.ReservationTimeUnit = reservationTimeUnit.(string)
 				}
 			}
-			// if the field is set, then auto-renewal is effective.
-			if v, ok := d.GetOk("auto_renew_time_unit"); ok {
-				request.AutoRenewTimeUnit = v.(string)
+		}
+		request.Billing = billingRequest
+	}
 
-				if v, ok := d.GetOk("auto_renew_time_length"); ok {
-					request.AutoRenewTime = v.(int)
-				}
+	if paymentTiming, ok := d.GetOk("payment_timing"); ok {
+		billingRequest := scs.Billing{
+			PaymentTiming: paymentTiming.(string),
+			Reservation:   &scs.Reservation{},
+		}
+		if billingRequest.PaymentTiming == PaymentTimingPrepaid {
+			if length, ok := d.GetOk("reservation_length"); ok {
+				billingRequest.Reservation.ReservationLength = length.(int)
+			}
+			if timeUnit, ok := d.GetOk("reservation_time_unit"); ok {
+				billingRequest.Reservation.ReservationTimeUnit = timeUnit.(string)
 			}
 		}
-
 		request.Billing = billingRequest
+	}
+
+	if request.Billing.PaymentTiming == "" {
+		return nil, Error(InvalidInputField, "payment_timing")
+	}
+
+	if request.Billing.PaymentTiming == PaymentTimingPrepaid {
+		// if the field is set, then auto-renewal is effective.
+		if v, ok := d.GetOk("auto_renew_time_unit"); ok {
+			request.AutoRenewTimeUnit = v.(string)
+			if v, ok := d.GetOk("auto_renew_time_length"); ok {
+				request.AutoRenewTime = v.(int)
+			}
+		}
 	}
 
 	if purchaseCount, ok := d.GetOk("purchase_count"); ok {
