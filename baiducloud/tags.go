@@ -28,6 +28,18 @@ func tagsComputedSchema() *schema.Schema {
 	}
 }
 
+func tagsCreationSchema() *schema.Schema {
+	return &schema.Schema{
+		Type:        schema.TypeMap,
+		Description: "Tags, support setting when creating instance, do not support modify",
+		Optional:    true,
+		Computed:    true,
+		Elem: &schema.Schema{
+			Type: schema.TypeString,
+		},
+	}
+}
+
 func flattenTagsToMap(tags []model.TagModel) map[string]string {
 	tagMap := make(map[string]string)
 	for _, tag := range tags {

@@ -241,7 +241,7 @@ func resourceBaiduCloudScs() *schema.Resource {
 				Description: "The time length of automatic renewal. It is valid when payment_timing is Prepaid, and the value should be 1-9 when the auto_renew_time_unit is month and 1-3 when the auto_renew_time_unit is year. Default to 1.",
 				Computed:    true,
 			},
-			"tags": tagsComputedSchema(),
+			"tags": tagsCreationSchema(),
 			"auto_renew": {
 				Type:        schema.TypeBool,
 				Description: "Whether to automatically renew.",
@@ -693,6 +693,10 @@ func buildBaiduCloudScsArgs(d *schema.ResourceData, meta interface{}) (*scs.Crea
 	if info, ok := d.GetOk("replication_info"); ok {
 		inputList := info.([]interface{})
 		request.ReplicationInfo = transSchemaToReplicationInfo(inputList)
+	}
+
+	if tags, ok := d.GetOk("tags"); ok {
+		request.Tags = tranceTagMapToModel(tags.(map[string]interface{}))
 	}
 
 	return request, nil
