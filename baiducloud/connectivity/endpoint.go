@@ -38,6 +38,8 @@ const (
 	DefaultBJRegionRdsEndPoint = "rds.bj.baidubce.com"
 	DefaultBJRegionDtsEndPoint = "rds.bj.baidubce.com"
 
+	DefaultBDRegionBccEndPoint = "bcc.bd.baidubce.com"
+
 	DefaultGZRegionBccEndPoint = "bcc.gz.baidubce.com"
 	DefaultGZRegionEipEndPoint = "eip.gz.baidubce.com"
 	DefaultGZRegionBlbEndPoint = "blb.gz.baidubce.com"
@@ -56,6 +58,8 @@ const (
 	DefaultSURegionScsEndPoint = "redis.su.baidubce.com"
 	DefaultSURegionRdsEndPoint = "rds.su.baidubce.com"
 
+	DefaultFSHRegionBccEndPoint = "bcc.fsh.baidubce.com"
+
 	DefaultFWHRegionBccEndPoint = "bcc.fwh.baidubce.com"
 	DefaultFWHRegionEipEndPoint = "eip.fwh.baidubce.com"
 	DefaultFWHRegionBlbEndPoint = "blb.fwh.baidubce.com"
@@ -65,6 +69,10 @@ const (
 	DefaultFWHRegionScsEndPoint = "redis.fwh.baidubce.com"
 	DefaultFWHRegionRdsEndPoint = "rds.fwh.baidubce.com"
 
+	DefaultHKGRegionBccEndPoint = "bcc.hkg.baidubce.com"
+
+	DefaultSINRegionBccEndPoint = "bcc.sin.baidubce.com"
+
 	DefaultCERTEndPoint = "certificate.baidubce.com"
 	DefaultIAMEndPoint  = "iam.bj.baidubce.com"
 )
@@ -73,9 +81,13 @@ var (
 	// Default Region Endpoints
 	DefaultRegionEndpoints = map[Region]map[ServiceCode]string{
 		RegionBeiJing:   RegionBJEndpoints,
+		RegionBaoDing:   RegionBDEndpoints,
 		RegionGuangZhou: RegionGZEndpoints,
 		RegionSuZhou:    RegionSUEndpoints,
+		RegionShangHai:  RegionFSHEndpoints,
 		RegionWuHan:     RegionFWHEndpoints,
+		RegionHongKong:  RegionHKGEndpoints,
+		RegionSingapore: RegionSINEndpoints,
 	}
 
 	// Region BJ Service Endpoints
@@ -93,6 +105,11 @@ var (
 		RDSCode:    DefaultBJRegionRdsEndPoint,
 		DTSCode:    DefaultBJRegionDtsEndPoint,
 		IAMCode:    DefaultIAMEndPoint,
+	}
+
+	// Region BD Service Endpoints
+	RegionBDEndpoints = map[ServiceCode]string{
+		BCCCode: DefaultBDRegionBccEndPoint,
 	}
 
 	// Region GZ Service Endpoints
@@ -127,6 +144,11 @@ var (
 		IAMCode:    DefaultIAMEndPoint,
 	}
 
+	// Region FSH Service Endpoints
+	RegionFSHEndpoints = map[ServiceCode]string{
+		BCCCode: DefaultFSHRegionBccEndPoint,
+	}
+
 	// Region FWH Service Endpoints
 	RegionFWHEndpoints = map[ServiceCode]string{
 		BCCCode:    DefaultFWHRegionBccEndPoint,
@@ -142,9 +164,19 @@ var (
 		RDSCode:    DefaultFWHRegionRdsEndPoint,
 		IAMCode:    DefaultIAMEndPoint,
 	}
+
+	// Region HKG Service Endpoints
+	RegionHKGEndpoints = map[ServiceCode]string{
+		BCCCode: DefaultHKGRegionBccEndPoint,
+	}
+
+	// Region SIN Service Endpoints
+	RegionSINEndpoints = map[ServiceCode]string{
+		BCCCode: DefaultSINRegionBccEndPoint,
+	}
 )
 
-//xml
+// Endpoints xml struct
 type Endpoints struct {
 	Endpoint []Endpoint `xml:"Endpoint"`
 }
