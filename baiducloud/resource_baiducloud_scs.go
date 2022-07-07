@@ -268,6 +268,29 @@ func resourceBaiduCloudScs() *schema.Resource {
 					Type: schema.TypeString,
 				},
 			},
+			"store_type": {
+				Type:        schema.TypeInt,
+				Description: "Store type of the instance. Valid values: `0`(high performance memory), `1`(ssd local disk), `3`(capacity storage, only for PegaDB).",
+				Optional:    true,
+			},
+			"enable_read_only": {
+				Type:         schema.TypeInt,
+				Description:  "Whether the copies are read only. Valid values: `1`(enabled), `2`(disabled). Defaults to `2`.",
+				Optional:     true,
+				Default:      2,
+				ValidateFunc: validation.IntInSlice([]int{1, 2}),
+			},
+			"disk_flavor": {
+				Type:         schema.TypeInt,
+				Description:  "Storage size(GB) when use PegaDB. Must be between `50` and `160`",
+				Optional:     true,
+				ValidateFunc: validation.IntBetween(50, 160),
+			},
+			"disk_type": {
+				Type:        schema.TypeString,
+				Description: "Disk type of the instance. Valid values: `cloud_hp1`, `enhanced_ssd_pl1`.",
+				Optional:    true,
+			},
 			"replication_info": {
 				Type:        schema.TypeList,
 				Description: "Replica info of the instance. Adding and removing replicas at same time in one operation is not supported.",
@@ -606,6 +629,22 @@ func buildBaiduCloudScsArgs(d *schema.ResourceData, meta interface{}) (*scs.Crea
 			subnetRequests[id] = cdsRequest
 		}
 		request.Subnets = subnetRequests
+	}
+
+	if diskFlavor, ok := d.GetOk("disk_flavor"); ok {
+		request.DiskFlavor = diskFlavor.(int)
+	}
+
+	if diskType, ok := d.GetOk("disk_type"); ok {
+		request.DiskType = diskType.(string)
+	}
+
+	if storeType, ok := d.GetOk("store_type"); ok {
+		request.StoreType = storeType.(int)
+	}
+
+	if enableReadOnly, ok := d.GetOk("enable_read_only"); ok {
+		request.EnableReadOnly = enableReadOnly.(int)
 	}
 
 	if info, ok := d.GetOk("replication_info"); ok {
