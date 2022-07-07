@@ -475,8 +475,8 @@ func resourceBaiduCloudScsUpdate(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	// update instance nodeType
-	if err := updateInstanceNodeType(d, meta, instanceID); err != nil {
+	// update instance nodeType/diskFlavor
+	if err := updateInstanceNodeTypeAndDiskFlavor(d, meta, instanceID); err != nil {
 		return err
 	}
 
@@ -694,14 +694,22 @@ func updateScsInstanceName(d *schema.ResourceData, meta interface{}, instanceID 
 	return nil
 }
 
-func updateInstanceNodeType(d *schema.ResourceData, meta interface{}, instanceID string) error {
-	action := "Update scs nodeType " + instanceID
+func updateInstanceNodeTypeAndDiskFlavor(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	action := "Update scs nodeType/diskFlavor " + instanceID
 	client := meta.(*connectivity.BaiduClient)
 	scsService := ScsService{client}
 
-	if d.HasChange("node_type") && "master_slave" == d.Get("cluster_type").(string) {
+	if d.HasChange("node_type") || (d.HasChange("disk_flavor") && "PegaDB" == d.Get("engine").(string)) {
+		shardNum := d.Get("shard_num")
+		if d.HasChange("shard_num") {
+			shardNum, _ = d.GetChange("shard_num")
+		}
+
 		args := &scs.ResizeInstanceArgs{
-			NodeType: d.Get("node_type").(string),
+			ClientToken: buildClientToken(),
+			NodeType:    d.Get("node_type").(string),
+			DiskFlavor:  d.Get("disk_flavor").(int),
+			ShardNum:    shardNum.(int),
 		}
 
 		addDebug(action, args)
@@ -733,6 +741,7 @@ func updateInstanceNodeType(d *schema.ResourceData, meta interface{}, instanceID
 		}
 
 		d.SetPartial("node_type")
+		d.SetPartial("disk_flavor")
 	}
 
 	return nil
@@ -745,7 +754,10 @@ func updateInstanceShardNum(d *schema.ResourceData, meta interface{}, instanceID
 
 	if d.HasChange("shard_num") && "cluster" == d.Get("cluster_type").(string) {
 		args := &scs.ResizeInstanceArgs{
-			ShardNum: d.Get("shard_num").(int),
+			ClientToken: buildClientToken(),
+			NodeType:    d.Get("node_type").(string),
+			DiskFlavor:  d.Get("disk_flavor").(int),
+			ShardNum:    d.Get("shard_num").(int),
 		}
 
 		addDebug(action, args)
