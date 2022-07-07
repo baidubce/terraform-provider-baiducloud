@@ -1,6 +1,7 @@
 package connectivity
 
 import (
+	"fmt"
 	"github.com/baidubce/bce-sdk-go/auth"
 	"github.com/baidubce/bce-sdk-go/services/appblb"
 	"github.com/baidubce/bce-sdk-go/services/bcc"
@@ -47,6 +48,8 @@ type BaiduClient struct {
 type ApiVersion string
 
 var goSdkMutex = sync.RWMutex{} // The Go SDK is not thread-safe
+
+var providerVersion = "1.13.0"
 
 // Client for BaiduCloudClient
 func (c *Config) Client() (*BaiduClient, error) {
@@ -126,7 +129,7 @@ func (client *BaiduClient) WithBccClient(do func(*bcc.Client) (interface{}, erro
 			return nil, err
 		}
 		bccClient.Config.Credentials = client.Credentials
-
+		bccClient.Config.UserAgent = buildUserAgent()
 		client.bccConn = bccClient
 	}
 	goSdkMutex.Unlock()
@@ -145,7 +148,7 @@ func (client *BaiduClient) WithVpcClient(do func(*vpc.Client) (interface{}, erro
 			return nil, err
 		}
 		vpcClient.Config.Credentials = client.Credentials
-
+		vpcClient.Config.UserAgent = buildUserAgent()
 		client.vpcConn = vpcClient
 	}
 
@@ -164,7 +167,7 @@ func (client *BaiduClient) WithEipClient(do func(*eip.Client) (interface{}, erro
 			return nil, err
 		}
 		eipClient.Config.Credentials = client.Credentials
-
+		eipClient.Config.UserAgent = buildUserAgent()
 		client.eipConn = eipClient
 	}
 
@@ -183,7 +186,7 @@ func (client *BaiduClient) WithAppBLBClient(do func(*appblb.Client) (interface{}
 			return nil, err
 		}
 		appBlbClient.Config.Credentials = client.Credentials
-
+		appBlbClient.Config.UserAgent = buildUserAgent()
 		client.appBlbConn = appBlbClient
 	}
 
@@ -202,7 +205,7 @@ func (client *BaiduClient) WithBosClient(do func(*bos.Client) (interface{}, erro
 			return nil, err
 		}
 		bosClient.Config.Credentials = client.Credentials
-
+		bosClient.Config.UserAgent = buildUserAgent()
 		client.bosConn = bosClient
 	}
 
@@ -221,7 +224,7 @@ func (client *BaiduClient) WithCertClient(do func(*cert.Client) (interface{}, er
 			return nil, err
 		}
 		certClient.Config.Credentials = client.Credentials
-
+		certClient.Config.UserAgent = buildUserAgent()
 		client.certConn = certClient
 	}
 
@@ -240,7 +243,7 @@ func (client *BaiduClient) WithCFCClient(do func(*cfc.Client) (interface{}, erro
 			return nil, err
 		}
 		cfcClient.Config.Credentials = client.Credentials
-
+		cfcClient.Config.UserAgent = buildUserAgent()
 		client.cfcConn = cfcClient
 	}
 
@@ -259,7 +262,7 @@ func (client *BaiduClient) WithScsClient(do func(*scs.Client) (interface{}, erro
 			return nil, err
 		}
 		scsClient.Config.Credentials = client.Credentials
-
+		scsClient.Config.UserAgent = buildUserAgent()
 		client.scsConn = scsClient
 	}
 
@@ -278,7 +281,7 @@ func (client *BaiduClient) WithCCEClient(do func(*cce.Client) (interface{}, erro
 			return nil, err
 		}
 		cceClient.Config.Credentials = client.Credentials
-
+		cceClient.Config.UserAgent = buildUserAgent()
 		client.cceConn = cceClient
 	}
 
@@ -297,7 +300,7 @@ func (client *BaiduClient) WithCCEv2Client(do func(*ccev2.Client) (interface{}, 
 			return nil, err
 		}
 		ccev2Client.Config.Credentials = client.Credentials
-
+		ccev2Client.Config.UserAgent = buildUserAgent()
 		client.ccev2Conn = ccev2Client
 	}
 
@@ -316,7 +319,7 @@ func (client *BaiduClient) WithRdsClient(do func(*rds.Client) (interface{}, erro
 			return nil, err
 		}
 		rdsClient.Config.Credentials = client.Credentials
-
+		rdsClient.Config.UserAgent = buildUserAgent()
 		client.rdsConn = rdsClient
 	}
 
@@ -335,6 +338,7 @@ func (client *BaiduClient) WithDtsClient(do func(*dts.Client) (interface{}, erro
 		if err != nil {
 			return nil, err
 		}
+		dtsClient.Config.UserAgent = buildUserAgent()
 		client.dtsConn = dtsClient
 	}
 
@@ -353,8 +357,13 @@ func (client *BaiduClient) WithIamClient(do func(*iam.Client) (interface{}, erro
 		if err != nil {
 			return nil, err
 		}
+		iamClient.Config.UserAgent = buildUserAgent()
 		client.iamConn = iamClient
 	}
 
 	return do(client.iamConn)
+}
+
+func buildUserAgent() string {
+	return fmt.Sprintf("terraform-provider-baiducloud/%s", providerVersion)
 }
