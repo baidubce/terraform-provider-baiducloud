@@ -71,6 +71,7 @@ const (
 )
 
 const GetFailTargetStatus = "Get Fail target status: %s."
+const InvalidInputField = "Input field %s is invalid."
 
 var (
 	// bcc error

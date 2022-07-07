@@ -32,6 +32,7 @@ $ terraform import baiducloud_scs.default id
 package baiducloud
 
 import (
+	"strings"
 	"time"
 
 	"github.com/baidubce/bce-sdk-go/bce"
@@ -267,6 +268,37 @@ func resourceBaiduCloudScs() *schema.Resource {
 					Type: schema.TypeString,
 				},
 			},
+			"replication_info": {
+				Type:        schema.TypeList,
+				Description: "Replica info of the instance. Adding and removing replicas at same time in one operation is not supported.",
+				Optional:    true,
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"availability_zone": {
+							Type:        schema.TypeString,
+							Description: "Availability zone of the replica. e.g. `cn-bj-a`.",
+							Required:    true,
+						},
+						"subnet_id": {
+							Type:        schema.TypeString,
+							Description: "Subnet id of the replica.",
+							Required:    true,
+						},
+						"is_master": {
+							Type:        schema.TypeInt,
+							Description: "Whether the replica is master node. Valid values: `1`(master node), `0`(slave node).",
+							Required:    true,
+						},
+					},
+				},
+			},
+			"replication_resize_type": {
+				Type:         schema.TypeString,
+				Description:  "Replica resize type. Must set when change `replication_info`. Valid values: `add`, `delete`.",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice([]string{"add", "delete"}, false),
+			},
 		},
 	}
 }
@@ -366,6 +398,7 @@ func resourceBaiduCloudScsRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("subnets", transSubnetsToSchema(result.Subnets))
 	d.Set("auto_renew", result.AutoRenew)
 	d.Set("tags", flattenTagsToMap(result.Tags))
+	d.Set("replication_info", transReplicationInfoToSchema(result.ReplicationInfo))
 
 	return nil
 }
@@ -379,6 +412,32 @@ func transSubnetsToSchema(subnets []scs.Subnet) []map[string]string {
 		subnetList = append(subnetList, subnetMap)
 	}
 	return subnetList
+}
+
+func transReplicationInfoToSchema(replicationInfo []scs.Replication) []map[string]interface{} {
+	var schemaList []map[string]interface{}
+	for _, replication := range replicationInfo {
+		replicationMap := make(map[string]interface{})
+		replicationMap["availability_zone"] = replication.AvailabilityZone
+		replicationMap["subnet_id"] = replication.SubnetId
+		replicationMap["is_master"] = replication.IsMaster
+		schemaList = append(schemaList, replicationMap)
+	}
+	return schemaList
+}
+
+func transSchemaToReplicationInfo(schema []interface{}) []scs.Replication {
+	replicationInfo := make([]scs.Replication, len(schema))
+	for id := range schema {
+		input := schema[id].(map[string]interface{})
+		replication := scs.Replication{
+			AvailabilityZone: input["availability_zone"].(string),
+			SubnetId:         input["subnet_id"].(string),
+			IsMaster:         input["is_master"].(int),
+		}
+		replicationInfo[id] = replication
+	}
+	return replicationInfo
 }
 
 func resourceBaiduCloudScsUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -398,6 +457,11 @@ func resourceBaiduCloudScsUpdate(d *schema.ResourceData, meta interface{}) error
 
 	// update instance shardNum
 	if err := updateInstanceShardNum(d, meta, instanceID); err != nil {
+		return err
+	}
+
+	// update instance replicationInfo
+	if err := updateInstanceReplicationInfo(d, meta, instanceID); err != nil {
 		return err
 	}
 
@@ -544,8 +608,12 @@ func buildBaiduCloudScsArgs(d *schema.ResourceData, meta interface{}) (*scs.Crea
 		request.Subnets = subnetRequests
 	}
 
-	return request, nil
+	if info, ok := d.GetOk("replication_info"); ok {
+		inputList := info.([]interface{})
+		request.ReplicationInfo = transSchemaToReplicationInfo(inputList)
+	}
 
+	return request, nil
 }
 
 func updateScsInstanceName(d *schema.ResourceData, meta interface{}, instanceID string) error {
@@ -663,6 +731,54 @@ func updateInstanceShardNum(d *schema.ResourceData, meta interface{}, instanceID
 			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
 		}
 		d.SetPartial("shard_num")
+	}
+
+	return nil
+}
+
+func updateInstanceReplicationInfo(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	action := "Update scs replicationInfo " + instanceID
+	client := meta.(*connectivity.BaiduClient)
+	scsService := ScsService{client}
+
+	if d.HasChange("replication_info") {
+		resizeType, ok := d.GetOk("replication_resize_type")
+		if !ok {
+			return Error(InvalidInputField, "replication_resize_type")
+		}
+		isAddReplication := strings.HasPrefix(resizeType.(string), "add")
+
+		args := &scs.ReplicationArgs{
+			ResizeType:      d.Get("replication_resize_type").(string),
+			ReplicationInfo: transSchemaToReplicationInfo(d.Get("replication_info").([]interface{})),
+		}
+
+		addDebug(action, args)
+		err := resource.Retry(d.Timeout(schema.TimeoutUpdate), func() *resource.RetryError {
+			_, err := client.WithScsClient(func(scsClient *scs.Client) (interface{}, error) {
+				if isAddReplication {
+					return nil, scsClient.AddReplication(instanceID, args)
+				}
+				return nil, scsClient.DeleteReplication(instanceID, args)
+			})
+			if err != nil {
+				if IsExceptedErrors(err, []string{InvalidInstanceStatus, OperationException, bce.EINTERNAL_ERROR}) {
+					return resource.RetryableError(err)
+				}
+				return resource.NonRetryableError(err)
+			}
+			return nil
+		})
+
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
+		}
+
+		stateConf := buildStateConf([]string{SCSStatusModifying}, []string{SCSStatusRunning}, d.Timeout(schema.TimeoutCreate), scsService.InstanceStateRefresh(d.Id(), []string{}))
+		if _, err := stateConf.WaitForState(); err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
+		}
+		d.SetPartial("replication_info")
 	}
 
 	return nil
