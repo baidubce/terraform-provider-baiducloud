@@ -1,4 +1,8 @@
-	## 1.13.0 (Unreleased)
+	## 1.14.0 (Unreleased)
+## 1.13.0 (July 07, 2022)
+ENHANCEMENTS:
+- BCC/VPC related service now support region `bd`(BaoDing), `fsh`(ShangHai), `hkg`(HongKong), `sin`(Singapore) 
+
 ## 1.12.9 (June 30, 2022)
 NOTES:
 - ADD bcc max parallelism note
