@@ -86,6 +86,7 @@ The following arguments are supported:
 * `instance_name` - (Required) Name of the instance. Support for uppercase and lowercase letters, numbers, Chinese and special characters, such as `-`, `_`, `/`, `.`. Must start with a letter, length 1-65.
 * `node_type` - (Required) Node type of the instance. e.g. `cache.n1.micro`. To learn about supported node type, see documentation on [Supported Node Types](https://cloud.baidu.com/doc/SCS/s/1jwvxtsh0#%E5%AE%9E%E4%BE%8B%E8%A7%84%E6%A0%BC)
 * `billing` - (Optional) **Deprecated**. Use `payment_timing`, `reservation_length`, `reservation_time_unit` instead. Billing information of the Scs.
+* `client_auth` - (Optional, Sensitive) Access password of the instance. Should be 8-16 characters, and contains at least two types of letters, numbers and symbols. Allowed symbols include `$ ^ * ( ) _ + - =`.
 * `cluster_type` - (Optional, ForceNew) Type of the instance. If `engine` is `memcache`, must be `default`. Valid values for other engine type: `cluster`, `master_slave`.  Defaults to `master_slave`.
 * `disk_flavor` - (Optional) Storage size(GB) when use PegaDB. Must be between `50` and `160`
 * `disk_type` - (Optional) Disk type of the instance. Valid values: `cloud_hp1`, `enhanced_ssd_pl1`.

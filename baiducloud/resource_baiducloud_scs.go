@@ -330,6 +330,12 @@ func resourceBaiduCloudScs() *schema.Resource {
 					Type: schema.TypeString,
 				},
 			},
+			"client_auth": {
+				Type:        schema.TypeString,
+				Description: "Access password of the instance. Should be 8-16 characters, and contains at least two types of letters, numbers and symbols. Allowed symbols include `$ ^ * ( ) _ + - =`.",
+				Optional:    true,
+				Sensitive:   true,
+			},
 			"store_type": {
 				Type:        schema.TypeInt,
 				Description: "Store type of the instance. Valid values: `0`(high performance memory), `1`(ssd local disk), `3`(capacity storage, only for PegaDB).",
@@ -724,6 +730,10 @@ func buildBaiduCloudScsArgs(d *schema.ResourceData, meta interface{}) (*scs.Crea
 
 	if diskType, ok := d.GetOk("disk_type"); ok {
 		request.DiskType = diskType.(string)
+	}
+
+	if clientAuth, ok := d.GetOk("client_auth"); ok {
+		request.ClientAuth = clientAuth.(string)
 	}
 
 	if storeType, ok := d.GetOk("store_type"); ok {
