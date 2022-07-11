@@ -1,4 +1,16 @@
-	## 1.14.0 (Unreleased)
+	## 1.15.0 (Unreleased)
+## 1.14.0 (July 11, 2022)
+ENHANCEMENTS:
+- resource/baiducloud_scs: Attribute `engine` now supports new value `PegaDB`
+- resource/baiducloud_scs: Attribute `tag` now supports specifying when creating.
+- resource/baiducloud_scs: Add new attributes `client_auth`, `store_type`, `enable_read_only`, `disk_type`, `replication_resize_type`, `reservation_length`, `reservation_time_unit`
+- resource/baiducloud_scs: Add new attributes `disk_flavor`, `replication_info`, and both support modification
+- resource/baiducloud_scs: Remove `ForceNew` behavior from attribute `engine_version`, `shard_num`, `vpc_id`
+- resource/baiducloud_instance: Remove `ForceNew` behavior from attribute `card_count` 
+
+BUG FIXES:
+- resource/baiducloud_scs: Attribute `billing` is deprecated, use `payment_timing`, `reservation_length`, `reservation_time_unit` instead.
+
 ## 1.13.0 (July 07, 2022)
 ENHANCEMENTS:
 - BCC/VPC related service now support region `bd`(BaoDing), `fsh`(ShangHai), `hkg`(HongKong), `sin`(Singapore) 
