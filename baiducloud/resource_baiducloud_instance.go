@@ -264,7 +264,6 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Count of the GPU cards or FPGA cards to be carried for the instance to be created, it is valid only when the gpu_card or fpga_card field is not empty.",
 				Optional:    true,
-				ForceNew:    true,
 			},
 			"auto_renew_time_unit": {
 				Type:         schema.TypeString,
