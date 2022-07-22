@@ -3,7 +3,7 @@ package baiducloud
 import (
 	"strings"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func postPaidDiffSuppressFunc(k, old, new string, d *schema.ResourceData) bool {

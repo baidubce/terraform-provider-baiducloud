@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	ccev2 "github.com/baidubce/bce-sdk-go/services/cce/v2"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 )
 

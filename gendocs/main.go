@@ -13,7 +13,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
 	cloud "github.com/terraform-providers/terraform-provider-baiducloud/baiducloud"
 )

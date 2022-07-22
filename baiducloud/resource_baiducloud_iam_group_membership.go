@@ -23,7 +23,7 @@ package baiducloud
 import (
 	"github.com/baidubce/bce-sdk-go/services/iam"
 	"github.com/baidubce/bce-sdk-go/services/iam/api"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 	"time"
 )

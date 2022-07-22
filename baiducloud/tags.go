@@ -2,7 +2,7 @@ package baiducloud
 
 import (
 	"github.com/baidubce/bce-sdk-go/model"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func tagsSchema() *schema.Schema {

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/baidubce/bce-sdk-go/services/bcc/api"
-	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
 const (

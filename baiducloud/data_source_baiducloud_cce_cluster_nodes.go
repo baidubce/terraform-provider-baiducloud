@@ -19,7 +19,7 @@ import (
 	"regexp"
 
 	"github.com/baidubce/bce-sdk-go/services/cce"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 )

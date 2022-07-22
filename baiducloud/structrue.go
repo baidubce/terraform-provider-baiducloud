@@ -1,6 +1,6 @@
 package baiducloud
 
-import "github.com/hashicorp/terraform/helper/schema"
+import "github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
 func expandStringList(configured []interface{}) []string {
 	vs := make([]string, 0, len(configured))

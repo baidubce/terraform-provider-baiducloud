@@ -6,8 +6,8 @@ import (
 
 	"github.com/baidubce/bce-sdk-go/services/bos/api"
 	"github.com/baidubce/bce-sdk-go/services/vpc"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func validateReservationLength() schema.SchemaValidateFunc {
