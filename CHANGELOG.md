@@ -1,4 +1,8 @@
 	## 1.15.0 (Unreleased)
+## 1.14.1 (August 10, 2022)
+NOTES:
+- Support baidu localdns
+
 ## 1.14.0 (July 11, 2022)
 ENHANCEMENTS:
 - resource/baiducloud_scs: Attribute `engine` now supports new value `PegaDB`
