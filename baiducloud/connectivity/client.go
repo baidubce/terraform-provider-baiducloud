@@ -13,6 +13,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/dts"
 	"github.com/baidubce/bce-sdk-go/services/eip"
 	"github.com/baidubce/bce-sdk-go/services/iam"
+	"github.com/baidubce/bce-sdk-go/services/localDns"
 	"github.com/baidubce/bce-sdk-go/services/rds"
 	"github.com/baidubce/bce-sdk-go/services/scs"
 	"github.com/baidubce/bce-sdk-go/services/sts"
@@ -30,19 +31,20 @@ type BaiduClient struct {
 
 	Credentials *auth.BceCredentials
 
-	bccConn    *bcc.Client
-	vpcConn    *vpc.Client
-	eipConn    *eip.Client
-	appBlbConn *appblb.Client
-	bosConn    *bos.Client
-	certConn   *cert.Client
-	cfcConn    *cfc.Client
-	scsConn    *scs.Client
-	cceConn    *cce.Client
-	ccev2Conn  *ccev2.Client
-	rdsConn    *rds.Client
-	dtsConn    *dts.Client
-	iamConn    *iam.Client
+	bccConn      *bcc.Client
+	vpcConn      *vpc.Client
+	eipConn      *eip.Client
+	appBlbConn   *appblb.Client
+	bosConn      *bos.Client
+	certConn     *cert.Client
+	cfcConn      *cfc.Client
+	scsConn      *scs.Client
+	cceConn      *cce.Client
+	ccev2Conn    *ccev2.Client
+	rdsConn      *rds.Client
+	dtsConn      *dts.Client
+	iamConn      *iam.Client
+	localDnsConn *localDns.Client
 }
 
 type ApiVersion string
@@ -362,6 +364,25 @@ func (client *BaiduClient) WithIamClient(do func(*iam.Client) (interface{}, erro
 	}
 
 	return do(client.iamConn)
+}
+
+func (client *BaiduClient) WithLocalDnsClient(do func(*localDns.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the LOCALDNS client if necessary
+	if client.localDnsConn == nil {
+		client.WithCommonClient(LOCALDNSCode)
+		localDnsClient, err := localDns.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		localDnsClient.Config.Credentials = client.Credentials
+		localDnsClient.Config.UserAgent = buildUserAgent()
+		client.localDnsConn = localDnsClient
+	}
+
+	return do(client.localDnsConn)
 }
 
 func buildUserAgent() string {

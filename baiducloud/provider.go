@@ -203,6 +203,9 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_cce_kubeconfig":                 dataSourceBaiduCloudCceKubeConfig(),
 			"baiducloud_rdss":                           dataSourceBaiduCloudRdss(),
 			"baiducloud_dtss":                           dataSourceBaiduCloudDtss(),
+			"baiducloud_localdns_privatezones":          dataSourceBaiduCloudLocalDnsPrivateZones(),
+			"baiducloud_localdns_vpcs":                  dataSourceBaiduCloudLocalDnsVpcs(),
+			"baiducloud_localdns_records":               dataSourceBaiduCloudPrivateZoneDNSRecords(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -248,6 +251,9 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_iam_policy":                  resourceBaiduCloudIamPolicy(),
 			"baiducloud_iam_user_policy_attachment":  resourceBaiduCloudIamUserPolicyAttachment(),
 			"baiducloud_iam_group_policy_attachment": resourceBaiduCloudIamGroupPolicyAttachment(),
+			"baiducloud_localdns_privatezone":        resourceBaiduCloudLocalDnsPrivateZone(),
+			"baiducloud_localdns_vpc":                resourceBaiduCloudLocalDnsVpc(),
+			"baiducloud_localdns_record":             resourceBaiduCloudPrivateZoneRecord(),
 		},
 
 		ConfigureFunc: providerConfigure,

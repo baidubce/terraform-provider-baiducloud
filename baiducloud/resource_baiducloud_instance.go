@@ -69,6 +69,7 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Name of the instance. Support for uppercase and lowercase letters, numbers, Chinese and special characters, such as \"-\",\"_\",\"/\",\".\", the value must start with a letter, length 1-65.",
 				Optional:    true,
+				Computed:    true,
 			},
 			"availability_zone": {
 				Type:        schema.TypeString,
@@ -264,6 +265,7 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Count of the GPU cards or FPGA cards to be carried for the instance to be created, it is valid only when the gpu_card or fpga_card field is not empty.",
 				Optional:    true,
+				Default:     0,
 			},
 			"auto_renew_time_unit": {
 				Type:         schema.TypeString,

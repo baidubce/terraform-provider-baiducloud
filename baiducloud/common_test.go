@@ -39,4 +39,6 @@ const (
 	BaiduCloudTestResourceTypeNameSnapshot            = BaiduCloudTestResourceTypeName + "-" + "snapshot"
 	BaiduCloudTestResourceTypeNameSubnet              = BaiduCloudTestResourceTypeName + "-" + "subnet"
 	BaiduCloudTestResourceTypeNameVpc                 = BaiduCloudTestResourceTypeName + "-" + "vpc"
+	BaiduCloudTestResourceTypeNameLocalDnsPrivatezone = BaiduCloudTestResourceTypeName + "-" + "localdns-privatezone"
+	BaiduCloudTestResourceTypeNameLocalDnsVPC         = BaiduCloudTestResourceTypeName + "-" + "localdns-vpc"
 )

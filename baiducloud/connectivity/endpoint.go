@@ -12,19 +12,20 @@ import (
 type ServiceCode string
 
 const (
-	BCCCode    = ServiceCode("BCC")
-	VPCCode    = ServiceCode("VPC")
-	EIPCode    = ServiceCode("EIP")
-	APPBLBCode = ServiceCode("APPBLB")
-	BOSCode    = ServiceCode("BOS")
-	CERTCode   = ServiceCode("CERT")
-	CFCCode    = ServiceCode("CFC")
-	CCECode    = ServiceCode("CCE")
-	CCEv2Code  = ServiceCode("CCEv2")
-	SCSCode    = ServiceCode("SCS")
-	RDSCode    = ServiceCode("RDS")
-	DTSCode    = ServiceCode("DTS")
-	IAMCode    = ServiceCode("IAM")
+	BCCCode      = ServiceCode("BCC")
+	VPCCode      = ServiceCode("VPC")
+	EIPCode      = ServiceCode("EIP")
+	APPBLBCode   = ServiceCode("APPBLB")
+	BOSCode      = ServiceCode("BOS")
+	CERTCode     = ServiceCode("CERT")
+	CFCCode      = ServiceCode("CFC")
+	CCECode      = ServiceCode("CCE")
+	CCEv2Code    = ServiceCode("CCEv2")
+	SCSCode      = ServiceCode("SCS")
+	RDSCode      = ServiceCode("RDS")
+	DTSCode      = ServiceCode("DTS")
+	IAMCode      = ServiceCode("IAM")
+	LOCALDNSCode = ServiceCode("LOCALDNS")
 )
 
 const (
@@ -92,19 +93,20 @@ var (
 
 	// Region BJ Service Endpoints
 	RegionBJEndpoints = map[ServiceCode]string{
-		BCCCode:    DefaultBJRegionBccEndPoint,
-		VPCCode:    DefaultBJRegionBccEndPoint,
-		EIPCode:    DefaultBJRegionEipEndPoint,
-		APPBLBCode: DefaultBJRegionBlbEndPoint,
-		BOSCode:    DefaultBJRegionBosEndPoint,
-		CERTCode:   DefaultCERTEndPoint,
-		CFCCode:    DefaultBJRegionCfcEndPoint,
-		CCECode:    DefaultBJRegionCceEndPoint,
-		CCEv2Code:  DefaultBJRegionCceEndPoint,
-		SCSCode:    DefaultBJRegionScsEndPoint,
-		RDSCode:    DefaultBJRegionRdsEndPoint,
-		DTSCode:    DefaultBJRegionDtsEndPoint,
-		IAMCode:    DefaultIAMEndPoint,
+		BCCCode:      DefaultBJRegionBccEndPoint,
+		VPCCode:      DefaultBJRegionBccEndPoint,
+		EIPCode:      DefaultBJRegionEipEndPoint,
+		APPBLBCode:   DefaultBJRegionBlbEndPoint,
+		BOSCode:      DefaultBJRegionBosEndPoint,
+		CERTCode:     DefaultCERTEndPoint,
+		CFCCode:      DefaultBJRegionCfcEndPoint,
+		CCECode:      DefaultBJRegionCceEndPoint,
+		CCEv2Code:    DefaultBJRegionCceEndPoint,
+		SCSCode:      DefaultBJRegionScsEndPoint,
+		RDSCode:      DefaultBJRegionRdsEndPoint,
+		DTSCode:      DefaultBJRegionDtsEndPoint,
+		IAMCode:      DefaultIAMEndPoint,
+		LOCALDNSCode: DefaultBJRegionBccEndPoint,
 	}
 
 	// Region BD Service Endpoints
