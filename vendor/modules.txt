@@ -74,7 +74,7 @@ github.com/aws/aws-sdk-go/service/sso
 github.com/aws/aws-sdk-go/service/sso/ssoiface
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
-# github.com/baidubce/bce-sdk-go v0.9.128
+# github.com/baidubce/bce-sdk-go v0.9.130
 github.com/baidubce/bce-sdk-go/auth
 github.com/baidubce/bce-sdk-go/bce
 github.com/baidubce/bce-sdk-go/http
@@ -87,6 +87,8 @@ github.com/baidubce/bce-sdk-go/services/bos/api
 github.com/baidubce/bce-sdk-go/services/cce
 github.com/baidubce/bce-sdk-go/services/cce/v2
 github.com/baidubce/bce-sdk-go/services/cce/v2/types
+github.com/baidubce/bce-sdk-go/services/cdn
+github.com/baidubce/bce-sdk-go/services/cdn/api
 github.com/baidubce/bce-sdk-go/services/cert
 github.com/baidubce/bce-sdk-go/services/cfc
 github.com/baidubce/bce-sdk-go/services/cfc/api
@@ -94,6 +96,7 @@ github.com/baidubce/bce-sdk-go/services/dts
 github.com/baidubce/bce-sdk-go/services/eip
 github.com/baidubce/bce-sdk-go/services/iam
 github.com/baidubce/bce-sdk-go/services/iam/api
+github.com/baidubce/bce-sdk-go/services/localDns
 github.com/baidubce/bce-sdk-go/services/rds
 github.com/baidubce/bce-sdk-go/services/scs
 github.com/baidubce/bce-sdk-go/services/sts

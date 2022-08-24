@@ -122,6 +122,7 @@ package baiducloud
 import (
 	"bytes"
 	"fmt"
+	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/cdn"
 	"os"
 	"strings"
 
@@ -203,6 +204,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_cce_kubeconfig":                 dataSourceBaiduCloudCceKubeConfig(),
 			"baiducloud_rdss":                           dataSourceBaiduCloudRdss(),
 			"baiducloud_dtss":                           dataSourceBaiduCloudDtss(),
+			"baiducloud_cdn_domains":                    cdn.DataSourceDomains(),
 			"baiducloud_localdns_privatezones":          dataSourceBaiduCloudLocalDnsPrivateZones(),
 			"baiducloud_localdns_vpcs":                  dataSourceBaiduCloudLocalDnsVpcs(),
 			"baiducloud_localdns_records":               dataSourceBaiduCloudPrivateZoneDNSRecords(),
@@ -251,6 +253,8 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_iam_policy":                  resourceBaiduCloudIamPolicy(),
 			"baiducloud_iam_user_policy_attachment":  resourceBaiduCloudIamUserPolicyAttachment(),
 			"baiducloud_iam_group_policy_attachment": resourceBaiduCloudIamGroupPolicyAttachment(),
+			"baiducloud_cdn_domain":                  cdn.ResourceDomain(),
+			"baiducloud_cdn_domain_config_cache":     cdn.ResourceDomainConfigCache(),
 			"baiducloud_localdns_privatezone":        resourceBaiduCloudLocalDnsPrivateZone(),
 			"baiducloud_localdns_vpc":                resourceBaiduCloudLocalDnsVpc(),
 			"baiducloud_localdns_record":             resourceBaiduCloudPrivateZoneRecord(),
@@ -299,6 +303,8 @@ func init() {
 		"rds_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom RDS endpoints.",
 
 		"dts_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom DTS endpoints.",
+
+		"cdn_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CDN endpoints.",
 	}
 }
 
@@ -374,6 +380,12 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["dts_endpoint"],
 				},
+				"cdn": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["cdn_endpoint"],
+				},
 			},
 		},
 		Set: endpointsToHash,
@@ -394,6 +406,7 @@ func endpointsToHash(v interface{}) int {
 	buf.WriteString(fmt.Sprintf("%s-", m["ccev2"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["rds"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["dts"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["cdn"].(string)))
 	return hashcode.String(buf.String())
 }
 
@@ -444,6 +457,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 
 	for _, endpointsSetI := range endpointsSet.List() {
 		endpoints := endpointsSetI.(map[string]interface{})
+		config.ConfigEndpoints = make(map[connectivity.ServiceCode]string)
 		config.ConfigEndpoints[connectivity.BCCCode] = strings.TrimSpace(endpoints["bcc"].(string))
 		config.ConfigEndpoints[connectivity.VPCCode] = strings.TrimSpace(endpoints["vpc"].(string))
 		config.ConfigEndpoints[connectivity.EIPCode] = strings.TrimSpace(endpoints["eip"].(string))
@@ -455,6 +469,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints[connectivity.CCEv2Code] = strings.TrimSpace(endpoints["ccev2"].(string))
 		config.ConfigEndpoints[connectivity.RDSCode] = strings.TrimSpace(endpoints["rds"].(string))
 		config.ConfigEndpoints[connectivity.DTSCode] = strings.TrimSpace(endpoints["dts"].(string))
+		config.ConfigEndpoints[connectivity.CDNCode] = strings.TrimSpace(endpoints["cdn"].(string))
 	}
 
 	client, err := config.Client()

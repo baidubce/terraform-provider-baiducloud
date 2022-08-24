@@ -25,6 +25,7 @@ const (
 	RDSCode      = ServiceCode("RDS")
 	DTSCode      = ServiceCode("DTS")
 	IAMCode      = ServiceCode("IAM")
+	CDNCode      = ServiceCode("CDN")
 	LOCALDNSCode = ServiceCode("LOCALDNS")
 )
 
@@ -76,6 +77,7 @@ const (
 
 	DefaultCERTEndPoint = "certificate.baidubce.com"
 	DefaultIAMEndPoint  = "iam.bj.baidubce.com"
+	DefaultCDNEndPoint  = "cdn.baidubce.com"
 )
 
 var (
@@ -106,6 +108,7 @@ var (
 		RDSCode:      DefaultBJRegionRdsEndPoint,
 		DTSCode:      DefaultBJRegionDtsEndPoint,
 		IAMCode:      DefaultIAMEndPoint,
+		CDNCode:      DefaultCDNEndPoint,
 		LOCALDNSCode: DefaultBJRegionBccEndPoint,
 	}
 

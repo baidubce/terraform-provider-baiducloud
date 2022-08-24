@@ -8,6 +8,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/bos"
 	"github.com/baidubce/bce-sdk-go/services/cce"
 	ccev2 "github.com/baidubce/bce-sdk-go/services/cce/v2"
+	"github.com/baidubce/bce-sdk-go/services/cdn"
 	"github.com/baidubce/bce-sdk-go/services/cert"
 	"github.com/baidubce/bce-sdk-go/services/cfc"
 	"github.com/baidubce/bce-sdk-go/services/dts"
@@ -44,6 +45,7 @@ type BaiduClient struct {
 	rdsConn      *rds.Client
 	dtsConn      *dts.Client
 	iamConn      *iam.Client
+	cdnConn      *cdn.Client
 	localDnsConn *localDns.Client
 }
 
@@ -51,7 +53,7 @@ type ApiVersion string
 
 var goSdkMutex = sync.RWMutex{} // The Go SDK is not thread-safe
 
-var providerVersion = "1.14.0"
+var providerVersion = "1.15.0"
 
 // Client for BaiduCloudClient
 func (c *Config) Client() (*BaiduClient, error) {
@@ -364,6 +366,23 @@ func (client *BaiduClient) WithIamClient(do func(*iam.Client) (interface{}, erro
 	}
 
 	return do(client.iamConn)
+}
+
+func (client *BaiduClient) WithCdnClient(do func(*cdn.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the CDN client if necessary
+	if client.cdnConn == nil {
+		client.WithCommonClient(CDNCode)
+		cdnClient, err := cdn.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		cdnClient.Config.UserAgent = buildUserAgent()
+		client.cdnConn = cdnClient
+	}
+	return do(client.cdnConn)
 }
 
 func (client *BaiduClient) WithLocalDnsClient(do func(*localDns.Client) (interface{}, error)) (interface{}, error) {

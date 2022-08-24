@@ -1,4 +1,15 @@
-	## 1.15.0 (Unreleased)
+	## 1.16.0 (Unreleased)
+
+
+## 1.15.0 (August 24, 2022)
+FEATURES:
+- **New Data Source:** `baiducloud_cdn_domains`
+- **New Resource:** `baiducloud_cdn_domain`
+- **New Resource:** `baiducloud_cdn_domain_config_cache`
+
+BUG FIXES:
+- Fix provider crash when setting custom endpoint.
+
 ## 1.14.1 (August 10, 2022)
 NOTES:
 - Support baidu localdns
