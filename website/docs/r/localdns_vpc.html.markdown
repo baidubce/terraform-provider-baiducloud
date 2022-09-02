@@ -15,8 +15,10 @@ Use this resource to get information about a Local Dns VPC.
 ## Example Usage
 
 ```hcl
-resource "baiducloud_localdns_vpc" "my-server" {
- zone_name = "terrraform.com"
+resource "baiducloud_localdns_vpc" "default" {
+   zone_id = "zone-test-id"
+   vpc_ids = ["vpc-test-id"]
+   region = "bj"
 }
 ```
 

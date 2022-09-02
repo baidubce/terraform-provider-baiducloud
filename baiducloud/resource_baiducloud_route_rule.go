@@ -73,7 +73,7 @@ func resourceBaiduCloudRouteRule() *schema.Resource {
 				Description:  "Type of the next hop, available values are custom、vpn and nat.",
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice([]string{"custom", "vpn", "nat"}, false),
+				ValidateFunc: validation.StringInSlice([]string{"custom", "vpn", "nat", "dcGateway", "peerConn", "ipv6gateway"}, false),
 			},
 			"description": {
 				Type:        schema.TypeString,
