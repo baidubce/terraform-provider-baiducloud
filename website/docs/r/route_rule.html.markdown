@@ -28,7 +28,7 @@ resource "baiducloud_route_rule" "default" {
 The following arguments are supported:
 
 * `destination_address` - (Required, ForceNew) Destination CIDR block of the routing rule. The network segment can be 0.0.0.0/0, otherwise, the destination address cannot overlap with this VPC CIDR block(except when the destination network segment or the VPC CIDR is 0.0.0.0/0).
-* `next_hop_type` - (Required, ForceNew) Type of the next hop, available values are custom、vpn and nat.
+* `next_hop_type` - (Required, ForceNew) Type of the next hop, available values are custom、vpn、 nat、 dcGateway、 peerConn and ipv6gateway.
 * `route_table_id` - (Required, ForceNew) ID of the routing table.
 * `source_address` - (Required, ForceNew) Source CIDR block of the routing rule. The value can be all network segments 0.0.0.0/0, existing subnet segments in the VPC, or the network segment within the subnet.
 * `description` - (Optional, ForceNew) Description of the routing rule.
