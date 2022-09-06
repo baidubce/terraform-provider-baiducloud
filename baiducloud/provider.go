@@ -180,6 +180,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_appblbs":                        dataSourceBaiduCloudAppBLBs(),
 			"baiducloud_appblb_listeners":               dataSourceBaiduCloudAppBLBListeners(),
 			"baiducloud_appblb_server_groups":           dataSourceBaiduCloudAppBLBServerGroups(),
+			"baiducloud_blbs":                           dataSourceBaiduCloudBLBs(),
 			"baiducloud_certs":                          dataSourceBaiduCloudCerts(),
 			"baiducloud_eips":                           dataSourceBaiduCloudEips(),
 			"baiducloud_instances":                      dataSourceBaiduCloudInstances(),
@@ -226,6 +227,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_acl":                         resourceBaiduCloudAcl(),
 			"baiducloud_nat_gateway":                 resourceBaiduCloudNatGateway(),
 			"baiducloud_nat_snat_rule":               resourceBaiduCloudNatSnatRule(),
+			"baiducloud_blb":                         resourceBaiduCloudBLB(),
 			"baiducloud_appblb":                      resourceBaiduCloudAppBLB(),
 			"baiducloud_peer_conn":                   resourceBaiduCloudPeerConn(),
 			"baiducloud_peer_conn_acceptor":          resourceBaiduCloudPeerConnAcceptor(),
@@ -290,6 +292,8 @@ func init() {
 
 		"appblb_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BLB endpoints.",
 
+		"blb_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BLB endpoints.",
+
 		"bos_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BOS endpoints.",
 
 		"cfc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CFC endpoints.",
@@ -337,6 +341,12 @@ func endpointsSchema() *schema.Schema {
 					Optional:    true,
 					Default:     "",
 					Description: descriptions["appblb_endpoint"],
+				},
+				"blb": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["blb_endpoint"],
 				},
 				"bos": {
 					Type:        schema.TypeString,
@@ -399,6 +409,7 @@ func endpointsToHash(v interface{}) int {
 	buf.WriteString(fmt.Sprintf("%s-", m["vpc"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["eip"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["appblb"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["blb"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["bos"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["cfc"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["scs"].(string)))
@@ -462,6 +473,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints[connectivity.VPCCode] = strings.TrimSpace(endpoints["vpc"].(string))
 		config.ConfigEndpoints[connectivity.EIPCode] = strings.TrimSpace(endpoints["eip"].(string))
 		config.ConfigEndpoints[connectivity.APPBLBCode] = strings.TrimSpace(endpoints["appblb"].(string))
+		config.ConfigEndpoints[connectivity.BLBCode] = strings.TrimSpace(endpoints["blb"].(string))
 		config.ConfigEndpoints[connectivity.BOSCode] = strings.TrimSpace(endpoints["bos"].(string))
 		config.ConfigEndpoints[connectivity.BOSCode] = strings.TrimSpace(endpoints["cfc"].(string))
 		config.ConfigEndpoints[connectivity.SCSCode] = strings.TrimSpace(endpoints["scs"].(string))

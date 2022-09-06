@@ -16,6 +16,7 @@ const (
 	VPCCode      = ServiceCode("VPC")
 	EIPCode      = ServiceCode("EIP")
 	APPBLBCode   = ServiceCode("APPBLB")
+	BLBCode      = ServiceCode("BLB")
 	BOSCode      = ServiceCode("BOS")
 	CERTCode     = ServiceCode("CERT")
 	CFCCode      = ServiceCode("CFC")
@@ -99,6 +100,7 @@ var (
 		VPCCode:      DefaultBJRegionBccEndPoint,
 		EIPCode:      DefaultBJRegionEipEndPoint,
 		APPBLBCode:   DefaultBJRegionBlbEndPoint,
+		BLBCode:      DefaultBJRegionBlbEndPoint,
 		BOSCode:      DefaultBJRegionBosEndPoint,
 		CERTCode:     DefaultCERTEndPoint,
 		CFCCode:      DefaultBJRegionCfcEndPoint,
@@ -124,6 +126,7 @@ var (
 		VPCCode:    DefaultGZRegionBccEndPoint,
 		EIPCode:    DefaultGZRegionEipEndPoint,
 		APPBLBCode: DefaultGZRegionBlbEndPoint,
+		BLBCode:    DefaultGZRegionBlbEndPoint,
 		BOSCode:    DefaultGZRegionBosEndPoint,
 		CERTCode:   DefaultCERTEndPoint,
 		CFCCode:    DefaultGZRegionCfcEndPoint,
@@ -140,6 +143,7 @@ var (
 		VPCCode:    DefaultSURegionBccEndPoint,
 		EIPCode:    DefaultSURegionEipEndPoint,
 		APPBLBCode: DefaultSURegionBlbEndPoint,
+		BLBCode:    DefaultSURegionBlbEndPoint,
 		BOSCode:    DefaultSURegionBosEndPoint,
 		CERTCode:   DefaultCERTEndPoint,
 		CFCCode:    DefaultSURegionCfcEndPoint,
@@ -162,6 +166,7 @@ var (
 		VPCCode:    DefaultFWHRegionBccEndPoint,
 		EIPCode:    DefaultFWHRegionEipEndPoint,
 		APPBLBCode: DefaultFWHRegionBlbEndPoint,
+		BLBCode:    DefaultFWHRegionBlbEndPoint,
 		BOSCode:    DefaultFWHRegionBosEndPoint,
 		CERTCode:   DefaultCERTEndPoint,
 		CFCCode:    DefaultFWHRegionCfcEndPoint,

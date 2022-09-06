@@ -5,6 +5,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/auth"
 	"github.com/baidubce/bce-sdk-go/services/appblb"
 	"github.com/baidubce/bce-sdk-go/services/bcc"
+	"github.com/baidubce/bce-sdk-go/services/blb"
 	"github.com/baidubce/bce-sdk-go/services/bos"
 	"github.com/baidubce/bce-sdk-go/services/cce"
 	ccev2 "github.com/baidubce/bce-sdk-go/services/cce/v2"
@@ -35,6 +36,7 @@ type BaiduClient struct {
 	bccConn      *bcc.Client
 	vpcConn      *vpc.Client
 	eipConn      *eip.Client
+	blbConn      *blb.Client
 	appBlbConn   *appblb.Client
 	bosConn      *bos.Client
 	certConn     *cert.Client
@@ -53,7 +55,7 @@ type ApiVersion string
 
 var goSdkMutex = sync.RWMutex{} // The Go SDK is not thread-safe
 
-var providerVersion = "1.15.0"
+var providerVersion = "1.13.0"
 
 // Client for BaiduCloudClient
 func (c *Config) Client() (*BaiduClient, error) {
@@ -195,6 +197,25 @@ func (client *BaiduClient) WithAppBLBClient(do func(*appblb.Client) (interface{}
 	}
 
 	return do(client.appBlbConn)
+}
+
+func (client *BaiduClient) WithBLBClient(do func(*blb.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the BLB client if necessary
+	if client.blbConn == nil {
+		client.WithCommonClient(BLBCode)
+		blbClient, err := blb.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		blbClient.Config.Credentials = client.Credentials
+		blbClient.Config.UserAgent = buildUserAgent()
+		client.blbConn = blbClient
+	}
+
+	return do(client.blbConn)
 }
 
 func (client *BaiduClient) WithBosClient(do func(*bos.Client) (interface{}, error)) (interface{}, error) {
