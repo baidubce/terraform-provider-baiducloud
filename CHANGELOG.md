@@ -1,5 +1,8 @@
 	## 1.16.0 (Unreleased)
-
+	
+## 1.15.3 (September 06, 2022)
+NOTES:
+- Support baidu blb
 
 ## 1.15.0 (August 24, 2022)
 FEATURES:
