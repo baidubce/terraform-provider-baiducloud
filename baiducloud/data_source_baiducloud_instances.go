@@ -211,6 +211,11 @@ func dataSourceBaiduCloudInstances() *schema.Resource {
 							Description: "The key pair name of the instance.",
 							Computed:    true,
 						},
+						"instance_spec": {
+							Type:        schema.TypeString,
+							Description: "spec",
+							Computed:    true,
+						},
 						"tags": tagsComputedSchema(),
 					},
 				},

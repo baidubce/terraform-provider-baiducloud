@@ -174,6 +174,7 @@ func (s *BccService) FlattenInstanceModelToMap(instances []api.InstanceModel) ([
 			"expire_time":              inst.ExpireTime,
 			"internal_ip":              inst.InternalIP,
 			"public_ip":                inst.PublicIP,
+			"instance_spec":            inst.Spec,
 			"cpu_count":                inst.CpuCount,
 			"gpu_card":                 inst.GpuCard,
 			"fpga_card":                inst.FpgaCard,

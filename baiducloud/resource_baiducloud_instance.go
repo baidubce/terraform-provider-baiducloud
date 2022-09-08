@@ -535,6 +535,7 @@ func resourceBaiduCloudInstanceRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("card_count", response.Instance.CardCount)
 	d.Set("dedicate_host_id", response.Instance.DedicatedHostId)
 	d.Set("tags", flattenTagsToMap(response.Instance.Tags))
+	d.Set("instance_spec", response.Instance.Spec)
 
 	billingMap := map[string]interface{}{"payment_timing": response.Instance.PaymentTiming}
 	d.Set("billing", billingMap)
