@@ -2,9 +2,6 @@
 Use this resource to get information about a BCC instance.
 
 ~> **NOTE:** The terminate operation of bcc does NOT take effect immediately，maybe takes for several minites.
-
-~> **NOTE:** It is recommended to set the maximum parallelism number to 18, otherwise it may cause errors ("There are too many connections").
-
 Example Usage
 
 ```hcl
@@ -137,13 +134,13 @@ func resourceBaiduCloudInstance() *schema.Resource {
 			"cpu_count": {
 				Type:         schema.TypeInt,
 				Description:  "Number of CPU cores to be created for the instance.",
-				Required:     true,
+				Optional:     true,
 				ValidateFunc: validation.IntAtLeast(1),
 			},
 			"memory_capacity_in_gb": {
 				Type:         schema.TypeInt,
 				Description:  "Memory capacity(GB) of the instance to be created.",
-				Required:     true,
+				Optional:     true,
 				ValidateFunc: validation.IntAtLeast(1),
 			},
 			"root_disk_size_in_gb": {
@@ -378,6 +375,11 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Description: "User Data",
 				Optional:    true,
 			},
+			"instance_spec": {
+				Type:        schema.TypeString,
+				Description: "spec",
+				Optional:    true,
+			},
 			"tags": tagsSchema(),
 		},
 	}
@@ -444,8 +446,13 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 			return resource.NonRetryableError(err)
 		}
 		addDebug(action, raw)
-		response, _ := raw.(*api.CreateInstanceResult)
-		d.SetId(response.InstanceIds[0])
+		if createBySpec {
+			response, _ := raw.(*api.CreateInstanceBySpecResult)
+			d.SetId(response.InstanceIds[0])
+		} else {
+			response, _ := raw.(*api.CreateInstanceResult)
+			d.SetId(response.InstanceIds[0])
+		}
 		return nil
 	})
 	ratelimit.CheckEnd()

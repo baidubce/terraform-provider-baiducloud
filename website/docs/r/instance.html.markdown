@@ -3,7 +3,7 @@ layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_instance"
 sidebar_current: "docs-baiducloud-resource-instance"
 description: |-
-  Use this resource to get information about a BCC instance.
+  Use this resource to create a BCC instance.
 ---
 
 # baiducloud_instance
@@ -12,10 +12,9 @@ Use this resource to get information about a BCC instance.
 
 ~> **NOTE:** The terminate operation of bcc does NOT take effect immediately，maybe takes for several minites.
 
-~> **NOTE:** It is recommended to set the maximum parallelism number to 18, otherwise it may cause errors ("There are too many connections").
-
 ## Example Usage
 
+### Create instance
 ```hcl
 resource "baiducloud_instance" "my-server" {
   image_id = "m-A4jJpFzi"
@@ -29,14 +28,29 @@ resource "baiducloud_instance" "my-server" {
 }
 ```
 
+### Create instance by spec
+> Use parameter *instance_spec* to replace instance_type, cpu_count, memory_capacity_in_gb, gpu_card, fpga_card, card_count, ephemeral_disks parameters，if the parameter *instance_spec* is specified, the above parameters are invalid
+```hcl
+resource "baiducloud_instance" "my-server" {
+  image_id = "m-pUgPC9sJ"
+  name = "my-instance"
+  availability_zone = "cn-bj-d"
+  instance_spec = "bcc.gr1.c1m4"
+  billing = {
+    payment_timing = "Postpaid"
+  }
+}
+```
+
 ## Argument Reference
 
 The following arguments are supported:
 
 * `billing` - (Required) Billing information of the instance.
-* `cpu_count` - (Required) Number of CPU cores to be created for the instance.
+* `cpu_count` - (Optional) Number of CPU cores to be created for the instance.Required when there is no parameter *spec*
 * `image_id` - (Required) ID of the image to be used for the instance.
-* `memory_capacity_in_gb` - (Required) Memory capacity(GB) of the instance to be created.
+* `spec` - (Optional) Specification for the instance.
+* `memory_capacity_in_gb` - (Optional) Memory capacity(GB) of the instance to be created.Required when there is no parameter *spec*
 * `action` - (Optional) Start or stop the instance, which can only be start or stop, default start.
 * `admin_pass` - (Optional, Sensitive) Password of the instance to be started. This value should be 8-16 characters, and English, numbers and symbols must exist at the same time. The symbols is limited to "!@#$%^*()".
 * `auto_renew_time_length` - (Optional, ForceNew) The time length of automatic renewal. It is valid when payment_timing is Prepaid, and the value should be 1-9 when the auto_renew_time_unit is month and 1-3 when the auto_renew_time_unit is year. Default to 1.
