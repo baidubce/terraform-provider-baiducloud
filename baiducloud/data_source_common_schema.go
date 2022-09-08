@@ -99,6 +99,8 @@ func (c *FilterConfig) checkValue(value interface{}) bool {
 		checkValue = strconv.Itoa(v)
 	case bool:
 		checkValue = strconv.FormatBool(v)
+	case int32:
+		checkValue = strconv.Itoa(int(v))
 	default:
 		return true
 	}
@@ -116,10 +118,11 @@ func (c *FilterConfig) checkValue(value interface{}) bool {
 
 func FilterDataSourceResult(d *schema.ResourceData, result *[]map[string]interface{}) {
 	filter := NewDataSourceFilter(d)
-
-	for i, data := range *result {
-		if !filter.checkFilter(data) {
-			*result = append((*result)[:i], (*result)[i+1:]...)
+	for index := 0; index < len(*result); {
+		if !filter.checkFilter((*result)[index]) {
+			*result = append((*result)[:index], (*result)[index+1:]...)
+			continue
 		}
+		index++
 	}
 }
