@@ -28,10 +28,12 @@ const (
 	IAMCode      = ServiceCode("IAM")
 	CDNCode      = ServiceCode("CDN")
 	LOCALDNSCode = ServiceCode("LOCALDNS")
+	BBCCode      = ServiceCode("BBC")
 )
 
 const (
 	DefaultBJRegionBccEndPoint = "bcc.bj.baidubce.com"
+	DefaultBJRegionBbcEndPoint = "bbc.bj.baidubce.com"
 	DefaultBJRegionEipEndPoint = "eip.bj.baidubce.com"
 	DefaultBJRegionBlbEndPoint = "blb.bj.baidubce.com"
 	DefaultBJRegionBosEndPoint = "bj.bcebos.com"
@@ -42,8 +44,10 @@ const (
 	DefaultBJRegionDtsEndPoint = "rds.bj.baidubce.com"
 
 	DefaultBDRegionBccEndPoint = "bcc.bd.baidubce.com"
+	DefaultBDRegionBbcEndPoint = "bbc.bd.baidubce.com"
 
 	DefaultGZRegionBccEndPoint = "bcc.gz.baidubce.com"
+	DefaultGZRegionBbcEndPoint = "bbc.gz.baidubce.com"
 	DefaultGZRegionEipEndPoint = "eip.gz.baidubce.com"
 	DefaultGZRegionBlbEndPoint = "blb.gz.baidubce.com"
 	DefaultGZRegionBosEndPoint = "gz.bcebos.com"
@@ -53,6 +57,7 @@ const (
 	DefaultGZRegionRdsEndPoint = "rds.gz.baidubce.com"
 
 	DefaultSURegionBccEndPoint = "bcc.su.baidubce.com"
+	DefaultSURegionBbcEndPoint = "bbc.su.baidubce.com"
 	DefaultSURegionEipEndPoint = "eip.su.baidubce.com"
 	DefaultSURegionBlbEndPoint = "blb.su.baidubce.com"
 	DefaultSURegionBosEndPoint = "su.bcebos.com"
@@ -64,6 +69,7 @@ const (
 	DefaultFSHRegionBccEndPoint = "bcc.fsh.baidubce.com"
 
 	DefaultFWHRegionBccEndPoint = "bcc.fwh.baidubce.com"
+	DefaultFWHRegionBbcEndPoint = "bbc.fwh.baidubce.com"
 	DefaultFWHRegionEipEndPoint = "eip.fwh.baidubce.com"
 	DefaultFWHRegionBlbEndPoint = "blb.fwh.baidubce.com"
 	DefaultFWHRegionBosEndPoint = "fwh.bcebos.com"
@@ -97,6 +103,7 @@ var (
 	// Region BJ Service Endpoints
 	RegionBJEndpoints = map[ServiceCode]string{
 		BCCCode:      DefaultBJRegionBccEndPoint,
+		BBCCode:      DefaultBJRegionBbcEndPoint,
 		VPCCode:      DefaultBJRegionBccEndPoint,
 		EIPCode:      DefaultBJRegionEipEndPoint,
 		APPBLBCode:   DefaultBJRegionBlbEndPoint,
@@ -118,11 +125,13 @@ var (
 	RegionBDEndpoints = map[ServiceCode]string{
 		BCCCode: DefaultBDRegionBccEndPoint,
 		VPCCode: DefaultBDRegionBccEndPoint,
+		BBCCode: DefaultBDRegionBbcEndPoint,
 	}
 
 	// Region GZ Service Endpoints
 	RegionGZEndpoints = map[ServiceCode]string{
 		BCCCode:    DefaultGZRegionBccEndPoint,
+		BBCCode:    DefaultGZRegionBbcEndPoint,
 		VPCCode:    DefaultGZRegionBccEndPoint,
 		EIPCode:    DefaultGZRegionEipEndPoint,
 		APPBLBCode: DefaultGZRegionBlbEndPoint,
@@ -140,6 +149,7 @@ var (
 	// Region SU Service Endpoints
 	RegionSUEndpoints = map[ServiceCode]string{
 		BCCCode:    DefaultSURegionBccEndPoint,
+		BBCCode:    DefaultSURegionBbcEndPoint,
 		VPCCode:    DefaultSURegionBccEndPoint,
 		EIPCode:    DefaultSURegionEipEndPoint,
 		APPBLBCode: DefaultSURegionBlbEndPoint,
@@ -163,6 +173,7 @@ var (
 	// Region FWH Service Endpoints
 	RegionFWHEndpoints = map[ServiceCode]string{
 		BCCCode:    DefaultFWHRegionBccEndPoint,
+		BBCCode:    DefaultFWHRegionBbcEndPoint,
 		VPCCode:    DefaultFWHRegionBccEndPoint,
 		EIPCode:    DefaultFWHRegionEipEndPoint,
 		APPBLBCode: DefaultFWHRegionBlbEndPoint,

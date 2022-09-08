@@ -209,6 +209,9 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_localdns_privatezones":          dataSourceBaiduCloudLocalDnsPrivateZones(),
 			"baiducloud_localdns_vpcs":                  dataSourceBaiduCloudLocalDnsVpcs(),
 			"baiducloud_localdns_records":               dataSourceBaiduCloudPrivateZoneDNSRecords(),
+			"baiducloud_bbc_images":                     dataSourceBaiduCloudBbcImages(),
+			"baiducloud_bbc_flavors":                    dataSourceBaiduCloudBbcFlavors(),
+			"baiducloud_bbc_instances":                  dataSourceBaiduCloudBbcInstances(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -260,6 +263,8 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_localdns_privatezone":        resourceBaiduCloudLocalDnsPrivateZone(),
 			"baiducloud_localdns_vpc":                resourceBaiduCloudLocalDnsVpc(),
 			"baiducloud_localdns_record":             resourceBaiduCloudPrivateZoneRecord(),
+			"baiducloud_bbc_instance":                resourceBaiduCloudBccInstance(),
+			"baiducloud_bbc_image":                   resourceBaiduCloudBbcImage(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -309,6 +314,8 @@ func init() {
 		"dts_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom DTS endpoints.",
 
 		"cdn_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CDN endpoints.",
+
+		"bbc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BBC endpoints.",
 	}
 }
 
@@ -396,6 +403,12 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["cdn_endpoint"],
 				},
+				"bbc": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["bbc_endpoint"],
+				},
 			},
 		},
 		Set: endpointsToHash,
@@ -418,6 +431,7 @@ func endpointsToHash(v interface{}) int {
 	buf.WriteString(fmt.Sprintf("%s-", m["rds"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["dts"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["cdn"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["bbc"].(string)))
 	return hashcode.String(buf.String())
 }
 
@@ -482,6 +496,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints[connectivity.RDSCode] = strings.TrimSpace(endpoints["rds"].(string))
 		config.ConfigEndpoints[connectivity.DTSCode] = strings.TrimSpace(endpoints["dts"].(string))
 		config.ConfigEndpoints[connectivity.CDNCode] = strings.TrimSpace(endpoints["cdn"].(string))
+		config.ConfigEndpoints[connectivity.BBCCode] = strings.TrimSpace(endpoints["bbc"].(string))
 	}
 
 	client, err := config.Client()

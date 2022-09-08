@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/baidubce/bce-sdk-go/auth"
 	"github.com/baidubce/bce-sdk-go/services/appblb"
+	"github.com/baidubce/bce-sdk-go/services/bbc"
 	"github.com/baidubce/bce-sdk-go/services/bcc"
 	"github.com/baidubce/bce-sdk-go/services/blb"
 	"github.com/baidubce/bce-sdk-go/services/bos"
@@ -49,6 +50,7 @@ type BaiduClient struct {
 	iamConn      *iam.Client
 	cdnConn      *cdn.Client
 	localDnsConn *localDns.Client
+	bbcConn      *bbc.Client
 }
 
 type ApiVersion string
@@ -106,7 +108,6 @@ func (client *BaiduClient) WithCommonClient(serviceCode ServiceCode) *BaiduClien
 	log.SetLogLevel(log.DEBUG)
 	log.SetLogHandler(log.NONE)
 	//log.SetLogDir(LogDir)
-
 	region := client.config.Region
 	if region == "" {
 		region = DefaultRegion
@@ -423,6 +424,24 @@ func (client *BaiduClient) WithLocalDnsClient(do func(*localDns.Client) (interfa
 	}
 
 	return do(client.localDnsConn)
+}
+
+func (client *BaiduClient) WithBbcClient(do func(*bbc.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the BBC client if necessary
+	if client.bbcConn == nil {
+		client.WithCommonClient(BBCCode)
+		bbcClient, err := bbc.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		bbcClient.Config.Credentials = client.Credentials
+		bbcClient.Config.UserAgent = buildUserAgent()
+		client.bbcConn = bbcClient
+	}
+	return do(client.bbcConn)
 }
 
 func buildUserAgent() string {
