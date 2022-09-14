@@ -31,6 +31,7 @@ The following arguments are supported:
 * `name` - (Required) Name of the NAT gateway, consisting of uppercase and lowercase letters、numbers and special characters, such as "-","_","/",".". The value must start with a letter, and the length should between 1-65.
 * `vpc_id` - (Required, ForceNew) VPC ID of the NAT gateway.
 * `spec` - (Optional, ForceNew) Specification of the NAT gateway, available values are small(supports up to 5 public IPs), medium(up to 10 public IPs) and large(up to 15 public IPs). Default to small.
+* `cu_num` - (Optional) Number of NAT gateway CU, max is 100.
 
 The `billing` object supports the following:
 

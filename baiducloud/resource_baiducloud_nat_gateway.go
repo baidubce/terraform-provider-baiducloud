@@ -80,6 +80,11 @@ func resourceBaiduCloudNatGateway() *schema.Resource {
 				Description: "Status of the NAT gateway.",
 				Computed:    true,
 			},
+			"cu_num": {
+				Type:        schema.TypeString,
+				Description: "cu num.",
+				Optional:    true,
+			},
 			"expired_time": {
 				Type:        schema.TypeString,
 				Description: "Expired time of the NAT gateway, which will be empty when the payment_timing is Postpaid.",
@@ -294,6 +299,9 @@ func buildBaiduCloudNatGatewayArgs(d *schema.ResourceData) *vpc.CreateNatGateway
 	}
 	if v := d.Get("vpc_id").(string); v != "" {
 		args.VpcId = v
+	}
+	if v := d.Get("cu_num").(string); v != "" {
+		args.CuNum = v
 	}
 	if v := d.Get("spec").(string); v != "" {
 		args.Spec = vpc.NatGatewaySpecType(v)
