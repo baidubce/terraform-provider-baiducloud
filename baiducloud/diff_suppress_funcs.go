@@ -10,6 +10,10 @@ func postPaidDiffSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
 	return d.Get("payment_timing").(string) == PaymentTimingPostpaid
 }
 
+func specDiffSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
+	return d.Get("instance_spec").(string) != ""
+}
+
 func appServerGroupPortHealthCheckHTTPSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
 	strs := strings.Split(k, ".")
 	if len(strs) == 3 {
