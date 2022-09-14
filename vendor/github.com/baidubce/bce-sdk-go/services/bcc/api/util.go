@@ -188,6 +188,10 @@ func getSecurityGroupUriWithId(id string) string {
 	return URI_PREFIXV2 + REQUEST_SECURITYGROUP_URI + "/" + id
 }
 
+func getSecurityGroupRuleUri() string {
+	return URI_PREFIXV2 + REQUEST_SECURITYGROUP_URI + "/rule"
+}
+
 func getImageUri() string {
 	return URI_PREFIXV2 + REQUEST_IMAGE_URI
 }
@@ -330,4 +334,28 @@ func getDeleteRecycledInstanceUri(id string) string {
 
 func getListInstancesByIdsUrl() string {
 	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + "/listByInstanceId"
+}
+
+func getBatchDeleteInstanceWithRelatedResourceUri() string {
+	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + "/batchDelete"
+}
+
+func getBatchStartInstanceUri() string {
+	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + "/batchAction"
+}
+
+func getBatchStopInstanceUri() string {
+	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + "/batchAction"
+}
+
+func getListInstanceTypesUri() string {
+	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + "/types"
+}
+
+func getListIdMappingsUri() string {
+	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + "/id/mapping"
+}
+
+func getBatchResizeInstanceUri() string {
+	return URI_PREFIXV2 + "/instanceBatchBySpec"
 }

@@ -2,6 +2,7 @@ package baiducloud
 
 import (
 	"log"
+	"reflect"
 
 	bccapi "github.com/baidubce/bce-sdk-go/services/bcc/api"
 	ccev2 "github.com/baidubce/bce-sdk-go/services/cce/v2"
@@ -1392,7 +1393,7 @@ func convertInstanceSpecFromJsonToMap(spec *ccev2types.InstanceSpec) ([]interfac
 		specMap["bbc_option"] = option
 	}
 
-	if spec.VPCConfig != (ccev2types.VPCConfig{}) {
+	if !reflect.DeepEqual(spec.VPCConfig, ccev2types.VPCConfig{}) {
 		config, err := convertVPCConfigFromJsonToMap(&spec.VPCConfig)
 		if err != nil {
 			return nil, err

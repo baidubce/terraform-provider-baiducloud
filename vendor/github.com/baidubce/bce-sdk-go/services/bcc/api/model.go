@@ -249,48 +249,49 @@ type DiskZoneResource struct {
 }
 
 type CreateInstanceArgs struct {
-	ImageId               string           `json:"imageId"`
-	Billing               Billing          `json:"billing"`
-	InstanceType          InstanceType     `json:"instanceType,omitempty"`
-	CpuCount              int              `json:"cpuCount"`
-	MemoryCapacityInGB    int              `json:"memoryCapacityInGB"`
-	RootDiskSizeInGb      int              `json:"rootDiskSizeInGb,omitempty"`
-	RootDiskStorageType   StorageType      `json:"rootDiskStorageType,omitempty"`
-	LocalDiskSizeInGB     int              `json:"localDiskSizeInGB,omitempty"`
-	EphemeralDisks        []EphemeralDisk  `json:"ephemeralDisks,omitempty"`
-	CreateCdsList         []CreateCdsModel `json:"createCdsList,omitempty"`
-	NetWorkCapacityInMbps int              `json:"networkCapacityInMbps,omitempty"`
-	EipName               string           `json:"eipName,omitempty"`
-	DedicateHostId        string           `json:"dedicatedHostId,omitempty"`
-	PurchaseCount         int              `json:"purchaseCount,omitempty"`
-	Name                  string           `json:"name,omitempty"`
-	Hostname              string           `json:"hostname,omitempty"`
-	IsOpenHostnameDomain  bool             `json:"isOpenHostnameDomain,omitempty"`
-	AutoSeqSuffix         bool             `json:"autoSeqSuffix,omitempty"`
-	AdminPass             string           `json:"adminPass,omitempty"`
-	ZoneName              string           `json:"zoneName,omitempty"`
-	SubnetId              string           `json:"subnetId,omitempty"`
-	SecurityGroupId       string           `json:"securityGroupId,omitempty"`
-	GpuCard               string           `json:"gpuCard,omitempty"`
-	FpgaCard              string           `json:"fpgaCard,omitempty"`
-	CardCount             string           `json:"cardCount,omitempty"`
-	AutoRenewTimeUnit     string           `json:"autoRenewTimeUnit"`
-	AutoRenewTime         int              `json:"autoRenewTime"`
-	CdsAutoRenew          bool             `json:"cdsAutoRenew"`
-	RelationTag           bool             `json:"relationTag,omitempty"`
-	Tags                  []model.TagModel `json:"tags,omitempty"`
-	DeployId              string           `json:"deployId,omitempty"`
-	BidModel              string           `json:"bidModel,omitempty"`
-	BidPrice              string           `json:"bidPrice,omitempty"`
-	KeypairId             string           `json:"keypairId,omitempty"`
-	AspId                 string           `json:"aspId,omitempty"`
-	InternetChargeType    string           `json:"internetChargeType,omitempty"`
-	UserData              string           `json:"userData,omitempty"`
-	InternalIps           []string         `json:"internalIps,omitempty"`
-	ClientToken           string           `json:"-"`
-	RequestToken          string           `json:"requestToken"`
-	DeployIdList          []string         `json:"deployIdList"`
-	DetetionProtection    int              `json:"deletionProtection"`
+	ImageId                   string           `json:"imageId"`
+	Billing                   Billing          `json:"billing"`
+	InstanceType              InstanceType     `json:"instanceType,omitempty"`
+	CpuCount                  int              `json:"cpuCount"`
+	MemoryCapacityInGB        int              `json:"memoryCapacityInGB"`
+	RootDiskSizeInGb          int              `json:"rootDiskSizeInGb,omitempty"`
+	RootDiskStorageType       StorageType      `json:"rootDiskStorageType,omitempty"`
+	LocalDiskSizeInGB         int              `json:"localDiskSizeInGB,omitempty"`
+	EphemeralDisks            []EphemeralDisk  `json:"ephemeralDisks,omitempty"`
+	CreateCdsList             []CreateCdsModel `json:"createCdsList,omitempty"`
+	NetWorkCapacityInMbps     int              `json:"networkCapacityInMbps,omitempty"`
+	EipName                   string           `json:"eipName,omitempty"`
+	DedicateHostId            string           `json:"dedicatedHostId,omitempty"`
+	PurchaseCount             int              `json:"purchaseCount,omitempty"`
+	Name                      string           `json:"name,omitempty"`
+	Hostname                  string           `json:"hostname,omitempty"`
+	IsOpenHostnameDomain      bool             `json:"isOpenHostnameDomain,omitempty"`
+	AutoSeqSuffix             bool             `json:"autoSeqSuffix,omitempty"`
+	AdminPass                 string           `json:"adminPass,omitempty"`
+	ZoneName                  string           `json:"zoneName,omitempty"`
+	SubnetId                  string           `json:"subnetId,omitempty"`
+	SecurityGroupId           string           `json:"securityGroupId,omitempty"`
+	EnterpriseSecurityGroupId string           `json:"enterpriseSecurityGroupId,omitempty"`
+	GpuCard                   string           `json:"gpuCard,omitempty"`
+	FpgaCard                  string           `json:"fpgaCard,omitempty"`
+	CardCount                 string           `json:"cardCount,omitempty"`
+	AutoRenewTimeUnit         string           `json:"autoRenewTimeUnit"`
+	AutoRenewTime             int              `json:"autoRenewTime"`
+	CdsAutoRenew              bool             `json:"cdsAutoRenew"`
+	RelationTag               bool             `json:"relationTag,omitempty"`
+	Tags                      []model.TagModel `json:"tags,omitempty"`
+	DeployId                  string           `json:"deployId,omitempty"`
+	BidModel                  string           `json:"bidModel,omitempty"`
+	BidPrice                  string           `json:"bidPrice,omitempty"`
+	KeypairId                 string           `json:"keypairId,omitempty"`
+	AspId                     string           `json:"aspId,omitempty"`
+	InternetChargeType        string           `json:"internetChargeType,omitempty"`
+	UserData                  string           `json:"userData,omitempty"`
+	InternalIps               []string         `json:"internalIps,omitempty"`
+	ClientToken               string           `json:"-"`
+	RequestToken              string           `json:"requestToken"`
+	DeployIdList              []string         `json:"deployIdList"`
+	DetetionProtection        int              `json:"deletionProtection"`
 }
 
 type CreateInstanceStockArgs struct {
@@ -363,39 +364,40 @@ type CreateInstanceResult struct {
 }
 
 type CreateInstanceBySpecArgs struct {
-	ImageId               string           `json:"imageId"`
-	Spec                  string           `json:"spec"`
-	RootDiskSizeInGb      int              `json:"rootDiskSizeInGb,omitempty"`
-	RootDiskStorageType   StorageType      `json:"rootDiskStorageType,omitempty"`
-	EphemeralDisks        []EphemeralDisk  `json:"ephemeralDisks,omitempty"`
-	CreateCdsList         []CreateCdsModel `json:"createCdsList,omitempty"`
-	NetWorkCapacityInMbps int              `json:"networkCapacityInMbps,omitempty"`
-	EipName               string           `json:"eipName,omitempty"`
-	InternetChargeType    string           `json:"internetChargeType,omitempty"`
-	PurchaseCount         int              `json:"purchaseCount,omitempty"`
-	Name                  string           `json:"name,omitempty"`
-	Hostname              string           `json:"hostname,omitempty"`
-	IsOpenHostnameDomain  bool             `json:"isOpenHostnameDomain,omitempty"`
-	AutoSeqSuffix         bool             `json:"autoSeqSuffix,omitempty"`
-	AdminPass             string           `json:"adminPass,omitempty"`
-	Billing               Billing          `json:"billing"`
-	ZoneName              string           `json:"zoneName,omitempty"`
-	SubnetId              string           `json:"subnetId,omitempty"`
-	SecurityGroupId       string           `json:"securityGroupId,omitempty"`
-	RelationTag           bool             `json:"relationTag,omitempty"`
-	Tags                  []model.TagModel `json:"tags,omitempty"`
-	KeypairId             string           `json:"keypairId"`
-	AutoRenewTimeUnit     string           `json:"autoRenewTimeUnit"`
-	AutoRenewTime         int              `json:"autoRenewTime"`
-	CdsAutoRenew          bool             `json:"cdsAutoRenew"`
-	AspId                 string           `json:"aspId"`
-	InternalIps           []string         `json:"internalIps,omitempty"`
-	DeployId              string           `json:"deployId,omitempty"`
-	UserData              string           `json:"userData,omitempty"`
-	ClientToken           string           `json:"-"`
-	RequestToken          string           `json:"requestToken"`
-	DeployIdList          []string         `json:"deployIdList"`
-	DetetionProtection    int              `json:"deletionProtection"`
+	ImageId                   string           `json:"imageId"`
+	Spec                      string           `json:"spec"`
+	RootDiskSizeInGb          int              `json:"rootDiskSizeInGb,omitempty"`
+	RootDiskStorageType       StorageType      `json:"rootDiskStorageType,omitempty"`
+	EphemeralDisks            []EphemeralDisk  `json:"ephemeralDisks,omitempty"`
+	CreateCdsList             []CreateCdsModel `json:"createCdsList,omitempty"`
+	NetWorkCapacityInMbps     int              `json:"networkCapacityInMbps,omitempty"`
+	EipName                   string           `json:"eipName,omitempty"`
+	InternetChargeType        string           `json:"internetChargeType,omitempty"`
+	PurchaseCount             int              `json:"purchaseCount,omitempty"`
+	Name                      string           `json:"name,omitempty"`
+	Hostname                  string           `json:"hostname,omitempty"`
+	IsOpenHostnameDomain      bool             `json:"isOpenHostnameDomain,omitempty"`
+	AutoSeqSuffix             bool             `json:"autoSeqSuffix,omitempty"`
+	AdminPass                 string           `json:"adminPass,omitempty"`
+	Billing                   Billing          `json:"billing"`
+	ZoneName                  string           `json:"zoneName,omitempty"`
+	SubnetId                  string           `json:"subnetId,omitempty"`
+	SecurityGroupId           string           `json:"securityGroupId,omitempty"`
+	EnterpriseSecurityGroupId string           `json:"enterpriseSecurityGroupId,omitempty"`
+	RelationTag               bool             `json:"relationTag,omitempty"`
+	Tags                      []model.TagModel `json:"tags,omitempty"`
+	KeypairId                 string           `json:"keypairId"`
+	AutoRenewTimeUnit         string           `json:"autoRenewTimeUnit"`
+	AutoRenewTime             int              `json:"autoRenewTime"`
+	CdsAutoRenew              bool             `json:"cdsAutoRenew"`
+	AspId                     string           `json:"aspId"`
+	InternalIps               []string         `json:"internalIps,omitempty"`
+	DeployId                  string           `json:"deployId,omitempty"`
+	UserData                  string           `json:"userData,omitempty"`
+	ClientToken               string           `json:"-"`
+	RequestToken              string           `json:"requestToken"`
+	DeployIdList              []string         `json:"deployIdList"`
+	DetetionProtection        int              `json:"deletionProtection"`
 }
 
 const (
@@ -416,38 +418,39 @@ type LabelConstraint struct {
 // --- 创建 BCC 的新接口的参数和返回值
 
 type CreateSpecialInstanceBySpecArgs struct {
-	ImageId               string           `json:"imageId"`
-	Spec                  string           `json:"spec"`
-	RootDiskSizeInGb      int              `json:"rootDiskSizeInGb,omitempty"`
-	RootDiskStorageType   StorageType      `json:"rootDiskStorageType,omitempty"`
-	EphemeralDisks        []EphemeralDisk  `json:"ephemeralDisks,omitempty"`
-	CreateCdsList         []CreateCdsModel `json:"createCdsList,omitempty"`
-	NetWorkCapacityInMbps int              `json:"networkCapacityInMbps,omitempty"`
-	InternetChargeType    string           `json:"internetChargeType,omitempty"`
-	PurchaseCount         int              `json:"purchaseCount,omitempty"`
-	Name                  string           `json:"name,omitempty"`
-	Hostname              string           `json:"hostname,omitempty"`
-	IsOpenHostnameDomain  bool             `json:"isOpenHostnameDomain,omitempty"`
-	UserData              string           `json:"userData,omitempty"`
-	AutoSeqSuffix         bool             `json:"autoSeqSuffix,omitempty"`
-	AdminPass             string           `json:"adminPass,omitempty"`
-	Billing               Billing          `json:"billing"`
-	ZoneName              string           `json:"zoneName,omitempty"`
-	SubnetId              string           `json:"subnetId,omitempty"`
-	SecurityGroupId       string           `json:"securityGroupId,omitempty"`
-	RelationTag           bool             `json:"relationTag,omitempty"`
-	Tags                  []model.TagModel `json:"tags,omitempty"`
-	KeypairId             string           `json:"keypairId"`
-	AutoRenewTimeUnit     string           `json:"autoRenewTimeUnit"`
-	AutoRenewTime         int              `json:"autoRenewTime"`
-	CdsAutoRenew          bool             `json:"cdsAutoRenew"`
-	AspId                 string           `json:"aspId"`
-	InternalIps           []string         `json:"internalIps,omitempty"`
-	DeployId              string           `json:"deployId,omitempty"`
-	ClientToken           string           `json:"-"`
-	RequestToken          string           `json:"requestToken"`
-	DeployIdList          []string         `json:"deployIdList"`
-	DetetionProtection    int              `json:"deletionProtection"`
+	ImageId                   string           `json:"imageId"`
+	Spec                      string           `json:"spec"`
+	RootDiskSizeInGb          int              `json:"rootDiskSizeInGb,omitempty"`
+	RootDiskStorageType       StorageType      `json:"rootDiskStorageType,omitempty"`
+	EphemeralDisks            []EphemeralDisk  `json:"ephemeralDisks,omitempty"`
+	CreateCdsList             []CreateCdsModel `json:"createCdsList,omitempty"`
+	NetWorkCapacityInMbps     int              `json:"networkCapacityInMbps,omitempty"`
+	InternetChargeType        string           `json:"internetChargeType,omitempty"`
+	PurchaseCount             int              `json:"purchaseCount,omitempty"`
+	Name                      string           `json:"name,omitempty"`
+	Hostname                  string           `json:"hostname,omitempty"`
+	IsOpenHostnameDomain      bool             `json:"isOpenHostnameDomain,omitempty"`
+	UserData                  string           `json:"userData,omitempty"`
+	AutoSeqSuffix             bool             `json:"autoSeqSuffix,omitempty"`
+	AdminPass                 string           `json:"adminPass,omitempty"`
+	Billing                   Billing          `json:"billing"`
+	ZoneName                  string           `json:"zoneName,omitempty"`
+	SubnetId                  string           `json:"subnetId,omitempty"`
+	SecurityGroupId           string           `json:"securityGroupId,omitempty"`
+	EnterpriseSecurityGroupId string           `json:"enterpriseSecurityGroupId,omitempty"`
+	RelationTag               bool             `json:"relationTag,omitempty"`
+	Tags                      []model.TagModel `json:"tags,omitempty"`
+	KeypairId                 string           `json:"keypairId"`
+	AutoRenewTimeUnit         string           `json:"autoRenewTimeUnit"`
+	AutoRenewTime             int              `json:"autoRenewTime"`
+	CdsAutoRenew              bool             `json:"cdsAutoRenew"`
+	AspId                     string           `json:"aspId"`
+	InternalIps               []string         `json:"internalIps,omitempty"`
+	DeployId                  string           `json:"deployId,omitempty"`
+	ClientToken               string           `json:"-"`
+	RequestToken              string           `json:"requestToken"`
+	DeployIdList              []string         `json:"deployIdList"`
+	DetetionProtection        int              `json:"deletionProtection"`
 	// CreateInstanceBySpecArgs 的基础上增加的参数
 	LabelConstraints []LabelConstraint `json:"labelConstraints,omitempty"`
 }
@@ -1752,4 +1755,76 @@ type VolumeDeleteResultModel struct {
 
 type DeletionProtectionArgs struct {
 	DeletionProtection int `json:"deletionProtection"`
+}
+
+type BatchDeleteInstanceWithRelateResourceArgs struct {
+	RelatedReleaseFlag bool     `json:"relatedRelease"`
+	BccRecycleFlag     bool     `json:"bccRecycleFlag"`
+	InstanceIds        []string `json:"instanceIds"`
+}
+
+type BatchStartInstanceArgs struct {
+	InstanceIds []string `json:"instanceIds"`
+}
+
+type BatchStopInstanceArgs struct {
+	ForceStop        bool     `json:"forceStop"`
+	StopWithNoCharge bool     `json:"stopWithNoCharge"`
+	InstanceIds      []string `json:"instanceIds"`
+}
+
+type ListInstanceTypeArgs struct {
+	ZoneName string `json:"zoneName"`
+}
+
+type ListInstanceTypeResults struct {
+	ZoneInstanceTypes []ZoneInstanceTypes `json:"zoneInstanceTypes"`
+}
+
+type ZoneInstanceTypes struct {
+	ZoneName      string   `json:"zoneName"`
+	InstanceTypes []string `json:"instanceTypes"`
+}
+
+type ListIdMappingArgs struct {
+	IdType      string   `json:"idType"`
+	ObjectType  string   `json:"objectType"`
+	InstanceIds []string `json:"instanceIds"`
+}
+
+type ListIdMappingResults struct {
+	IdMapping []IdMapping `json:"mappings"`
+}
+
+type IdMapping struct {
+	Uuid string `json:"uuid"`
+	Id   string `json:"id"`
+}
+
+type BatchResizeInstanceArgs struct {
+	Spec           string   `json:"spec"`
+	InstanceIdList []string `json:"instanceIdList"`
+}
+
+type BatchResizeInstanceResults struct {
+	OrderUuidResults []string `json:"orderUuidResults"`
+}
+
+// UpdateSecurityGroupRuleArgs defines the structure of input parameters for the UpdateSecurityGroupRule api
+type UpdateSecurityGroupRuleArgs struct {
+	SgVersion           int64   `json:"sgVersion,omitempty"`
+	SecurityGroupRuleId string  `json:"securityGroupRuleId"`
+	Remark              *string `json:"remark,omitempty"`
+	PortRange           *string `json:"portRange,omitempty"`
+	SourceIp            *string `json:"sourceIp,omitempty"`
+	SourceGroupId       *string `json:"sourceGroupId,omitempty"`
+	DestIp              *string `json:"destIp,omitempty"`
+	DestGroupId         *string `json:"destGroupId,omitempty"`
+	Protocol            *string `json:"protocol,omitempty"`
+}
+
+// DeleteSecurityGroupRuleArgs defines the structure of input parameters for the DeleteSecurityGroupRule api
+type DeleteSecurityGroupRuleArgs struct {
+	SgVersion           int64  `json:"sgVersion,omitempty"`
+	SecurityGroupRuleId string `json:"securityGroupRuleId"`
 }
