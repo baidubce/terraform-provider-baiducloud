@@ -1,5 +1,25 @@
 	## 1.16.0 (Unreleased)
-	
+
+## 1.15.6 (September 14, 2022)
+NOTES:
+- go sdk update to v0.9.135
+ENHANCEMENTS:
+- Support baiducloud NAT param cu_num
+BUG FIXES:
+- Fix when instance_spec are provided, cpu_count, instance_type and memory_size_in_gb still diff
+
+## 1.15.5 (September 08, 2022)
+FEATURES:
+- **New Data Source:** `baiducloud_bbc_instances`
+- **New Data Source:** `baiducloud_bbc_images`
+- **New Data Source:** `baiducloud_bbc_flavors`
+- **New Resource:** `baiducloud_bbc_instance`
+- **New Resource:** `baiducloud_bbc_image`
+ENHANCEMENTS:
+- Support baiducloud BCC param instance_spec
+BUG FIXES:
+- Fix filter's bug.
+
 ## 1.15.3 (September 06, 2022)
 NOTES:
 - Support baidu blb
