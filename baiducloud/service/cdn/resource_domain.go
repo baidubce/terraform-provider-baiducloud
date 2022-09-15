@@ -54,6 +54,18 @@ func ResourceDomain() *schema.Resource {
 							Optional:    true,
 							Default:     false,
 						},
+						"weight": {
+							Type:         schema.TypeInt,
+							Description:  "The origin server weight. Must be between `1` and `100`. Sum of all weights should not be greater than 100. No effect when `peer` is domain name.",
+							Optional:     true,
+							ValidateFunc: validation.IntBetween(1, 100),
+						},
+						"isp": {
+							Type:         schema.TypeString,
+							Description:  "ISP of the origin server. Valid values: `un`(China Unicom), `ct`(China Telecom), `cm`(China Mobile)",
+							Optional:     true,
+							ValidateFunc: validation.StringInSlice([]string{"un", "ct", "cm"}, false),
+						},
 					},
 				},
 			},

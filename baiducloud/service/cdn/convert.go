@@ -31,6 +31,8 @@ func flattenOriginPeers(originPeers []api.OriginPeer) interface{} {
 			"peer":   v.Peer,
 			"host":   v.Host,
 			"backup": v.Backup,
+			"weight": v.Weight,
+			"isp":    v.ISP,
 		})
 	}
 	return tfList
@@ -44,6 +46,8 @@ func expandOriginPeers(tfList []interface{}) []api.OriginPeer {
 			Peer:   tfMap["peer"].(string),
 			Host:   tfMap["host"].(string),
 			Backup: tfMap["backup"].(bool),
+			Weight: tfMap["weight"].(int),
+			ISP:    tfMap["isp"].(string),
 		})
 	}
 	return originPeers
@@ -228,6 +232,202 @@ func expandMobileAccess(tfList []interface{}) bool {
 		return v
 	}
 	return false
+}
+
+//</editor-fold>
+
+//</editor-fold>
+
+//<editor-fold desc="ACLConfig">
+
+//<editor-fold desc="RefererACL">
+func flattenRefererACL(refererACL *api.RefererACL) []interface{} {
+	return []interface{}{map[string]interface{}{
+		"black_list":  flex.FlattenStringValueSet(refererACL.BlackList),
+		"white_list":  flex.FlattenStringValueSet(refererACL.WhiteList),
+		"allow_empty": refererACL.AllowEmpty,
+	}}
+}
+
+func expandRefererACL(tfList []interface{}) *api.RefererACL {
+	refererACL := &api.RefererACL{
+		BlackList:  []string{},
+		WhiteList:  []string{},
+		AllowEmpty: true,
+	}
+	if len(tfList) == 0 || tfList[0] == nil {
+		return refererACL
+	}
+	tfMap := tfList[0].(map[string]interface{})
+	refererACL.AllowEmpty = tfMap["allow_empty"].(bool)
+	refererACL.BlackList = flex.ExpandStringValueSet(tfMap["black_list"].(*schema.Set))
+	refererACL.WhiteList = flex.ExpandStringValueSet(tfMap["white_list"].(*schema.Set))
+	return refererACL
+}
+
+//</editor-fold>
+
+//<editor-fold desc="IpACL">
+func flattenIpACL(ipACL *api.IpACL) []interface{} {
+	return []interface{}{map[string]interface{}{
+		"black_list": flex.FlattenStringValueSet(ipACL.BlackList),
+		"white_list": flex.FlattenStringValueSet(ipACL.WhiteList),
+	}}
+}
+
+func expandIpACL(tfList []interface{}) *api.IpACL {
+	ipACL := &api.IpACL{
+		BlackList: []string{},
+		WhiteList: []string{},
+	}
+	if len(tfList) == 0 || tfList[0] == nil {
+		return ipACL
+	}
+	tfMap := tfList[0].(map[string]interface{})
+	ipACL.BlackList = flex.ExpandStringValueSet(tfMap["black_list"].(*schema.Set))
+	ipACL.WhiteList = flex.ExpandStringValueSet(tfMap["white_list"].(*schema.Set))
+	return ipACL
+}
+
+//</editor-fold>
+
+//<editor-fold desc="UaACL">
+func flattenUaACL(uaACL *api.UaACL) []interface{} {
+	return []interface{}{map[string]interface{}{
+		"black_list": flex.FlattenStringValueSet(uaACL.BlackList),
+		"white_list": flex.FlattenStringValueSet(uaACL.WhiteList),
+	}}
+}
+
+func expandUaACL(tfList []interface{}) *api.UaACL {
+	uaACL := &api.UaACL{
+		BlackList: []string{},
+		WhiteList: []string{},
+	}
+	if len(tfList) == 0 || tfList[0] == nil {
+		return uaACL
+	}
+	tfMap := tfList[0].(map[string]interface{})
+	uaACL.BlackList = flex.ExpandStringValueSet(tfMap["black_list"].(*schema.Set))
+	uaACL.WhiteList = flex.ExpandStringValueSet(tfMap["white_list"].(*schema.Set))
+	return uaACL
+}
+
+//</editor-fold>
+
+//<editor-fold desc="Cors">
+func flattenCors(cors *api.CorsCfg) []interface{} {
+	tfMap := map[string]interface{}{
+		"allow":       "off",
+		"origin_list": flex.FlattenStringValueSet(cors.Origins),
+	}
+	if cors.IsAllow {
+		tfMap["allow"] = "on"
+		tfMap["origin_list"] = flex.FlattenStringValueSet(cors.Origins)
+	}
+	return []interface{}{tfMap}
+}
+
+func expandCors(tfList []interface{}) api.CorsCfg {
+	cors := api.CorsCfg{}
+
+	if len(tfList) == 0 || tfList[0] == nil {
+		return cors
+	}
+	tfMap := tfList[0].(map[string]interface{})
+
+	if tfMap["allow"].(string) == "on" {
+		cors.IsAllow = true
+	}
+	if cors.IsAllow {
+		cors.Origins = flex.ExpandStringValueSet(tfMap["origin_list"].(*schema.Set))
+	}
+
+	return cors
+}
+
+//</editor-fold>
+
+//<editor-fold desc="AccessLimit">
+func flattenAccessLimit(accessLimit *api.AccessLimit) []interface{} {
+	tfMap := map[string]interface{}{
+		"enabled": accessLimit.Enabled,
+	}
+	if accessLimit.Enabled {
+		tfMap["limit"] = accessLimit.Limit
+	}
+	return []interface{}{tfMap}
+}
+
+func expandAccessLimit(tfList []interface{}) *api.AccessLimit {
+	accessLimit := &api.AccessLimit{}
+
+	if len(tfList) == 0 || tfList[0] == nil {
+		return accessLimit
+	}
+	tfMap := tfList[0].(map[string]interface{})
+
+	accessLimit.Enabled = tfMap["enabled"].(bool)
+	if accessLimit.Enabled {
+		accessLimit.Limit = tfMap["limit"].(int)
+	}
+
+	return accessLimit
+}
+
+//</editor-fold>
+
+//<editor-fold desc="TrafficLimit">
+func flattenTrafficLimit(trafficLimit *api.TrafficLimit) []interface{} {
+	tfMap := map[string]interface{}{
+		"enable": trafficLimit.Enabled,
+	}
+	if trafficLimit.Enabled {
+		tfMap["limit_rate"] = trafficLimit.LimitRate
+		tfMap["limit_start_hour"] = trafficLimit.LimitStartHour
+		tfMap["limit_end_hour"] = trafficLimit.LimitEndHour
+	}
+
+	return []interface{}{tfMap}
+}
+
+func expandTrafficLimit(tfList []interface{}) *api.TrafficLimit {
+	trafficLimit := &api.TrafficLimit{}
+
+	if len(tfList) == 0 || tfList[0] == nil {
+		return trafficLimit
+	}
+	tfMap := tfList[0].(map[string]interface{})
+
+	trafficLimit.Enabled = tfMap["enable"].(bool)
+	if trafficLimit.Enabled {
+		trafficLimit.LimitRate = tfMap["limit_rate"].(int)
+		if v, ok := tfMap["limit_start_hour"]; ok {
+			trafficLimit.LimitStartHour = v.(int)
+		}
+		if v, ok := tfMap["limit_end_hour"]; ok {
+			trafficLimit.LimitEndHour = v.(int)
+		}
+	}
+
+	return trafficLimit
+}
+
+//</editor-fold>
+
+//<editor-fold desc="RequestAuth">
+func expandRequestAuth(tfList []interface{}) *api.RequestAuth {
+	if len(tfList) == 0 || tfList[0] == nil {
+		return nil
+	}
+	requestAuth := &api.RequestAuth{}
+	tfMap := tfList[0].(map[string]interface{})
+	requestAuth.Type = tfMap["type"].(string)
+	requestAuth.Key1 = tfMap["key1"].(string)
+	requestAuth.Key2 = tfMap["key2"].(string)
+	requestAuth.Timeout = tfMap["timeout"].(int)
+	requestAuth.TimestampMetric = tfMap["timestamp_metric"].(int)
+	return requestAuth
 }
 
 //</editor-fold>

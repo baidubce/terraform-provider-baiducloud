@@ -34,6 +34,8 @@ func TestAccDomain(t *testing.T) {
 					resource.TestCheckResourceAttrSet(resourceName, "create_time"),
 					resource.TestCheckResourceAttrSet(resourceName, "last_modify_time"),
 					resource.TestCheckResourceAttrSet(resourceName, "is_ban"),
+					resource.TestCheckResourceAttr(resourceName, "origin.0.weight", "20"),
+					resource.TestCheckResourceAttr(resourceName, "origin.0.isp", "un"),
 				),
 			},
 			{
@@ -100,6 +102,8 @@ resource "baiducloud_cdn_domain" "test" {
         backup = false
         host   = "acc.test.com"
         peer   = "http://2.3.4.5:80"
+		weight = 20
+		isp    = "un"
     }
 }`, domain)
 }
@@ -113,11 +117,13 @@ resource "baiducloud_cdn_domain" "test" {
         backup = false
         host   = "acc.test.com"
         peer   = "http://2.3.4.5:80"
+		weight = 20
     }
 	origin {
         backup = true
         host   = "acc2.test.com"
         peer   = "https://2.3.4.5:443"
+		weight = 30
     }
 }`, domain, domain)
 }

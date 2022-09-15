@@ -57,6 +57,7 @@ resource "baiducloud_cdn_domain" "test" {
         backup = false
         host   = "acc1.test.com"
         peer   = "http://2.3.4.5:80"
+        weight = 30
     }
 }
 resource "baiducloud_cdn_domain_config_cache" "test" {
@@ -85,12 +86,15 @@ resource "baiducloud_cdn_domain_config_cache" "test" {
 
 func testAccDomainConfigCacheUpdate(domain string) string {
 	return fmt.Sprintf(`
+data "baiducloud_cdn_domains" "test" {
+}
 resource "baiducloud_cdn_domain" "test" {
     domain = "%s"
     origin {
         backup = false
         host   = "acc1.test.com"
         peer   = "http://2.3.4.5:80"
+        weight = 30
     }
 }
 resource "baiducloud_cdn_domain_config_cache" "test" {
@@ -121,7 +125,7 @@ resource "baiducloud_cdn_domain_config_cache" "test" {
     }
     cache_share {
         enabled = true
-		domain = "acc2.test.com"
+		domain = "${data.baiducloud_cdn_domains.test.domains.0.domain}"
     }
     mobile_access {
         distinguish_client = false
