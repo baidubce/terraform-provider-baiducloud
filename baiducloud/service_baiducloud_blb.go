@@ -2,6 +2,7 @@ package baiducloud
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/baidubce/bce-sdk-go/services/blb"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -15,6 +16,7 @@ type BLBService struct {
 
 func (s *BLBService) BLBStateRefreshFunc(id string, failState []string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
+		time.Sleep(time.Second * time.Duration(10))
 		raw, err := s.client.WithBLBClient(func(client *blb.Client) (i interface{}, e error) {
 			return client.DescribeLoadBalancerDetail(id)
 		})

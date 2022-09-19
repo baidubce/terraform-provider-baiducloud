@@ -66,6 +66,22 @@ func appBlbProtocolTCPUDPHTTPSuppressFunc(k, old, new string, d *schema.Resource
 	return true
 }
 
+func blbProtocolTCPUDPSSLSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
+	if v, ok := d.GetOk("protocol"); ok {
+		return stringInSlice([]string{TCP, UDP, SSL}, v.(string))
+	}
+
+	return true
+}
+
+func blbProtocolTCPUDPHTTPSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
+	if v, ok := d.GetOk("protocol"); ok {
+		return stringInSlice([]string{TCP, UDP, HTTP}, v.(string))
+	}
+
+	return true
+}
+
 func cfcTriggerSourceTypeSuppressFunc(sourceType []string) schema.SchemaDiffSuppressFunc {
 	return func(k, old, new string, d *schema.ResourceData) bool {
 		sType := d.Get("source_type").(string)
