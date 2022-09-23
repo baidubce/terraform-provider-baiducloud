@@ -76,6 +76,7 @@ The following arguments are supported:
 * `subnet_id` - (Optional) The subnet ID of VPC. The default subnet will be used when it is empty. The instance will restart after changing the subnet.
 * `tags` - (Optional, ForceNew) Tags, do not support modify
 * `user_data` - (Optional) User Data
+* `deploy_set_ids` - (Optional) Deploy set id list the instance belong to. *NOTE*:Change of this list will reboot bcc instance, probably.
 
 The `billing` object supports the following:
 

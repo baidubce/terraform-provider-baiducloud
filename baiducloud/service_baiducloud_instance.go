@@ -163,6 +163,11 @@ func (s *BccService) FlattenInstanceModelToMap(instances []api.InstanceModel) ([
 			return nil, err
 		}
 
+		deploysetIds := make([]string, 0)
+		for _, value := range inst.DeploySetList {
+			deploysetIds = append(deploysetIds, value.DeploySetId)
+		}
+
 		result = append(result, map[string]interface{}{
 			"instance_id":              inst.InstanceId,
 			"name":                     inst.InstanceName,
@@ -193,6 +198,7 @@ func (s *BccService) FlattenInstanceModelToMap(instances []api.InstanceModel) ([
 			"auto_renew":               inst.AutoRenew,
 			"keypair_id":               inst.KeypairId,
 			"keypair_name":             inst.KeypairName,
+			"deploy_set_ids":           deploysetIds,
 			"tags":                     flattenTagsToMap(inst.Tags),
 		})
 	}

@@ -216,6 +216,14 @@ func dataSourceBaiduCloudInstances() *schema.Resource {
 							Description: "spec",
 							Computed:    true,
 						},
+						"deploy_set_ids": {
+							Type:        schema.TypeSet,
+							Description: "Deploy set ids the instance belong to",
+							Optional:    true,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
+						},
 						"tags": tagsComputedSchema(),
 					},
 				},

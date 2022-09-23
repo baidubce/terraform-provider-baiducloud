@@ -213,6 +213,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_bbc_images":                     dataSourceBaiduCloudBbcImages(),
 			"baiducloud_bbc_flavors":                    dataSourceBaiduCloudBbcFlavors(),
 			"baiducloud_bbc_instances":                  dataSourceBaiduCloudBbcInstances(),
+			"baiducloud_deploysets":                     dataSourceBaiduCloudDeploySets(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -262,12 +263,12 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_iam_group_policy_attachment": resourceBaiduCloudIamGroupPolicyAttachment(),
 			"baiducloud_cdn_domain":                  cdn.ResourceDomain(),
 			"baiducloud_cdn_domain_config_cache":     cdn.ResourceDomainConfigCache(),
-			"baiducloud_cdn_domain_config_acl":       cdn.ResourceDomainConfigACL(),
 			"baiducloud_localdns_privatezone":        resourceBaiduCloudLocalDnsPrivateZone(),
 			"baiducloud_localdns_vpc":                resourceBaiduCloudLocalDnsVpc(),
 			"baiducloud_localdns_record":             resourceBaiduCloudPrivateZoneRecord(),
 			"baiducloud_bbc_instance":                resourceBaiduCloudBccInstance(),
 			"baiducloud_bbc_image":                   resourceBaiduCloudBbcImage(),
+			"baiducloud_deployset":                   resourceBaiduCloudDeploySet(),
 		},
 
 		ConfigureFunc: providerConfigure,

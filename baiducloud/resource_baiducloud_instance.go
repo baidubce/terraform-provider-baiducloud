@@ -383,6 +383,14 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Description: "spec",
 				Optional:    true,
 			},
+			"deploy_set_ids": {
+				Type:        schema.TypeSet,
+				Description: "Deploy set ids the instance belong to",
+				Optional:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
 			"tags": tagsSchema(),
 		},
 	}
@@ -510,7 +518,6 @@ func resourceBaiduCloudInstanceRead(d *schema.ResourceData, meta interface{}) er
 
 	instanceID := d.Id()
 	action := "Query BCC Instance " + instanceID
-
 	raw, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
 		return bccClient.GetInstanceDetail(instanceID)
 	})
@@ -556,7 +563,11 @@ func resourceBaiduCloudInstanceRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("keypair_id", response.Instance.KeypairId)
 	d.Set("keypair_name", response.Instance.KeypairName)
 	d.Set("auto_renew", response.Instance.AutoRenew)
-
+	deploysetIds := make([]string, 0)
+	for _, value := range response.Instance.DeploySetList {
+		deploysetIds = append(deploysetIds, value.DeploySetId)
+	}
+	d.Set("deploy_set_ids", deploysetIds)
 	raw, err = client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
 		args := &api.ListSecurityGroupArgs{
 			InstanceId: instanceID,
@@ -564,7 +575,6 @@ func resourceBaiduCloudInstanceRead(d *schema.ResourceData, meta interface{}) er
 		return bccClient.ListSecurityGroup(args)
 	})
 	addDebug(action, raw)
-
 	if err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
 	}
@@ -645,6 +655,11 @@ func resourceBaiduCloudInstanceUpdate(d *schema.ResourceData, meta interface{}) 
 
 	// update instance action
 	if err := updateInstanceAction(d, meta, instanceID); err != nil {
+		return err
+	}
+
+	// update instance deploy
+	if err := updateInstanceDeploy(d, meta, instanceID); err != nil {
 		return err
 	}
 
@@ -974,7 +989,14 @@ func buildBaiduCloudInstanceBySpecArgs(d *schema.ResourceData, meta interface{})
 	if v, ok := d.GetOk("tags"); ok {
 		request.Tags = tranceTagMapToModel(v.(map[string]interface{}))
 	}
-
+	deploysetIds := make([]string, 0)
+	v, ok := d.GetOk("deploy_set_ids")
+	if ok {
+		for _, value := range v.(*schema.Set).List() {
+			deploysetIds = append(deploysetIds, value.(string))
+		}
+	}
+	request.DeployIdList = deploysetIds
 	return request, nil
 }
 
@@ -1270,5 +1292,35 @@ func updateInstanceAction(d *schema.ResourceData, meta interface{}, instanceID s
 		d.SetPartial("action")
 	}
 
+	return nil
+}
+
+func updateInstanceDeploy(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	action := "Update instance deploy sets " + instanceID
+	client := meta.(*connectivity.BaiduClient)
+	if d.HasChange("deploy_set_ids") {
+		v, ok := d.GetOk("deploy_set_ids")
+		deps := make([]string, 0)
+		if ok {
+			deploySets := v.(*schema.Set).List()
+			for _, dep := range deploySets {
+				// update deploy sets
+				deps = append(deps, dep.(string))
+			}
+
+		}
+		if _, err := client.WithBccClient(func(bccClient *bcc.Client) (i interface{}, e error) {
+			req := &api.UpdateInstanceDeployArgs{
+				ClientToken: buildClientToken(),
+			}
+			req.DeploySetIds = deps
+			req.InstanceId = instanceID
+			err, _ := bccClient.UpdateInstanceDeploySet(req)
+			return nil, err
+		}); err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+		}
+		d.SetPartial("deploy_set_ids")
+	}
 	return nil
 }

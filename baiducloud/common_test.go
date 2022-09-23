@@ -45,4 +45,5 @@ const (
 	BaiduCloudTestResourceTypeNameLocalDnsVPC         = BaiduCloudTestResourceTypeName + "-" + "localdns-vpc"
 	BaiduCloudTestResourceTypeNameBbcImage            = BaiduCloudTestResourceTypeName + "-" + "bbc-image"
 	BaiduCloudTestResourceTypeNameBbcInstance         = BaiduCloudTestResourceTypeName + "-" + "bbc-instance"
+	BaiduCloudTestResourceTypeNameDeploySet           = BaiduCloudTestResourceTypeName + "-" + "deployset"
 )
