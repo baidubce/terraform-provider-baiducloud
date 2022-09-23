@@ -1,4 +1,13 @@
 	## 1.16.0 (Unreleased)
+## 1.15.9 (September 23, 2022)
+NOTES:
+- Support baiducloud deploy set
+FEATURES:
+- **New Data Source:** `baiducloud_deploysets`
+- **New Resource:** `baiducloud_deployset`
+ENHANCEMENTS:
+- Support baiducloud BCC param deploy_set_ids
+
 ## 1.15.8 (September 19, 2022)
 NOTES:
 - Support baidu blb listener
