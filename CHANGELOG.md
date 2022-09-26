@@ -1,4 +1,8 @@
 	## 1.16.0 (Unreleased)
+## 1.15.10 (September 26, 2022)
+NOTES:
+- Support baidu blb backend server
+
 ## 1.15.9 (September 23, 2022)
 NOTES:
 - Support baiducloud deploy set
