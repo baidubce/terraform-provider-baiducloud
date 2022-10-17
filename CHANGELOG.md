@@ -1,4 +1,8 @@
 	## 1.16.0 (Unreleased)
+## 1.15.11 (October 17, 2022)
+NOTES:
+- Support baidu blb security group
+
 ## 1.15.10 (September 26, 2022)
 NOTES:
 - Support baidu blb backend server
