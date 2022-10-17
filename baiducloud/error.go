@@ -47,6 +47,7 @@ const (
 	Ccev2InstanceGroupNotFound = "cce.warning.InstanceGroupNotFound"
 	Ccev2InstanceNotFound      = "cce.warning.InstanceNotFound"
 	InstanceNotExist           = "InstanceNotExist"
+	BlbNotFound                = "BlbNotFound"
 
 	// scs error
 	InvalidInstanceStatus = "InvalidInstanceStatus"
@@ -99,7 +100,7 @@ var (
 var NotFoundErrorList = []string{
 	NotFound, ResourceNotFoundException, ResourceNotFound, ResourceNotFound2, InstanceNotFound,
 	"NoSuchObject", "NoSuchNat", EipNotFound, InstanceNotExist, CceNotFound,
-	Ccev2ClusterNotFound, Ccev2InstanceGroupNotFound, Ccev2InstanceNotFound,
+	Ccev2ClusterNotFound, Ccev2InstanceGroupNotFound, Ccev2InstanceNotFound, BlbNotFound,
 }
 
 // WrapErrorOld An Error to wrap the different erros

@@ -25,7 +25,7 @@ func TestAccBaiduCloudBLBListener_Basic(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccBLBHTTPListenerConfigBasic(BaiduCloudTestResourceTypeName),
+				Config: testAccBLBHTTPListenerConfigBasic(BaiduCloudTestResourceTypeNameblbListener),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccBLBListenerResourceName),
 					resource.TestCheckResourceAttr(testAccBLBListenerResourceName, "listener_port", "129"),
@@ -34,7 +34,7 @@ func TestAccBaiduCloudBLBListener_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccBLBHTTPListenerConfigBasicUpdate(BaiduCloudTestResourceTypeName),
+				Config: testAccBLBHTTPListenerConfigBasicUpdate(BaiduCloudTestResourceTypeNameblbListener),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccBLBListenerResourceName),
 					resource.TestCheckResourceAttr(testAccBLBListenerResourceName, "listener_port", "129"),
@@ -56,7 +56,7 @@ func TestAccBaiduCloudBLBListener_TCPListener(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccBLBTCPListenerConfig(BaiduCloudTestResourceTypeName),
+				Config: testAccBLBTCPListenerConfig(BaiduCloudTestResourceTypeNameblbListener),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccBLBListenerResourceName),
 					resource.TestCheckResourceAttr(testAccBLBListenerResourceName, "listener_port", "124"),
@@ -65,7 +65,7 @@ func TestAccBaiduCloudBLBListener_TCPListener(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccBLBTCPListenerConfigUpdate(BaiduCloudTestResourceTypeName),
+				Config: testAccBLBTCPListenerConfigUpdate(BaiduCloudTestResourceTypeNameblbListener),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccBLBListenerResourceName),
 					resource.TestCheckResourceAttr(testAccBLBListenerResourceName, "listener_port", "124"),
@@ -87,7 +87,7 @@ func TestAccBaiduCloudBLBListener_UDPListener(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccBLBUDPListenerConfig(BaiduCloudTestResourceTypeName),
+				Config: testAccBLBUDPListenerConfig(BaiduCloudTestResourceTypeNameblbListener),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccBLBListenerResourceName),
 					resource.TestCheckResourceAttr(testAccBLBListenerResourceName, "listener_port", "125"),
@@ -96,7 +96,7 @@ func TestAccBaiduCloudBLBListener_UDPListener(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccBLBUDPListenerConfigUpdate(BaiduCloudTestResourceTypeName),
+				Config: testAccBLBUDPListenerConfigUpdate(BaiduCloudTestResourceTypeNameblbListener),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccBLBListenerResourceName),
 					resource.TestCheckResourceAttr(testAccBLBListenerResourceName, "listener_port", "125"),
@@ -118,7 +118,7 @@ func TestAccBaiduCloudBLBListener_HTTPListener(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccBLBHTTPListenerConfig(BaiduCloudTestResourceTypeName),
+				Config: testAccBLBHTTPListenerConfig(BaiduCloudTestResourceTypeNameblbListener),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccBLBListenerResourceName),
 					resource.TestCheckResourceAttr(testAccBLBListenerResourceName, "listener_port", "126"),
@@ -127,7 +127,7 @@ func TestAccBaiduCloudBLBListener_HTTPListener(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccBLBHTTPListenerConfigUpdate(BaiduCloudTestResourceTypeName),
+				Config: testAccBLBHTTPListenerConfigUpdate(BaiduCloudTestResourceTypeNameblbListener),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccBLBListenerResourceName),
 					resource.TestCheckResourceAttr(testAccBLBListenerResourceName, "listener_port", "126"),
