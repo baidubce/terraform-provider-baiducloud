@@ -1,4 +1,15 @@
 	## 1.16.0 (Unreleased)
+## 1.15.12 (October 24, 2022)
+NOTES:
+- Support baiducloud VPN
+  FEATURES:
+- **New Data Source:** `baiducloud_vpn_gateways`
+- **New Data Source:** `baiducloud_vpn_conns`
+- **New Resource:** `baiducloud_vpn_gateway`
+- **New Resource:** `baiducloud_vpn_conn`
+  ENHANCEMENTS:
+- BCE Go SDK update to v0.9.137
+
 ## 1.15.11 (October 17, 2022)
 NOTES:
 - Support baidu blb security group
