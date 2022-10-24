@@ -74,7 +74,7 @@ github.com/aws/aws-sdk-go/service/sso
 github.com/aws/aws-sdk-go/service/sso/ssoiface
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
-# github.com/baidubce/bce-sdk-go v0.9.135
+# github.com/baidubce/bce-sdk-go v0.9.137
 github.com/baidubce/bce-sdk-go/auth
 github.com/baidubce/bce-sdk-go/bce
 github.com/baidubce/bce-sdk-go/http
@@ -104,6 +104,7 @@ github.com/baidubce/bce-sdk-go/services/scs
 github.com/baidubce/bce-sdk-go/services/sts
 github.com/baidubce/bce-sdk-go/services/sts/api
 github.com/baidubce/bce-sdk-go/services/vpc
+github.com/baidubce/bce-sdk-go/services/vpn
 github.com/baidubce/bce-sdk-go/util
 github.com/baidubce/bce-sdk-go/util/crypto
 github.com/baidubce/bce-sdk-go/util/log

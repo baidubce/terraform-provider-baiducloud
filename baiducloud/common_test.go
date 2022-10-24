@@ -48,4 +48,6 @@ const (
 	BaiduCloudTestResourceTypeNameBbcImage            = BaiduCloudTestResourceTypeName + "-" + "bbc-image"
 	BaiduCloudTestResourceTypeNameBbcInstance         = BaiduCloudTestResourceTypeName + "-" + "bbc-instance"
 	BaiduCloudTestResourceTypeNameDeploySet           = BaiduCloudTestResourceTypeName + "-" + "deployset"
+	BaiduCloudTestResourceTypeNameVPNGateway          = BaiduCloudTestResourceTypeName + "-" + "VPNGateway"
+	BaiduCloudTestResourceTypeNameVPNConn             = BaiduCloudTestResourceTypeName + "-" + "VPNConn"
 )

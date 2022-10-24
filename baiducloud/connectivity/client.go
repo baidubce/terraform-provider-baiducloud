@@ -22,6 +22,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/sts"
 	"github.com/baidubce/bce-sdk-go/services/sts/api"
 	"github.com/baidubce/bce-sdk-go/services/vpc"
+	"github.com/baidubce/bce-sdk-go/services/vpn"
 	"github.com/baidubce/bce-sdk-go/util/log"
 	"sync"
 )
@@ -51,13 +52,14 @@ type BaiduClient struct {
 	cdnConn      *cdn.Client
 	localDnsConn *localDns.Client
 	bbcConn      *bbc.Client
+	vpnConn      *vpn.Client
 }
 
 type ApiVersion string
 
 var goSdkMutex = sync.RWMutex{} // The Go SDK is not thread-safe
 
-var providerVersion = "1.15.7"
+var providerVersion = "1.13.0"
 
 // Client for BaiduCloudClient
 func (c *Config) Client() (*BaiduClient, error) {
@@ -442,6 +444,24 @@ func (client *BaiduClient) WithBbcClient(do func(*bbc.Client) (interface{}, erro
 		client.bbcConn = bbcClient
 	}
 	return do(client.bbcConn)
+}
+
+func (client *BaiduClient) WithVPNClient(do func(*vpn.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	// Initialize the VPN client if necessary
+	if client.vpnConn == nil {
+		client.WithCommonClient(VPNCode)
+		vpnClient, err := vpn.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			goSdkMutex.Unlock()
+			return nil, err
+		}
+		vpnClient.Config.Credentials = client.Credentials
+		vpnClient.Config.UserAgent = buildUserAgent()
+		client.vpnConn = vpnClient
+	}
+	goSdkMutex.Unlock()
+	return do(client.vpnConn)
 }
 
 func buildUserAgent() string {

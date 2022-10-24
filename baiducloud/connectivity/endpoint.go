@@ -29,11 +29,13 @@ const (
 	CDNCode      = ServiceCode("CDN")
 	LOCALDNSCode = ServiceCode("LOCALDNS")
 	BBCCode      = ServiceCode("BBC")
+	VPNCode      = ServiceCode("VPN")
 )
 
 const (
 	DefaultBJRegionBccEndPoint = "bcc.bj.baidubce.com"
 	DefaultBJRegionBbcEndPoint = "bbc.bj.baidubce.com"
+	DefaultBJRegionVpnEndPoint = "bcc.bj.baidubce.com"
 	DefaultBJRegionEipEndPoint = "eip.bj.baidubce.com"
 	DefaultBJRegionBlbEndPoint = "blb.bj.baidubce.com"
 	DefaultBJRegionBosEndPoint = "bj.bcebos.com"
@@ -45,9 +47,11 @@ const (
 
 	DefaultBDRegionBccEndPoint = "bcc.bd.baidubce.com"
 	DefaultBDRegionBbcEndPoint = "bbc.bd.baidubce.com"
+	DefaultBDRegionVpnEndPoint = "bcc.bd.baidubce.com"
 
 	DefaultGZRegionBccEndPoint = "bcc.gz.baidubce.com"
 	DefaultGZRegionBbcEndPoint = "bbc.gz.baidubce.com"
+	DefaultGZRegionVpnEndPoint = "bcc.gz.baidubce.com"
 	DefaultGZRegionEipEndPoint = "eip.gz.baidubce.com"
 	DefaultGZRegionBlbEndPoint = "blb.gz.baidubce.com"
 	DefaultGZRegionBosEndPoint = "gz.bcebos.com"
@@ -58,6 +62,7 @@ const (
 
 	DefaultSURegionBccEndPoint = "bcc.su.baidubce.com"
 	DefaultSURegionBbcEndPoint = "bbc.su.baidubce.com"
+	DefaultSURegionVPNEndPoint = "bcc.su.baidubce.com"
 	DefaultSURegionEipEndPoint = "eip.su.baidubce.com"
 	DefaultSURegionBlbEndPoint = "blb.su.baidubce.com"
 	DefaultSURegionBosEndPoint = "su.bcebos.com"
@@ -67,9 +72,11 @@ const (
 	DefaultSURegionRdsEndPoint = "rds.su.baidubce.com"
 
 	DefaultFSHRegionBccEndPoint = "bcc.fsh.baidubce.com"
+	DefaultFSHRegionVPNEndPoint = "bcc.fsh.baidubce.com"
 
 	DefaultFWHRegionBccEndPoint = "bcc.fwh.baidubce.com"
 	DefaultFWHRegionBbcEndPoint = "bbc.fwh.baidubce.com"
+	DefaultFWHRegionVPNEndPoint = "bcc.fwh.baidubce.com"
 	DefaultFWHRegionEipEndPoint = "eip.fwh.baidubce.com"
 	DefaultFWHRegionBlbEndPoint = "blb.fwh.baidubce.com"
 	DefaultFWHRegionBosEndPoint = "fwh.bcebos.com"
@@ -79,8 +86,10 @@ const (
 	DefaultFWHRegionRdsEndPoint = "rds.fwh.baidubce.com"
 
 	DefaultHKGRegionBccEndPoint = "bcc.hkg.baidubce.com"
+	DefaultHKGRegionVPNEndPoint = "bcc.hkg.baidubce.com"
 
 	DefaultSINRegionBccEndPoint = "bcc.sin.baidubce.com"
+	DefaultSINRegionVPNEndPoint = "bcc.sin.baidubce.com"
 
 	DefaultCERTEndPoint = "certificate.baidubce.com"
 	DefaultIAMEndPoint  = "iam.bj.baidubce.com"
@@ -104,6 +113,7 @@ var (
 	RegionBJEndpoints = map[ServiceCode]string{
 		BCCCode:      DefaultBJRegionBccEndPoint,
 		BBCCode:      DefaultBJRegionBbcEndPoint,
+		VPNCode:      DefaultBJRegionVpnEndPoint,
 		VPCCode:      DefaultBJRegionBccEndPoint,
 		EIPCode:      DefaultBJRegionEipEndPoint,
 		APPBLBCode:   DefaultBJRegionBlbEndPoint,
@@ -125,12 +135,14 @@ var (
 	RegionBDEndpoints = map[ServiceCode]string{
 		BCCCode: DefaultBDRegionBccEndPoint,
 		VPCCode: DefaultBDRegionBccEndPoint,
+		VPNCode: DefaultBDRegionVpnEndPoint,
 		BBCCode: DefaultBDRegionBbcEndPoint,
 	}
 
 	// Region GZ Service Endpoints
 	RegionGZEndpoints = map[ServiceCode]string{
 		BCCCode:    DefaultGZRegionBccEndPoint,
+		VPNCode:    DefaultGZRegionVpnEndPoint,
 		BBCCode:    DefaultGZRegionBbcEndPoint,
 		VPCCode:    DefaultGZRegionBccEndPoint,
 		EIPCode:    DefaultGZRegionEipEndPoint,
@@ -150,6 +162,7 @@ var (
 	RegionSUEndpoints = map[ServiceCode]string{
 		BCCCode:    DefaultSURegionBccEndPoint,
 		BBCCode:    DefaultSURegionBbcEndPoint,
+		VPNCode:    DefaultSURegionVPNEndPoint,
 		VPCCode:    DefaultSURegionBccEndPoint,
 		EIPCode:    DefaultSURegionEipEndPoint,
 		APPBLBCode: DefaultSURegionBlbEndPoint,
@@ -167,6 +180,7 @@ var (
 	// Region FSH Service Endpoints
 	RegionFSHEndpoints = map[ServiceCode]string{
 		BCCCode: DefaultFSHRegionBccEndPoint,
+		VPNCode: DefaultFSHRegionVPNEndPoint,
 		VPCCode: DefaultFSHRegionBccEndPoint,
 	}
 
@@ -174,6 +188,7 @@ var (
 	RegionFWHEndpoints = map[ServiceCode]string{
 		BCCCode:    DefaultFWHRegionBccEndPoint,
 		BBCCode:    DefaultFWHRegionBbcEndPoint,
+		VPNCode:    DefaultFWHRegionVPNEndPoint,
 		VPCCode:    DefaultFWHRegionBccEndPoint,
 		EIPCode:    DefaultFWHRegionEipEndPoint,
 		APPBLBCode: DefaultFWHRegionBlbEndPoint,
@@ -192,12 +207,14 @@ var (
 	RegionHKGEndpoints = map[ServiceCode]string{
 		BCCCode: DefaultHKGRegionBccEndPoint,
 		VPCCode: DefaultHKGRegionBccEndPoint,
+		VPNCode: DefaultHKGRegionVPNEndPoint,
 	}
 
 	// Region SIN Service Endpoints
 	RegionSINEndpoints = map[ServiceCode]string{
 		BCCCode: DefaultSINRegionBccEndPoint,
 		VPCCode: DefaultSINRegionBccEndPoint,
+		VPNCode: DefaultSINRegionVPNEndPoint,
 	}
 )
 
