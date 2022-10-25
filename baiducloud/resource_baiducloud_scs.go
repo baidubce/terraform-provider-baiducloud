@@ -349,10 +349,9 @@ func resourceBaiduCloudScs() *schema.Resource {
 				ValidateFunc: validation.IntInSlice([]int{1, 2}),
 			},
 			"disk_flavor": {
-				Type:         schema.TypeInt,
-				Description:  "Storage size(GB) when use PegaDB. Must be between `50` and `160`",
-				Optional:     true,
-				ValidateFunc: validation.IntBetween(50, 160),
+				Type:        schema.TypeInt,
+				Description: "Storage size(GB) when use PegaDB.",
+				Optional:    true,
 			},
 			"disk_type": {
 				Type:        schema.TypeString,
