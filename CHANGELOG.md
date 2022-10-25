@@ -1,4 +1,16 @@
-	## 1.16.0 (Unreleased)
+	## 1.17.0 (Unreleased)
+## 1.16.0 (October 25, 2022)
+FEATURES:
+- **New Data Source:** `baiducloud_cdn_domain_certificate`
+- **New Resource:** `baiducloud_cdn_domain_config_origin`
+- **New Resource:** `baiducloud_cdn_domain_config_advanced`
+- **New Resource:** `baiducloud_cdn_domain_config_https`
+
+ENHANCEMENTS:
+- resource/baiducloud_cdn_domain_config_cache: Merge configuration read API calls.
+- resource/baiducloud_cdn_domain_config_acl: Merge configuration read API calls.
+- resource/baiducloud_scs: Delete validation for `disk_flavor`.
+
 ## 1.15.12 (October 24, 2022)
 NOTES:
 - Support baiducloud VPN
@@ -21,9 +33,11 @@ NOTES:
 ## 1.15.9 (September 23, 2022)
 NOTES:
 - Support baiducloud deploy set
+
 FEATURES:
 - **New Data Source:** `baiducloud_deploysets`
 - **New Resource:** `baiducloud_deployset`
+
 ENHANCEMENTS:
 - Support baiducloud BCC param deploy_set_ids
 

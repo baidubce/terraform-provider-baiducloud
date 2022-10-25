@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_scs"
+subcategory: "SCS"
 sidebar_current: "docs-baiducloud-resource-scs"
 description: |-
 Use this resource to get information about a SCS.
@@ -88,7 +89,7 @@ The following arguments are supported:
 * `billing` - (Optional) **Deprecated**. Use `payment_timing`, `reservation_length`, `reservation_time_unit` instead. Billing information of the Scs.
 * `client_auth` - (Optional, Sensitive) Access password of the instance. Should be 8-16 characters, and contains at least two types of letters, numbers and symbols. Allowed symbols include `$ ^ * ( ) _ + - =`.
 * `cluster_type` - (Optional, ForceNew) Type of the instance. If `engine` is `memcache`, must be `default`. Valid values for other engine type: `cluster`, `master_slave`.  Defaults to `master_slave`.
-* `disk_flavor` - (Optional) Storage size(GB) when use PegaDB. Must be between `50` and `160`
+* `disk_flavor` - (Optional) Storage size(GB) when use PegaDB.
 * `disk_type` - (Optional) Disk type of the instance. Valid values: `cloud_hp1`, `enhanced_ssd_pl1`.
 * `enable_read_only` - (Optional) Whether the copies are read only. Valid values: `1`(enabled), `2`(disabled). Defaults to `2`.
 * `engine_version` - (Optional) Engine version of the instance. Must be set when `engine` is `redis`. Valid values: `3.2`, `4.0`, `5.0`, `6.0`.
