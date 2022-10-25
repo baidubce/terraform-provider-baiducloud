@@ -1,4 +1,8 @@
 	## 1.17.0 (Unreleased)
+## 1.16.1 (October 25, 2022)
+BUG FIXES:
+- Fix subcategory error for CDN/SCS docs.
+
 ## 1.16.0 (October 25, 2022)
 FEATURES:
 - **New Data Source:** `baiducloud_cdn_domain_certificate`
