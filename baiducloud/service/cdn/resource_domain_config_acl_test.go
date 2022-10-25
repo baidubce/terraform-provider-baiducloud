@@ -7,13 +7,9 @@ import (
 	"testing"
 )
 
-const (
-	testAccCdnDomainConfigACLResourceType = "baiducloud_cdn_domain_config_acl"
-)
-
 func TestAccDomainConfigACL(t *testing.T) {
 	domain := "acc.test.com"
-	resourceName := testAccCdnDomainConfigACLResourceType + ".test"
+	resourceName := "baiducloud_cdn_domain_config_acl.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { acctest.PreCheck(t) },
@@ -29,6 +25,7 @@ func TestAccDomainConfigACL(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "cors.0.origin_list.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "access_limit.0.limit", "500"),
 					resource.TestCheckResourceAttr(resourceName, "traffic_limit.0.limit_rate", "500"),
+					resource.TestCheckResourceAttr(resourceName, "request_auth.#", "0"),
 				),
 			},
 			{
@@ -45,6 +42,7 @@ func TestAccDomainConfigACL(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "cors.0.allow", "off"),
 					resource.TestCheckResourceAttr(resourceName, "access_limit.0.enabled", "false"),
 					resource.TestCheckResourceAttr(resourceName, "traffic_limit.0.enable", "false"),
+					resource.TestCheckResourceAttr(resourceName, "request_auth.#", "1"),
 				),
 			},
 		},
@@ -126,5 +124,12 @@ resource "baiducloud_cdn_domain_config_acl" "test" {
     	limit_end_hour   = 23
     	limit_rate       = 500
   	}
+    request_auth {
+        type = "b"
+        key1 = "1234abcd1"
+        key2 = "5678abcd2"
+        timeout = 1802
+        timestamp_metric = 10
+    }
 }`, domain)
 }

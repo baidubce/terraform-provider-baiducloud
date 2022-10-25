@@ -226,7 +226,7 @@ func ResourceDomainConfigACL() *schema.Resource {
 							Type:         schema.TypeString,
 							Description:  "Authentication method. Valid values: `A`, `B`, `C`",
 							Required:     true,
-							ValidateFunc: validation.StringInSlice([]string{"A", "B", "C"}, false),
+							ValidateFunc: validation.StringInSlice([]string{"A", "B", "C"}, true),
 						},
 						"key1": {
 							Type:        schema.TypeString,
@@ -265,34 +265,20 @@ func resourceDomainConfigACLCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	d.SetId(domain)
-	return nil
+	return resourceDomainConfigACLRead(d, meta)
 }
 
 func resourceDomainConfigACLRead(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*connectivity.BaiduClient)
 	domain := d.Id()
-
 	d.Set("domain", domain)
 
-	if err := readRefererACL(d, conn, domain); err != nil {
-		return err
-	}
-	if err := readIpACL(d, conn, domain); err != nil {
-		return err
-	}
-	if err := readUaACL(d, conn, domain); err != nil {
+	if err := readCommonConfigACL(d, conn, domain); err != nil {
 		return err
 	}
 	if err := readCors(d, conn, domain); err != nil {
 		return err
 	}
-	if err := readAccessLimit(d, conn, domain); err != nil {
-		return err
-	}
-	if err := readTrafficLimit(d, conn, domain); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -307,6 +293,42 @@ func resourceDomainConfigACLUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceDomainConfigACLDelete(d *schema.ResourceData, meta interface{}) error {
+	return nil
+}
+
+func readCommonConfigACL(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
+	config, err := FindDomainConfigByName(conn, domain)
+	if err != nil {
+		return fmt.Errorf("error getting CDN Domain (%s) Config: %w", domain, err)
+	}
+	log.Printf("[DEBUG] Read CDN Domain (%s) Config RefererACL result: %+v", domain, config.RefererACL)
+	log.Printf("[DEBUG] Read CDN Domain (%s) Config IpACL result: %+v", domain, config.IpACL)
+	log.Printf("[DEBUG] Read CDN Domain (%s) Config UaAcl result: %+v", domain, config.UaAcl)
+	log.Printf("[DEBUG] Read CDN Domain (%s) Config AccessLimit result: %+v", domain, config.AccessLimit)
+	log.Printf("[DEBUG] Read CDN Domain (%s) Config TrafficLimit result: %+v", domain, config.TrafficLimit)
+	log.Printf("[DEBUG] Read CDN Domain (%s) Config RequestAuth result: %+v", domain, config.RequestAuth)
+
+	d.Set("referer_acl", flattenRefererACL(config.RefererACL))
+	d.Set("ip_acl", flattenIpACL(config.IpACL))
+	d.Set("ua_acl", flattenUaACL(config.UaAcl))
+	d.Set("access_limit", flattenAccessLimit(config.AccessLimit))
+	d.Set("traffic_limit", flattenTrafficLimit(config.TrafficLimit))
+	d.Set("request_auth", flattenRequestAuth(config.RequestAuth))
+
+	return nil
+}
+
+func readCors(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
+	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
+		return client.GetCors(domain)
+	})
+	log.Printf("[DEBUG] Read CDN Domain (%s) Config Cors result: %+v", domain, raw)
+
+	if err != nil {
+		return fmt.Errorf("error getting CDN Domain (%s) Config Cors: %w", domain, err)
+	}
+
+	d.Set("cors", flattenCors(raw.(*api.CorsCfg)))
 	return nil
 }
 
@@ -332,25 +354,10 @@ func updateConfigACL(d *schema.ResourceData, conn *connectivity.BaiduClient, dom
 	if err := updateRequestAuth(d, conn, domain); err != nil {
 		return err
 	}
-
 	return nil
 }
 
 //<editor-fold desc="RefererACL">
-func readRefererACL(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
-	log.Printf("[DEBUG] Read CDN Domain Config RefererACL: %s", domain)
-
-	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
-		return client.GetRefererACL(domain)
-	})
-	if err != nil {
-		return fmt.Errorf("error getting CDN Domain (%s) Config RefererACL: %w", domain, err)
-	}
-
-	d.Set("referer_acl", flattenRefererACL(raw.(*api.RefererACL)))
-	return nil
-}
-
 func updateRefererACL(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
 	if d.IsNewResource() || d.HasChange("referer_acl") {
 		oldV, newV := d.GetChange("referer_acl")
@@ -360,7 +367,7 @@ func updateRefererACL(d *schema.ResourceData, conn *connectivity.BaiduClient, do
 			return nil
 		}
 
-		log.Printf("[DEBUG] Update CDN Domain Config RefererACL: %s", domain)
+		log.Printf("[DEBUG] Update CDN Domain (%s) Config RefererACL", domain)
 
 		allowEmpty := newRefererACL.AllowEmpty
 		allowEmptyUpdated := false
@@ -411,20 +418,6 @@ func setRefererACL(conn *connectivity.BaiduClient, domain string, list []string,
 //</editor-fold>
 
 //<editor-fold desc="IpACL">
-func readIpACL(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
-	log.Printf("[DEBUG] Read CDN Domain Config IpACL: %s", domain)
-
-	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
-		return client.GetIpACL(domain)
-	})
-	if err != nil {
-		return fmt.Errorf("error getting CDN Domain (%s) Config IpACL: %w", domain, err)
-	}
-
-	d.Set("ip_acl", flattenIpACL(raw.(*api.IpACL)))
-	return nil
-}
-
 func updateIpACL(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
 	if d.IsNewResource() || d.HasChange("ip_acl") {
 		oldV, newV := d.GetChange("ip_acl")
@@ -434,7 +427,7 @@ func updateIpACL(d *schema.ResourceData, conn *connectivity.BaiduClient, domain 
 			return nil
 		}
 
-		log.Printf("[DEBUG] Update CDN Domain Config IpACL: %s", domain)
+		log.Printf("[DEBUG] Update CDN Domain (%s) Config IpACL", domain)
 
 		if len(oldIpACL.BlackList) > 0 && len(newIpACL.BlackList) == 0 {
 			if err := setIpACL(conn, domain, []string{}, true); err != nil {
@@ -477,20 +470,6 @@ func setIpACL(conn *connectivity.BaiduClient, domain string, list []string, setB
 //</editor-fold>
 
 //<editor-fold desc="UaACL">
-func readUaACL(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
-	log.Printf("[DEBUG] Read CDN Domain Config UaACL: %s", domain)
-
-	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
-		return client.GetUaACL(domain)
-	})
-	if err != nil {
-		return fmt.Errorf("error getting CDN Domain (%s) Config UaACL: %w", domain, err)
-	}
-
-	d.Set("ua_acl", flattenUaACL(raw.(*api.UaACL)))
-	return nil
-}
-
 func updateUaACL(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
 	if d.IsNewResource() || d.HasChange("ua_acl") {
 		oldV, newV := d.GetChange("ua_acl")
@@ -500,7 +479,7 @@ func updateUaACL(d *schema.ResourceData, conn *connectivity.BaiduClient, domain 
 			return nil
 		}
 
-		log.Printf("[DEBUG] Update CDN Domain Config UaACL: %s", domain)
+		log.Printf("[DEBUG] Update CDN Domain (%s) Config UaACL", domain)
 
 		if len(oldUaACL.BlackList) > 0 && len(newUaACL.BlackList) == 0 {
 			if err := setUaACL(conn, domain, []string{}, true); err != nil {
@@ -542,21 +521,6 @@ func setUaACL(conn *connectivity.BaiduClient, domain string, list []string, setB
 
 //</editor-fold>
 
-//<editor-fold desc="Cors">
-func readCors(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
-	log.Printf("[DEBUG] Read CDN Domain Config Cors: %s", domain)
-
-	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
-		return client.GetCors(domain)
-	})
-	if err != nil {
-		return fmt.Errorf("error getting CDN Domain (%s) Config Cors: %w", domain, err)
-	}
-
-	d.Set("cors", flattenCors(raw.(*api.CorsCfg)))
-	return nil
-}
-
 func updateCors(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
 	if d.IsNewResource() || d.HasChange("cors") {
 		oldV, newV := d.GetChange("cors")
@@ -566,7 +530,7 @@ func updateCors(d *schema.ResourceData, conn *connectivity.BaiduClient, domain s
 			return nil
 		}
 
-		log.Printf("[DEBUG] Update CDN Domain Config Cors: %s", domain)
+		log.Printf("[DEBUG] Update CDN Domain (%s) Config Cors", domain)
 
 		_, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
 			return nil, client.SetCors(domain, newCors.IsAllow, newCors.Origins)
@@ -578,26 +542,9 @@ func updateCors(d *schema.ResourceData, conn *connectivity.BaiduClient, domain s
 	return nil
 }
 
-//</editor-fold>
-
-//<editor-fold desc="AccessLimit">
-func readAccessLimit(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
-	log.Printf("[DEBUG] Read CDN Domain Config AccessLimit: %s", domain)
-
-	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
-		return client.GetAccessLimit(domain)
-	})
-	if err != nil {
-		return fmt.Errorf("error getting CDN Domain (%s) Config AccessLimit: %w", domain, err)
-	}
-
-	d.Set("access_limit", flattenAccessLimit(raw.(*api.AccessLimit)))
-	return nil
-}
-
 func updateAccessLimit(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
 	if d.IsNewResource() || d.HasChange("access_limit") {
-		log.Printf("[DEBUG] Update CDN Domain Config AccessLimit: %s", domain)
+		log.Printf("[DEBUG] Update CDN Domain (%s) Config AccessLimit", domain)
 
 		_, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
 			return nil, client.SetAccessLimit(domain, expandAccessLimit(d.Get("access_limit").([]interface{})))
@@ -609,26 +556,9 @@ func updateAccessLimit(d *schema.ResourceData, conn *connectivity.BaiduClient, d
 	return nil
 }
 
-//</editor-fold>
-
-//<editor-fold desc="TrafficLimit">
-func readTrafficLimit(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
-	log.Printf("[DEBUG] Read CDN Domain Config TrafficLimit: %s", domain)
-
-	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
-		return client.GetTrafficLimit(domain)
-	})
-	if err != nil {
-		return fmt.Errorf("error getting CDN Domain (%s) Config TrafficLimit: %w", domain, err)
-	}
-
-	d.Set("traffic_limit", flattenTrafficLimit(raw.(*api.TrafficLimit)))
-	return nil
-}
-
 func updateTrafficLimit(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
 	if d.IsNewResource() || d.HasChange("traffic_limit") {
-		log.Printf("[DEBUG] Update CDN Domain Config TrafficLimit: %s", domain)
+		log.Printf("[DEBUG] Update CDN Domain (%s) Config TrafficLimit", domain)
 
 		_, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
 			return nil, client.SetTrafficLimit(domain, expandTrafficLimit(d.Get("traffic_limit").([]interface{})))
@@ -640,12 +570,9 @@ func updateTrafficLimit(d *schema.ResourceData, conn *connectivity.BaiduClient, 
 	return nil
 }
 
-//</editor-fold>
-
-//<editor-fold desc="RequestAuth">
 func updateRequestAuth(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
 	if d.IsNewResource() || d.HasChange("request_auth") {
-		log.Printf("[DEBUG] Update CDN Domain Config RequestAuth: %s", domain)
+		log.Printf("[DEBUG] Update CDN Domain (%s) Config RequestAuth", domain)
 
 		_, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
 			return nil, client.SetDomainRequestAuth(domain, expandRequestAuth(d.Get("request_auth").([]interface{})))
@@ -656,5 +583,3 @@ func updateRequestAuth(d *schema.ResourceData, conn *connectivity.BaiduClient, d
 	}
 	return nil
 }
-
-//</editor-fold>

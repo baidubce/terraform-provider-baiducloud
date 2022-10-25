@@ -21,6 +21,21 @@ func flattenDomainStatuses(domainStatuses []api.DomainStatus) interface{} {
 	return tfList
 }
 
+func flattenDomainCertificate(certificate *api.CertificateDetail) interface{} {
+	return []map[string]interface{}{
+		{
+			"cert_id":          certificate.CertId,
+			"cert_name":        certificate.CertName,
+			"cert_common_name": certificate.CommonName,
+			"cert_dns_names":   certificate.DNSNames,
+			"cert_start_time":  certificate.StartTime,
+			"cert_stop_time":   certificate.StopTime,
+			"cert_create_time": certificate.CreateTime,
+			"cert_update_time": certificate.UpdateTime,
+		},
+	}
+}
+
 //</editor-fold>
 
 //<editor-fold desc="OriginPeer">
@@ -269,6 +284,9 @@ func expandRefererACL(tfList []interface{}) *api.RefererACL {
 
 //<editor-fold desc="IpACL">
 func flattenIpACL(ipACL *api.IpACL) []interface{} {
+	if ipACL == nil {
+		return nil
+	}
 	return []interface{}{map[string]interface{}{
 		"black_list": flex.FlattenStringValueSet(ipACL.BlackList),
 		"white_list": flex.FlattenStringValueSet(ipACL.WhiteList),
@@ -416,6 +434,19 @@ func expandTrafficLimit(tfList []interface{}) *api.TrafficLimit {
 //</editor-fold>
 
 //<editor-fold desc="RequestAuth">
+func flattenRequestAuth(requestAuth *api.RequestAuth) []interface{} {
+	if requestAuth == nil {
+		return nil
+	}
+	return []interface{}{map[string]interface{}{
+		"type":             requestAuth.Type,
+		"key1":             requestAuth.Key1,
+		"key2":             requestAuth.Key2,
+		"timeout":          requestAuth.Timeout,
+		"timestamp_metric": requestAuth.TimestampMetric,
+	}}
+}
+
 func expandRequestAuth(tfList []interface{}) *api.RequestAuth {
 	if len(tfList) == 0 || tfList[0] == nil {
 		return nil
@@ -431,5 +462,268 @@ func expandRequestAuth(tfList []interface{}) *api.RequestAuth {
 }
 
 //</editor-fold>
+
+//</editor-fold>
+
+//<editor-fold desc="Advanced">
+
+//<editor-fold desc="IPv6Dispatch">
+func flattenIPv6Dispatch(ipv6Enabled bool) []interface{} {
+	return []interface{}{map[string]interface{}{
+		"enable": ipv6Enabled,
+	}}
+}
+
+func expandIPv6Dispatch(tfList []interface{}) bool {
+	if len(tfList) == 0 || tfList[0] == nil {
+		return false
+	}
+	tfMap := tfList[0].(map[string]interface{})
+	return tfMap["enable"].(bool)
+}
+
+//</editor-fold>
+
+//<editor-fold desc="HttpHeader">
+func flattenHttpHeaders(httpHeaders []api.HttpHeader) *schema.Set {
+	tfSet := schema.NewSet(httpHeaderHash, nil)
+	for _, v := range httpHeaders {
+		tfSet.Add(map[string]interface{}{
+			"type":     v.Type,
+			"header":   v.Header,
+			"value":    v.Value,
+			"action":   v.Action,
+			"describe": v.Describe,
+		})
+	}
+	return tfSet
+}
+
+func expandHttpHeaders(tfSet *schema.Set) []api.HttpHeader {
+	list := []api.HttpHeader{}
+	for _, v := range tfSet.List() {
+		tfMap := v.(map[string]interface{})
+		list = append(list, api.HttpHeader{
+			Type:     tfMap["type"].(string),
+			Header:   tfMap["header"].(string),
+			Value:    tfMap["value"].(string),
+			Action:   tfMap["action"].(string),
+			Describe: tfMap["describe"].(string),
+		})
+	}
+	return list
+}
+
+func httpHeaderHash(v interface{}) int {
+	tfMap := v.(map[string]interface{})
+	var s []string
+
+	if v, ok := tfMap["type"]; ok {
+		s = append(s, v.(string))
+	}
+	if v, ok := tfMap["header"]; ok {
+		s = append(s, v.(string))
+	}
+	if v, ok := tfMap["value"]; ok {
+		s = append(s, v.(string))
+	}
+	if v, ok := tfMap["action"]; ok {
+		s = append(s, v.(string))
+	}
+	if v, ok := tfMap["describe"]; ok {
+		s = append(s, v.(string))
+	}
+	return hashcode.Strings(s)
+}
+
+//</editor-fold>
+
+//<editor-fold desc="MediaDrag">
+func flattenMediaDragConf(mediaDragConf *api.MediaDragConf) []interface{} {
+	tfMap := map[string]interface{}{}
+	if mediaDragConf == nil {
+		return []interface{}{tfMap}
+	}
+	if mediaDragConf.Mp4 != nil {
+		tfMap["mp4"] = flattenMediaCfg(mediaDragConf.Mp4)
+	}
+	if mediaDragConf.Flv != nil {
+		tfMap["flv"] = flattenMediaCfg(mediaDragConf.Flv)
+	}
+	return []interface{}{tfMap}
+}
+
+func expandMediaDragConf(tfList []interface{}) *api.MediaDragConf {
+	mediaDragConf := &api.MediaDragConf{}
+	if len(tfList) == 0 || tfList[0] == nil {
+		return mediaDragConf
+	}
+	tfMap := tfList[0].(map[string]interface{})
+	if mediaCfg, ok := tfMap["mp4"].([]interface{}); ok {
+		mediaDragConf.Mp4 = expandMediaCfg(mediaCfg)
+	}
+	if mediaCfg, ok := tfMap["flv"].([]interface{}); ok {
+		mediaDragConf.Flv = expandMediaCfg(mediaCfg)
+	}
+	return mediaDragConf
+}
+
+func flattenMediaCfg(mediaCfg *api.MediaCfg) []interface{} {
+	return []interface{}{map[string]interface{}{
+		"file_suffix":    flex.FlattenStringValueSet(mediaCfg.FileSuffix),
+		"start_arg_name": mediaCfg.StartArgName,
+		"end_arg_name":   mediaCfg.EndArgName,
+		"drag_mode":      mediaCfg.DragMode,
+	}}
+}
+
+func expandMediaCfg(tfList []interface{}) *api.MediaCfg {
+	if len(tfList) == 0 || tfList[0] == nil {
+		return nil
+	}
+	tfMap := tfList[0].(map[string]interface{})
+	return &api.MediaCfg{
+		FileSuffix:   flex.ExpandStringValueSet(tfMap["file_suffix"].(*schema.Set)),
+		StartArgName: tfMap["start_arg_name"].(string),
+		EndArgName:   tfMap["end_arg_name"].(string),
+		DragMode:     tfMap["drag_mode"].(string),
+	}
+}
+
+//</editor-fold>
+
+//<editor-fold desc="SeoSwitch">
+func flattenSeoSwitch(seo *api.SeoSwitch) []interface{} {
+	return []interface{}{map[string]interface{}{
+		"directly_origin": seo.DirectlyOrigin,
+	}}
+}
+
+func expandSeoSwitch(tfList []interface{}) *api.SeoSwitch {
+	seo := &api.SeoSwitch{
+		DirectlyOrigin: "OFF",
+		PushRecord:     "OFF",
+	}
+
+	if len(tfList) == 0 || tfList[0] == nil {
+		return seo
+	}
+	tfMap := tfList[0].(map[string]interface{})
+	seo.DirectlyOrigin = tfMap["directly_origin"].(string)
+	return seo
+}
+
+//</editor-fold>
+
+//<editor-fold desc="Compress">
+func flattenCompress(compressType string) []interface{} {
+	tfMap := map[string]interface{}{
+		"allow": false,
+	}
+	if len(compressType) > 0 {
+		tfMap["allow"] = true
+		tfMap["type"] = compressType
+	}
+	return []interface{}{tfMap}
+}
+
+func expandCompress(tfList []interface{}) (bool, string) {
+	if len(tfList) == 0 || tfList[0] == nil {
+		return false, ""
+	}
+	tfMap := tfList[0].(map[string]interface{})
+	return tfMap["allow"].(bool), tfMap["type"].(string)
+}
+
+//</editor-fold>
+
+//</editor-fold>
+
+//<editor-fold desc="Https">
+func flattenHttps(https *api.HTTPSConfig) []interface{} {
+	tfMap := map[string]interface{}{
+		"enabled": https.Enabled,
+		"cert_id": https.CertId,
+	}
+	if https.Enabled {
+		tfMap["http_redirect"] = https.HttpRedirect
+		tfMap["http_redirect_code"] = https.HttpRedirectCode
+		tfMap["https_redirect"] = https.HttpsRedirect
+		tfMap["https_redirect_code"] = https.HttpsRedirectCode
+		tfMap["http2_enabled"] = https.Http2Enabled
+		tfMap["verify_client"] = https.VerifyClient
+		tfMap["ssl_protocols"] = flex.FlattenStringValueSet(https.SslProtocols)
+	}
+
+	return []interface{}{tfMap}
+}
+
+func expandHttps(tfList []interface{}) *api.HTTPSConfig {
+	https := &api.HTTPSConfig{}
+
+	if len(tfList) == 0 || tfList[0] == nil {
+		return https
+	}
+	tfMap := tfList[0].(map[string]interface{})
+
+	https.Enabled = tfMap["enabled"].(bool)
+	if https.Enabled {
+		https.CertId = tfMap["cert_id"].(string)
+		https.HttpRedirect = tfMap["http_redirect"].(bool)
+		if https.HttpRedirect {
+			https.HttpRedirectCode = tfMap["http_redirect_code"].(int)
+		}
+		https.HttpsRedirect = tfMap["https_redirect"].(bool)
+		if https.HttpsRedirect {
+			https.HttpsRedirectCode = tfMap["https_redirect_code"].(int)
+		}
+		https.Http2Enabled = tfMap["http2_enabled"].(bool)
+		https.VerifyClient = tfMap["verify_client"].(bool)
+		https.SslProtocols = flex.ExpandStringValueSet(tfMap["ssl_protocols"].(*schema.Set))
+	}
+
+	return https
+}
+
+//</editor-fold>
+
+//<editor-fold desc="Origin">
+func flattenClientIp(clientIp *api.ClientIp) []interface{} {
+	tfMap := map[string]interface{}{
+		"enabled": false,
+	}
+	if clientIp != nil && clientIp.Enabled {
+		tfMap["enabled"] = true
+		tfMap["name"] = clientIp.Name
+	}
+	return []interface{}{tfMap}
+}
+
+func expandClientIp(tfList []interface{}) *api.ClientIp {
+	clientIp := &api.ClientIp{}
+	if len(tfList) == 0 || tfList[0] == nil {
+		return clientIp
+	}
+	tfMap := tfList[0].(map[string]interface{})
+	clientIp.Enabled = tfMap["enabled"].(bool)
+	if clientIp.Enabled {
+		clientIp.Name = tfMap["name"].(string)
+	}
+	return clientIp
+}
+
+func flattenOriginProtocol(originProtocol string) []interface{} {
+	return []interface{}{map[string]interface{}{
+		"value": originProtocol,
+	}}
+}
+
+func expandOriginProtocol(tfList []interface{}) string {
+	if len(tfList) == 0 || tfList[0] == nil {
+		return "http"
+	}
+	tfMap := tfList[0].(map[string]interface{})
+	return tfMap["value"].(string)
+}
 
 //</editor-fold>

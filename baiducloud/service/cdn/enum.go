@@ -32,3 +32,10 @@ func validErrorPageStatusCodes() []int {
 		500, 501, 502, 503, 504,
 	}
 }
+
+func validDragMode(forMp4 bool) []string {
+	if forMp4 {
+		return []string{"second"}
+	}
+	return []string{"byteAV", "byte"}
+}

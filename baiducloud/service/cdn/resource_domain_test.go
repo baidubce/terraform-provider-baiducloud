@@ -102,8 +102,8 @@ resource "baiducloud_cdn_domain" "test" {
         backup = false
         host   = "acc.test.com"
         peer   = "http://2.3.4.5:80"
-		weight = 20
-		isp    = "un"
+       	weight = 20
+       	isp    = "un"
     }
 }`, domain)
 }
@@ -117,13 +117,13 @@ resource "baiducloud_cdn_domain" "test" {
         backup = false
         host   = "acc.test.com"
         peer   = "http://2.3.4.5:80"
-		weight = 20
+       	weight = 20
     }
 	origin {
         backup = true
         host   = "acc2.test.com"
         peer   = "https://2.3.4.5:443"
-		weight = 30
+       	weight = 30
     }
 }`, domain, domain)
 }

@@ -161,30 +161,23 @@ func resourceDomainConfigCacheCreate(d *schema.ResourceData, meta interface{}) e
 	conn := meta.(*connectivity.BaiduClient)
 	domain := d.Get("domain").(string)
 
-	if err := update(d, conn, domain); err != nil {
+	if err := updateConfigCache(d, conn, domain); err != nil {
 		return err
 	}
 
 	d.SetId(domain)
-	return nil
+	return resourceDomainConfigCacheRead(d, meta)
 }
 
 func resourceDomainConfigCacheRead(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*connectivity.BaiduClient)
 	domain := d.Id()
-
 	d.Set("domain", domain)
 
-	if err := readCacheTTL(d, conn, domain); err != nil {
+	if err := readCommonConfigCache(d, conn, domain); err != nil {
 		return err
 	}
 	if err := readCacheUrlArgs(d, conn, domain); err != nil {
-		return err
-	}
-	if err := readErrorPage(d, conn, domain); err != nil {
-		return err
-	}
-	if err := readCacheShare(d, conn, domain); err != nil {
 		return err
 	}
 	if err := readMobileAccess(d, conn, domain); err != nil {
@@ -197,7 +190,7 @@ func resourceDomainConfigCacheUpdate(d *schema.ResourceData, meta interface{}) e
 	conn := meta.(*connectivity.BaiduClient)
 	domain := d.Id()
 
-	if err := update(d, conn, domain); err != nil {
+	if err := updateConfigCache(d, conn, domain); err != nil {
 		return err
 	}
 
@@ -208,7 +201,51 @@ func resourceDomainConfigCacheDelete(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func update(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
+func readCommonConfigCache(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
+	config, err := FindDomainConfigByName(conn, domain)
+	if err != nil {
+		return fmt.Errorf("error getting CDN Domain (%s) Config: %w", domain, err)
+	}
+	log.Printf("[DEBUG] Read CDN Domain (%s) Config CacheTTL result: %+v", domain, config.CacheTTL)
+	log.Printf("[DEBUG] Read CDN Domain (%s) Config ErrorPage result: %+v", domain, config.ErrorPage)
+	log.Printf("[DEBUG] Read CDN Domain (%s) Config CacheShare result: %+v", domain, config.CacheShare)
+
+	d.Set("cache_ttl", flattenCacheTTLs(config.CacheTTL))
+	d.Set("error_page", flattenErrorPages(config.ErrorPage))
+	d.Set("cache_share", flattenCacheShare(config.CacheShare))
+
+	return nil
+}
+
+func readCacheUrlArgs(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
+	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
+		return client.GetCacheUrlArgs(domain)
+	})
+	log.Printf("[DEBUG] Read CDN Domain (%s) Config CacheUrlArgs result: %+v", domain, raw)
+
+	if err != nil {
+		return fmt.Errorf("error getting CDN Domain (%s) Config CacheUrlArgs: %w", domain, err)
+	}
+
+	d.Set("cache_url_args", flattenCacheUrlArgs(raw.(*api.CacheUrlArgs)))
+	return nil
+}
+
+func readMobileAccess(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
+	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
+		return client.GetMobileAccess(domain)
+	})
+	log.Printf("[DEBUG] Read CDN Domain (%s) Config MobileAccess result: %+v", domain, raw)
+
+	if err != nil {
+		return fmt.Errorf("error getting CDN Domain (%s) Config MobileAccess: %w", domain, err)
+	}
+
+	d.Set("mobile_access", flattenMobileAccess(raw.(bool)))
+	return nil
+}
+
+func updateConfigCache(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
 	if err := updateCacheTTL(d, conn, domain); err != nil {
 		return err
 	}
@@ -227,24 +264,9 @@ func update(d *schema.ResourceData, conn *connectivity.BaiduClient, domain strin
 	return nil
 }
 
-//<editor-fold desc="CacheTTL">
-func readCacheTTL(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
-	log.Printf("[DEBUG] Read CDN Domain Config CacheTTL: %s", domain)
-
-	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
-		return client.GetCacheTTL(domain)
-	})
-	if err != nil {
-		return fmt.Errorf("error getting CDN Domain (%s) Config CacheTTL: %w", domain, err)
-	}
-
-	d.Set("cache_ttl", flattenCacheTTLs(raw.([]api.CacheTTL)))
-	return nil
-}
-
 func updateCacheTTL(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
 	if d.IsNewResource() || d.HasChange("cache_ttl") {
-		log.Printf("[DEBUG] Update CDN Domain Config CacheTTL: %s", domain)
+		log.Printf("[DEBUG] Update CDN Domain (%s) Config CacheTTL", domain)
 
 		_, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
 			schema := d.Get("cache_ttl").(*schema.Set)
@@ -257,26 +279,9 @@ func updateCacheTTL(d *schema.ResourceData, conn *connectivity.BaiduClient, doma
 	return nil
 }
 
-//</editor-fold>
-
-//<editor-fold desc="CacheUrlArgs">
-func readCacheUrlArgs(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
-	log.Printf("[DEBUG] Read CDN Domain Config CacheUrlArgs: %s", domain)
-
-	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
-		return client.GetCacheUrlArgs(domain)
-	})
-	if err != nil {
-		return fmt.Errorf("error getting CDN Domain (%s) Config CacheUrlArgs: %w", domain, err)
-	}
-
-	d.Set("cache_url_args", flattenCacheUrlArgs(raw.(*api.CacheUrlArgs)))
-	return nil
-}
-
 func updateCacheUrlArgs(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
 	if d.IsNewResource() || d.HasChange("cache_url_args") {
-		log.Printf("[DEBUG] Update CDN Domain Config CacheUrlArgs: %s", domain)
+		log.Printf("[DEBUG] Update CDN Domain (%s) Config CacheUrlArgs", domain)
 
 		_, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
 			return nil, client.SetCacheUrlArgs(domain, expandCacheUrlArgs(d.Get("cache_url_args").([]interface{})))
@@ -288,26 +293,9 @@ func updateCacheUrlArgs(d *schema.ResourceData, conn *connectivity.BaiduClient, 
 	return nil
 }
 
-//</editor-fold>
-
-//<editor-fold desc="ErrorPage">
-func readErrorPage(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
-	log.Printf("[DEBUG] Read CDN Domain Config ErrorPage: %s", domain)
-
-	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
-		return client.GetErrorPage(domain)
-	})
-	if err != nil {
-		return fmt.Errorf("error getting CDN Domain (%s) Config ErrorPage: %w", domain, err)
-	}
-
-	d.Set("error_page", flattenErrorPages(raw.([]api.ErrorPage)))
-	return nil
-}
-
 func updateErrorPage(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
 	if d.IsNewResource() || d.HasChange("error_page") {
-		log.Printf("[DEBUG] Update CDN Domain Config ErrorPage: %s", domain)
+		log.Printf("[DEBUG] Update CDN Domain (%s) Config ErrorPage", domain)
 
 		_, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
 			return nil, client.SetErrorPage(domain, expandErrorPages(d.Get("error_page").(*schema.Set)))
@@ -319,26 +307,9 @@ func updateErrorPage(d *schema.ResourceData, conn *connectivity.BaiduClient, dom
 	return nil
 }
 
-//</editor-fold>
-
-//<editor-fold desc="CacheShare">
-func readCacheShare(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
-	log.Printf("[DEBUG] Read CDN Domain Config CacheShare: %s", domain)
-
-	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
-		return client.GetCacheShared(domain)
-	})
-	if err != nil {
-		return fmt.Errorf("error getting CDN Domain (%s) Config CacheShare: %w", domain, err)
-	}
-
-	d.Set("cache_share", flattenCacheShare(raw.(*api.CacheShared)))
-	return nil
-}
-
 func updateCacheShare(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
 	if d.IsNewResource() || d.HasChange("cache_share") {
-		log.Printf("[DEBUG] Update CDN Domain Config CacheShare: %s", domain)
+		log.Printf("[DEBUG] Update CDN Domain (%s) Config CacheShare", domain)
 
 		_, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
 			request := expandCacheShare(d.Get("cache_share").([]interface{}))
@@ -351,26 +322,9 @@ func updateCacheShare(d *schema.ResourceData, conn *connectivity.BaiduClient, do
 	return nil
 }
 
-//</editor-fold>
-
-//<editor-fold desc="MobileAccess">
-func readMobileAccess(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
-	log.Printf("[DEBUG] Read CDN Domain Config MobileAccess: %s", domain)
-
-	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
-		return client.GetMobileAccess(domain)
-	})
-	if err != nil {
-		return fmt.Errorf("error getting CDN Domain (%s) Config MobileAccess: %w", domain, err)
-	}
-
-	d.Set("mobile_access", flattenMobileAccess(raw.(bool)))
-	return nil
-}
-
 func updateMobileAccess(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
 	if d.IsNewResource() || d.HasChange("mobile_access") {
-		log.Printf("[DEBUG] Update CDN Domain Config MobileAccess: %s", domain)
+		log.Printf("[DEBUG] Update CDN Domain (%s) Config MobileAccess", domain)
 
 		_, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
 			return nil, client.SetMobileAccess(domain, expandMobileAccess(d.Get("mobile_access").([]interface{})))
@@ -381,5 +335,3 @@ func updateMobileAccess(d *schema.ResourceData, conn *connectivity.BaiduClient, 
 	}
 	return nil
 }
-
-//</editor-fold>

@@ -128,3 +128,64 @@ func trafficLimitDiffSuppress(k, old, new string, d *schema.ResourceData) bool {
 	}
 	return false
 }
+
+func ipv6DispatchDiffSuppress(k, old, new string, d *schema.ResourceData) bool {
+	if k == "ipv6_dispatch.#" && new == "0" {
+		oldV, _ := d.GetChange("ipv6_dispatch")
+		return expandIPv6Dispatch(oldV.([]interface{})) == expandIPv6Dispatch(nil)
+	}
+	return false
+}
+
+func seoSwitchDiffSuppress(k, old, new string, d *schema.ResourceData) bool {
+	if k == "seo_switch.#" && new == "0" {
+		oldV, _ := d.GetChange("seo_switch")
+		return *expandSeoSwitch(oldV.([]interface{})) == *expandSeoSwitch(nil)
+	}
+	return false
+}
+
+func compressDiffSuppress(k, old, new string, d *schema.ResourceData) bool {
+	if k == "compress.#" && new == "0" {
+		oldV, _ := d.GetChange("compress")
+		oldAllow, oldType := expandCompress(oldV.([]interface{}))
+		return oldAllow == false && oldType == ""
+	}
+	if k == "compress.0.type" {
+		return d.Get("compress.0.allow").(bool) == false
+	}
+	return false
+}
+
+func httpsDiffSuppress(k, old, new string, d *schema.ResourceData) bool {
+	if k == "https.#" && new == "0" {
+		oldV, _ := d.GetChange("https")
+		return reflect.DeepEqual(expandHttps(oldV.([]interface{})), expandHttps(nil))
+	}
+
+	if strings.HasPrefix(k, "https.0") && k != "https.0.enabled" {
+		newHttps := expandHttps(d.Get("https").([]interface{}))
+		if newHttps.Enabled == false {
+			return true
+		}
+		if k == "https.0.http_redirect_code" {
+			return newHttps.HttpRedirect == false
+		}
+		if k == "https.0.https_redirect_code" {
+			return newHttps.HttpsRedirect == false
+		}
+	}
+	return false
+}
+
+func clientIpDiffSuppress(k, old, new string, d *schema.ResourceData) bool {
+	if k == "client_ip.#" && new == "0" {
+		oldV, _ := d.GetChange("client_ip")
+		return reflect.DeepEqual(expandClientIp(oldV.([]interface{})), expandClientIp(nil))
+	}
+
+	if k == "client_ip.0.name" {
+		return d.Get("client_ip.0.enabled").(bool) == false
+	}
+	return false
+}

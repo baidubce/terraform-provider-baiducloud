@@ -7,13 +7,9 @@ import (
 	"testing"
 )
 
-const (
-	testAccCdnDomainConfigCacheResourceType = "baiducloud_cdn_domain_config_cache"
-)
-
 func TestAccDomainConfigCache(t *testing.T) {
 	domain := "acc.test.com"
-	resourceName := testAccCdnDomainConfigCacheResourceType + ".test"
+	resourceName := "baiducloud_cdn_domain_config_cache.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { acctest.PreCheck(t) },
@@ -24,10 +20,10 @@ func TestAccDomainConfigCache(t *testing.T) {
 				Config: testAccDomainConfigCacheCreate(domain),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "cache_ttl.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "cache_url_args.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "cache_url_args.0.cache_full_url", "true"),
 					resource.TestCheckResourceAttr(resourceName, "error_page.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "cache_share.#", "0"),
-					resource.TestCheckResourceAttr(resourceName, "mobile_access.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "cache_share.0.enabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "mobile_access.0.distinguish_client", "false"),
 				),
 			},
 			{
@@ -39,10 +35,11 @@ func TestAccDomainConfigCache(t *testing.T) {
 				Config: testAccDomainConfigCacheUpdate(domain),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "cache_ttl.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "cache_url_args.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "cache_url_args.0.cache_full_url", "false"),
+					resource.TestCheckResourceAttr(resourceName, "cache_url_args.0.cache_url_args.#", "3"),
 					resource.TestCheckResourceAttr(resourceName, "error_page.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "cache_share.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "mobile_access.0.distinguish_client", "false"),
+					resource.TestCheckResourceAttr(resourceName, "cache_share.0.enabled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "mobile_access.0.distinguish_client", "true"),
 				),
 			},
 		},
@@ -68,19 +65,10 @@ resource "baiducloud_cdn_domain_config_cache" "test" {
         ttl = 36000
         weight = 30
     }
-	cache_url_args {
-		cache_full_url = true
-	}
     error_page {
 		code = 403
 		url = "403.html"
 	}
-    cache_share {
-        enabled = false
-    }
-    mobile_access {
-        distinguish_client = true
-    }
 }`, domain)
 }
 
@@ -125,10 +113,10 @@ resource "baiducloud_cdn_domain_config_cache" "test" {
     }
     cache_share {
         enabled = true
-		domain = "${data.baiducloud_cdn_domains.test.domains.0.domain}"
+		domain = "${data.baiducloud_cdn_domains.test.domains.1.domain}"
     }
     mobile_access {
-        distinguish_client = false
+        distinguish_client = true
     }
 }`, domain)
 }
