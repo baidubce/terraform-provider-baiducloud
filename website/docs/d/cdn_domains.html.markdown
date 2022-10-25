@@ -3,7 +3,7 @@
 page_title: "baiducloud_cdn_domains Data Source - terraform-provider-baiducloud"
 subcategory: "CDN"
 description: |-
-Use this data source to query all domain names under the user.
+  Use this data source to query all domain names under the user.
 ---
 
 # baiducloud_cdn_domains (Data Source)

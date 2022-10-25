@@ -3,9 +3,9 @@
 page_title: "baiducloud_cdn_domain_config_acl Resource - terraform-provider-baiducloud"
 subcategory: "CDN"
 description: |-
-Use this resource to manage acl-related configuration of the acceleration domain.
-More information can be found in the Developer Guide https://cloud.baidu.com/doc/CDN/s/yjxzhvf21.
-~> NOTE: Creating a resource will overwrite current acl-related configuration. Deleting a resource won't change current configuration.
+  Use this resource to manage acl-related configuration of the acceleration domain.
+  More information can be found in the Developer Guide https://cloud.baidu.com/doc/CDN/s/yjxzhvf21.
+  ~> NOTE: Creating a resource will overwrite current acl-related configuration. Deleting a resource won't change current configuration.
 ---
 
 # baiducloud_cdn_domain_config_acl (Resource)

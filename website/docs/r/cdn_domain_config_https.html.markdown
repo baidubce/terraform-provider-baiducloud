@@ -3,9 +3,9 @@
 page_title: "baiducloud_cdn_domain_config_https Resource - terraform-provider-baiducloud"
 subcategory: "CDN"
 description: |-
-Use this resource to manage Https configuration of the acceleration domain.
-More information can be found in the Developer Guide https://cloud.baidu.com/doc/CDN/s/Sjwvyf6w8.
-~> NOTE: Creating a resource will overwrite current Https configuration. Deleting a resource won't change current configuration.
+  Use this resource to manage Https configuration of the acceleration domain.
+  More information can be found in the Developer Guide https://cloud.baidu.com/doc/CDN/s/Sjwvyf6w8.
+  ~> NOTE: Creating a resource will overwrite current Https configuration. Deleting a resource won't change current configuration.
 ---
 
 # baiducloud_cdn_domain_config_https (Resource)

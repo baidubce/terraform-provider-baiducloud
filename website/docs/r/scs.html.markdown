@@ -4,7 +4,7 @@ page_title: "BaiduCloud: baiducloud_scs"
 subcategory: "SCS"
 sidebar_current: "docs-baiducloud-resource-scs"
 description: |-
-Use this resource to get information about a SCS.
+  Use this resource to get information about a SCS.
 ---
 
 # baiducloud_scs

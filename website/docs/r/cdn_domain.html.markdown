@@ -3,8 +3,8 @@
 page_title: "baiducloud_cdn_domain Resource - terraform-provider-baiducloud"
 subcategory: "CDN"
 description: |-
-Use this resource to manage acceleration domain and its origin configuration.
-More information can be found in the Developer Guide https://cloud.baidu.com/doc/CDN/s/rjwvyev26.
+  Use this resource to manage acceleration domain and its origin configuration.
+  More information can be found in the Developer Guide https://cloud.baidu.com/doc/CDN/s/rjwvyev26.
 ---
 
 # baiducloud_cdn_domain (Resource)
