@@ -1,4 +1,16 @@
 	## 1.17.0 (Unreleased)
+## 1.16.2 (October 27, 2022)
+NOTES:
+- Support baiducloud ENI
+
+FEATURES:
+- **New Data Source:** `baiducloud_enis`
+- **New Resource:** `baiducloud_eni`
+- **New Resource:** `baiducloud_eni_attachment`
+
+ENHANCEMENTS:
+- resource/baiducloud_specs: Parameter additions and changes
+
 ## 1.16.1 (October 25, 2022)
 BUG FIXES:
 - Fix subcategory error for CDN/SCS docs.
