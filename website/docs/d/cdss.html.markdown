@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "BCC"
 page_title: "BaiduCloud: baiducloud_cdss"
 sidebar_current: "docs-baiducloud-datasource-cdss"
 description: |-

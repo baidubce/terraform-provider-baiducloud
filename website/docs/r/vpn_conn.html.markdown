@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "VPN"
 page_title: "BaiduCloud: baiducloud_vpn_conn"
 sidebar_current: "docs-baiducloud-resource-vpn_conn"
 description: |-

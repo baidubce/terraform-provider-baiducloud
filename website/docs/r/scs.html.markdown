@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "SCS"
 page_title: "BaiduCloud: baiducloud_scs"
 subcategory: "SCS"
 sidebar_current: "docs-baiducloud-resource-scs"

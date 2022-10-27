@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "LOCALDNS"
 page_title: "BaiduCloud: baiducloud_localdns_privatezones"
 sidebar_current: "docs-baiducloud-datasource-localdns_privatezones"
 description: |-

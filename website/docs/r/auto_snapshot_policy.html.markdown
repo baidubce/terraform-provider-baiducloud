@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "BCC"
 page_title: "BaiduCloud: baiducloud_auto_snapshot_policy"
 sidebar_current: "docs-baiducloud-resource-auto_snapshot_policy"
 description: |-

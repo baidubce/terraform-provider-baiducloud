@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "CCEv2"
 page_title: "BaiduCloud: baiducloud_ccev2_cluster"
 sidebar_current: "docs-baiducloud-resource-ccev2_cluster"
 description: |-

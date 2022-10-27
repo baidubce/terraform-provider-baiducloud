@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "IAM"
 page_title: "BaiduCloud: baiducloud_iam_group"
 sidebar_current: "docs-baiducloud-resource-iam_group"
 description: |-

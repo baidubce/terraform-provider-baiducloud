@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "IAM"
 page_title: "BaiduCloud: baiducloud_iam_group_policy_attachment"
 sidebar_current: "docs-baiducloud-resource-iam_group_policy_attachment"
 description: |-

@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "LOCALDNS"
 page_title: "BaiduCloud: baiducloud_localdns_vpc"
 sidebar_current: "docs-baiducloud-resource-localdns_vpc"
 description: |-

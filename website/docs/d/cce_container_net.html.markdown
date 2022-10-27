@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "CCE"
 page_title: "BaiduCloud: baiducloud_cce_container_net"
 sidebar_current: "docs-baiducloud-datasource-cce_container_net"
 description: |-

@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "VPC"
 page_title: "BaiduCloud: baiducloud_vpc"
 sidebar_current: "docs-baiducloud-resource-vpc"
 description: |-

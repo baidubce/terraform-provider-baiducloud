@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "CERT"
 page_title: "BaiduCloud: baiducloud_cert"
 sidebar_current: "docs-baiducloud-resource-cert"
 description: |-

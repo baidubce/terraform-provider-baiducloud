@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "VPC"
 page_title: "BaiduCloud: baiducloud_nat_snat_rules"
 sidebar_current: "docs-baiducloud-datasource-nat_snat_rules"
 description: |-

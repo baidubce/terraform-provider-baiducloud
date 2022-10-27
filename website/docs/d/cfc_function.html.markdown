@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "CFC"
 page_title: "BaiduCloud: baiducloud_cfc_function"
 sidebar_current: "docs-baiducloud-datasource-cfc_function"
 description: |-

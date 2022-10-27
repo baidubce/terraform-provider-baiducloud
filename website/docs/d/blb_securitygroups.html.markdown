@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "BLB"
 page_title: "BaiduCloud: baiducloud_blb_securitygroups"
 sidebar_current: "docs-baiducloud-datasource-blb_securitygroups"
 description: |-

@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "BCC"
 page_title: "BaiduCloud: baiducloud_security_groups"
 sidebar_current: "docs-baiducloud-datasource-security_groups"
 description: |-

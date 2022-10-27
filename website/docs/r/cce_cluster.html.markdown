@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "CCE"
 page_title: "BaiduCloud: baiducloud_cce_cluster"
 sidebar_current: "docs-baiducloud-resource-cce_cluster"
 description: |-

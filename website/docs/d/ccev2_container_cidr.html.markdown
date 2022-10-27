@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "CCEv2"
 page_title: "BaiduCloud: baiducloud_ccev2_container_cidr"
 sidebar_current: "docs-baiducloud-datasource-ccev2_container_cidr"
 description: |-

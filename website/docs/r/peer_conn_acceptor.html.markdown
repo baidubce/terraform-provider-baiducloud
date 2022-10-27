@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "VPC"
 page_title: "BaiduCloud: baiducloud_peer_conn_acceptor"
 sidebar_current: "docs-baiducloud-resource-peer_conn_acceptor"
 description: |-

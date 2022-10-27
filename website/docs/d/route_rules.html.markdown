@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "VPC"
 page_title: "BaiduCloud: baiducloud_route_rules"
 sidebar_current: "docs-baiducloud-datasource-route_rules"
 description: |-

@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "CFC"
 page_title: "BaiduCloud: baiducloud_cfc_trigger"
 sidebar_current: "docs-baiducloud-resource-cfc_trigger"
 description: |-

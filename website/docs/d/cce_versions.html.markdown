@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "CCE"
 page_title: "BaiduCloud: baiducloud_cce_versions"
 sidebar_current: "docs-baiducloud-datasource-cce_versions"
 description: |-

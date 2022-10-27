@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "RDS"
 page_title: "BaiduCloud: baiducloud_rdss"
 sidebar_current: "docs-baiducloud-datasource-rdss"
 description: |-

@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "BCC"
 page_title: "BaiduCloud: baiducloud_snapshot"
 sidebar_current: "docs-baiducloud-resource-snapshot"
 description: |-

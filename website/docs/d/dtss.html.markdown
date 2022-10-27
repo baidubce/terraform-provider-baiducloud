@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "DTS"
 page_title: "BaiduCloud: baiducloud_dtss"
 sidebar_current: "docs-baiducloud-datasource-dtss"
 description: |-

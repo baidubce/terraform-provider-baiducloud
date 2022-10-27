@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "BLB"
 page_title: "BaiduCloud: baiducloud_blb"
 sidebar_current: "docs-baiducloud-resource-blb"
 description: |-

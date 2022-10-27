@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "BOS"
 page_title: "BaiduCloud: baiducloud_bos_bucket_object"
 sidebar_current: "docs-baiducloud-resource-bos_bucket_object"
 description: |-

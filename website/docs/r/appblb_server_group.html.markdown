@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "APPBLB"
 page_title: "BaiduCloud: baiducloud_appblb_server_group"
 sidebar_current: "docs-baiducloud-resource-appblb_server_group"
 description: |-

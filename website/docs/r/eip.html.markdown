@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "EIP"
 page_title: "BaiduCloud: baiducloud_eip"
 sidebar_current: "docs-baiducloud-resource-eip"
 description: |-

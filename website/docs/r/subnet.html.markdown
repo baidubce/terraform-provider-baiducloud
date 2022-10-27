@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "VPC"
 page_title: "BaiduCloud: baiducloud_subnet"
 sidebar_current: "docs-baiducloud-resource-subnet"
 description: |-

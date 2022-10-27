@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "BCC"
 page_title: "BaiduCloud: baiducloud_images"
 sidebar_current: "docs-baiducloud-datasource-images"
 description: |-

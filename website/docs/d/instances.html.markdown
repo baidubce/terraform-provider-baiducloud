@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "BCC"
 page_title: "BaiduCloud: baiducloud_instances"
 sidebar_current: "docs-baiducloud-datasource-instances"
 description: |-

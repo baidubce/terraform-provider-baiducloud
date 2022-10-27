@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "BCC"
 page_title: "BaiduCloud: baiducloud_cds_attachment"
 sidebar_current: "docs-baiducloud-resource-cds_attachment"
 description: |-

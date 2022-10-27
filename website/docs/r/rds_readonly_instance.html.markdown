@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "RDS"
 page_title: "BaiduCloud: baiducloud_rds_readonly_instance"
 sidebar_current: "docs-baiducloud-resource-rds_readonly_instance"
 description: |-

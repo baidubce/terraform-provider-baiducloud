@@ -1,5 +1,6 @@
 ---
 layout: "baiducloud"
+subcategory: "BBC"
 page_title: "BaiduCloud: baiducloud_bbc_images"
 sidebar_current: "docs-baiducloud-datasource-bbc_images"
 description: |-
