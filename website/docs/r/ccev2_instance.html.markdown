@@ -5,8 +5,8 @@ page_title: "BaiduCloud: baiducloud_ccev2_instance"
 sidebar_current: "docs-baiducloud-resource-ccev2_instance"
 description: |-
   Use this resource to bind to an instance and modify some of its attributes.
-Note that this resource will not create a real instance, it is just a way to bind to a remote instance and modify its attributes.
-If you wish to create more instances, please use baiducloud_ccev2_instance_group.
+  Note that this resource will not create a real instance, it is just a way to bind to a remote instance and modify its attributes.
+  If you wish to create more instances, please use baiducloud_ccev2_instance_group.
 ---
 
 # baiducloud_ccev2_instance

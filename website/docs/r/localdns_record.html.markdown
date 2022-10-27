@@ -4,7 +4,7 @@ subcategory: "LOCALDNS"
 page_title: "BaiduCloud: baiducloud_localdns_record"
 sidebar_current: "docs-baiducloud-resource-localdns_record"
 description: |-
-Provide a resource to create a local dns record.
+  Provide a resource to create a local dns record.
 ---
 
 # baiducloud_localdns_record

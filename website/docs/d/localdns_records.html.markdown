@@ -4,7 +4,7 @@ subcategory: "LOCALDNS"
 page_title: "BaiduCloud: baiducloud_localdns_records"
 sidebar_current: "docs-baiducloud-datasource-localdns_records"
 description: |-
-Use this data source to query localdns records list.
+  Use this data source to query localdns records list.
 ---
 
 # baiducloud_localdns_records
