@@ -30,12 +30,14 @@ const (
 	LOCALDNSCode = ServiceCode("LOCALDNS")
 	BBCCode      = ServiceCode("BBC")
 	VPNCode      = ServiceCode("VPN")
+	ENICode      = ServiceCode("ENI")
 )
 
 const (
 	DefaultBJRegionBccEndPoint = "bcc.bj.baidubce.com"
 	DefaultBJRegionBbcEndPoint = "bbc.bj.baidubce.com"
 	DefaultBJRegionVpnEndPoint = "bcc.bj.baidubce.com"
+	DefaultBJRegionEniEndPoint = "bcc.bj.baidubce.com"
 	DefaultBJRegionEipEndPoint = "eip.bj.baidubce.com"
 	DefaultBJRegionBlbEndPoint = "blb.bj.baidubce.com"
 	DefaultBJRegionBosEndPoint = "bj.bcebos.com"
@@ -48,11 +50,13 @@ const (
 	DefaultBDRegionBccEndPoint = "bcc.bd.baidubce.com"
 	DefaultBDRegionBbcEndPoint = "bbc.bd.baidubce.com"
 	DefaultBDRegionVpnEndPoint = "bcc.bd.baidubce.com"
+	DefaultBDRegionEniEndPoint = "bcc.bd.baidubce.com"
 
 	DefaultGZRegionBccEndPoint = "bcc.gz.baidubce.com"
 	DefaultGZRegionBbcEndPoint = "bbc.gz.baidubce.com"
 	DefaultGZRegionVpnEndPoint = "bcc.gz.baidubce.com"
 	DefaultGZRegionEipEndPoint = "eip.gz.baidubce.com"
+	DefaultGZRegionEniEndPoint = "bcc.gz.baidubce.com"
 	DefaultGZRegionBlbEndPoint = "blb.gz.baidubce.com"
 	DefaultGZRegionBosEndPoint = "gz.bcebos.com"
 	DefaultGZRegionCfcEndPoint = "cfc.gz.baidubce.com"
@@ -64,6 +68,7 @@ const (
 	DefaultSURegionBbcEndPoint = "bbc.su.baidubce.com"
 	DefaultSURegionVPNEndPoint = "bcc.su.baidubce.com"
 	DefaultSURegionEipEndPoint = "eip.su.baidubce.com"
+	DefaultSURegionEniEndPoint = "bcc.su.baidubce.com"
 	DefaultSURegionBlbEndPoint = "blb.su.baidubce.com"
 	DefaultSURegionBosEndPoint = "su.bcebos.com"
 	DefaultSURegionCfcEndPoint = "cfc.su.baidubce.com"
@@ -73,11 +78,13 @@ const (
 
 	DefaultFSHRegionBccEndPoint = "bcc.fsh.baidubce.com"
 	DefaultFSHRegionVPNEndPoint = "bcc.fsh.baidubce.com"
+	DefaultFSHRegionEniEndPoint = "bcc.fsh.baidubce.com"
 
 	DefaultFWHRegionBccEndPoint = "bcc.fwh.baidubce.com"
 	DefaultFWHRegionBbcEndPoint = "bbc.fwh.baidubce.com"
-	DefaultFWHRegionVPNEndPoint = "bcc.fwh.baidubce.com"
+	DefaultFWHRegionVPNEndPoint = "bbc.fwh.baidubce.com"
 	DefaultFWHRegionEipEndPoint = "eip.fwh.baidubce.com"
+	DefaultFWHRegionEniEndPoint = "bcc.fwh.baidubce.com"
 	DefaultFWHRegionBlbEndPoint = "blb.fwh.baidubce.com"
 	DefaultFWHRegionBosEndPoint = "fwh.bcebos.com"
 	DefaultFWHRegionCfcEndPoint = "cfc.fwh.baidubce.com"
@@ -87,9 +94,11 @@ const (
 
 	DefaultHKGRegionBccEndPoint = "bcc.hkg.baidubce.com"
 	DefaultHKGRegionVPNEndPoint = "bcc.hkg.baidubce.com"
+	DefaultHKGRegionEniEndPoint = "bcc.hkg.baidubce.com"
 
 	DefaultSINRegionBccEndPoint = "bcc.sin.baidubce.com"
 	DefaultSINRegionVPNEndPoint = "bcc.sin.baidubce.com"
+	DefaultSINRegionEniEndPoint = "bcc.sin.baidubce.com"
 
 	DefaultCERTEndPoint = "certificate.baidubce.com"
 	DefaultIAMEndPoint  = "iam.bj.baidubce.com"
@@ -116,6 +125,7 @@ var (
 		VPNCode:      DefaultBJRegionVpnEndPoint,
 		VPCCode:      DefaultBJRegionBccEndPoint,
 		EIPCode:      DefaultBJRegionEipEndPoint,
+		ENICode:      DefaultBJRegionEniEndPoint,
 		APPBLBCode:   DefaultBJRegionBlbEndPoint,
 		BLBCode:      DefaultBJRegionBlbEndPoint,
 		BOSCode:      DefaultBJRegionBosEndPoint,
@@ -136,6 +146,7 @@ var (
 		BCCCode: DefaultBDRegionBccEndPoint,
 		VPCCode: DefaultBDRegionBccEndPoint,
 		VPNCode: DefaultBDRegionVpnEndPoint,
+		ENICode: DefaultBDRegionEniEndPoint,
 		BBCCode: DefaultBDRegionBbcEndPoint,
 	}
 
@@ -146,6 +157,7 @@ var (
 		BBCCode:    DefaultGZRegionBbcEndPoint,
 		VPCCode:    DefaultGZRegionBccEndPoint,
 		EIPCode:    DefaultGZRegionEipEndPoint,
+		ENICode:    DefaultGZRegionEniEndPoint,
 		APPBLBCode: DefaultGZRegionBlbEndPoint,
 		BLBCode:    DefaultGZRegionBlbEndPoint,
 		BOSCode:    DefaultGZRegionBosEndPoint,
@@ -165,6 +177,7 @@ var (
 		VPNCode:    DefaultSURegionVPNEndPoint,
 		VPCCode:    DefaultSURegionBccEndPoint,
 		EIPCode:    DefaultSURegionEipEndPoint,
+		ENICode:    DefaultSURegionEniEndPoint,
 		APPBLBCode: DefaultSURegionBlbEndPoint,
 		BLBCode:    DefaultSURegionBlbEndPoint,
 		BOSCode:    DefaultSURegionBosEndPoint,
@@ -182,6 +195,7 @@ var (
 		BCCCode: DefaultFSHRegionBccEndPoint,
 		VPNCode: DefaultFSHRegionVPNEndPoint,
 		VPCCode: DefaultFSHRegionBccEndPoint,
+		ENICode: DefaultFSHRegionEniEndPoint,
 	}
 
 	// Region FWH Service Endpoints
@@ -191,6 +205,7 @@ var (
 		VPNCode:    DefaultFWHRegionVPNEndPoint,
 		VPCCode:    DefaultFWHRegionBccEndPoint,
 		EIPCode:    DefaultFWHRegionEipEndPoint,
+		ENICode:    DefaultFWHRegionEniEndPoint,
 		APPBLBCode: DefaultFWHRegionBlbEndPoint,
 		BLBCode:    DefaultFWHRegionBlbEndPoint,
 		BOSCode:    DefaultFWHRegionBosEndPoint,
@@ -208,6 +223,7 @@ var (
 		BCCCode: DefaultHKGRegionBccEndPoint,
 		VPCCode: DefaultHKGRegionBccEndPoint,
 		VPNCode: DefaultHKGRegionVPNEndPoint,
+		ENICode: DefaultHKGRegionEniEndPoint,
 	}
 
 	// Region SIN Service Endpoints
@@ -215,6 +231,7 @@ var (
 		BCCCode: DefaultSINRegionBccEndPoint,
 		VPCCode: DefaultSINRegionBccEndPoint,
 		VPNCode: DefaultSINRegionVPNEndPoint,
+		ENICode: DefaultSINRegionEniEndPoint,
 	}
 )
 

@@ -15,6 +15,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/cfc"
 	"github.com/baidubce/bce-sdk-go/services/dts"
 	"github.com/baidubce/bce-sdk-go/services/eip"
+	"github.com/baidubce/bce-sdk-go/services/eni"
 	"github.com/baidubce/bce-sdk-go/services/iam"
 	"github.com/baidubce/bce-sdk-go/services/localDns"
 	"github.com/baidubce/bce-sdk-go/services/rds"
@@ -53,6 +54,7 @@ type BaiduClient struct {
 	localDnsConn *localDns.Client
 	bbcConn      *bbc.Client
 	vpnConn      *vpn.Client
+	eniConn      *eni.Client
 }
 
 type ApiVersion string
@@ -462,6 +464,24 @@ func (client *BaiduClient) WithVPNClient(do func(*vpn.Client) (interface{}, erro
 	}
 	goSdkMutex.Unlock()
 	return do(client.vpnConn)
+}
+
+func (client *BaiduClient) WithEniClient(do func(*eni.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	// Initialize the Eni client if necessary
+	if client.eniConn == nil {
+		client.WithCommonClient(ENICode)
+		eniClient, err := eni.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			goSdkMutex.Unlock()
+			return nil, err
+		}
+		eniClient.Config.Credentials = client.Credentials
+		eniClient.Config.UserAgent = buildUserAgent()
+		client.eniConn = eniClient
+	}
+	goSdkMutex.Unlock()
+	return do(client.eniConn)
 }
 
 func buildUserAgent() string {

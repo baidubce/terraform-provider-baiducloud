@@ -96,6 +96,7 @@ github.com/baidubce/bce-sdk-go/services/cfc
 github.com/baidubce/bce-sdk-go/services/cfc/api
 github.com/baidubce/bce-sdk-go/services/dts
 github.com/baidubce/bce-sdk-go/services/eip
+github.com/baidubce/bce-sdk-go/services/eni
 github.com/baidubce/bce-sdk-go/services/iam
 github.com/baidubce/bce-sdk-go/services/iam/api
 github.com/baidubce/bce-sdk-go/services/localDns

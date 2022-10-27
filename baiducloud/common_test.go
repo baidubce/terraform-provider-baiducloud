@@ -50,4 +50,6 @@ const (
 	BaiduCloudTestResourceTypeNameDeploySet           = BaiduCloudTestResourceTypeName + "-" + "deployset"
 	BaiduCloudTestResourceTypeNameVPNGateway          = BaiduCloudTestResourceTypeName + "-" + "VPNGateway"
 	BaiduCloudTestResourceTypeNameVPNConn             = BaiduCloudTestResourceTypeName + "-" + "VPNConn"
+	BaiduCloudTestResourceTypeNameEniAttachment       = BaiduCloudTestResourceTypeName + "-" + "eni-attachment"
+	BaiduCloudTestResourceTypeNameEni                 = BaiduCloudTestResourceTypeName + "-" + "eni"
 )
