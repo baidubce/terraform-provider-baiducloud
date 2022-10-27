@@ -194,7 +194,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_snapshots":                      dataSourceBaiduCloudSnapshots(),
 			"baiducloud_auto_snapshot_policies":         dataSourceBaiduCloudAutoSnapshotPolicies(),
 			"baiducloud_zones":                          dataSourceBaiduCloudZones(),
-			"baiducloud_specs":                          dataSourceBaiduCloudSpecs(),
+			"baiducloud_specs":                          dataSourceBaiduCloudBccFlavors(),
 			"baiducloud_images":                         dataSourceBaiduCloudImages(),
 			"baiducloud_cfc_function":                   dataSourceBaiduCloudCFCFunction(),
 			"baiducloud_scs_specs":                      dataSourceBaiduCloudScsSpecs(),

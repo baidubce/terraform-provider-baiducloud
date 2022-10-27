@@ -25,6 +25,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 )
 
+// Deprecated: New function is dataSourceBaiduCloudBccFlavors()
 func dataSourceBaiduCloudSpecs() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceBaiduCloudSpecsRead,

@@ -251,3 +251,51 @@ func (s *BccService) StopInstance(instanceID string, timeout time.Duration) erro
 
 	return nil
 }
+
+func (s *BccService) ListAllFlavors(zone string) ([]api.ZoneResourceDetailSpec, error) {
+	action := "List " + zone + "all flavors "
+	raw, err := s.client.WithBccClient(func(client *bcc.Client) (i interface{}, e error) {
+		return client.ListFlavorSpec(&api.ListFlavorSpecArgs{
+			ZoneName: zone,
+		})
+	})
+	if err != nil {
+		return nil, WrapError(err)
+	}
+	addDebug(action, raw)
+	result := make([]api.ZoneResourceDetailSpec, 0)
+	response := raw.(*api.ListFlavorSpecResult)
+	result = append(result, response.ZoneResources...)
+	return result, nil
+}
+
+func (s *BccService) FlattenBccFlavorsModelToMap(bccFlavors []api.ZoneResourceDetailSpec) []map[string]interface{} {
+	res := make([]map[string]interface{}, 0)
+	for _, spec := range bccFlavors {
+		for _, group := range spec.BccResources.FlavorGroups {
+			for _, flavor := range group.Flavors {
+				res = append(res, map[string]interface{}{
+					"zone_name":             spec.ZoneName,
+					"group_id":              group.GroupId,
+					"cpu_count":             flavor.CpuCount,
+					"memory_capacity_in_gb": flavor.MemoryCapacityInGB,
+					"ephemeral_disk_in_gb":  flavor.EphemeralDiskInGb,
+					"ephemeral_disk_count":  flavor.EphemeralDiskCount,
+					"ephemeral_disk_type":   flavor.EphemeralDiskType,
+					"gpu_card_type":         flavor.GpuCardType,
+					"gpu_card_count":        flavor.GpuCardCount,
+					"fpga_card_type":        flavor.FpgaCardType,
+					"fpga_card_count":       flavor.FpgaCardCount,
+					"product_type":          flavor.ProductType,
+					"spec":                  flavor.Spec,
+					"spec_id":               flavor.SpecId,
+					"cpu_model":             flavor.CpuModel,
+					"cpu_ghz":               flavor.CpuGHz,
+					"network_bandwidth":     flavor.NetworkBandwidth,
+					"network_package":       flavor.NetworkPackage,
+				})
+			}
+		}
+	}
+	return res
+}

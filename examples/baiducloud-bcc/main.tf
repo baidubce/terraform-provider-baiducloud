@@ -12,17 +12,24 @@ data "baiducloud_specs" "default" {
   # support General/memory/cpu
   #instance_type     = "General"
   #name_regex        = "bcc.g1.tiny"
-  cpu_count         = 1
-  memory_size_in_gb = 4
+  zone_name = data.baiducloud_zones.default.zones.0.zone_name
+  filter {
+    name   = "cpu_count"
+    values = ["^([1])$"]
+  }
+  filter {
+    name   = "memory_capacity_in_gb"
+    values = ["^([4])$"]
+  }
 }
 
 data "baiducloud_zones" "default" {
-  name_regex = ".*a$"
+  name_regex = ".*d$"
 }
 
 data "baiducloud_images" "default" {
   image_type = "System"
-  name_regex = "7.5.*"
+  name_regex = "8.4 aarch64"
   os_name    = "CentOS"
 }
 
@@ -85,8 +92,9 @@ resource "baiducloud_instance" "my-server" {
   name                  = "${var.instance_short_name}-${var.instance_role}-${format(var.instance_format, count.index + 1)}"
   availability_zone     = data.baiducloud_zones.default.zones.0.zone_name
   cpu_count             = data.baiducloud_specs.default.specs.0.cpu_count
-  memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_size_in_gb
-  billing = {
+  memory_capacity_in_gb = data.baiducloud_specs.default.specs.0.memory_capacity_in_gb
+  instance_type         = data.baiducloud_specs.default.specs.0.spec_id
+  billing               = {
     payment_timing = var.payment_timing
   }
 
