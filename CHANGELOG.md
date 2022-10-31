@@ -1,4 +1,8 @@
 	## 1.17.0 (Unreleased)
+## 1.16.3 (October 31, 2022)
+NOTES:
+- Support baiducloud SMS signature
+
 ## 1.16.2 (October 27, 2022)
 NOTES:
 - Support baiducloud ENI
