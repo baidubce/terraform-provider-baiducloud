@@ -220,6 +220,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_deploysets":                     dataSourceBaiduCloudDeploySets(),
 			"baiducloud_vpn_conns":                      dataSourceBaiduCloudVPNConns(),
 			"baiducloud_enis":                           dataSourceBaiduCloudEnis(),
+			"baiducloud_sms_signature":                  dataSourceBaiduCloudSMSSignature(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -285,6 +286,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_vpn_conn":                    resourceBaiduCloudVpnConn(),
 			"baiducloud_eni":                         resourceBaiduCloudEni(),
 			"baiducloud_eni_attachment":              resourceBaiduCloudEniInstanceAttachment(),
+			"baiducloud_sms_signature":               resourceBaiduCloudSMSSignature(),
 		},
 
 		ConfigureFunc: providerConfigure,

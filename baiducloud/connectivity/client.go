@@ -20,6 +20,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/localDns"
 	"github.com/baidubce/bce-sdk-go/services/rds"
 	"github.com/baidubce/bce-sdk-go/services/scs"
+	"github.com/baidubce/bce-sdk-go/services/sms"
 	"github.com/baidubce/bce-sdk-go/services/sts"
 	"github.com/baidubce/bce-sdk-go/services/sts/api"
 	"github.com/baidubce/bce-sdk-go/services/vpc"
@@ -52,6 +53,7 @@ type BaiduClient struct {
 	iamConn      *iam.Client
 	cdnConn      *cdn.Client
 	localDnsConn *localDns.Client
+	smsConn      *sms.Client
 	bbcConn      *bbc.Client
 	vpnConn      *vpn.Client
 	eniConn      *eni.Client
@@ -428,6 +430,25 @@ func (client *BaiduClient) WithLocalDnsClient(do func(*localDns.Client) (interfa
 	}
 
 	return do(client.localDnsConn)
+}
+
+func (client *BaiduClient) WithSMSClient(do func(*sms.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the LOCALDNS client if necessary
+	if client.smsConn == nil {
+		client.WithCommonClient(SMSCode)
+		smsClient, err := sms.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		smsClient.Config.Credentials = client.Credentials
+		smsClient.Config.UserAgent = buildUserAgent()
+		client.smsConn = smsClient
+	}
+
+	return do(client.smsConn)
 }
 
 func (client *BaiduClient) WithBbcClient(do func(*bbc.Client) (interface{}, error)) (interface{}, error) {
