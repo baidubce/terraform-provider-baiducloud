@@ -1,4 +1,13 @@
-	## 1.17.0 (Unreleased)
+	## 1.18.0 (Unreleased)
+## 1.17.0 (November 02, 2022)
+NOTES:
+- Support BaiduCloud SNIC (Service Network Interface Card)
+
+FEATURES:
+- **New Data Source:** `baiducloud_snics`
+- **New Data Source:** `baiducloud_snic_public_services`
+- **New Resource:** `baiducloud_snic`
+
 ## 1.16.3 (October 31, 2022)
 NOTES:
 - Support baiducloud SMS signature
@@ -34,12 +43,14 @@ ENHANCEMENTS:
 ## 1.15.12 (October 24, 2022)
 NOTES:
 - Support baiducloud VPN
-  FEATURES:
+
+FEATURES:
 - **New Data Source:** `baiducloud_vpn_gateways`
 - **New Data Source:** `baiducloud_vpn_conns`
 - **New Resource:** `baiducloud_vpn_gateway`
 - **New Resource:** `baiducloud_vpn_conn`
-  ENHANCEMENTS:
+
+ENHANCEMENTS:
 - BCE Go SDK update to v0.9.137
 
 ## 1.15.11 (October 17, 2022)
