@@ -7,6 +7,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud"
 	"log"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -42,4 +43,32 @@ func CheckResource(rName string, state *terraform.State) (*terraform.ResourceSta
 		return nil, fmt.Errorf("No Domain ID is set")
 	}
 	return rs, nil
+}
+
+func ConfigCompose(config ...string) string {
+	var str strings.Builder
+
+	for _, conf := range config {
+		str.WriteString(conf)
+	}
+
+	return str.String()
+}
+
+func ConfigVPCWithSubnet() string {
+	return fmt.Sprintf(`
+resource "baiducloud_vpc" "test" {
+  name        = "vpc_terraform_test"
+  description = "created by terraform for test"
+  cidr        = "192.168.0.0/24"
+}
+
+resource "baiducloud_subnet" "test" {
+  name        = "subnet_terraform_test"
+  zone_name   = "cn-bj-a"
+  cidr        = "192.168.0.0/24"
+  vpc_id      = baiducloud_vpc.test.id
+  description = "created by terraform for test"
+}`)
+
 }

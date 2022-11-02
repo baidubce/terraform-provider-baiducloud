@@ -1,0 +1,1 @@
+terraform import baiducloud_snic.example endpoint-abs1sd13

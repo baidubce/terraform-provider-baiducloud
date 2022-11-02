@@ -15,6 +15,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/cfc"
 	"github.com/baidubce/bce-sdk-go/services/dts"
 	"github.com/baidubce/bce-sdk-go/services/eip"
+	"github.com/baidubce/bce-sdk-go/services/endpoint"
 	"github.com/baidubce/bce-sdk-go/services/eni"
 	"github.com/baidubce/bce-sdk-go/services/iam"
 	"github.com/baidubce/bce-sdk-go/services/localDns"
@@ -57,6 +58,7 @@ type BaiduClient struct {
 	bbcConn      *bbc.Client
 	vpnConn      *vpn.Client
 	eniConn      *eni.Client
+	snicConn     *endpoint.Client
 }
 
 type ApiVersion string
@@ -503,6 +505,24 @@ func (client *BaiduClient) WithEniClient(do func(*eni.Client) (interface{}, erro
 	}
 	goSdkMutex.Unlock()
 	return do(client.eniConn)
+}
+
+func (client *BaiduClient) WithSNICClient(do func(*endpoint.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	// Initialize the SNIC client if necessary
+	if client.snicConn == nil {
+		client.WithCommonClient(BCCCode)
+		snicClient, err := endpoint.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			goSdkMutex.Unlock()
+			return nil, err
+		}
+		snicClient.Config.Credentials = client.Credentials
+		snicClient.Config.UserAgent = buildUserAgent()
+		client.snicConn = snicClient
+	}
+	goSdkMutex.Unlock()
+	return do(client.snicConn)
 }
 
 func buildUserAgent() string {

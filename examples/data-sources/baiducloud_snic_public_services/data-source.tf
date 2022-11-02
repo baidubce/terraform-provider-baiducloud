@@ -1,0 +1,1 @@
+data "baiducloud_snic_public_services" "example" {}

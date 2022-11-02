@@ -96,12 +96,15 @@ github.com/baidubce/bce-sdk-go/services/cfc
 github.com/baidubce/bce-sdk-go/services/cfc/api
 github.com/baidubce/bce-sdk-go/services/dts
 github.com/baidubce/bce-sdk-go/services/eip
+github.com/baidubce/bce-sdk-go/services/endpoint
 github.com/baidubce/bce-sdk-go/services/eni
 github.com/baidubce/bce-sdk-go/services/iam
 github.com/baidubce/bce-sdk-go/services/iam/api
 github.com/baidubce/bce-sdk-go/services/localDns
 github.com/baidubce/bce-sdk-go/services/rds
 github.com/baidubce/bce-sdk-go/services/scs
+github.com/baidubce/bce-sdk-go/services/sms
+github.com/baidubce/bce-sdk-go/services/sms/api
 github.com/baidubce/bce-sdk-go/services/sts
 github.com/baidubce/bce-sdk-go/services/sts/api
 github.com/baidubce/bce-sdk-go/services/vpc

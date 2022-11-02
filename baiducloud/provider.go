@@ -123,6 +123,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/cdn"
+	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/snic"
 	"os"
 	"strings"
 
@@ -221,6 +222,8 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_vpn_conns":                      dataSourceBaiduCloudVPNConns(),
 			"baiducloud_enis":                           dataSourceBaiduCloudEnis(),
 			"baiducloud_sms_signature":                  dataSourceBaiduCloudSMSSignature(),
+			"baiducloud_snics":                          snic.DataSourceSNICs(),
+			"baiducloud_snic_public_services":           snic.DataSourcePublicServices(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -287,6 +290,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_eni":                         resourceBaiduCloudEni(),
 			"baiducloud_eni_attachment":              resourceBaiduCloudEniInstanceAttachment(),
 			"baiducloud_sms_signature":               resourceBaiduCloudSMSSignature(),
+			"baiducloud_snic":                        snic.ResourceSNIC(),
 		},
 
 		ConfigureFunc: providerConfigure,
