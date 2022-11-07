@@ -25,3 +25,19 @@ func (s *SMSService) GetSMSSignatureDetail(signatureId string) (*api.GetSignatur
 
 	return raw.(*api.GetSignatureResult), nil
 }
+
+func (s *SMSService) GetSMSTemplateDetail(templateId string) (*api.GetTemplateResult, error) {
+	action := "Query SMS Template " + templateId
+
+	detailArgs := &api.GetTemplateArgs{
+		TemplateId: templateId,
+	}
+	raw, err := s.client.WithSMSClient(func(smsClient *sms.Client) (i interface{}, e error) {
+		return smsClient.GetTemplate(detailArgs)
+	})
+	if err != nil {
+		return nil, WrapErrorf(err, DefaultErrorMsg, "baiducloud_sms_template", action, BCESDKGoERROR)
+	}
+
+	return raw.(*api.GetTemplateResult), nil
+}

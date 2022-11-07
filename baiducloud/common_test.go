@@ -53,4 +53,5 @@ const (
 	BaiduCloudTestResourceTypeNameEniAttachment       = BaiduCloudTestResourceTypeName + "-" + "eni-attachment"
 	BaiduCloudTestResourceTypeNameEni                 = BaiduCloudTestResourceTypeName + "-" + "eni"
 	BaiduCloudTestResourceTypeNameSMSSignature        = BaiduCloudTestResourceTypeName + "-" + "sms-signature"
+	BaiduCloudTestResourceTypeNameSMSTemplate         = BaiduCloudTestResourceTypeName + "-" + "sms-template"
 )
