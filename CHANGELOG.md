@@ -1,4 +1,8 @@
 	## 1.18.0 (Unreleased)
+## 1.17.1 (November 07, 2022)
+NOTES:
+- Support baiducloud SMS Template
+
 ## 1.17.0 (November 02, 2022)
 NOTES:
 - Support BaiduCloud SNIC (Service Network Interface Card)
