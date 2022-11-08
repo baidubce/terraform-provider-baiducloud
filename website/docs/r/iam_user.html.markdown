@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "IAM"
+subcategory: "Identity and Access Management (IAM)"
 page_title: "BaiduCloud: baiducloud_iam_user"
 sidebar_current: "docs-baiducloud-resource-iam_user"
 description: |-

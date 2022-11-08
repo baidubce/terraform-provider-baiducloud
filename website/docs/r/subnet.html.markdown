@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "VPC"
+subcategory: "Virtual private Cloud (VPC)"
 page_title: "BaiduCloud: baiducloud_subnet"
 sidebar_current: "docs-baiducloud-resource-subnet"
 description: |-

@@ -1,8 +1,8 @@
 ---
 layout: "baiducloud"
-subcategory: "SCS"
+subcategory: "Simple Cache Service for Redis (SCS)"
 page_title: "BaiduCloud: baiducloud_scs_specs"
-subcategory: "SCS"
+subcategory: "Simple Cache Service for Redis (SCS)"
 sidebar_current: "docs-baiducloud-datasource-scs_specs"
 description: |-
   Use this data source to query scs specs list.

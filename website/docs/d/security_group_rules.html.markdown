@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "BCC"
+subcategory: "Baidu Cloud Compute (BCC)"
 page_title: "BaiduCloud: baiducloud_security_group_rules"
 sidebar_current: "docs-baiducloud-datasource-security_group_rules"
 description: |-

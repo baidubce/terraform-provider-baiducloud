@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "VPC"
+subcategory: "Virtual private Cloud (VPC)"
 page_title: "BaiduCloud: baiducloud_nat_gateways"
 sidebar_current: "docs-baiducloud-datasource-nat_gateways"
 description: |-

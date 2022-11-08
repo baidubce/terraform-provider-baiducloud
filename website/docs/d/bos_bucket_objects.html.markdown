@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "BOS"
+subcategory: "Baidu Object Storage (BOS)"
 page_title: "BaiduCloud: baiducloud_bos_bucket_objects"
 sidebar_current: "docs-baiducloud-datasource-bos_bucket_objects"
 description: |-

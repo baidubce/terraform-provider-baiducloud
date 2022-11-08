@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "ENI"
+subcategory: "Elastic Network Interface (ENI)"
 page_title: "BaiduCloud: baiducloud_enis"
 sidebar_current: "docs-baiducloud-datasource-enis"
 description: |-

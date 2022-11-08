@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "APPBLB"
+subcategory: "Application Load Balance (APPBLB)"
 page_title: "BaiduCloud: baiducloud_appblbs"
 sidebar_current: "docs-baiducloud-datasource-appblbs"
 description: |-

@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "CFC"
+subcategory: "Cloud Function Compute (CFC)"
 page_title: "BaiduCloud: baiducloud_cfc_trigger"
 sidebar_current: "docs-baiducloud-resource-cfc_trigger"
 description: |-

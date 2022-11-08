@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "CCE"
+subcategory: "Cloud Container Engine (CCE)"
 page_title: "BaiduCloud: baiducloud_cce_kubeconfig"
 sidebar_current: "docs-baiducloud-datasource-cce_kubeconfig"
 description: |-

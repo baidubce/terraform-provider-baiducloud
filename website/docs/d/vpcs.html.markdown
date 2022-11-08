@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "VPC"
+subcategory: "Virtual private Cloud (VPC)"
 page_title: "BaiduCloud: baiducloud_vpcs"
 sidebar_current: "docs-baiducloud-datasource-vpcs"
 description: |-

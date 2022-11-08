@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "VPC"
+subcategory: "Virtual private Cloud (VPC)"
 page_title: "BaiduCloud: baiducloud_route_rule"
 sidebar_current: "docs-baiducloud-resource-route_rule"
 description: |-

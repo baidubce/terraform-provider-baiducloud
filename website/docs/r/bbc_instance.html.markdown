@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "BBC"
+subcategory: "Baidu Baremetal Compute (BBC)"
 page_title: "BaiduCloud: baiducloud_bbc_instance"
 sidebar_current: "docs-baiducloud-resource-bbc_instance"
 description: |-

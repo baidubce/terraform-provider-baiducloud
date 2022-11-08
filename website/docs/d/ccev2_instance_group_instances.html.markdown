@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "CCEv2"
+subcategory: "Cloud Container Engine v2 (CCEv2)"
 page_title: "BaiduCloud: baiducloud_ccev2_instance_group_instances"
 sidebar_current: "docs-baiducloud-datasource-ccev2_instance_group_instances"
 description: |-

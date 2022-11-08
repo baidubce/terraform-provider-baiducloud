@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "DTS"
+subcategory: "Data Transmission Service (DTS)"
 page_title: "BaiduCloud: baiducloud_dts"
 sidebar_current: "docs-baiducloud-resource-dts"
 description: |-

@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "SMS"
+subcategory: "Simple Message Service (SMS)"
 page_title: "BaiduCloud: baiducloud_sms_template"
 sidebar_current: "docs-baiducloud-datasource-sms_template"
 description: |-

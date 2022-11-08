@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "EIP"
+subcategory: "Elastic IP (EIP)"
 page_title: "BaiduCloud: baiducloud_eip_association"
 sidebar_current: "docs-baiducloud-resource-eip_association"
 description: |-

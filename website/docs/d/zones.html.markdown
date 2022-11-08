@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "BCC"
+subcategory: "Baidu Cloud Compute (BCC)"
 page_title: "BaiduCloud: baiducloud_zones"
 sidebar_current: "docs-baiducloud-datasource-zones"
 description: |-

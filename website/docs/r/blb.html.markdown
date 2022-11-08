@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "BLB"
+subcategory: "Baidu Load Balance (BLB)"
 page_title: "BaiduCloud: baiducloud_blb"
 sidebar_current: "docs-baiducloud-resource-blb"
 description: |-

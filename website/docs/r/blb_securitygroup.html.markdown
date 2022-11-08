@@ -1,6 +1,6 @@
 ---
 layout: "baiducloud"
-subcategory: "BLB"
+subcategory: "Baidu Load Balance (BLB)"
 page_title: "BaiduCloud: baiducloud_blb_securitygroup"
 sidebar_current: "docs-baiducloud-resource-blb_securitygroup"
 description: |-
