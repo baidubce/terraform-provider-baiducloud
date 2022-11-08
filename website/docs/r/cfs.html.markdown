@@ -4,7 +4,7 @@ subcategory: "Cloud File Storage (CFS)"
 page_title: "BaiduCloud: baiducloud_cfs"
 sidebar_current: "docs-baiducloud-resource-cfs"
 description: |-
-Use this resource to create a CFS.
+ Use this resource to create a CFS.
 ---
 
 # baiducloud_cfs
