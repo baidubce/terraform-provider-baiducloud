@@ -52,6 +52,8 @@ const (
 	BaiduCloudTestResourceTypeNameVPNConn             = BaiduCloudTestResourceTypeName + "-" + "VPNConn"
 	BaiduCloudTestResourceTypeNameEniAttachment       = BaiduCloudTestResourceTypeName + "-" + "eni-attachment"
 	BaiduCloudTestResourceTypeNameEni                 = BaiduCloudTestResourceTypeName + "-" + "eni"
+	BaiduCloudTestResourceTypeNameCfs                 = BaiduCloudTestResourceTypeName + "-" + "cfs"
+	BaiduCloudTestResourceTypeNameCfsMountTarget      = BaiduCloudTestResourceTypeName + "-" + "cfs-mount-target"
 	BaiduCloudTestResourceTypeNameSMSSignature        = BaiduCloudTestResourceTypeName + "-" + "sms-signature"
 	BaiduCloudTestResourceTypeNameSMSTemplate         = BaiduCloudTestResourceTypeName + "-" + "sms-template"
 )

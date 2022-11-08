@@ -13,6 +13,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/cdn"
 	"github.com/baidubce/bce-sdk-go/services/cert"
 	"github.com/baidubce/bce-sdk-go/services/cfc"
+	"github.com/baidubce/bce-sdk-go/services/cfs"
 	"github.com/baidubce/bce-sdk-go/services/dts"
 	"github.com/baidubce/bce-sdk-go/services/eip"
 	"github.com/baidubce/bce-sdk-go/services/endpoint"
@@ -58,6 +59,7 @@ type BaiduClient struct {
 	bbcConn      *bbc.Client
 	vpnConn      *vpn.Client
 	eniConn      *eni.Client
+	cfsConn      *cfs.Client
 	snicConn     *endpoint.Client
 }
 
@@ -65,7 +67,7 @@ type ApiVersion string
 
 var goSdkMutex = sync.RWMutex{} // The Go SDK is not thread-safe
 
-var providerVersion = "1.17.0"
+var providerVersion = "1.13.0"
 
 // Client for BaiduCloudClient
 func (c *Config) Client() (*BaiduClient, error) {
@@ -505,6 +507,24 @@ func (client *BaiduClient) WithEniClient(do func(*eni.Client) (interface{}, erro
 	}
 	goSdkMutex.Unlock()
 	return do(client.eniConn)
+}
+
+func (client *BaiduClient) WithCfsClient(do func(*cfs.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	// Initialize the CFS client if necessary
+	if client.cfsConn == nil {
+		client.WithCommonClient(CFSCode)
+		cfsClient, err := cfs.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			goSdkMutex.Unlock()
+			return nil, err
+		}
+		cfsClient.Config.Credentials = client.Credentials
+		cfsClient.Config.UserAgent = buildUserAgent()
+		client.cfsConn = cfsClient
+	}
+	goSdkMutex.Unlock()
+	return do(client.cfsConn)
 }
 
 func (client *BaiduClient) WithSNICClient(do func(*endpoint.Client) (interface{}, error)) (interface{}, error) {

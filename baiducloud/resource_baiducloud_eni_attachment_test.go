@@ -76,7 +76,7 @@ resource "baiducloud_instance" "server1" {
   billing           = {
     payment_timing = "Postpaid"
   }
-  admin_pass      = "Zhangq123"
+  admin_pass      = "Eni12345"
   subnet_id       = baiducloud_subnet.subnet.id
   security_groups = [
     baiducloud_security_group.sg.id

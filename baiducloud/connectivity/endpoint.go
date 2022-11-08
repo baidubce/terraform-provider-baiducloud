@@ -31,6 +31,7 @@ const (
 	BBCCode      = ServiceCode("BBC")
 	VPNCode      = ServiceCode("VPN")
 	ENICode      = ServiceCode("ENI")
+	CFSCode      = ServiceCode("CFS")
 	SMSCode      = ServiceCode("SMS")
 )
 
@@ -43,6 +44,7 @@ const (
 	DefaultBJRegionBlbEndPoint = "blb.bj.baidubce.com"
 	DefaultBJRegionBosEndPoint = "bj.bcebos.com"
 	DefaultBJRegionCfcEndPoint = "cfc.bj.baidubce.com"
+	DefaultBJRegionCfsEndPoint = "cfs.bj.baidubce.com"
 	DefaultBJRegionCceEndPoint = "cce.bj.baidubce.com"
 	DefaultBJRegionScsEndPoint = "redis.bj.baidubce.com"
 	DefaultBJRegionRdsEndPoint = "rds.bj.baidubce.com"
@@ -53,6 +55,7 @@ const (
 	DefaultBDRegionBbcEndPoint = "bbc.bd.baidubce.com"
 	DefaultBDRegionVpnEndPoint = "bcc.bd.baidubce.com"
 	DefaultBDRegionEniEndPoint = "bcc.bd.baidubce.com"
+	DefaultBDRegionCfsEndPoint = "cfs.bd.baidubce.com"
 
 	DefaultGZRegionBccEndPoint = "bcc.gz.baidubce.com"
 	DefaultGZRegionBbcEndPoint = "bbc.gz.baidubce.com"
@@ -74,6 +77,7 @@ const (
 	DefaultSURegionBlbEndPoint = "blb.su.baidubce.com"
 	DefaultSURegionBosEndPoint = "su.bcebos.com"
 	DefaultSURegionCfcEndPoint = "cfc.su.baidubce.com"
+	DefaultSURegionCfsEndPoint = "cfs.su.baidubce.com"
 	DefaultSURegionCceEndPoint = "cce.su.baidubce.com"
 	DefaultSURegionScsEndPoint = "redis.su.baidubce.com"
 	DefaultSURegionRdsEndPoint = "rds.su.baidubce.com"
@@ -92,12 +96,14 @@ const (
 	DefaultFWHRegionBosEndPoint = "fwh.bcebos.com"
 	DefaultFWHRegionCfcEndPoint = "cfc.fwh.baidubce.com"
 	DefaultFWHRegionCceEndPoint = "cce.fwh.baidubce.com"
+	DefaultFWHRegionCfsEndPoint = "cfs.fwh.baidubce.com"
 	DefaultFWHRegionScsEndPoint = "redis.fwh.baidubce.com"
 	DefaultFWHRegionRdsEndPoint = "rds.fwh.baidubce.com"
 
 	DefaultHKGRegionBccEndPoint = "bcc.hkg.baidubce.com"
 	DefaultHKGRegionVPNEndPoint = "bcc.hkg.baidubce.com"
 	DefaultHKGRegionEniEndPoint = "bcc.hkg.baidubce.com"
+	DefaultHKGRegionCfsEndPoint = "cfs.hkg.baidubce.com"
 
 	DefaultSINRegionBccEndPoint = "bcc.sin.baidubce.com"
 	DefaultSINRegionVPNEndPoint = "bcc.sin.baidubce.com"
@@ -142,6 +148,7 @@ var (
 		IAMCode:      DefaultIAMEndPoint,
 		CDNCode:      DefaultCDNEndPoint,
 		LOCALDNSCode: DefaultBJRegionBccEndPoint,
+		CFSCode:      DefaultBJRegionCfsEndPoint,
 		SMSCode:      DefaultBJRegionSmsEndPoint,
 	}
 
@@ -152,6 +159,7 @@ var (
 		VPNCode: DefaultBDRegionVpnEndPoint,
 		ENICode: DefaultBDRegionEniEndPoint,
 		BBCCode: DefaultBDRegionBbcEndPoint,
+		CFSCode: DefaultBDRegionCfsEndPoint,
 	}
 
 	// Region GZ Service Endpoints
@@ -192,6 +200,7 @@ var (
 		SCSCode:    DefaultSURegionScsEndPoint,
 		RDSCode:    DefaultSURegionRdsEndPoint,
 		IAMCode:    DefaultIAMEndPoint,
+		CFSCode:    DefaultSURegionCfsEndPoint,
 		SMSCode:    DefaultSURegionSmsEndPoint,
 	}
 
@@ -221,6 +230,7 @@ var (
 		SCSCode:    DefaultFWHRegionScsEndPoint,
 		RDSCode:    DefaultFWHRegionRdsEndPoint,
 		IAMCode:    DefaultIAMEndPoint,
+		CFSCode:    DefaultFWHRegionCfsEndPoint,
 	}
 
 	// Region HKG Service Endpoints
@@ -229,6 +239,7 @@ var (
 		VPCCode: DefaultHKGRegionBccEndPoint,
 		VPNCode: DefaultHKGRegionVPNEndPoint,
 		ENICode: DefaultHKGRegionEniEndPoint,
+		CFSCode: DefaultHKGRegionCfsEndPoint,
 	}
 
 	// Region SIN Service Endpoints

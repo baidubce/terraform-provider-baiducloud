@@ -245,7 +245,7 @@ func resourceBaiduCloudEniAttachmentDelete(d *schema.ResourceData, meta interfac
 		eniService.eniStateRefresh(d.Get("eni_id").(string)),
 	)
 	if _, err := stateConf.WaitForState(); err != nil {
-		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_eni_attachment", action, BCESDKGoERROR)
 	}
 	return nil
 }

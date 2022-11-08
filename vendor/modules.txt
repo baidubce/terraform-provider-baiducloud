@@ -94,6 +94,7 @@ github.com/baidubce/bce-sdk-go/services/cdn/api
 github.com/baidubce/bce-sdk-go/services/cert
 github.com/baidubce/bce-sdk-go/services/cfc
 github.com/baidubce/bce-sdk-go/services/cfc/api
+github.com/baidubce/bce-sdk-go/services/cfs
 github.com/baidubce/bce-sdk-go/services/dts
 github.com/baidubce/bce-sdk-go/services/eip
 github.com/baidubce/bce-sdk-go/services/endpoint
