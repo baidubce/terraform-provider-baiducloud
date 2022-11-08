@@ -1,4 +1,14 @@
-	## 1.18.0 (Unreleased)
+	## 1.19.0 (Unreleased)
+## 1.18.0 (November 08, 2022)
+NOTES:
+- Support baiducloud Cloud File Storage (CFS)
+
+FEATURES:
+- **New Data Source:** `baiducloud_cfss`
+- **New Data Source:** `baiducloud_cfs_mount_targets`
+- **New Resource:** `baiducloud_cfs`
+- **New Resource:** `baiducloud_cfs_mount_target`
+
 ## 1.17.1 (November 07, 2022)
 NOTES:
 - Support baiducloud SMS Template
