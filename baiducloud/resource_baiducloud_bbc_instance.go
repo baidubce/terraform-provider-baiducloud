@@ -50,7 +50,6 @@ resource "baiducloud_bbc_instance" "bbc_instance2" {
     "testKey" = "terraform_test"
   }
   description = "terraform_test"
-  admin_pass  = "terraform123456"
 }
 ```
 

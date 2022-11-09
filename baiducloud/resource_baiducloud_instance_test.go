@@ -303,7 +303,6 @@ resource "baiducloud_instance" "default" {
   billing = {
     payment_timing = "Postpaid"
   }
-  admin_pass = "terraform@123"
 
   subnet_id       = baiducloud_subnet.default02.id
   security_groups = [baiducloud_security_group.default02.id]
@@ -391,7 +390,6 @@ resource "baiducloud_instance" "default" {
   billing = {
     payment_timing = "Postpaid"
   }
-  admin_pass = "terraform@123"
 
   subnet_id       = baiducloud_subnet.default02.id
   security_groups = [baiducloud_security_group.default02.id]

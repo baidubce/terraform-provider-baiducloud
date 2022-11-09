@@ -60,7 +60,6 @@ resource "baiducloud_bbc_instance" "bbc_instance2" {
     "testKey" = "terraform_test"
   }
   description = "terraform_test"
-  admin_pass  = "terraform123456"
 }
 ```
 If you want to create a prepaid BBC, use following properties
@@ -84,7 +83,7 @@ The following arguments are supported:
 * `security_groups` - (Required) Security groups of the bbc instance.
 * `zone_name` - (Required, ForceNew) The naming convention of zonename is "country-region-availability area", in lowercase, for example, Beijing availability area A is "cn-bj-a"“
 * `action` - (Optional) action.Available values are "start" and "stop" 
-* `admin_pass` - (Optional) name.
+* `admin_pass` - (Optional) root user password.
 * `auto_renew_time_unit` - (Optional) Monthly payment or annual payment, month is "month" and year is "year".
 * `auto_renew_time` - (Optional) The automatic renewal time is 1-9 per month and 1-3 per year.
 * `deploy_set_id` - (Optional) deploy set of bbc.
