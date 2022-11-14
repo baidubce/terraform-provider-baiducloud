@@ -40,6 +40,10 @@ resource "baiducloud_scs" "default" {
   node_type = data.baiducloud_scs_specs.default.specs.0.node_type
   cluster_type = "master_slave"
   replication_num = 1
+  security_ips = [
+    "192.168.1.1",
+    "172.16.2.1/24",
+  ]
 }
 
 data "baiducloud_scss" "default" {

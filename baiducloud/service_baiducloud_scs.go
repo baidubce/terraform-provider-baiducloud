@@ -105,3 +105,20 @@ func (e *ScsService) FlattenScsModelsToMap(scss []scs.InstanceModel) []map[strin
 	}
 	return result
 }
+
+func (s *ScsService) GetSecurityIPs(instanceId string) ([]string, error) {
+	result := make([]string, 0)
+
+	action := "List all SCS instance "
+	raw, err := s.client.WithScsClient(func(scsClient *scs.Client) (interface{}, error) {
+		return scsClient.GetSecurityIp(instanceId)
+	})
+	if err != nil {
+		return nil, err
+	}
+	addDebug(action, raw)
+
+	response := raw.(*scs.GetSecurityIpResult)
+	result = append(result, response.SecurityIps...)
+	return result, nil
+}

@@ -152,6 +152,14 @@ func dataSourceBaiduCloudScss() *schema.Resource {
 							Description: "Whether to automatically renew.",
 							Computed:    true,
 						},
+						"security_ips": {
+							Type:        schema.TypeSet,
+							Description: "Security ips of the scs.",
+							Computed:    true,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
+						},
 						"tags": tagsComputedSchema(),
 					},
 				},
@@ -188,6 +196,10 @@ func dataSourceBaiduCloudScssRead(d *schema.ResourceData, meta interface{}) erro
 				continue
 			}
 		}
+		ips, err := scsService.GetSecurityIPs(e.InstanceID)
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scss", action, BCESDKGoERROR)
+		}
 		scsMap = append(scsMap, map[string]interface{}{
 			"instance_id":     e.InstanceID,
 			"instance_name":   e.InstanceName,
@@ -203,6 +215,7 @@ func dataSourceBaiduCloudScssRead(d *schema.ResourceData, meta interface{}) erro
 			"used_capacity":   e.UsedCapacity,
 			"payment_timing":  e.PaymentTiming,
 			"zone_names":      e.ZoneNames,
+			"security_ips":    ips,
 			"tags":            flattenTagsToMap(e.Tags),
 		})
 	}

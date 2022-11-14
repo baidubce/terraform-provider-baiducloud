@@ -2,7 +2,6 @@
 layout: "baiducloud"
 subcategory: "Simple Cache Service for Redis (SCS)"
 page_title: "BaiduCloud: baiducloud_scs"
-subcategory: "Simple Cache Service for Redis (SCS)"
 sidebar_current: "docs-baiducloud-resource-scs"
 description: |-
   Use this resource to get information about a SCS.
@@ -27,8 +26,12 @@ resource "baiducloud_scs" "default" {
 	engine = "memcache"
 	port = 11211
 	node_type = "cache.n1.micro"
-	cluster_type = "defalut"
+	cluster_type = "default"
 	shard_num = 2
+    security_ips = [
+      "192.168.1.1",
+      "172.16.2.1/24",
+    ]
 }
 ```
 
@@ -43,6 +46,10 @@ resource "baiducloud_scs" "default" {
 	cluster_type = "master_slave"
 	replication_num = 1
 	shard_num = 1
+    security_ips = [
+      "192.168.1.1",
+      "172.16.2.1/24",
+    ]
 }
 ```
 
@@ -78,6 +85,10 @@ resource "baiducloud_scs" "default" {
 		is_master         = 0
 		subnet_id         = "sbn-vhnqd71mivjq"
 	}
+    security_ips = [
+      "192.168.1.1",
+      "172.16.2.1/24",
+    ]
 }
 ```
 
@@ -109,6 +120,7 @@ The following arguments are supported:
 * `subnets` - (Optional) Subnets of the instance.
 * `tags` - (Optional) Tags, support setting when creating instance, do not support modify
 * `vpc_id` - (Optional) ID of the specific VPC
+* `security_ips` - (Optional) Security ips of the scs.
 
 The `billing` object supports the following:
 

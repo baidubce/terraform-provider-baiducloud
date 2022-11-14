@@ -389,6 +389,16 @@ func resourceBaiduCloudScs() *schema.Resource {
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice([]string{"add", "delete"}, false),
 			},
+			"security_ips": {
+				Type:        schema.TypeSet,
+				Description: "Security ips of the scs.",
+				Optional:    true,
+				Computed:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Set: schema.HashString,
+			},
 		},
 	}
 }
@@ -442,13 +452,17 @@ func resourceBaiduCloudScsCreate(d *schema.ResourceData, meta interface{}) error
 	if _, err := stateConf.WaitForState(); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
 	}
+	err = updateInstanceSecurityIPs(d, meta, d.Id())
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
+	}
 
 	return resourceBaiduCloudScsRead(d, meta)
 }
 
 func resourceBaiduCloudScsRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
-
+	scsService := ScsService{client: client}
 	instanceID := d.Id()
 	action := "Query SCS Instance " + instanceID
 
@@ -490,6 +504,11 @@ func resourceBaiduCloudScsRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("tags", flattenTagsToMap(result.Tags))
 	d.Set("replication_info", transReplicationInfoToSchema(result.ReplicationInfo))
 	d.Set("shard_num", result.ShardNum)
+	ips, err := scsService.GetSecurityIPs(d.Id())
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
+	}
+	d.Set("security_ips", ips)
 
 	return nil
 }
@@ -553,6 +572,10 @@ func resourceBaiduCloudScsUpdate(d *schema.ResourceData, meta interface{}) error
 
 	// update instance replicationInfo
 	if err := updateInstanceReplicationInfo(d, meta, instanceID); err != nil {
+		return err
+	}
+
+	if err := updateInstanceSecurityIPs(d, meta, instanceID); err != nil {
 		return err
 	}
 
@@ -932,5 +955,53 @@ func updateInstanceReplicationInfo(d *schema.ResourceData, meta interface{}, ins
 		d.SetPartial("replication_info")
 	}
 
+	return nil
+}
+
+func updateInstanceSecurityIPs(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	action := "Update scs security ips " + instanceID
+	client := meta.(*connectivity.BaiduClient)
+	scsService := ScsService{
+		client: client,
+	}
+	ips, err := scsService.GetSecurityIPs(d.Id())
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
+	}
+	os := &schema.Set{
+		F: schema.HashString,
+	}
+	for _, ip := range ips {
+		os.Add(ip)
+	}
+	ns := d.Get("security_ips").(*schema.Set)
+	addIPs := ns.Difference(os).List()
+	deleteIPs := os.Difference(ns).List()
+
+	addIPsArg := make([]string, 0)
+	for _, ips := range addIPs {
+		addIPsArg = append(addIPsArg, ips.(string))
+	}
+	// Add security IPs
+	if _, err := client.WithScsClient(func(scsClient *scs.Client) (i interface{}, e error) {
+		return nil, scsClient.AddSecurityIp(instanceID, &scs.SecurityIpArgs{
+			SecurityIps: addIPsArg,
+		})
+	}); err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
+	}
+
+	deleteIPsArg := make([]string, 0)
+	for _, ips := range deleteIPs {
+		deleteIPsArg = append(deleteIPsArg, ips.(string))
+	}
+	// Delete security IPs
+	if _, err := client.WithScsClient(func(scsClient *scs.Client) (i interface{}, e error) {
+		return nil, scsClient.DeleteSecurityIp(instanceID, &scs.SecurityIpArgs{
+			SecurityIps: deleteIPsArg,
+		})
+	}); err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
+	}
 	return nil
 }
