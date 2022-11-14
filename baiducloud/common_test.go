@@ -13,6 +13,7 @@ const (
 	BaiduCloudTestResourceTypeNameblbListener         = BaiduCloudTestResourceTypeName + "-" + "blb-listener"
 	BaiduCloudTestResourceTypeNameblbServer           = BaiduCloudTestResourceTypeName + "-" + "blb-backend-server"
 	BaiduCloudTestResourceTypeNameblbSecurityGroup    = BaiduCloudTestResourceTypeName + "-" + "blb-security-group"
+	BaiduCloudTestResourceTypeNameblsLogStore         = BaiduCloudTestResourceTypeName + "-" + "bls-log-store"
 	BaiduCloudTestResourceTypeNameAutoSnapshotPolicy  = BaiduCloudTestResourceTypeName + "-" + "auto-snapshot-policy"
 	BaiduCloudTestResourceTypeNameBosBucket           = BaiduCloudTestResourceTypeName + "-" + "bos-bucket"
 	BaiduCloudTestResourceTypeNameBosBucketObject     = BaiduCloudTestResourceTypeName + "-" + "bos-bucket-object"

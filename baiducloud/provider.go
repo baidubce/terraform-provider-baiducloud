@@ -225,6 +225,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_cfs_mount_targets":              dataSourceBaiduCloudCfsMountTargets(),
 			"baiducloud_sms_signature":                  dataSourceBaiduCloudSMSSignature(),
 			"baiducloud_sms_template":                   dataSourceBaiduCloudSMSTemplate(),
+			"baiducloud_bls_log_stores":                 dataSourceBaiduCloudBLSLogStores(),
 			"baiducloud_snics":                          snic.DataSourceSNICs(),
 			"baiducloud_snic_public_services":           snic.DataSourcePublicServices(),
 		},
@@ -296,6 +297,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_cfs_mount_target":            resourceBaiduCloudCfsMountTarget(),
 			"baiducloud_sms_signature":               resourceBaiduCloudSMSSignature(),
 			"baiducloud_sms_template":                resourceBaiduCloudSMSTemplate(),
+			"baiducloud_bls_log_store":               resourceBaiduCloudBLSLogStore(),
 			"baiducloud_snic":                        snic.ResourceSNIC(),
 		},
 

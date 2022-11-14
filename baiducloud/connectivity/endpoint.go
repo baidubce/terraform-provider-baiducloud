@@ -33,6 +33,7 @@ const (
 	ENICode      = ServiceCode("ENI")
 	CFSCode      = ServiceCode("CFS")
 	SMSCode      = ServiceCode("SMS")
+	BLSCode      = ServiceCode("BLS")
 )
 
 const (
@@ -50,6 +51,7 @@ const (
 	DefaultBJRegionRdsEndPoint = "rds.bj.baidubce.com"
 	DefaultBJRegionDtsEndPoint = "rds.bj.baidubce.com"
 	DefaultBJRegionSmsEndPoint = "smsv3.bj.baidubce.com"
+	DefaultBJRegionBlsEndPoint = "bls-log.bj.baidubce.com"
 
 	DefaultBDRegionBccEndPoint = "bcc.bd.baidubce.com"
 	DefaultBDRegionBbcEndPoint = "bbc.bd.baidubce.com"
@@ -68,6 +70,7 @@ const (
 	DefaultGZRegionCceEndPoint = "cce.gz.baidubce.com"
 	DefaultGZRegionScsEndPoint = "redis.gz.baidubce.com"
 	DefaultGZRegionRdsEndPoint = "rds.gz.baidubce.com"
+	DefaultGZRegionBlsEndPoint = "bls-log.gz.baidubce.com"
 
 	DefaultSURegionBccEndPoint = "bcc.su.baidubce.com"
 	DefaultSURegionBbcEndPoint = "bbc.su.baidubce.com"
@@ -82,6 +85,7 @@ const (
 	DefaultSURegionScsEndPoint = "redis.su.baidubce.com"
 	DefaultSURegionRdsEndPoint = "rds.su.baidubce.com"
 	DefaultSURegionSmsEndPoint = "smsv3.su.baidubce.com"
+	DefaultSURegionBlsEndPoint = "bls-log.su.baidubce.com"
 
 	DefaultFSHRegionBccEndPoint = "bcc.fsh.baidubce.com"
 	DefaultFSHRegionVPNEndPoint = "bcc.fsh.baidubce.com"
@@ -150,6 +154,7 @@ var (
 		LOCALDNSCode: DefaultBJRegionBccEndPoint,
 		CFSCode:      DefaultBJRegionCfsEndPoint,
 		SMSCode:      DefaultBJRegionSmsEndPoint,
+		BLSCode:      DefaultBJRegionBlsEndPoint,
 	}
 
 	// Region BD Service Endpoints
@@ -180,6 +185,7 @@ var (
 		SCSCode:    DefaultGZRegionScsEndPoint,
 		RDSCode:    DefaultGZRegionRdsEndPoint,
 		IAMCode:    DefaultIAMEndPoint,
+		BLSCode:    DefaultGZRegionBlsEndPoint,
 	}
 
 	// Region SU Service Endpoints
@@ -202,6 +208,7 @@ var (
 		IAMCode:    DefaultIAMEndPoint,
 		CFSCode:    DefaultSURegionCfsEndPoint,
 		SMSCode:    DefaultSURegionSmsEndPoint,
+		BLSCode:    DefaultSURegionBlsEndPoint,
 	}
 
 	// Region FSH Service Endpoints

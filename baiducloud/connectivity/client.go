@@ -7,6 +7,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/bbc"
 	"github.com/baidubce/bce-sdk-go/services/bcc"
 	"github.com/baidubce/bce-sdk-go/services/blb"
+	"github.com/baidubce/bce-sdk-go/services/bls"
 	"github.com/baidubce/bce-sdk-go/services/bos"
 	"github.com/baidubce/bce-sdk-go/services/cce"
 	ccev2 "github.com/baidubce/bce-sdk-go/services/cce/v2"
@@ -61,6 +62,7 @@ type BaiduClient struct {
 	eniConn      *eni.Client
 	cfsConn      *cfs.Client
 	snicConn     *endpoint.Client
+	blsConn      *bls.Client
 }
 
 type ApiVersion string
@@ -543,6 +545,25 @@ func (client *BaiduClient) WithSNICClient(do func(*endpoint.Client) (interface{}
 	}
 	goSdkMutex.Unlock()
 	return do(client.snicConn)
+}
+
+func (client *BaiduClient) WithBLSClient(do func(*bls.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the LOCALDNS client if necessary
+	if client.blsConn == nil {
+		client.WithCommonClient(BLSCode)
+		blsClient, err := bls.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		blsClient.Config.Credentials = client.Credentials
+		blsClient.Config.UserAgent = buildUserAgent()
+		client.blsConn = blsClient
+	}
+
+	return do(client.blsConn)
 }
 
 func buildUserAgent() string {
