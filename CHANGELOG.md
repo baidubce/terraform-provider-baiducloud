@@ -1,4 +1,8 @@
 	## 1.19.0 (Unreleased)
+## 1.18.2 (November 14, 2022)
+NOTES:
+- Support baiducloud BLS Log Store
+
 ## 1.18.1 (November 14, 2022)
 NOTES:
 - Support baiducloud SCS security IPs
