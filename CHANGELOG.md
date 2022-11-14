@@ -1,4 +1,10 @@
 	## 1.19.0 (Unreleased)
+## 1.18.1 (November 14, 2022)
+NOTES:
+- Support baiducloud SCS security IPs
+ENHANCEMENTS:
+- resource/baiducloud_scs: Add parameter security IPs
+
 ## 1.18.0 (November 08, 2022)
 NOTES:
 - Support baiducloud Cloud File Storage (CFS)
