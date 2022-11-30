@@ -15,7 +15,7 @@ Use this data source to query spec list.
 ## Example Usage
 
 ```hcl
-data "baiducloud_bcc_specs" "default" {
+data "baiducloud_specs" "default" {
   zone_name = "cn-bj-d"
   output_file = "specs.json"
 
