@@ -36,6 +36,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/rateLimit"
+	"strconv"
 	"time"
 )
 
@@ -75,44 +76,37 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				ForceNew:    true,
 				Computed:    true,
 			},
-			"billing": {
-				Type:        schema.TypeMap,
-				Description: "Billing information of the instance.",
-				Required:    true,
+			"payment_timing": {
+				Type:         schema.TypeString,
+				Description:  "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.",
+				Optional:     true,
+				Default:      api.PaymentTimingPostPaid,
+				ValidateFunc: validatePaymentTiming(),
+			},
+			"reservation": {
+				Type:             schema.TypeMap,
+				Description:      "Reservation of the instance.",
+				Optional:         true,
+				DiffSuppressFunc: postPaidDiffSuppressFunc,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"payment_timing": {
-							Type:         schema.TypeString,
-							Description:  "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.",
-							Required:     true,
-							Default:      api.PaymentTimingPostPaid,
-							ValidateFunc: validatePaymentTiming(),
-						},
-						"reservation": {
-							Type:             schema.TypeMap,
-							Description:      "Reservation of the instance.",
-							Optional:         true,
+						"reservation_length": {
+							Type: schema.TypeInt,
+							Description: "The reservation length that you will pay for your resource. " +
+								"It is valid when payment_timing is Prepaid. Valid values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36].",
+							Required:         true,
+							Default:          1,
+							ValidateFunc:     validateReservationLength(),
 							DiffSuppressFunc: postPaidDiffSuppressFunc,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"reservation_length": {
-										Type:             schema.TypeInt,
-										Description:      "The reservation length that you will pay for your resource. It is valid when payment_timing is Prepaid. Valid values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36].",
-										Required:         true,
-										Default:          1,
-										ValidateFunc:     validateReservationLength(),
-										DiffSuppressFunc: postPaidDiffSuppressFunc,
-									},
-									"reservation_time_unit": {
-										Type:             schema.TypeString,
-										Description:      "The reservation time unit that you will pay for your resource. It is valid when payment_timing is Prepaid. The value can only be month currently, which is also the default value.",
-										Required:         true,
-										Default:          "Month",
-										ValidateFunc:     validateReservationUnit(),
-										DiffSuppressFunc: postPaidDiffSuppressFunc,
-									},
-								},
-							},
+						},
+						"reservation_time_unit": {
+							Type: schema.TypeString,
+							Description: "The reservation time unit that you will pay for your resource." +
+								" It is valid when payment_timing is Prepaid. The value can only be month currently, which is also the default value.",
+							Required:         true,
+							Default:          "Month",
+							ValidateFunc:     validateReservationUnit(),
+							DiffSuppressFunc: postPaidDiffSuppressFunc,
 						},
 					},
 				},
@@ -547,8 +541,7 @@ func resourceBaiduCloudInstanceRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("tags", flattenTagsToMap(response.Instance.Tags))
 	d.Set("instance_spec", response.Instance.Spec)
 
-	billingMap := map[string]interface{}{"payment_timing": response.Instance.PaymentTiming}
-	d.Set("billing", billingMap)
+	d.Set("payment_timing", response.Instance.PaymentTiming)
 
 	// Computed
 	d.Set("description", response.Instance.Description)
@@ -738,41 +731,37 @@ func buildBaiduCloudInstanceArgs(d *schema.ResourceData, meta interface{}) (*api
 		request.InstanceType = api.InstanceType(it)
 	}
 
-	if v, ok := d.GetOk("billing"); ok {
-		billing := v.(map[string]interface{})
-		billingRequest := api.Billing{
-			PaymentTiming: api.PaymentTimingType(""),
-			Reservation:   &api.Reservation{},
-		}
-		if p, ok := billing["payment_timing"]; ok {
-			paymentTiming := api.PaymentTimingType(p.(string))
-			billingRequest.PaymentTiming = paymentTiming
-		}
-		if billingRequest.PaymentTiming == api.PaymentTimingPrePaid {
-			if r, ok := billing["reservation"]; ok {
-				reservation := r.(map[string]interface{})
-				if reservationLength, ok := reservation["reservation_length"]; ok {
-					billingRequest.Reservation.ReservationLength = reservationLength.(int)
-				}
-				if reservationTimeUnit, ok := reservation["reservation_time_unit"]; ok {
-					billingRequest.Reservation.ReservationTimeUnit = reservationTimeUnit.(string)
-				}
-			}
-			// if the field is set, then auto-renewal is effective.
-			if v, ok := d.GetOk("auto_renew_time_unit"); ok {
-				request.AutoRenewTimeUnit = v.(string)
-
-				if v, ok := d.GetOk("auto_renew_time_length"); ok {
-					request.AutoRenewTime = v.(int)
-				}
-				if v, ok := d.GetOk("cds_auto_renew"); ok {
-					request.CdsAutoRenew = v.(bool)
-				}
-			}
-		}
-
-		request.Billing = billingRequest
+	billingRequest := api.Billing{
+		PaymentTiming: api.PaymentTimingType(""),
+		Reservation:   &api.Reservation{},
 	}
+	if p, ok := d.GetOk("payment_timing"); ok {
+		paymentTiming := api.PaymentTimingType(p.(string))
+		billingRequest.PaymentTiming = paymentTiming
+	}
+	if billingRequest.PaymentTiming == api.PaymentTimingPrePaid {
+		if r, ok := d.GetOk("reservation"); ok {
+			reservation := r.(map[string]interface{})
+			if reservationLength, ok := reservation["reservation_length"]; ok {
+				reservationLengthInt, err := strconv.Atoi(reservationLength.(string))
+				billingRequest.Reservation.ReservationLength = reservationLengthInt
+				if err != nil {
+					return nil, err
+				}
+			}
+			if reservationTimeUnit, ok := reservation["reservation_time_unit"]; ok {
+				billingRequest.Reservation.ReservationTimeUnit = reservationTimeUnit.(string)
+			}
+		}
+		// if the field is set, then auto-renewal is effective.
+		if v, ok := d.GetOk("auto_renew_time_unit"); ok {
+			request.AutoRenewTimeUnit = v.(string)
+			if v, ok := d.GetOk("auto_renew_time"); ok {
+				request.AutoRenewTime = v.(int)
+			}
+		}
+	}
+	request.Billing = billingRequest
 
 	if adminPass, ok := d.GetOk("admin_pass"); ok {
 		request.AdminPass = adminPass.(string)
@@ -888,41 +877,37 @@ func buildBaiduCloudInstanceBySpecArgs(d *schema.ResourceData, meta interface{})
 		request.Spec = instanceSpec.(string)
 	}
 
-	if v, ok := d.GetOk("billing"); ok {
-		billing := v.(map[string]interface{})
-		billingRequest := api.Billing{
-			PaymentTiming: api.PaymentTimingType(""),
-			Reservation:   &api.Reservation{},
-		}
-		if p, ok := billing["payment_timing"]; ok {
-			paymentTiming := api.PaymentTimingType(p.(string))
-			billingRequest.PaymentTiming = paymentTiming
-		}
-		if billingRequest.PaymentTiming == api.PaymentTimingPrePaid {
-			if r, ok := billing["reservation"]; ok {
-				reservation := r.(map[string]interface{})
-				if reservationLength, ok := reservation["reservation_length"]; ok {
-					billingRequest.Reservation.ReservationLength = reservationLength.(int)
-				}
-				if reservationTimeUnit, ok := reservation["reservation_time_unit"]; ok {
-					billingRequest.Reservation.ReservationTimeUnit = reservationTimeUnit.(string)
-				}
-			}
-			// if the field is set, then auto-renewal is effective.
-			if v, ok := d.GetOk("auto_renew_time_unit"); ok {
-				request.AutoRenewTimeUnit = v.(string)
-
-				if v, ok := d.GetOk("auto_renew_time_length"); ok {
-					request.AutoRenewTime = v.(int)
-				}
-				if v, ok := d.GetOk("cds_auto_renew"); ok {
-					request.CdsAutoRenew = v.(bool)
-				}
-			}
-		}
-
-		request.Billing = billingRequest
+	billingRequest := api.Billing{
+		PaymentTiming: api.PaymentTimingType(""),
+		Reservation:   &api.Reservation{},
 	}
+	if p, ok := d.GetOk("payment_timing"); ok {
+		paymentTiming := api.PaymentTimingType(p.(string))
+		billingRequest.PaymentTiming = paymentTiming
+	}
+	if billingRequest.PaymentTiming == api.PaymentTimingPrePaid {
+		if r, ok := d.GetOk("reservation"); ok {
+			reservation := r.(map[string]interface{})
+			if reservationLength, ok := reservation["reservation_length"]; ok {
+				reservationLengthInt, err := strconv.Atoi(reservationLength.(string))
+				billingRequest.Reservation.ReservationLength = reservationLengthInt
+				if err != nil {
+					return nil, err
+				}
+			}
+			if reservationTimeUnit, ok := reservation["reservation_time_unit"]; ok {
+				billingRequest.Reservation.ReservationTimeUnit = reservationTimeUnit.(string)
+			}
+		}
+		// if the field is set, then auto-renewal is effective.
+		if v, ok := d.GetOk("auto_renew_time_unit"); ok {
+			request.AutoRenewTimeUnit = v.(string)
+			if v, ok := d.GetOk("auto_renew_time"); ok {
+				request.AutoRenewTime = v.(int)
+			}
+		}
+	}
+	request.Billing = billingRequest
 
 	if adminPass, ok := d.GetOk("admin_pass"); ok {
 		request.AdminPass = adminPass.(string)

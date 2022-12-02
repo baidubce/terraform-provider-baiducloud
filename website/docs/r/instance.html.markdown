@@ -1,6 +1,5 @@
 ---
 layout: "baiducloud"
-subcategory: "Baidu Cloud Compute (BCC)"
 page_title: "BaiduCloud: baiducloud_instance"
 sidebar_current: "docs-baiducloud-resource-instance"
 description: |-
@@ -23,9 +22,13 @@ resource "baiducloud_instance" "my-server" {
   availability_zone = "cn-bj-a"
   cpu_count = "2"
   memory_capacity_in_gb = "8"
-  billing = {
-    payment_timing = "Postpaid"
-  }
+  payment_timing = "Postpaid"
+#  if create prepaid instance, please refer below
+#  payment_timing = "Prepaid"
+#  reservation = {
+#    reservation_length = 1
+#    reservation_time_unit =  "Month"
+#  }
 }
 ```
 
@@ -37,9 +40,13 @@ resource "baiducloud_instance" "my-server" {
   name = "my-instance"
   availability_zone = "cn-bj-d"
   instance_spec = "bcc.gr1.c1m4"
-  billing = {
-    payment_timing = "Postpaid"
-  }
+  payment_timing = "Postpaid"
+#  if create prepaid instance, please refer below
+#  payment_timing = "Prepaid"
+#  reservation = {
+#    reservation_length = 1
+#    reservation_time_unit =  "Month"
+#  }
 }
 ```
 
@@ -79,9 +86,7 @@ The following arguments are supported:
 * `user_data` - (Optional) User Data
 * `deploy_set_ids` - (Optional) Deploy set id list the instance belong to. *NOTE*:Change of this list will reboot bcc instance, probably.
 
-The `billing` object supports the following:
-
-* `payment_timing` - (Required) Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.
+* `payment_timing` - (Optional) Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.
 * `reservation` - (Optional) Reservation of the instance.
 
 The `reservation` object supports the following:
