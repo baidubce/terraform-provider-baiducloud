@@ -1,4 +1,8 @@
 	## 1.19.0 (Unreleased)
+## 1.18.3 (December 2, 2022)
+NOTES:
+- fix baiducloud BCC prepaid mistakes
+
 ## 1.18.2 (November 14, 2022)
 NOTES:
 - Support baiducloud BLS Log Store
