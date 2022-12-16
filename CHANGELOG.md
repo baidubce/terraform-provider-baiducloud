@@ -1,4 +1,8 @@
 	## 1.19.0 (Unreleased)
+## 1.18.4 (December 16, 2022)
+NOTES:
+- fix baiducloud EIP auto renew mistakes
+
 ## 1.18.3 (December 2, 2022)
 NOTES:
 - fix baiducloud BCC prepaid mistakes
