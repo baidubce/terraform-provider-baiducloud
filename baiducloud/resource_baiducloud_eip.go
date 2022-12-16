@@ -120,7 +120,7 @@ func resourceBaiduCloudEip() *schema.Resource {
 				Sensitive:        true,
 				DiffSuppressFunc: postPaidDiffSuppressFunc,
 				ValidateFunc:     validation.IntInSlice([]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36}),
-				ConflictsWith:    []string{"auto_renew_time", "auto_renew_time_unit"},
+				//ConflictsWith:    []string{"auto_renew_time", "auto_renew_time_unit"},
 			},
 			"reservation_time_unit": {
 				Type:             schema.TypeString,
@@ -129,7 +129,7 @@ func resourceBaiduCloudEip() *schema.Resource {
 				Sensitive:        true,
 				DiffSuppressFunc: postPaidDiffSuppressFunc,
 				ValidateFunc:     validation.StringInSlice([]string{"month"}, false),
-				ConflictsWith:    []string{"auto_renew_time", "auto_renew_time_unit"},
+				//ConflictsWith:    []string{"auto_renew_time", "auto_renew_time_unit"},
 			},
 			"auto_renew_time": {
 				Type:             schema.TypeInt,
@@ -137,7 +137,7 @@ func resourceBaiduCloudEip() *schema.Resource {
 				Optional:         true,
 				DiffSuppressFunc: postPaidDiffSuppressFunc,
 				ValidateFunc:     validation.IntInSlice([]int{1, 2, 3, 4, 5, 6, 7, 8, 9}),
-				ConflictsWith:    []string{"reservation_length", "reservation_time_unit"},
+				//ConflictsWith:    []string{"reservation_length", "reservation_time_unit"},
 			},
 			"auto_renew_time_unit": {
 				Type:             schema.TypeString,
@@ -145,7 +145,7 @@ func resourceBaiduCloudEip() *schema.Resource {
 				Optional:         true,
 				DiffSuppressFunc: postPaidDiffSuppressFunc,
 				ValidateFunc:     validation.StringInSlice([]string{"month", "year"}, false),
-				ConflictsWith:    []string{"reservation_length", "reservation_time_unit"},
+				//ConflictsWith:    []string{"reservation_length", "reservation_time_unit"},
 			},
 			"tags": tagsSchema(),
 		},
