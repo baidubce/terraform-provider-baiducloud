@@ -262,6 +262,7 @@ type PortTypeModel struct {
 
 type DescribeLoadBalancerDetailResult struct {
 	BlbId           string           `json:"blbId"`
+	Name            string           `json:"name"`
 	Status          BLBStatus        `json:"status"`
 	Description     string           `json:"desc"`
 	Address         string           `json:"address"`
@@ -570,10 +571,16 @@ type CreateAppIpGroupArgs struct {
 }
 
 type AppIpGroupMember struct {
-	Ip     string `json:"ip,omitempty"`
-	Port   int    `json:"port,omitempty"`
-	Weight int    `json:"weight,omitempty"`
-	MemberId     string `json:"memberId,omitempty"`
+	Ip       string                      `json:"ip,omitempty"`
+	Port     int                         `json:"port,omitempty"`
+	Weight   int                         `json:"weight,omitempty"`
+	MemberId string                      `json:"memberId,omitempty"`
+	PortList []AppIpGroupMemberPortModel `json:"portList,omitempty"`
+}
+
+type AppIpGroupMemberPortModel struct {
+	HealthCheckPortType string `json:"healthCheckPortType"`
+	Status              string `json:"status"`
 }
 
 type CreateAppIpGroupResult struct {

@@ -6,6 +6,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/appblb"
 	"github.com/baidubce/bce-sdk-go/services/bbc"
 	"github.com/baidubce/bce-sdk-go/services/bcc"
+	"github.com/baidubce/bce-sdk-go/services/bec"
 	"github.com/baidubce/bce-sdk-go/services/blb"
 	"github.com/baidubce/bce-sdk-go/services/bls"
 	"github.com/baidubce/bce-sdk-go/services/bos"
@@ -63,6 +64,7 @@ type BaiduClient struct {
 	cfsConn      *cfs.Client
 	snicConn     *endpoint.Client
 	blsConn      *bls.Client
+	becConn      *bec.Client
 }
 
 type ApiVersion string
@@ -564,6 +566,24 @@ func (client *BaiduClient) WithBLSClient(do func(*bls.Client) (interface{}, erro
 	}
 
 	return do(client.blsConn)
+}
+
+func (client *BaiduClient) WithBECClient(do func(*bec.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	// Initialize the BEC client if necessary
+	if client.becConn == nil {
+		client.WithCommonClient(BECCode)
+		becClient, err := bec.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			goSdkMutex.Unlock()
+			return nil, err
+		}
+		becClient.Config.Credentials = client.Credentials
+		becClient.Config.UserAgent = buildUserAgent()
+		client.becConn = becClient
+	}
+	goSdkMutex.Unlock()
+	return do(client.becConn)
 }
 
 func buildUserAgent() string {

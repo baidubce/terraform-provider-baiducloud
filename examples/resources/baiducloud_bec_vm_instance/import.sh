@@ -1,0 +1,1 @@
+terraform import baiducloud_bec_vm_instance.example vm-abs1sd13
