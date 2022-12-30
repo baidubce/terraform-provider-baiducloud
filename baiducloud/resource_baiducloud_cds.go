@@ -395,14 +395,16 @@ func buildBaiduCloudCreateCDSArgs(d *schema.ResourceData, meta interface{}) (*ap
 		result.Billing.PaymentTiming = api.PaymentTimingType(v.(string))
 	}
 
+	reservation := &api.Reservation{}
 	if result.Billing.PaymentTiming == api.PaymentTimingPrePaid {
 		if v, ok := d.GetOk("reservation_length"); ok {
-			result.Billing.Reservation.ReservationLength = v.(int)
+			reservation.ReservationLength = v.(int)
 		}
 
 		if v, ok := d.GetOk("reservation_time_unit"); ok {
-			result.Billing.Reservation.ReservationTimeUnit = v.(string)
+			reservation.ReservationTimeUnit = v.(string)
 		}
+		result.Billing.Reservation = reservation
 	}
 
 	return result, nil
