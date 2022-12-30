@@ -1,4 +1,8 @@
-	## 1.19.1 (Unreleased)
+	## 1.19.2 (Unreleased)
+## 1.19.1 (December 30, 2022)
+NOTES:
+- Fix baiducloud CDS prepaid mistakes
+
 ## 1.19.0 (December 29, 2022)
 NOTES:
 - Support Baidu Edge Computing (BEC)
