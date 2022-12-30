@@ -122,6 +122,7 @@ package baiducloud
 import (
 	"bytes"
 	"fmt"
+	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/bec"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/cdn"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/snic"
 	"os"
@@ -228,6 +229,8 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_bls_log_stores":                 dataSourceBaiduCloudBLSLogStores(),
 			"baiducloud_snics":                          snic.DataSourceSNICs(),
 			"baiducloud_snic_public_services":           snic.DataSourcePublicServices(),
+			"baiducloud_bec_nodes":                      bec.DataSourceNodes(),
+			"baiducloud_bec_vm_instances":               bec.DataSourceVMInstances(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -299,6 +302,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_sms_template":                resourceBaiduCloudSMSTemplate(),
 			"baiducloud_bls_log_store":               resourceBaiduCloudBLSLogStore(),
 			"baiducloud_snic":                        snic.ResourceSNIC(),
+			"baiducloud_bec_vm_instance":             bec.ResourceVMInstance(),
 		},
 
 		ConfigureFunc: providerConfigure,

@@ -1,4 +1,13 @@
-	## 1.19.0 (Unreleased)
+	## 1.19.1 (Unreleased)
+## 1.19.0 (December 29, 2022)
+NOTES:
+- Support Baidu Edge Computing (BEC)
+
+FEATURES:
+- **New Resource:** `baiducloud_bec_vm_instance`
+- **New Data Source:** `baiducloud_bec_nodes`
+- **New Data Source:** `baiducloud_bec_vm_instances`
+
 ## 1.18.4 (December 16, 2022)
 NOTES:
 - fix baiducloud EIP auto renew mistakes

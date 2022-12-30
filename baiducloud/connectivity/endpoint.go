@@ -34,6 +34,7 @@ const (
 	CFSCode      = ServiceCode("CFS")
 	SMSCode      = ServiceCode("SMS")
 	BLSCode      = ServiceCode("BLS")
+	BECCode      = ServiceCode("BEC")
 )
 
 const (
@@ -52,6 +53,7 @@ const (
 	DefaultBJRegionDtsEndPoint = "rds.bj.baidubce.com"
 	DefaultBJRegionSmsEndPoint = "smsv3.bj.baidubce.com"
 	DefaultBJRegionBlsEndPoint = "bls-log.bj.baidubce.com"
+	DefaultBJRegionBecEndPoint = "bec.baidubce.com"
 
 	DefaultBDRegionBccEndPoint = "bcc.bd.baidubce.com"
 	DefaultBDRegionBbcEndPoint = "bbc.bd.baidubce.com"
@@ -155,6 +157,7 @@ var (
 		CFSCode:      DefaultBJRegionCfsEndPoint,
 		SMSCode:      DefaultBJRegionSmsEndPoint,
 		BLSCode:      DefaultBJRegionBlsEndPoint,
+		BECCode:      DefaultBJRegionBecEndPoint,
 	}
 
 	// Region BD Service Endpoints
