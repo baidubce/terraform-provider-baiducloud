@@ -1,4 +1,8 @@
-	## 1.19.2 (Unreleased)
+	## 1.19.3 (Unreleased)
+## 1.19.2 (January 3, 2023)
+NOTES:
+- Fix bcc instance autorenew mistakes
+
 ## 1.19.1 (December 30, 2022)
 NOTES:
 - Fix baiducloud CDS prepaid mistakes
