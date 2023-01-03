@@ -756,7 +756,7 @@ func buildBaiduCloudInstanceArgs(d *schema.ResourceData, meta interface{}) (*api
 		// if the field is set, then auto-renewal is effective.
 		if v, ok := d.GetOk("auto_renew_time_unit"); ok {
 			request.AutoRenewTimeUnit = v.(string)
-			if v, ok := d.GetOk("auto_renew_time"); ok {
+			if v, ok := d.GetOk("auto_renew_time_length"); ok {
 				request.AutoRenewTime = v.(int)
 			}
 		}
@@ -902,7 +902,7 @@ func buildBaiduCloudInstanceBySpecArgs(d *schema.ResourceData, meta interface{})
 		// if the field is set, then auto-renewal is effective.
 		if v, ok := d.GetOk("auto_renew_time_unit"); ok {
 			request.AutoRenewTimeUnit = v.(string)
-			if v, ok := d.GetOk("auto_renew_time"); ok {
+			if v, ok := d.GetOk("auto_renew_time_length"); ok {
 				request.AutoRenewTime = v.(int)
 			}
 		}
