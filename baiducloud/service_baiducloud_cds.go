@@ -237,14 +237,14 @@ func (s *BccService) ListAllCDSVolumeDetail(args *api.ListCDSVolumeArgs) ([]api.
 		args.Marker = result.NextMarker
 	}
 
-	for idx, c := range cdsList {
-		cdsDetail, err := s.GetCDSVolumeDetail(c.Id)
-		if err != nil {
-			return nil, WrapError(err)
-		}
-
-		cdsList[idx] = *cdsDetail
-	}
+	//for idx, c := range cdsList {
+	//	cdsDetail, err := s.GetCDSVolumeDetail(c.Id)
+	//	if err != nil {
+	//		return nil, WrapError(err)
+	//	}
+	//
+	//	cdsList[idx] = *cdsDetail
+	//}
 
 	return cdsList, nil
 }
