@@ -1,9 +1,10 @@
 ---
 layout: "baiducloud"
+subcategory: "Baidu Cloud Compute (BCC)"
 page_title: "BaiduCloud: baiducloud_instance"
 sidebar_current: "docs-baiducloud-resource-instance"
 description: |-
-  Use this resource to create a BCC instance.
+Use this resource to create bcc instance.
 ---
 
 # baiducloud_instance
