@@ -1,7 +1,12 @@
-	## 1.19.5 (Unreleased)
+	## 1.19.6 (Unreleased)
+## 1.19.5 (March 01, 2023)
+NOTES:
+- Update ccev2 supported k8s version
+
 ## 1.19.4 (January 11, 2023)
 NOTES:
 - Fix some doc mistakes
+- 
 ## 1.19.3 (January 6, 2023)
 NOTES:
 - Optimization cds datasource
