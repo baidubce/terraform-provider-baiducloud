@@ -18,7 +18,7 @@ resource "baiducloud_ccev2_cluster" "default_managed" {
   cluster_spec  {
     cluster_name = var.cluster_name
     cluster_type = "normal"
-    k8s_version = "1.16.8"
+    k8s_version = "1.18.9"
     runtime_type = "docker"
     vpc_id = baiducloud_vpc.default.id
     plugins = ["core-dns", "kube-proxy"]
