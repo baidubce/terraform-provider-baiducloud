@@ -167,7 +167,7 @@ The following arguments are supported:
 
 * `region` - (Required) This is the BaiduCloud region. It must be provided, but
   it can also be sourced from the `BAIDUCLOUD_REGION` environment variables.
-  The default input value is ap-guangzhou.
+  The default input value is bj. Available value is [bj, bd, gz, su, fsh, fwh, hkg, sin]
 
 * `endpoints` - (Optional) An `endpoints` block (documented below) to support custom endpoints.
 
