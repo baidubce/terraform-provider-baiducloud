@@ -1,4 +1,8 @@
-	## 1.19.6 (Unreleased)
+	## 1.19.7 (Unreleased)
+## 1.19.6 (April 04, 2023)
+NOTES:
+- Add parameter disk_io_type for rds instance
+
 ## 1.19.5 (March 01, 2023)
 NOTES:
 - Update ccev2 supported k8s version
