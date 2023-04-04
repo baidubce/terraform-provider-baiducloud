@@ -25,6 +25,7 @@ resource "baiducloud_rds_instance" "default" {
     cpu_count                 = 1
     memory_capacity           = 1
     volume_capacity           = 5
+    disk_io_type              = "normal_io"
 }
 ```
 
@@ -38,6 +39,7 @@ The following arguments are supported:
 * `engine` - (Required, ForceNew) Engine of the instance. Available values are MySQL、SQLServer、PostgreSQL.
 * `memory_capacity` - (Required) Memory capacity(GB) of the instance.
 * `volume_capacity` - (Required) Volume capacity(GB) of the instance
+* `disk_io_type` - (Required, ForceNew) Type of disk, Available values are normal_io,cloud_high,cloud_nor,cloud_enha
 * `category` - (Optional, ForceNew) Category of the instance. Available values are Basic、Standard(Default), only SQLServer 2012sp3 support Basic.
 * `instance_name` - (Optional) Name of the instance. Support for uppercase and lowercase letters, numbers, Chinese and special characters, such as "-","_","/",".", the value must start with a letter, length 1-65.
 * `purchase_count` - (Optional) Count of the instance to buy

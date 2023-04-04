@@ -109,6 +109,13 @@ func resourceBaiduCloudRdsInstance() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validation.IntAtLeast(5),
 			},
+			"disk_io_type": {
+				Type:         schema.TypeString,
+				Description:  "Type of disk, Available values are normal_io,cloud_high,cloud_nor,cloud_enha",
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validation.StringInSlice([]string{"normal_io", "cloud_high", "cloud_nor", "cloud_enha"}, false),
+			},
 			"vpc_id": {
 				Type:        schema.TypeString,
 				Description: "ID of the specific VPC",
@@ -435,6 +442,10 @@ func buildBaiduCloudRdsInstanceArgs(d *schema.ResourceData, meta interface{}) (*
 
 	if purchaseCount, ok := d.GetOk("purchase_count"); ok {
 		request.PurchaseCount = purchaseCount.(int)
+	}
+
+	if diskIoType, ok := d.GetOk("disk_io_type"); ok {
+		request.DiskIoType = diskIoType.(string)
 	}
 
 	if instanceName, ok := d.GetOk("instance_name"); ok {
