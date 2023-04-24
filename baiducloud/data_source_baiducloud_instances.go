@@ -43,6 +43,66 @@ func dataSourceBaiduCloudInstances() *schema.Resource {
 				Description: "Name of the available zone to which the instance belongs.",
 				Optional:    true,
 			},
+			"keypair_id": {
+				Type:        schema.TypeString,
+				Description: "Keypair ID of the instance.",
+				Optional:    true,
+			},
+			"auto_renew": {
+				Type:        schema.TypeBool,
+				Description: "Whether to renew automatically.",
+				Optional:    true,
+			},
+			"instance_ids": {
+				Type:        schema.TypeString,
+				Description: "Multiple instance IDs, separated by commas.",
+				Optional:    true,
+			},
+			"instance_names": {
+				Type:        schema.TypeString,
+				Description: "Multiple instance names, separated by commas.",
+				Optional:    true,
+			},
+			"cds_ids": {
+				Type:        schema.TypeString,
+				Description: "Multiple cds disk IDs, separated by commas.",
+				Optional:    true,
+			},
+			"deploy_set_ids": {
+				Type:        schema.TypeString,
+				Description: "Multiple deployment set IDs, separated by commas.",
+				Optional:    true,
+			},
+			"security_group_ids": {
+				Type:        schema.TypeString,
+				Description: "Multiple security group IDs, separated by commas.",
+				Optional:    true,
+			},
+			"payment_timing": {
+				Type:        schema.TypeString,
+				Description: "Payment method. Valid values: `Prepaid`, `Postpaid`.",
+				Optional:    true,
+			},
+			"status": {
+				Type:        schema.TypeString,
+				Description: "Instance status. Valid values: `Recycled`, `Running`, `Stopped`, `Stopping`, `Starting`.",
+				Optional:    true,
+			},
+			"tags": {
+				Type:        schema.TypeString,
+				Description: "Multiple tags, separated by commas. Format: `tagKey:tagValue` or `tagKey`.",
+				Optional:    true,
+			},
+			"vpc_id": {
+				Type:        schema.TypeString,
+				Description: "Can only be used in combination with the `private_ips` query parameter.",
+				Optional:    true,
+			},
+			"private_ips": {
+				Type:        schema.TypeString,
+				Description: "Multiple intranet IPs, separated by commas. Must be used in combination with `vpc_id`.",
+				Optional:    true,
+			},
 			"output_file": {
 				Type:        schema.TypeString,
 				Description: "Output file of the instances search result",
@@ -245,6 +305,43 @@ func dataSourceBaiduCloudInstancesRead(d *schema.ResourceData, meta interface{})
 	}
 	if v, ok := d.GetOk("zone_name"); ok && v.(string) != "" {
 		listArgs.ZoneName = v.(string)
+	}
+
+	if v, ok := d.GetOk("keypair_id"); ok && v.(string) != "" {
+		listArgs.KeypairId = v.(string)
+	}
+	if v, ok := d.GetOk("auto_renew"); ok {
+		listArgs.AutoRenew = v.(bool)
+	}
+	if v, ok := d.GetOk("instance_ids"); ok && v.(string) != "" {
+		listArgs.InstanceIds = v.(string)
+	}
+	if v, ok := d.GetOk("instance_names"); ok && v.(string) != "" {
+		listArgs.InstanceNames = v.(string)
+	}
+	if v, ok := d.GetOk("cds_ids"); ok && v.(string) != "" {
+		listArgs.CdsIds = v.(string)
+	}
+	if v, ok := d.GetOk("deploy_set_ids"); ok && v.(string) != "" {
+		listArgs.DeploySetIds = v.(string)
+	}
+	if v, ok := d.GetOk("security_group_ids"); ok && v.(string) != "" {
+		listArgs.SecurityGroupIds = v.(string)
+	}
+	if v, ok := d.GetOk("payment_timing"); ok && v.(string) != "" {
+		listArgs.PaymentTiming = v.(string)
+	}
+	if v, ok := d.GetOk("status"); ok && v.(string) != "" {
+		listArgs.Status = v.(string)
+	}
+	if v, ok := d.GetOk("tags"); ok && v.(string) != "" {
+		listArgs.Tags = v.(string)
+	}
+	if v, ok := d.GetOk("vpc_id"); ok && v.(string) != "" {
+		listArgs.VpcId = v.(string)
+	}
+	if v, ok := d.GetOk("private_ips"); ok && v.(string) != "" {
+		listArgs.PrivateIps = v.(string)
 	}
 
 	action := "List all Instance "

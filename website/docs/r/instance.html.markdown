@@ -55,11 +55,7 @@ resource "baiducloud_instance" "my-server" {
 
 The following arguments are supported:
 
-* `billing` - (Required) Billing information of the instance.
-* `cpu_count` - (Optional) Number of CPU cores to be created for the instance.Required when there is no parameter *spec*
 * `image_id` - (Required) ID of the image to be used for the instance.
-* `spec` - (Optional) Specification for the instance.
-* `memory_capacity_in_gb` - (Optional) Memory capacity(GB) of the instance to be created.Required when there is no parameter *spec*
 * `action` - (Optional) Start or stop the instance, which can only be start or stop, default start.
 * `admin_pass` - (Optional, Sensitive) Password of the instance to be started. This value should be 8-16 characters, and English, numbers and symbols must exist at the same time. The symbols is limited to "!@#$%^*()".
 * `auto_renew_time_length` - (Optional, ForceNew) The time length of automatic renewal. It is valid when payment_timing is Prepaid, and the value should be 1-9 when the auto_renew_time_unit is month and 1-3 when the auto_renew_time_unit is year. Default to 1.
@@ -68,32 +64,31 @@ The following arguments are supported:
 * `card_count` - (Optional) Count of the GPU cards or FPGA cards to be carried for the instance to be created, it is valid only when the gpu_card or fpga_card field is not empty.
 * `cds_auto_renew` - (Optional, ForceNew) Whether the cds is automatically renewed. It is valid when payment_timing is Prepaid. Default to false.
 * `cds_disks` - (Optional) CDS disks of the instance.
+* `cpu_count` - (Optional) Number of CPU cores to be created for the instance.
 * `dedicate_host_id` - (Optional, ForceNew) The ID of dedicated host.
 * `delete_cds_snapshot_flag` - (Optional, ForceNew) Whether to release the cds disk snapshots, default to false. It is effective only when the related_release_flag is true.
+* `deploy_set_ids` - (Optional) Deploy set ids the instance belong to
 * `description` - (Optional) Description of the instance.
 * `ephemeral_disks` - (Optional) Ephemeral disks of the instance.
 * `fpga_card` - (Optional, ForceNew) FPGA card of the instance.
 * `gpu_card` - (Optional, ForceNew) GPU card of the instance.
+* `hostname` - (Optional) Hostname of the instance.
+* `instance_spec` - (Optional) spec
 * `instance_type` - (Optional, ForceNew) Type of the instance to start. Available values are N1, N2, N3, N4, N5, C1, C2, S1, G1, F1. Default to N3.
+* `is_open_hostname_domain` - (Optional) Whether to automatically generate hostname domain.
 * `keypair_id` - (Optional, ForceNew) Key pair id of the instance.
+* `memory_capacity_in_gb` - (Optional) Memory capacity(GB) of the instance to be created.
 * `name` - (Optional) Name of the instance. Support for uppercase and lowercase letters, numbers, Chinese and special characters, such as "-","_","/",".", the value must start with a letter, length 1-65.
+* `payment_timing` - (Optional) Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.
 * `related_release_flag` - (Optional, ForceNew) Whether to release the eip and data disks mounted by the current instance. Can only be released uniformly or not. Default to false.
 * `relation_tag` - (Optional, ForceNew) The new instance associated with existing Tags or not, default false. The Tags should already exit if set true
+* `reservation` - (Optional) Reservation of the instance.
 * `root_disk_size_in_gb` - (Optional, ForceNew) System disk size(GB) of the instance to be created. The value range is [40,500]GB, Default to 40GB, and more than 40GB is charged according to the cloud disk price. Note that the specified system disk size needs to meet the minimum disk space limit of the mirror used.
 * `root_disk_storage_type` - (Optional, ForceNew) System disk storage type of the instance. Available values are std1, hp1, cloud_hp1, local, sata, ssd. Default to cloud_hp1.
 * `security_groups` - (Optional) Security groups of the instance.
 * `subnet_id` - (Optional) The subnet ID of VPC. The default subnet will be used when it is empty. The instance will restart after changing the subnet.
 * `tags` - (Optional, ForceNew) Tags, do not support modify
 * `user_data` - (Optional) User Data
-* `deploy_set_ids` - (Optional) Deploy set id list the instance belong to. *NOTE*:Change of this list will reboot bcc instance, probably.
-
-* `payment_timing` - (Optional) Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.
-* `reservation` - (Optional) Reservation of the instance.
-
-The `reservation` object supports the following:
-
-* `reservation_length` - (Required) The reservation length that you will pay for your resource. It is valid when payment_timing is Prepaid. Valid values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36].
-* `reservation_time_unit` - (Required) The reservation time unit that you will pay for your resource. It is valid when payment_timing is Prepaid. The value can only be month currently, which is also the default value.
 
 The `cds_disks` object supports the following:
 
@@ -105,6 +100,11 @@ The `ephemeral_disks` object supports the following:
 
 * `size_in_gb` - (Optional, ForceNew) Size(GB) of the ephemeral disk.
 * `storage_type` - (Optional, ForceNew) Storage type of the ephemeral disk. Available values are std1, hp1, cloud_hp1, local, sata, ssd. Default to cloud_hp1.
+
+The `reservation` object supports the following:
+
+* `reservation_length` - (Required) The reservation length that you will pay for your resource. It is valid when payment_timing is Prepaid. Valid values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36].
+* `reservation_time_unit` - (Required) The reservation time unit that you will pay for your resource. It is valid when payment_timing is Prepaid. The value can only be month currently, which is also the default value.
 
 ## Attributes Reference
 

@@ -1,5 +1,5 @@
 /*
-Use this resource to get information about a BCC instance.
+Use this resource to create a BCC instance.
 
 ~> **NOTE:** The terminate operation of bcc does NOT take effect immediately，maybe takes for several minites.
 Example Usage
@@ -376,6 +376,7 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "spec",
 				Optional:    true,
+				Computed:    true,
 			},
 			"deploy_set_ids": {
 				Type:        schema.TypeSet,
@@ -384,6 +385,17 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+			},
+			"hostname": {
+				Type:        schema.TypeString,
+				Description: "Hostname of the instance.",
+				Optional:    true,
+				Computed:    true,
+			},
+			"is_open_hostname_domain": {
+				Type:        schema.TypeBool,
+				Description: "Whether to automatically generate hostname domain.",
+				Optional:    true,
 			},
 			"tags": tagsSchema(),
 		},
@@ -556,6 +568,8 @@ func resourceBaiduCloudInstanceRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("keypair_id", response.Instance.KeypairId)
 	d.Set("keypair_name", response.Instance.KeypairName)
 	d.Set("auto_renew", response.Instance.AutoRenew)
+	d.Set("hostname", response.Instance.Hostname)
+
 	deploysetIds := make([]string, 0)
 	for _, value := range response.Instance.DeploySetList {
 		deploysetIds = append(deploysetIds, value.DeploySetId)
@@ -653,6 +667,11 @@ func resourceBaiduCloudInstanceUpdate(d *schema.ResourceData, meta interface{}) 
 
 	// update instance deploy
 	if err := updateInstanceDeploy(d, meta, instanceID); err != nil {
+		return err
+	}
+
+	// update instance hostname
+	if err := updateInstanceHostname(d, meta, instanceID); err != nil {
 		return err
 	}
 
@@ -853,6 +872,23 @@ func buildBaiduCloudInstanceArgs(d *schema.ResourceData, meta interface{}) (*api
 		request.Tags = tranceTagMapToModel(v.(map[string]interface{}))
 	}
 
+	deploysetIds := make([]string, 0)
+	v, ok := d.GetOk("deploy_set_ids")
+	if ok {
+		for _, value := range v.(*schema.Set).List() {
+			deploysetIds = append(deploysetIds, value.(string))
+		}
+	}
+	request.DeployIdList = deploysetIds
+
+	if v, ok := d.GetOk("hostname"); ok && v.(string) != "" {
+		request.Hostname = v.(string)
+	}
+
+	if v, ok := d.GetOk("is_open_hostname_domain"); ok {
+		request.IsOpenHostnameDomain = v.(bool)
+	}
+
 	return request, nil
 }
 
@@ -982,6 +1018,15 @@ func buildBaiduCloudInstanceBySpecArgs(d *schema.ResourceData, meta interface{})
 		}
 	}
 	request.DeployIdList = deploysetIds
+
+	if v, ok := d.GetOk("hostname"); ok && v.(string) != "" {
+		request.Hostname = v.(string)
+	}
+
+	if v, ok := d.GetOk("is_open_hostname_domain"); ok {
+		request.IsOpenHostnameDomain = v.(bool)
+	}
+
 	return request, nil
 }
 
@@ -1308,4 +1353,42 @@ func updateInstanceDeploy(d *schema.ResourceData, meta interface{}, instanceID s
 		d.SetPartial("deploy_set_ids")
 	}
 	return nil
+}
+
+func updateInstanceHostname(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	action := "Update instance hostname " + instanceID
+	client := meta.(*connectivity.BaiduClient)
+	if d.HasChanges("hostname", "is_open_hostname_domain") {
+		modifyInstanceHostnameArgs := &api.ModifyInstanceHostnameArgs{}
+		modifyInstanceHostnameArgs.Hostname = d.Get("hostname").(string)
+		modifyInstanceHostnameArgs.IsOpenHostnameDomain = d.Get("is_open_hostname_domain").(bool)
+		modifyInstanceHostnameArgs.Reboot = true
+
+		err := resource.Retry(d.Timeout(schema.TimeoutUpdate), func() *resource.RetryError {
+			_, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
+				return nil, bccClient.ModifyInstanceHostname(instanceID, modifyInstanceHostnameArgs)
+			})
+			if err != nil {
+				if IsExceptedErrors(err, []string{OperationDenied, bce.EINTERNAL_ERROR}) {
+					return resource.RetryableError(err)
+				}
+				return resource.NonRetryableError(err)
+			}
+			addDebug(action, modifyInstanceHostnameArgs)
+			return nil
+		})
+
+		if err != nil {
+			if NotFoundError(err) {
+				d.SetId("")
+				return nil
+			}
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+		}
+
+		d.SetPartial("hostname")
+		d.SetPartial("is_open_hostname_domain")
+	}
+	return nil
+
 }

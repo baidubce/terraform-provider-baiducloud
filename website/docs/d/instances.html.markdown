@@ -25,10 +25,22 @@ output "instances" {
 
 The following arguments are supported:
 
+* `auto_renew` - (Optional) Whether to renew automatically.
+* `cds_ids` - (Optional) Multiple cds disk IDs, separated by commas.
 * `dedicated_host_id` - (Optional) Dedicated host id of the instance to retrieve.
+* `deploy_set_ids` - (Optional) Multiple deployment set IDs, separated by commas.
 * `filter` - (Optional, ForceNew) only support filter string/int/bool value
+* `instance_ids` - (Optional) Multiple instance IDs, separated by commas.
+* `instance_names` - (Optional) Multiple instance names, separated by commas.
 * `internal_ip` - (Optional) Internal ip address of the instance to retrieve.
+* `keypair_id` - (Optional) Keypair ID of the instance.
 * `output_file` - (Optional, ForceNew) Output file of the instances search result
+* `payment_timing` - (Optional) Payment method. Valid values: `Prepaid`, `Postpaid`.
+* `private_ips` - (Optional) Multiple intranet IPs, separated by commas. Must be used in combination with `vpc_id`.
+* `security_group_ids` - (Optional) Multiple security group IDs, separated by commas.
+* `status` - (Optional) Instance status. Valid values: `Recycled`, `Running`, `Stopped`, `Stopping`, `Starting`.
+* `tags` - (Optional) Multiple tags, separated by commas. Format: `tagKey:tagValue` or `tagKey`.
+* `vpc_id` - (Optional) Can only be used in combination with the `private_ips` query parameter.
 * `zone_name` - (Optional) Name of the available zone to which the instance belongs.
 
 The `filter` object supports the following:
@@ -55,6 +67,7 @@ In addition to all arguments above, the following attributes are exported:
   * `gpu_card` - The gpu card of the instance.
   * `image_id` - The image id of the instance.
   * `instance_id` - The ID of the instance.
+  * `instance_spec` - spec
   * `instance_type` - The type of the instance.
   * `internal_ip` - The internal ip of the instance.
   * `keypair_id` - The key pair id of the instance.

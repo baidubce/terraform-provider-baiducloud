@@ -23,11 +23,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"os"
 
 	"github.com/baidubce/bce-sdk-go/auth"
 	"github.com/baidubce/bce-sdk-go/bce"
+	sdk_http "github.com/baidubce/bce-sdk-go/http"
 	"github.com/baidubce/bce-sdk-go/services/bos/api"
 	"github.com/baidubce/bce-sdk-go/services/sts"
 	"github.com/baidubce/bce-sdk-go/util/log"
@@ -183,7 +185,8 @@ func (c *Client) SimpleListObjects(bucket, prefix string, maxKeys int, marker,
 // RETURNS:
 //     - error: nil if exists and have authority otherwise the specific error
 func (c *Client) HeadBucket(bucket string) error {
-	return api.HeadBucket(c, bucket)
+	err, _ := api.HeadBucket(c, bucket)
+	return err
 }
 
 // DoesBucketExist - test the given bucket existed or not
@@ -194,7 +197,7 @@ func (c *Client) HeadBucket(bucket string) error {
 //     - bool: true if exists and false if not exists or occurs error
 //     - error: nil if exists or not exist, otherwise the specific error
 func (c *Client) DoesBucketExist(bucket string) (bool, error) {
-	err := api.HeadBucket(c, bucket)
+	err, _ := api.HeadBucket(c, bucket)
 	if err == nil {
 		return true, nil
 	}
@@ -207,6 +210,21 @@ func (c *Client) DoesBucketExist(bucket string) (bool, error) {
 		}
 	}
 	return false, err
+}
+
+//IsNsBucket - test the given bucket is namespace bucket or not
+func (c *Client) IsNsBucket(bucket string) bool {
+	err, resp := api.HeadBucket(c, bucket)
+	if err == nil && resp.Header(sdk_http.BCE_BUCKET_TYPE) == api.NAMESPACE_BUCKET {
+		return true
+	}
+	if realErr, ok := err.(*bce.BceServiceError); ok {
+		if realErr.StatusCode == http.StatusForbidden &&
+			resp.Header(sdk_http.BCE_BUCKET_TYPE) == api.NAMESPACE_BUCKET {
+			return true
+		}
+	}
+	return false
 }
 
 // PutBucket - create a new bucket
@@ -940,15 +958,15 @@ func (c *Client) BasicCopyObject(bucket, object, srcBucket,
 // PARAMS:
 //     - bucket: the name of the bucket
 //     - object: the name of the object
-//     - responseHeaders: the optional response headers to get the given object
+//     - args: the optional args in querysring
 //     - ranges: the optional range start and end to get the given object
 // RETURNS:
 //     - *api.GetObjectResult: result struct which contains "Body" and header fields
 //       for details reference https://cloud.baidu.com/doc/BOS/API.html#GetObject.E6.8E.A5.E5.8F.A3
 //     - error: any error if it occurs
-func (c *Client) GetObject(bucket, object string, responseHeaders map[string]string,
+func (c *Client) GetObject(bucket, object string, args map[string]string,
 	ranges ...int64) (*api.GetObjectResult, error) {
-	return api.GetObject(c, bucket, object, responseHeaders, ranges...)
+	return api.GetObject(c, bucket, object, args, ranges...)
 }
 
 // BasicGetObject - the basic interface of geting the given object
@@ -2110,7 +2128,10 @@ func (c *Client) parallelPartCopy(srcMeta api.GetObjectMetaResult, source string
 	var err error
 	size := srcMeta.ContentLength
 	partSize := int64(DEFAULT_MULTIPART_SIZE)
-
+	if partSize * MAX_PART_NUMBER < size {
+		lowerLimit := int64(math.Ceil(float64(size) / MAX_PART_NUMBER))
+		partSize = int64(math.Ceil(float64(lowerLimit)/float64(partSize))) * partSize
+	}
 	partNum := (size + partSize - 1) / partSize
 
 	parallelChan := make(chan int, c.MaxParallel)
@@ -2217,4 +2238,16 @@ func (c *Client) PutSymlink(bucket string, object string, symlinkKey string, sym
 //     - error: the put error if any occurs
 func (c *Client) GetSymlink(bucket string, object string) (string, error) {
 	return api.GetObjectSymlink(c, bucket, object)
+}
+
+func (c *Client) PutBucketMirror(bucket string, putBucketMirrorArgs *api.PutBucketMirrorArgs) error {
+	return api.PutBucketMirror(c, bucket, putBucketMirrorArgs)
+}
+
+func (c *Client) GetBucketMirror(bucket string) (*api.PutBucketMirrorArgs, error) {
+	return api.GetBucketMirror(c, bucket)
+}
+
+func (c *Client) DeleteBucketMirror(bucket string) error {
+	return api.DeleteBucketMirror(c, bucket)
 }
