@@ -1,4 +1,11 @@
-	## 1.19.7 (Unreleased)
+	## 1.19.8 (Unreleased)
+
+## 1.19.7 (April 25, 2023)
+ENHANCEMENTS:
+- resource/baiducloud_instance: Add parameter `hostname`, support modification.
+- datasource/baiducloud_instance: Add parameters `keypair_id`, `auto_renew`, `instance_ids`, `instance_names`, 
+`cds_ids`, `deploy_set_ids`, `security_group_ids`, `payment_timing`, `status`, `tags`, `vpc_id`, `private_ips`.
+
 ## 1.19.6 (April 04, 2023)
 NOTES:
 - Add parameter disk_io_type for rds instance
@@ -10,7 +17,7 @@ NOTES:
 ## 1.19.4 (January 11, 2023)
 NOTES:
 - Fix some doc mistakes
-- 
+
 ## 1.19.3 (January 6, 2023)
 NOTES:
 - Optimization cds datasource
@@ -47,6 +54,7 @@ NOTES:
 ## 1.18.1 (November 14, 2022)
 NOTES:
 - Support baiducloud SCS security IPs
+
 ENHANCEMENTS:
 - resource/baiducloud_scs: Add parameter security IPs
 
