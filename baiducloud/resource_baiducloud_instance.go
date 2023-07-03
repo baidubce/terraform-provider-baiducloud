@@ -889,6 +889,10 @@ func buildBaiduCloudInstanceArgs(d *schema.ResourceData, meta interface{}) (*api
 		request.IsOpenHostnameDomain = v.(bool)
 	}
 
+	if v, ok := d.GetOk("cds_auto_renew"); ok {
+		request.CdsAutoRenew = v.(bool)
+	}
+
 	return request, nil
 }
 
@@ -1025,6 +1029,10 @@ func buildBaiduCloudInstanceBySpecArgs(d *schema.ResourceData, meta interface{})
 
 	if v, ok := d.GetOk("is_open_hostname_domain"); ok {
 		request.IsOpenHostnameDomain = v.(bool)
+	}
+
+	if v, ok := d.GetOk("cds_auto_renew"); ok {
+		request.CdsAutoRenew = v.(bool)
 	}
 
 	return request, nil

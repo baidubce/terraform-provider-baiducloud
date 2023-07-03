@@ -1,4 +1,8 @@
-	## 1.19.8 (Unreleased)
+	## 1.19.9 (Unreleased)
+
+## 1.19.8 (July 3, 2023)
+BUG FIXES:
+- resource/baiducloud_instance: Fix parameter `cds_auto_renew` does not take effect when set to true.
 
 ## 1.19.7 (April 25, 2023)
 ENHANCEMENTS:
