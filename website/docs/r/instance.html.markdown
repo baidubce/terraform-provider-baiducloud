@@ -9,7 +9,7 @@ description: |-
 
 # baiducloud_instance
 
-Use this resource to get information about a BCC instance.
+Use this resource to create a BCC instance.
 
 ~> **NOTE:** The terminate operation of bcc does NOT take effect immediately，maybe takes for several minites.
 
@@ -83,6 +83,7 @@ The following arguments are supported:
 * `related_release_flag` - (Optional, ForceNew) Whether to release the eip and data disks mounted by the current instance. Can only be released uniformly or not. Default to false.
 * `relation_tag` - (Optional, ForceNew) The new instance associated with existing Tags or not, default false. The Tags should already exit if set true
 * `reservation` - (Optional) Reservation of the instance.
+* `resource_group_id` - (Optional) Resource group Id of the instance.
 * `root_disk_size_in_gb` - (Optional, ForceNew) System disk size(GB) of the instance to be created. The value range is [40,500]GB, Default to 40GB, and more than 40GB is charged according to the cloud disk price. Note that the specified system disk size needs to meet the minimum disk space limit of the mirror used.
 * `root_disk_storage_type` - (Optional, ForceNew) System disk storage type of the instance. Available values are std1, hp1, cloud_hp1, local, sata, ssd. Default to cloud_hp1.
 * `security_groups` - (Optional) Security groups of the instance.

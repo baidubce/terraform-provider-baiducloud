@@ -1,4 +1,9 @@
-	## 1.19.9 (Unreleased)
+	## 1.19.10 (Unreleased)
+
+## 1.19.9 (July 12, 2023)
+ENHANCEMENTS:
+- resource/baiducloud_instance: Add parameter `resource_group_id` to support specifying resource group when creating instance.
+- Update `baidubce/bce-sdk-go` to v0.9.153 
 
 ## 1.19.8 (July 3, 2023)
 BUG FIXES:

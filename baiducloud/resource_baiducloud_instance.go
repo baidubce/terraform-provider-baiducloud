@@ -398,6 +398,11 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Optional:    true,
 			},
 			"tags": tagsSchema(),
+			"resource_group_id": {
+				Type:        schema.TypeString,
+				Description: "Resource group Id of the instance.",
+				Optional:    true,
+			},
 		},
 	}
 }
@@ -893,6 +898,10 @@ func buildBaiduCloudInstanceArgs(d *schema.ResourceData, meta interface{}) (*api
 		request.CdsAutoRenew = v.(bool)
 	}
 
+	if v, ok := d.GetOk("resource_group_id"); ok {
+		request.ResGroupId = v.(string)
+	}
+
 	return request, nil
 }
 
@@ -1033,6 +1042,10 @@ func buildBaiduCloudInstanceBySpecArgs(d *schema.ResourceData, meta interface{})
 
 	if v, ok := d.GetOk("cds_auto_renew"); ok {
 		request.CdsAutoRenew = v.(bool)
+	}
+
+	if v, ok := d.GetOk("resource_group_id"); ok {
+		request.ResGroupId = v.(string)
 	}
 
 	return request, nil
