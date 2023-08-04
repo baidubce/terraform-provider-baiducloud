@@ -26,8 +26,8 @@ func TestAccBaiduCloudPeerConnAcceptor(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccPeerConnAcceptorResourceName),
 					resource.TestCheckResourceAttr(testAccPeerConnAcceptorResourceName, "bandwidth_in_mbps", "20"),
-					resource.TestCheckResourceAttr(testAccPeerConnAcceptorResourceName, "description", "created by terraform"),
-					resource.TestCheckResourceAttr(testAccPeerConnAcceptorResourceName, "local_if_name", "local-interface"),
+					resource.TestCheckResourceAttr(testAccPeerConnResourceName, "description", "created by terraform"),
+					resource.TestCheckResourceAttr(testAccPeerConnResourceName, "local_if_name", "local-interface"),
 					resource.TestCheckResourceAttrSet(testAccPeerConnResourceName, "local_if_id"),
 					resource.TestCheckResourceAttrSet(testAccPeerConnAcceptorResourceName, "local_vpc_id"),
 					resource.TestCheckResourceAttrSet(testAccPeerConnAcceptorResourceName, "peer_vpc_id"),
@@ -48,8 +48,8 @@ func TestAccBaiduCloudPeerConnAcceptor(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBaiduCloudDataSourceId(testAccPeerConnAcceptorResourceName),
 					resource.TestCheckResourceAttr(testAccPeerConnAcceptorResourceName, "bandwidth_in_mbps", "20"),
-					resource.TestCheckResourceAttr(testAccPeerConnAcceptorResourceName, "description", "created by terraform"),
-					resource.TestCheckResourceAttr(testAccPeerConnAcceptorResourceName, "local_if_name", "local-interface"),
+					resource.TestCheckResourceAttr(testAccPeerConnResourceName, "description", "created by terraform"),
+					resource.TestCheckResourceAttr(testAccPeerConnResourceName, "local_if_name", "local-interface"),
 					resource.TestCheckResourceAttrSet(testAccPeerConnResourceName, "local_if_id"),
 					resource.TestCheckResourceAttrSet(testAccPeerConnAcceptorResourceName, "local_vpc_id"),
 					resource.TestCheckResourceAttrSet(testAccPeerConnAcceptorResourceName, "peer_vpc_id"),
@@ -116,6 +116,7 @@ resource "baiducloud_peer_conn" "default" {
   peer_region       = "bj"
   description       = "created by terraform"
   local_if_name     = "local-interface"
+  dns_sync          = true
   billing = {
     payment_timing = "Postpaid"
   }

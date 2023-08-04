@@ -1,4 +1,8 @@
-	## 1.19.10 (Unreleased)
+	## 1.19.11 (Unreleased)
+
+## 1.19.10 (August 4, 2023)
+BUG FIXES:
+- resource/baiducloud_peer_conn_acceptor: Fix error when creating cross-account or cross-region resources.
 
 ## 1.19.9 (July 12, 2023)
 ENHANCEMENTS:
@@ -14,7 +18,7 @@ ENHANCEMENTS:
 - resource/baiducloud_instance: Add parameter `hostname`, support modification.
 - datasource/baiducloud_instance: Add parameters `keypair_id`, `auto_renew`, `instance_ids`, `instance_names`, 
 `cds_ids`, `deploy_set_ids`, `security_group_ids`, `payment_timing`, `status`, `tags`, `vpc_id`, `private_ips`.
-
+p
 ## 1.19.6 (April 04, 2023)
 NOTES:
 - Add parameter disk_io_type for rds instance

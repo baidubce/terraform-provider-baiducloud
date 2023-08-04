@@ -266,7 +266,7 @@ func resourceBaiduCloudPeerConnAcceptorUpdate(d *schema.ResourceData, meta inter
 
 	d.Partial(false)
 
-	return resourceBaiduCloudPeerConnRead(d, meta)
+	return resourceBaiduCloudPeerConnAcceptorRead(d, meta)
 }
 
 func resourceBaiduCloudPeerConnAcceptorDelete(d *schema.ResourceData, meta interface{}) error {
