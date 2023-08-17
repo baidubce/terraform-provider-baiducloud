@@ -1,4 +1,11 @@
-	## 1.19.12 (Unreleased)
+	## 1.19.13 (Unreleased)
+
+## 1.19.12 (August 17, 2023)
+FEATURES:
+- **New Resource:** `baiducloud_bcc_key_pair`
+
+ENHANCEMENTS:
+- eip support region bd
 
 ## 1.19.11 (August 10, 2023)
 FEATURES:
