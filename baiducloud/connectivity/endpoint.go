@@ -60,6 +60,7 @@ const (
 	DefaultBDRegionVpnEndPoint = "bcc.bd.baidubce.com"
 	DefaultBDRegionEniEndPoint = "bcc.bd.baidubce.com"
 	DefaultBDRegionCfsEndPoint = "cfs.bd.baidubce.com"
+	DefaultBDRegionEipEndPoint = "eip.bd.baidubce.com"
 
 	DefaultGZRegionBccEndPoint = "bcc.gz.baidubce.com"
 	DefaultGZRegionBbcEndPoint = "bbc.gz.baidubce.com"
@@ -168,6 +169,7 @@ var (
 		ENICode: DefaultBDRegionEniEndPoint,
 		BBCCode: DefaultBDRegionBbcEndPoint,
 		CFSCode: DefaultBDRegionCfsEndPoint,
+		EIPCode: DefaultBDRegionEipEndPoint,
 	}
 
 	// Region GZ Service Endpoints
