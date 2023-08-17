@@ -11,6 +11,9 @@ import (
 	"testing"
 )
 
+const ResourcePrefix = "tf-acc-test"
+const DefaultEmailAddress = "test@test.com"
+
 var Providers map[string]terraform.ResourceProvider
 var Provider *schema.Provider
 

@@ -305,6 +305,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_bls_log_store":               resourceBaiduCloudBLSLogStore(),
 			"baiducloud_snic":                        snic.ResourceSNIC(),
 			"baiducloud_bec_vm_instance":             bec.ResourceVMInstance(),
+			"baiducloud_bcc_key_pair":                bcc.ResourceKeyPair(),
 		},
 
 		ConfigureFunc: providerConfigure,

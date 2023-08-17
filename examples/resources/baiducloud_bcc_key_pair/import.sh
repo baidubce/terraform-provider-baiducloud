@@ -1,0 +1,1 @@
+terraform import baiducloud_bcc_key_pair.example k-7U8ZiXP8
