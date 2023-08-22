@@ -21,10 +21,6 @@ func ResourceAccessKey() *schema.Resource {
 		Description: "Use this resource to manage IAM access key. \n\n" +
 			"More information can be found in the [Developer Guide](https://cloud.baidu.com/doc/IAM/s/mjx35fixq). \n\n",
 
-		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
-		},
-
 		Create: resourceAccessKeyCreate,
 		Read:   resourceAccessKeyRead,
 		Update: resourceAccessKeyUpdate,
