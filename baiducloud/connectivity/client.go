@@ -2,6 +2,8 @@ package connectivity
 
 import (
 	"fmt"
+	"sync"
+
 	"github.com/baidubce/bce-sdk-go/auth"
 	"github.com/baidubce/bce-sdk-go/services/appblb"
 	"github.com/baidubce/bce-sdk-go/services/bbc"
@@ -30,7 +32,6 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/vpc"
 	"github.com/baidubce/bce-sdk-go/services/vpn"
 	"github.com/baidubce/bce-sdk-go/util/log"
-	"sync"
 )
 
 // BaiduClient of BaiduCloud
@@ -71,7 +72,7 @@ type ApiVersion string
 
 var goSdkMutex = sync.RWMutex{} // The Go SDK is not thread-safe
 
-var providerVersion = "1.19.12"
+var providerVersion = "1.19.13"
 
 // Client for BaiduCloudClient
 func (c *Config) Client() (*BaiduClient, error) {

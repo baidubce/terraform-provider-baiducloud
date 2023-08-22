@@ -1,4 +1,9 @@
-	## 1.19.13 (Unreleased)
+	## 1.19.14 (Unreleased)
+
+## 1.19.13 (August 22, 2023)
+FEATURES:
+- **New Resource:** `baiducloud_iam_access_key`
+- **New Data Source:** `baiducloud_iam_access_keys`
 
 ## 1.19.12 (August 17, 2023)
 FEATURES:
