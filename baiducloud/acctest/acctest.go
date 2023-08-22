@@ -2,17 +2,21 @@ package acctest
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"regexp"
+	"strings"
+	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud"
-	"log"
-	"os"
-	"strings"
-	"testing"
 )
 
 const ResourcePrefix = "tf-acc-test"
 const DefaultEmailAddress = "test@test.com"
+const RFC3339RegexPattern = `^[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\.[0-9]+)?([Zz]|([+-]([01][0-9]|2[0-3]):[0-5][0-9]))$`
 
 var Providers map[string]terraform.ResourceProvider
 var Provider *schema.Provider
@@ -46,6 +50,10 @@ func CheckResource(rName string, state *terraform.State) (*terraform.ResourceSta
 		return nil, fmt.Errorf("No Domain ID is set")
 	}
 	return rs, nil
+}
+
+func CheckResourceAttrRFC3339(resourceName, attributeName string) resource.TestCheckFunc {
+	return resource.TestMatchResourceAttr(resourceName, attributeName, regexp.MustCompile(RFC3339RegexPattern))
 }
 
 func ConfigCompose(config ...string) string {

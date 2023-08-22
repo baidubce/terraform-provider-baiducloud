@@ -122,12 +122,14 @@ package baiducloud
 import (
 	"bytes"
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/bcc"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/bec"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/cdn"
+	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/iam"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/snic"
-	"os"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/hashcode"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -233,6 +235,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_bec_nodes":                      bec.DataSourceNodes(),
 			"baiducloud_bec_vm_instances":               bec.DataSourceVMInstances(),
 			"baiducloud_bcc_key_pairs":                  bcc.DataSourceKeyPairs(),
+			"baiducloud_iam_access_keys":                iam.DataSourceAccessKeys(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -306,6 +309,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_snic":                        snic.ResourceSNIC(),
 			"baiducloud_bec_vm_instance":             bec.ResourceVMInstance(),
 			"baiducloud_bcc_key_pair":                bcc.ResourceKeyPair(),
+			"baiducloud_iam_access_key":              iam.ResourceAccessKey(),
 		},
 
 		ConfigureFunc: providerConfigure,
