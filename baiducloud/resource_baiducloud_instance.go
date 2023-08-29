@@ -28,6 +28,9 @@ $ terraform import baiducloud_instance.my-server id
 package baiducloud
 
 import (
+	"strconv"
+	"time"
+
 	"github.com/baidubce/bce-sdk-go/bce"
 	"github.com/baidubce/bce-sdk-go/services/bcc"
 	"github.com/baidubce/bce-sdk-go/services/bcc/api"
@@ -36,8 +39,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/rateLimit"
-	"strconv"
-	"time"
 )
 
 func resourceBaiduCloudInstance() *schema.Resource {
@@ -403,6 +404,12 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Description: "Resource group Id of the instance.",
 				Optional:    true,
 			},
+			"stop_with_no_charge": {
+				Type:        schema.TypeBool,
+				Description: "Whether to enable stopping charging after shutdown for postpaid instance without local disks. Defaults to false.",
+				Optional:    true,
+				Default:     false,
+			},
 		},
 	}
 }
@@ -515,7 +522,8 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 
 	// stop the instance if the action field is stop.
 	if d.Get("action").(string) == INSTANCE_ACTION_STOP {
-		if err := bccService.StopInstance(d.Id(), d.Timeout(schema.TimeoutUpdate)); err != nil {
+		stopWithNoCharge := d.Get("stop_with_no_charge").(bool)
+		if err := bccService.StopInstance(d.Id(), stopWithNoCharge, d.Timeout(schema.TimeoutUpdate)); err != nil {
 			return err
 		}
 	}
@@ -1335,7 +1343,8 @@ func updateInstanceAction(d *schema.ResourceData, meta interface{}, instanceID s
 				return err
 			}
 		} else if act == INSTANCE_ACTION_STOP {
-			if err := bccService.StopInstance(instanceID, d.Timeout(schema.TimeoutUpdate)); err != nil {
+			stopWithNoCharge := d.Get("stop_with_no_charge").(bool)
+			if err := bccService.StopInstance(instanceID, stopWithNoCharge, d.Timeout(schema.TimeoutUpdate)); err != nil {
 				return err
 			}
 		}

@@ -87,6 +87,7 @@ The following arguments are supported:
 * `root_disk_size_in_gb` - (Optional, ForceNew) System disk size(GB) of the instance to be created. The value range is [40,500]GB, Default to 40GB, and more than 40GB is charged according to the cloud disk price. Note that the specified system disk size needs to meet the minimum disk space limit of the mirror used.
 * `root_disk_storage_type` - (Optional, ForceNew) System disk storage type of the instance. Available values are std1, hp1, cloud_hp1, local, sata, ssd. Default to cloud_hp1.
 * `security_groups` - (Optional) Security groups of the instance.
+* `stop_with_no_charge` - (Optional) Whether to enable stopping charging after shutdown for postpaid instance without local disks. Defaults to false.
 * `subnet_id` - (Optional) The subnet ID of VPC. The default subnet will be used when it is empty. The instance will restart after changing the subnet.
 * `tags` - (Optional, ForceNew) Tags, do not support modify
 * `user_data` - (Optional) User Data

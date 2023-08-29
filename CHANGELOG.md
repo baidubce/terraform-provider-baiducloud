@@ -1,4 +1,8 @@
-	## 1.19.14 (Unreleased)
+	## 1.19.15 (Unreleased)
+
+## 1.19.14 (August 29, 2023)
+ENHANCEMENTS:
+- resource/baiducloud_instance: Add parameter `stop_with_no_charge` to support stopping charging after shutdown for postpaid instance without local disks.
 
 ## 1.19.13 (August 22, 2023)
 FEATURES:

@@ -229,11 +229,11 @@ func (s *BccService) StartInstance(instanceID string, timeout time.Duration) err
 	return nil
 }
 
-func (s *BccService) StopInstance(instanceID string, timeout time.Duration) error {
+func (s *BccService) StopInstance(instanceID string, stopWithNoCharge bool, timeout time.Duration) error {
 	action := "Stop instance " + instanceID
 
 	_, err := s.client.WithBccClient(func(bccClient *bcc.Client) (i interface{}, e error) {
-		return nil, bccClient.StopInstance(instanceID, false)
+		return nil, bccClient.StopInstanceWithNoCharge(instanceID, false, stopWithNoCharge)
 	})
 	if err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
