@@ -69,10 +69,9 @@ func resourceBaiduCloudNatGateway() *schema.Resource {
 			},
 			"spec": {
 				Type:         schema.TypeString,
-				Description:  "Specification of the NAT gateway, available values are small(supports up to 5 public IPs), medium(up to 10 public IPs) and large(up to 15 public IPs). Default to small.",
+				Description:  "Specification of the NAT gateway, available values are small(supports up to 5 public IPs), medium(up to 10 public IPs) and large(up to 15 public IPs).",
 				Optional:     true,
 				ForceNew:     true,
-				Default:      "small",
 				ValidateFunc: validation.StringInSlice([]string{"small", "medium", "large"}, false),
 			},
 			"status": {
@@ -81,9 +80,10 @@ func resourceBaiduCloudNatGateway() *schema.Resource {
 				Computed:    true,
 			},
 			"cu_num": {
-				Type:        schema.TypeString,
-				Description: "cu num.",
-				Optional:    true,
+				Type:          schema.TypeString,
+				Description:   "cu num.",
+				Optional:      true,
+				ConflictsWith: []string{"spec"},
 			},
 			"expired_time": {
 				Type:        schema.TypeString,

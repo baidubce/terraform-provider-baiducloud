@@ -1,4 +1,8 @@
-	## 1.19.15 (Unreleased)
+	## 1.19.16 (Unreleased)
+
+## 1.19.15 (August 30, 2023)
+BUG FIXES:
+- resource/baiducloud_nat_gateway: Remove default value of parameter `spec` to fix an issue where enhanced gateway could not be created.
 
 ## 1.19.14 (August 29, 2023)
 ENHANCEMENTS:
