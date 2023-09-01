@@ -139,7 +139,7 @@ func resourceKeyPairRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("error setting fingerprint: %w", err)
 	}
 
-	return resourceKeyPairRead(d, meta)
+	return nil
 }
 
 func resourceKeyPairUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -151,7 +151,8 @@ func resourceKeyPairUpdate(d *schema.ResourceData, meta interface{}) error {
 	if err := updateDescription(d, conn); err != nil {
 		return fmt.Errorf("error updating BCC key pair (%s) description: %w", d.Id(), err)
 	}
-	return nil
+
+	return resourceKeyPairRead(d, meta)
 }
 
 func resourceKeyPairDelete(d *schema.ResourceData, meta interface{}) error {

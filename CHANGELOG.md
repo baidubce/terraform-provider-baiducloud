@@ -1,4 +1,8 @@
-	## 1.19.17 (Unreleased)
+	## 1.19.18 (Unreleased)
+
+## 1.19.17 (September 1, 2023)
+BUG FIXES:
+- resource/baiducloud_bcc_key_pair: Fix an issue where key pair could not be created.
 
 ## 1.19.16 (September 1, 2023)
 ENHANCEMENTS:
