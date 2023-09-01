@@ -108,9 +108,14 @@ const (
 	DefaultFWHRegionRdsEndPoint = "rds.fwh.baidubce.com"
 
 	DefaultHKGRegionBccEndPoint = "bcc.hkg.baidubce.com"
+	DefaultHKGRegionBbcEndPoint = "bbc.hkg.baidubce.com"
 	DefaultHKGRegionVPNEndPoint = "bcc.hkg.baidubce.com"
 	DefaultHKGRegionEniEndPoint = "bcc.hkg.baidubce.com"
 	DefaultHKGRegionCfsEndPoint = "cfs.hkg.baidubce.com"
+	DefaultHKGRegionEipEndPoint = "eip.hkg.baidubce.com"
+	DefaultHKGRegionCceEndPoint = "cce.hkg.baidubce.com"
+	DefaultHKGRegionBlbEndPoint = "blb.hkg.baidubce.com"
+	DefaultHKGRegionBosEndPoint = "hkg.bcebos.com"
 
 	DefaultSINRegionBccEndPoint = "bcc.sin.baidubce.com"
 	DefaultSINRegionVPNEndPoint = "bcc.sin.baidubce.com"
@@ -136,6 +141,10 @@ var (
 
 	// Region BJ Service Endpoints
 	RegionBJEndpoints = map[ServiceCode]string{
+		CERTCode: DefaultCERTEndPoint,
+		IAMCode:  DefaultIAMEndPoint,
+		CDNCode:  DefaultCDNEndPoint,
+
 		BCCCode:      DefaultBJRegionBccEndPoint,
 		BBCCode:      DefaultBJRegionBbcEndPoint,
 		VPNCode:      DefaultBJRegionVpnEndPoint,
@@ -145,15 +154,12 @@ var (
 		APPBLBCode:   DefaultBJRegionBlbEndPoint,
 		BLBCode:      DefaultBJRegionBlbEndPoint,
 		BOSCode:      DefaultBJRegionBosEndPoint,
-		CERTCode:     DefaultCERTEndPoint,
 		CFCCode:      DefaultBJRegionCfcEndPoint,
 		CCECode:      DefaultBJRegionCceEndPoint,
 		CCEv2Code:    DefaultBJRegionCceEndPoint,
 		SCSCode:      DefaultBJRegionScsEndPoint,
 		RDSCode:      DefaultBJRegionRdsEndPoint,
 		DTSCode:      DefaultBJRegionDtsEndPoint,
-		IAMCode:      DefaultIAMEndPoint,
-		CDNCode:      DefaultCDNEndPoint,
 		LOCALDNSCode: DefaultBJRegionBccEndPoint,
 		CFSCode:      DefaultBJRegionCfsEndPoint,
 		SMSCode:      DefaultBJRegionSmsEndPoint,
@@ -163,6 +169,10 @@ var (
 
 	// Region BD Service Endpoints
 	RegionBDEndpoints = map[ServiceCode]string{
+		CERTCode: DefaultCERTEndPoint,
+		IAMCode:  DefaultIAMEndPoint,
+		CDNCode:  DefaultCDNEndPoint,
+
 		BCCCode: DefaultBDRegionBccEndPoint,
 		VPCCode: DefaultBDRegionBccEndPoint,
 		VPNCode: DefaultBDRegionVpnEndPoint,
@@ -174,6 +184,10 @@ var (
 
 	// Region GZ Service Endpoints
 	RegionGZEndpoints = map[ServiceCode]string{
+		CERTCode: DefaultCERTEndPoint,
+		IAMCode:  DefaultIAMEndPoint,
+		CDNCode:  DefaultCDNEndPoint,
+
 		BCCCode:    DefaultGZRegionBccEndPoint,
 		VPNCode:    DefaultGZRegionVpnEndPoint,
 		BBCCode:    DefaultGZRegionBbcEndPoint,
@@ -183,18 +197,20 @@ var (
 		APPBLBCode: DefaultGZRegionBlbEndPoint,
 		BLBCode:    DefaultGZRegionBlbEndPoint,
 		BOSCode:    DefaultGZRegionBosEndPoint,
-		CERTCode:   DefaultCERTEndPoint,
 		CFCCode:    DefaultGZRegionCfcEndPoint,
 		CCECode:    DefaultGZRegionCceEndPoint,
 		CCEv2Code:  DefaultGZRegionCceEndPoint,
 		SCSCode:    DefaultGZRegionScsEndPoint,
 		RDSCode:    DefaultGZRegionRdsEndPoint,
-		IAMCode:    DefaultIAMEndPoint,
 		BLSCode:    DefaultGZRegionBlsEndPoint,
 	}
 
 	// Region SU Service Endpoints
 	RegionSUEndpoints = map[ServiceCode]string{
+		CERTCode: DefaultCERTEndPoint,
+		IAMCode:  DefaultIAMEndPoint,
+		CDNCode:  DefaultCDNEndPoint,
+
 		BCCCode:    DefaultSURegionBccEndPoint,
 		BBCCode:    DefaultSURegionBbcEndPoint,
 		VPNCode:    DefaultSURegionVPNEndPoint,
@@ -204,13 +220,11 @@ var (
 		APPBLBCode: DefaultSURegionBlbEndPoint,
 		BLBCode:    DefaultSURegionBlbEndPoint,
 		BOSCode:    DefaultSURegionBosEndPoint,
-		CERTCode:   DefaultCERTEndPoint,
 		CFCCode:    DefaultSURegionCfcEndPoint,
 		CCECode:    DefaultSURegionCceEndPoint,
 		CCEv2Code:  DefaultSURegionCceEndPoint,
 		SCSCode:    DefaultSURegionScsEndPoint,
 		RDSCode:    DefaultSURegionRdsEndPoint,
-		IAMCode:    DefaultIAMEndPoint,
 		CFSCode:    DefaultSURegionCfsEndPoint,
 		SMSCode:    DefaultSURegionSmsEndPoint,
 		BLSCode:    DefaultSURegionBlsEndPoint,
@@ -218,6 +232,10 @@ var (
 
 	// Region FSH Service Endpoints
 	RegionFSHEndpoints = map[ServiceCode]string{
+		CERTCode: DefaultCERTEndPoint,
+		IAMCode:  DefaultIAMEndPoint,
+		CDNCode:  DefaultCDNEndPoint,
+
 		BCCCode: DefaultFSHRegionBccEndPoint,
 		VPNCode: DefaultFSHRegionVPNEndPoint,
 		VPCCode: DefaultFSHRegionBccEndPoint,
@@ -226,6 +244,10 @@ var (
 
 	// Region FWH Service Endpoints
 	RegionFWHEndpoints = map[ServiceCode]string{
+		CERTCode: DefaultCERTEndPoint,
+		IAMCode:  DefaultIAMEndPoint,
+		CDNCode:  DefaultCDNEndPoint,
+
 		BCCCode:    DefaultFWHRegionBccEndPoint,
 		BBCCode:    DefaultFWHRegionBbcEndPoint,
 		VPNCode:    DefaultFWHRegionVPNEndPoint,
@@ -235,27 +257,40 @@ var (
 		APPBLBCode: DefaultFWHRegionBlbEndPoint,
 		BLBCode:    DefaultFWHRegionBlbEndPoint,
 		BOSCode:    DefaultFWHRegionBosEndPoint,
-		CERTCode:   DefaultCERTEndPoint,
 		CFCCode:    DefaultFWHRegionCfcEndPoint,
 		CCECode:    DefaultFWHRegionCceEndPoint,
 		CCEv2Code:  DefaultFWHRegionCceEndPoint,
 		SCSCode:    DefaultFWHRegionScsEndPoint,
 		RDSCode:    DefaultFWHRegionRdsEndPoint,
-		IAMCode:    DefaultIAMEndPoint,
 		CFSCode:    DefaultFWHRegionCfsEndPoint,
 	}
 
 	// Region HKG Service Endpoints
 	RegionHKGEndpoints = map[ServiceCode]string{
-		BCCCode: DefaultHKGRegionBccEndPoint,
-		VPCCode: DefaultHKGRegionBccEndPoint,
-		VPNCode: DefaultHKGRegionVPNEndPoint,
-		ENICode: DefaultHKGRegionEniEndPoint,
-		CFSCode: DefaultHKGRegionCfsEndPoint,
+		CERTCode: DefaultCERTEndPoint,
+		IAMCode:  DefaultIAMEndPoint,
+		CDNCode:  DefaultCDNEndPoint,
+
+		BCCCode:    DefaultHKGRegionBccEndPoint,
+		BBCCode:    DefaultHKGRegionBbcEndPoint,
+		VPCCode:    DefaultHKGRegionBccEndPoint,
+		VPNCode:    DefaultHKGRegionVPNEndPoint,
+		ENICode:    DefaultHKGRegionEniEndPoint,
+		CFSCode:    DefaultHKGRegionCfsEndPoint,
+		EIPCode:    DefaultHKGRegionEipEndPoint,
+		CCECode:    DefaultHKGRegionCceEndPoint,
+		CCEv2Code:  DefaultHKGRegionCceEndPoint,
+		BLBCode:    DefaultHKGRegionBlbEndPoint,
+		APPBLBCode: DefaultHKGRegionBlbEndPoint,
+		BOSCode:    DefaultHKGRegionBosEndPoint,
 	}
 
 	// Region SIN Service Endpoints
 	RegionSINEndpoints = map[ServiceCode]string{
+		CERTCode: DefaultCERTEndPoint,
+		IAMCode:  DefaultIAMEndPoint,
+		CDNCode:  DefaultCDNEndPoint,
+
 		BCCCode: DefaultSINRegionBccEndPoint,
 		VPCCode: DefaultSINRegionBccEndPoint,
 		VPNCode: DefaultSINRegionVPNEndPoint,

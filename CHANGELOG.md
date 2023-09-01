@@ -1,4 +1,8 @@
-	## 1.19.16 (Unreleased)
+	## 1.19.17 (Unreleased)
+
+## 1.19.16 (September 1, 2023)
+ENHANCEMENTS:
+- Hong Kong region (hkg) can now configure BBC, EIP, CCE, BLB, and BOS.
 
 ## 1.19.15 (August 30, 2023)
 BUG FIXES:
