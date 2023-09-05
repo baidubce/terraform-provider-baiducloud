@@ -72,7 +72,7 @@ type ApiVersion string
 
 var goSdkMutex = sync.RWMutex{} // The Go SDK is not thread-safe
 
-var providerVersion = "1.19.17"
+var providerVersion = "1.19.18"
 
 // Client for BaiduCloudClient
 func (c *Config) Client() (*BaiduClient, error) {

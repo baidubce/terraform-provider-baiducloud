@@ -1,4 +1,7 @@
-	## 1.19.18 (Unreleased)
+	## 1.19.19 (Unreleased)
+## 1.19.18 (September 5, 2023)
+ENHANCEMENTS:
+- resource/baiducloud_instance: Support modifying parameter `instance_spec`.
 
 ## 1.19.17 (September 1, 2023)
 BUG FIXES:

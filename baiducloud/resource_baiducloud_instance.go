@@ -663,6 +663,11 @@ func resourceBaiduCloudInstanceUpdate(d *schema.ResourceData, meta interface{}) 
 		return err
 	}
 
+	// update instance spec
+	if err := updateInstanceSpec(d, meta, instanceID); err != nil {
+		return err
+	}
+
 	// update instance security groups
 	if err := updateInstanceSecurityGroups(d, meta, instanceID); err != nil {
 		return err
@@ -1250,6 +1255,39 @@ func updateInstanceCapacity(d *schema.ResourceData, meta interface{}, instanceID
 		d.SetPartial("cpu_count")
 		d.SetPartial("memory_capacity_in_gb")
 		d.SetPartial("ephemeral_disks")
+	}
+
+	return nil
+}
+
+func updateInstanceSpec(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	action := "Update instance spec " + instanceID
+	client := meta.(*connectivity.BaiduClient)
+	bccService := BccService{client}
+
+	if d.HasChange("instance_spec") {
+		args := &api.ResizeInstanceArgs{
+			ClientToken: buildClientToken(),
+			Spec:        d.Get("instance_spec").(string),
+		}
+
+		if _, err := client.WithBccClient(func(bccClient *bcc.Client) (i interface{}, e error) {
+			return nil, bccClient.ResizeInstanceBySpec(instanceID, args)
+		}); err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+		}
+
+		stateConf := buildStateConf(
+			[]string{string(api.InstanceStatusScaling)},
+			[]string{string(api.InstanceStatusRunning)},
+			d.Timeout(schema.TimeoutUpdate),
+			bccService.InstanceStateRefresh(instanceID),
+		)
+		if _, err := stateConf.WaitForState(); err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+		}
+
+		d.SetPartial("instance_spec")
 	}
 
 	return nil
