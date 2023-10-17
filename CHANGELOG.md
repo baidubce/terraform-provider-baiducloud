@@ -1,4 +1,8 @@
-	## 1.19.19 (Unreleased)
+	## 1.19.20 (Unreleased)
+## 1.19.19 (October 17, 2023)
+NOTES:
+- update resource/baiducloud_cds storage_type description : add `enhanced_ssd_pl1`.
+
 ## 1.19.18 (September 5, 2023)
 ENHANCEMENTS:
 - resource/baiducloud_instance: Support modifying parameter `instance_spec`.

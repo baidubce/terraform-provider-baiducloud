@@ -72,8 +72,9 @@ func resourceBaiduCloudCDS() *schema.Resource {
 				ValidateFunc: validation.IntBetween(5, 32768),
 			},
 			"storage_type": {
-				Type:         schema.TypeString,
-				Description:  "CDS dist storage type, support hp1, std1, cloud_hp1 and hdd, default hp1, see https://cloud.baidu.com/doc/BCC/s/6jwvyo0q2/#storagetype for detail",
+				Type: schema.TypeString,
+				Description: "CDS dist storage type, support hp1, std1, cloud_hp1, hdd and enhanced_ssd_pl1, default hp1, " +
+					"see https://cloud.baidu.com/doc/BCC/s/6jwvyo0q2/#storagetype for detail",
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validateStorageType(),
