@@ -122,14 +122,13 @@ package baiducloud
 import (
 	"bytes"
 	"fmt"
-	"os"
-	"strings"
-
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/bcc"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/bec"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/cdn"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/iam"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/snic"
+	"os"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/hashcode"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -213,6 +212,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_ccev2_instance_group_instances": dataSourceBaiduCloudCCEv2InstanceGroupInstances(),
 			"baiducloud_cce_kubeconfig":                 dataSourceBaiduCloudCceKubeConfig(),
 			"baiducloud_rdss":                           dataSourceBaiduCloudRdss(),
+			"baiducloud_rds_security_ips":               dataSourceBaiduCloudRdsSecurityIps(),
 			"baiducloud_dtss":                           dataSourceBaiduCloudDtss(),
 			"baiducloud_cdn_domains":                    cdn.DataSourceDomains(),
 			"baiducloud_cdn_domain_certificate":         cdn.DataSourceDomainCertificate(),
@@ -278,6 +278,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_rds_instance":                resourceBaiduCloudRdsInstance(),
 			"baiducloud_rds_readonly_instance":       resourceBaiduCloudRdsReadOnlyInstance(),
 			"baiducloud_rds_account":                 resourceBaiduCloudRdsAccount(),
+			"baiducloud_rds_security_ip":             resourceBaiduCloudRdsSecurityIp(),
 			"baiducloud_dts":                         resourceBaiduCloudDts(),
 			"baiducloud_iam_user":                    resourceBaiduCloudIamUser(),
 			"baiducloud_iam_group":                   resourceBaiduCloudIamGroup(),

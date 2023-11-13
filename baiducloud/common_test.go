@@ -37,6 +37,7 @@ const (
 	BaiduCloudTestResourceTypeNameRdsAccount          = BaiduCloudTestResourceTypeName + "-" + "rds-account"
 	BaiduCloudTestResourceTypeNameRdsInstance         = BaiduCloudTestResourceTypeName + "-" + "rds-instance"
 	BaiduCloudTestResourceTypeNameRdsReadonlyInstance = BaiduCloudTestResourceTypeName + "-" + "rds-readonly-instance"
+	BaiduCloudTestResourceTypeNameRdsSecurityIp       = BaiduCloudTestResourceTypeName + "-" + "rds-security-ip"
 	BaiduCloudTestResourceTypeNameRouteRule           = BaiduCloudTestResourceTypeName + "-" + "route-rule"
 	BaiduCloudTestResourceTypeNameScs                 = BaiduCloudTestResourceTypeName + "-" + "scs"
 	BaiduCloudTestResourceTypeNameSecurityGroup       = BaiduCloudTestResourceTypeName + "-" + "security-group"

@@ -1,4 +1,9 @@
-	## 1.19.20 (Unreleased)
+	## 1.19.21 (Unreleased)
+## 1.19.20 (November 13, 2023)
+NOTES:
+- ADD RDS Security ip.
+	
+	
 ## 1.19.19 (October 17, 2023)
 NOTES:
 - update resource/baiducloud_cds storage_type description : add `enhanced_ssd_pl1`.
