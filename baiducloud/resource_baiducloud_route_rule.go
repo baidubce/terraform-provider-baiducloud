@@ -42,6 +42,10 @@ func resourceBaiduCloudRouteRule() *schema.Resource {
 			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"route_table_id": {
 				Type:        schema.TypeString,
@@ -63,15 +67,45 @@ func resourceBaiduCloudRouteRule() *schema.Resource {
 			},
 			"next_hop_id": {
 				Type:        schema.TypeString,
-				Description: "ID of the next hop.",
+				Description: "Next-hop ID, this field must be filled when creating a single path route.",
 				Optional:    true,
 				Computed:    true,
 				ForceNew:    true,
 			},
+			"next_hop_list": {
+				Type:        schema.TypeList,
+				Description: "Create a multi-path route based on the next hop information. This field is required when creating a multi-path route.",
+				Optional:    true,
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"next_hop_id": {
+							Type:        schema.TypeString,
+							Description: "Next-hop ID.",
+							Required:    true,
+							ForceNew:    true,
+						},
+						"next_hop_type": {
+							Type:         schema.TypeString,
+							Description:  "Routing type. Currently only the dedicated gateway type dcGateway is supported.",
+							Required:     true,
+							ForceNew:     true,
+							ValidateFunc: validation.StringInSlice([]string{"dcGateway"}, false),
+						},
+						"path_type": {
+							Type:         schema.TypeString,
+							Description:  "Multi-line mode. The load balancing value is ecmp; the main backup mode value is ha:active, ha:standby, which represent the main and backup routes respectively.",
+							Required:     true,
+							ForceNew:     true,
+							ValidateFunc: validation.StringInSlice([]string{"ecmp", "ha:active", "ha:standby"}, false),
+						},
+					},
+				},
+			},
 			"next_hop_type": {
 				Type:         schema.TypeString,
-				Description:  "Type of the next hop, available values are custom、vpn and nat.",
-				Required:     true,
+				Description:  "Type of the next hop, available values are custom, vpn, nat and dcGateway.",
+				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{"custom", "vpn", "nat", "dcGateway", "peerConn", "ipv6gateway"}, false),
 			},
@@ -201,6 +235,20 @@ func buildBaiduCloudRouteRuleArgs(d *schema.ResourceData, meta interface{}) *vpc
 	}
 	if v := d.Get("next_hop_type").(string); v != "" {
 		request.NexthopType = vpc.NexthopType(v)
+		if len(d.Get("next_hop_list").([]interface{})) > 0 {
+			nextHopList := d.Get("next_hop_list").([]interface{})
+			result := make([]vpc.NextHop, len(nextHopList))
+			for _, item := range nextHopList {
+				itemMap := item.(map[string]interface{})
+				temp := vpc.NextHop{
+					NexthopId:   itemMap["next_hop_id"].(string),
+					NexthopType: vpc.NexthopType(itemMap["next_hop_type"].(string)),
+					PathType:    itemMap["path_type"].(string),
+				}
+				result = append(result, temp)
+			}
+			request.NextHopList = result
+		}
 	}
 	if v := d.Get("description").(string); v != "" {
 		request.Description = v
