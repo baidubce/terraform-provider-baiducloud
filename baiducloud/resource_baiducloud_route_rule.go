@@ -17,6 +17,7 @@ resource "baiducloud_route_rule" "default" {
 package baiducloud
 
 import (
+	"strings"
 	"time"
 
 	"github.com/baidubce/bce-sdk-go/bce"
@@ -72,36 +73,39 @@ func resourceBaiduCloudRouteRule() *schema.Resource {
 				Computed:    true,
 				ForceNew:    true,
 			},
-			"next_hop_list": {
-				Type:        schema.TypeList,
-				Description: "Create a multi-path route based on the next hop information. This field is required when creating a multi-path route.",
-				Optional:    true,
-				Computed:    true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"next_hop_id": {
-							Type:        schema.TypeString,
-							Description: "Next-hop ID.",
-							Required:    true,
-							ForceNew:    true,
-						},
-						"next_hop_type": {
-							Type:         schema.TypeString,
-							Description:  "Routing type. Currently only the dedicated gateway type dcGateway is supported.",
-							Required:     true,
-							ForceNew:     true,
-							ValidateFunc: validation.StringInSlice([]string{"dcGateway"}, false),
-						},
-						"path_type": {
-							Type:         schema.TypeString,
-							Description:  "Multi-line mode. The load balancing value is ecmp; the main backup mode value is ha:active, ha:standby, which represent the main and backup routes respectively.",
-							Required:     true,
-							ForceNew:     true,
-							ValidateFunc: validation.StringInSlice([]string{"ecmp", "ha:active", "ha:standby"}, false),
-						},
-					},
-				},
-			},
+			/**
+			* todo 目前OpenAPI的多线路由只支持创建，查询和更新都不支持，所以暂时不开放，待API完善后开放
+			 */
+			//"next_hop_list": {
+			//	Type:        schema.TypeList,
+			//	Description: "Create a multi-path route based on the next hop information. This field is required when creating a multi-path route.",
+			//	Optional:    true,
+			//	Computed:    true,
+			//	Elem: &schema.Resource{
+			//		Schema: map[string]*schema.Schema{
+			//			"next_hop_id": {
+			//				Type:        schema.TypeString,
+			//				Description: "Next-hop ID.",
+			//				Required:    true,
+			//				ForceNew:    true,
+			//			},
+			//			"next_hop_type": {
+			//				Type:         schema.TypeString,
+			//				Description:  "Routing type. Currently only the dedicated gateway type dcGateway is supported.",
+			//				Required:     true,
+			//				ForceNew:     true,
+			//				ValidateFunc: validation.StringInSlice([]string{"dcGateway"}, false),
+			//			},
+			//			"path_type": {
+			//				Type:         schema.TypeString,
+			//				Description:  "Multi-line mode. The load balancing value is ecmp; the main backup mode value is ha:active, ha:standby, which represent the main and backup routes respectively.",
+			//				Required:     true,
+			//				ForceNew:     true,
+			//				ValidateFunc: validation.StringInSlice([]string{"ecmp", "ha:active", "ha:standby"}, false),
+			//			},
+			//		},
+			//	},
+			//},
 			"next_hop_type": {
 				Type:         schema.TypeString,
 				Description:  "Type of the next hop, available values are custom, vpn, nat and dcGateway.",
@@ -150,11 +154,15 @@ func resourceBaiduCloudRouteRuleCreate(d *schema.ResourceData, meta interface{})
 func resourceBaiduCloudRouteRuleRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
 
-	routeRuleId := d.Id()
+	idParts := strings.Split(d.Id(), ":")
+	routeRuleId := idParts[0]
 	action := "Query Route Rule " + routeRuleId
 
 	routeTableID := ""
-	if v, ok := d.GetOk("route_table_id"); ok {
+	if len(idParts) > 1 {
+		routeTableID = idParts[1]
+		d.SetId(idParts[0])
+	} else if v, ok := d.GetOk("route_table_id"); ok {
 		routeTableID = v.(string)
 	}
 	raw, err := client.WithVpcClient(func(vpcClient *vpc.Client) (i interface{}, e error) {
@@ -170,6 +178,7 @@ func resourceBaiduCloudRouteRuleRead(d *schema.ResourceData, meta interface{}) e
 	}
 
 	result, _ := raw.(*vpc.GetRouteTableResult)
+	d.SetId(routeRuleId)
 	for _, rule := range result.RouteRules {
 		if rule.RouteRuleId == routeRuleId {
 			d.Set("route_table_id", rule.RouteTableId)
@@ -178,7 +187,6 @@ func resourceBaiduCloudRouteRuleRead(d *schema.ResourceData, meta interface{}) e
 			d.Set("next_hop_id", rule.NexthopId)
 			d.Set("next_hop_type", rule.NexthopType)
 			d.Set("description", rule.Description)
-
 			return nil
 		}
 	}
