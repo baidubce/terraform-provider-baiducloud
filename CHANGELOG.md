@@ -1,4 +1,8 @@
-	## 1.19.23 (Unreleased)
+	## 1.19.24 (Unreleased)
+## 1.19.23 (November 27, 2023)
+NOTES:
+- ADD SCS Security ip.
+        
 ## 1.19.22 (November 24, 2023)
 NOTES:
 - The routing table now supports import.
