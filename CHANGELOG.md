@@ -1,4 +1,8 @@
-	## 1.19.22 (Unreleased)
+	## 1.19.23 (Unreleased)
+## 1.19.22 (December 25, 2023)
+NOTES:
+- The nat gateway now supports the DNAT and SNAT eips.
+
 ## 1.19.21 (November 15, 2023)
 NOTES:
 - The routing table now supports the configuration of dedicated gateways, including single-line and multi-line routing.
