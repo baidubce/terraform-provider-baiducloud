@@ -90,9 +90,17 @@ func dataSourceBaiduCloudNatGateways() *schema.Resource {
 							Description: "Status of the NAT gateway.",
 							Computed:    true,
 						},
-						"eips": {
-							Type:        schema.TypeList,
-							Description: "EIP list of the NAT gateway.",
+						"snat_eips": {
+							Type:        schema.TypeSet,
+							Description: "One public network EIP associated with the NAT gateway SNATs or one or more EIPs in the shared bandwidth.",
+							Computed:    true,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
+						},
+						"dnat_eips": {
+							Type:        schema.TypeSet,
+							Description: "One public network EIP associated with the NAT gateway DNATs or one or more EIPs in the shared bandwidth.",
 							Computed:    true,
 							Elem: &schema.Schema{
 								Type: schema.TypeString,
@@ -200,9 +208,10 @@ func flattenNAT(nat *vpc.NAT) map[string]interface{} {
 	natMap["vpc_id"] = nat.VpcId
 	natMap["spec"] = nat.Spec
 	natMap["status"] = nat.Status
-	natMap["eips"] = nat.Eips
 	natMap["payment_timing"] = nat.PaymentTiming
 	natMap["expired_time"] = nat.ExpiredTime
+	natMap["snat_eips"] = nat.Eips
+	natMap["dnat_eips"] = nat.DnatEips
 
 	return natMap
 }

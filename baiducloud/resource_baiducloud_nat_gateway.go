@@ -68,8 +68,9 @@ func resourceBaiduCloudNatGateway() *schema.Resource {
 				ForceNew:    true,
 			},
 			"spec": {
-				Type:         schema.TypeString,
-				Description:  "Specification of the NAT gateway, available values are small(supports up to 5 public IPs), medium(up to 10 public IPs) and large(up to 15 public IPs).",
+				Type: schema.TypeString,
+				Description: "Specification of the NAT gateway, available values are small(supports up to 5 public IPs), " +
+					"medium(up to 10 public IPs) and large(up to 15 public IPs).",
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{"small", "medium", "large"}, false),
@@ -90,10 +91,20 @@ func resourceBaiduCloudNatGateway() *schema.Resource {
 				Description: "Expired time of the NAT gateway, which will be empty when the payment_timing is Postpaid.",
 				Computed:    true,
 			},
-			"eips": {
+			"snat_eips": {
 				Type:        schema.TypeSet,
-				Description: "One public network EIP associated with the NAT gateway or one or more EIPs in the shared bandwidth.",
+				Description: "One public network EIP associated with the NAT gateway SNATs or one or more EIPs in the shared bandwidth.",
 				Computed:    true,
+				Optional:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"dnat_eips": {
+				Type:        schema.TypeSet,
+				Description: "One public network EIP associated with the NAT gateway DNATs or one or more EIPs in the shared bandwidth.",
+				Computed:    true,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -215,7 +226,8 @@ func resourceBaiduCloudNatGatewayRead(d *schema.ResourceData, meta interface{}) 
 	d.Set("name", nat.Name)
 	d.Set("vpc_id", nat.VpcId)
 	d.Set("spec", nat.Spec)
-	d.Set("eips", nat.Eips)
+	d.Set("snat_eips", nat.Eips)
+	d.Set("dnat_ips", nat.DnatEips)
 
 	billingMap := map[string]interface{}{"payment_timing": nat.PaymentTiming}
 	d.Set("billing", billingMap)
@@ -233,6 +245,23 @@ func resourceBaiduCloudNatGatewayUpdate(d *schema.ResourceData, meta interface{}
 	action := "Update NAT Gateway " + natId
 
 	d.Partial(true)
+
+	// 更新snat eips
+	if d.HasChange("snat_eips") {
+		err := updateEips(d, client, "snat_eips")
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_nat_gateway", action, BCESDKGoERROR)
+		}
+	}
+
+	// 更新dnat eips
+	if d.HasChange("dnat_eips") {
+		err := updateEips(d, client, "dnat_eips")
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_nat_gateway", action, BCESDKGoERROR)
+		}
+	}
+
 	if d.HasChange("name") {
 		args := &vpc.UpdateNatGatewayArgs{}
 		if v := d.Get("name").(string); v != "" {
@@ -306,6 +335,20 @@ func buildBaiduCloudNatGatewayArgs(d *schema.ResourceData) *vpc.CreateNatGateway
 	if v := d.Get("spec").(string); v != "" {
 		args.Spec = vpc.NatGatewaySpecType(v)
 	}
+	if v, ok := d.Get("snat_eips").(*schema.Set); ok && v.Len() > 0 {
+		eips := make([]string, 0, v.Len())
+		for _, eip := range v.List() {
+			eips = append(eips, eip.(string))
+		}
+		args.Eips = eips
+	}
+	if v, ok := d.Get("dnat_eips").(*schema.Set); ok && v.Len() > 0 {
+		eips := make([]string, 0, v.Len())
+		for _, eip := range v.List() {
+			eips = append(eips, eip.(string))
+		}
+		args.DnatEips = eips
+	}
 
 	if v, ok := d.GetOk("billing"); ok {
 		billing := v.(map[string]interface{})
@@ -328,4 +371,108 @@ func buildBaiduCloudNatGatewayArgs(d *schema.ResourceData) *vpc.CreateNatGateway
 	}
 
 	return args
+}
+
+func updateEips(d *schema.ResourceData, client *connectivity.BaiduClient, eipType string) (err error) {
+	oldSet, newSet := d.GetChange(eipType)
+	vpcService := VpcService{client}
+	addedEips, removedEips := diffSets(oldSet.(*schema.Set), newSet.(*schema.Set))
+	stateConf := buildStateConf(
+		[]string{string(vpc.NAT_STATUS_BUILDING), string(vpc.NAT_STATUS_CONFIGURING)},
+		[]string{string(vpc.NAT_STATUS_ACTIVE)},
+		d.Timeout(schema.TimeoutCreate),
+		vpcService.NatGatewayStateRefresh(d.Id()),
+	)
+	stateConf.Target = []string{string(vpc.NAT_STATUS_ACTIVE)}
+	if len(newSet.(*schema.Set).List()) == 0 {
+		stateConf.Target = []string{string(vpc.NAT_STATUS_UNCONFIGURED)}
+	}
+	if len(addedEips) > 0 {
+		err = bindEips(client, d.Id(), addedEips, eipType)
+		if err != nil {
+			return err
+		}
+		if _, err := stateConf.WaitForState(); err != nil {
+			return err
+		}
+	}
+	if len(removedEips) > 0 {
+		err = unbindEips(client, d.Id(), removedEips, eipType)
+		if err != nil {
+			return err
+		}
+		if _, err := stateConf.WaitForState(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func bindEips(client *connectivity.BaiduClient, id string, eips []string, eipType string) error {
+	var err error
+	if eipType == "snat_eips" {
+		args := &vpc.BindEipsArgs{Eips: eips}
+		_, err = client.WithVpcClient(func(vpcClient *vpc.Client) (i interface{}, e error) {
+			return nil, vpcClient.BindEips(id, args)
+		})
+	} else if eipType == "dnat_eips" {
+		args := &vpc.BindDnatEipsArgs{DnatEips: eips}
+		_, err = client.WithVpcClient(func(vpcClient *vpc.Client) (i interface{}, e error) {
+			return nil, vpcClient.BindDnatEips(id, args)
+		})
+	}
+	return err
+}
+
+func unbindEips(client *connectivity.BaiduClient, id string, eips []string, eipType string) error {
+	var err error
+	if eipType == "snat_eips" {
+		args := &vpc.UnBindEipsArgs{Eips: eips}
+		_, err = client.WithVpcClient(func(vpcClient *vpc.Client) (i interface{}, e error) {
+			return nil, vpcClient.UnBindEips(id, args)
+		})
+	} else if eipType == "dnat_eips" {
+		args := &vpc.UnBindDnatEipsArgs{DnatEips: eips}
+		_, err = client.WithVpcClient(func(vpcClient *vpc.Client) (i interface{}, e error) {
+			return nil, vpcClient.UnBindDnatEips(id, args)
+		})
+	}
+	return err
+}
+
+func diffSets(oldSet, newSet *schema.Set) (addedEips []string, removedEips []string) {
+	oldList := oldSet.List()
+	newList := newSet.List()
+
+	// 创建一个map来快速检查EIP是否存在于新集合中
+	newEipsMap := make(map[string]struct{})
+	for _, nip := range newList {
+		nipStr := nip.(string)
+		newEipsMap[nipStr] = struct{}{}
+	}
+
+	// 检查旧集合中的每个EIP，如果它不在新集合中，则它被删除了
+	for _, oip := range oldList {
+		oipStr := oip.(string)
+		if _, exists := newEipsMap[oipStr]; !exists {
+			removedEips = append(removedEips, oipStr)
+		}
+	}
+
+	// 创建一个map来快速检查EIP是否存在于旧集合中
+	oldEipsMap := make(map[string]struct{})
+	for _, oip := range oldList {
+		oipStr := oip.(string)
+		oldEipsMap[oipStr] = struct{}{}
+	}
+
+	// 检查新集合中的每个EIP，如果它不在旧集合中，则它是新增的
+	for _, nip := range newList {
+		nipStr := nip.(string)
+		if _, exists := oldEipsMap[nipStr]; !exists {
+			addedEips = append(addedEips, nipStr)
+		}
+	}
+
+	return addedEips, removedEips
 }

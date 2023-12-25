@@ -1,10 +1,9 @@
 ---
 layout: "baiducloud"
-subcategory: "Virtual private Cloud (VPC)"
 page_title: "BaiduCloud: baiducloud_nat_gateways"
 sidebar_current: "docs-baiducloud-datasource-nat_gateways"
 description: |-
-  Use this data source to query NAT gateway list.
+Use this data source to query NAT gateway list.
 ---
 
 # baiducloud_nat_gateways
@@ -50,6 +49,8 @@ In addition to all arguments above, the following attributes are exported:
   * `name` - Name of the NAT gateway.
   * `payment_timing` - Payment timing of the NAT gateway.
   * `spec` - Spec of the NAT gateway.
+  * `snat_eips` - One public network EIP associated with the NAT gateway SNATs or one or more EIPs in the shared bandwidth.
+  * `dnat_eips` - One public network EIP associated with the NAT gateway DNATs or one or more EIPs in the shared bandwidth.
   * `status` - Status of the NAT gateway.
   * `vpc_id` - VPC ID of the NAT gateway.
 
