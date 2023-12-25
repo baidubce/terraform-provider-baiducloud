@@ -40,6 +40,7 @@ const (
 	BaiduCloudTestResourceTypeNameRdsSecurityIp       = BaiduCloudTestResourceTypeName + "-" + "rds-security-ip"
 	BaiduCloudTestResourceTypeNameRouteRule           = BaiduCloudTestResourceTypeName + "-" + "route-rule"
 	BaiduCloudTestResourceTypeNameScs                 = BaiduCloudTestResourceTypeName + "-" + "scs"
+	BaiduCloudTestResourceTypeNameScsSecurityIp       = BaiduCloudTestResourceTypeName + "-" + "scs-security-ip"
 	BaiduCloudTestResourceTypeNameSecurityGroup       = BaiduCloudTestResourceTypeName + "-" + "security-group"
 	BaiduCloudTestResourceTypeNameSecurityGroupRule   = BaiduCloudTestResourceTypeName + "-" + "security-group-rule"
 	BaiduCloudTestResourceTypeNameSnapshot            = BaiduCloudTestResourceTypeName + "-" + "snapshot"

@@ -1,7 +1,15 @@
-	## 1.19.23 (Unreleased)
-## 1.19.22 (December 25, 2023)
+	## 1.19.25 (Unreleased)
+## 1.19.24 (December 25, 2023)
 NOTES:
 - The nat gateway now supports the DNAT and SNAT eips.
+
+## 1.19.23 (November 27, 2023)
+NOTES:
+- ADD SCS Security ip.
+        
+## 1.19.22 (November 24, 2023)
+NOTES:
+- The routing table now supports import.
 
 ## 1.19.21 (November 15, 2023)
 NOTES:

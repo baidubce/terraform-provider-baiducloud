@@ -75,7 +75,7 @@ func resourceBaiduCloudSubnet() *schema.Resource {
 			},
 			"vpc_id": {
 				Type:        schema.TypeString,
-				Description: "ID of the VPC.",
+				Description: "The VPC ID that the subnet belongs to.",
 				Required:    true,
 				ForceNew:    true,
 			},

@@ -1,10 +1,9 @@
 ---
 layout: "baiducloud"
-subcategory: "Virtual private Cloud (VPC)"
 page_title: "BaiduCloud: baiducloud_subnet"
 sidebar_current: "docs-baiducloud-resource-subnet"
 description: |-
-  Provide a resource to create a VPC subnet.
+Provide a resource to create a VPC subnet.
 ---
 
 # baiducloud_subnet
@@ -33,7 +32,7 @@ The following arguments are supported:
 
 * `cidr` - (Required, ForceNew) CIDR block of the subnet.
 * `name` - (Required) Name of the subnet, which cannot take the value "default", the length is no more than 65 characters, and the value can be composed of numbers, characters and underscores.
-* `vpc_id` - (Required, ForceNew) ID of the VPC.
+* `vpc_id` - (Required, ForceNew) The VPC ID that the subnet belongs to.
 * `zone_name` - (Required, ForceNew) The availability zone name within which the subnet should be created.
 * `description` - (Optional) Description of the subnet, and the value must be no more than 200 characters.
 * `subnet_type` - (Optional, ForceNew) Type of the subnet, valid values are BCC, BCC_NAT and BBC. Default to BCC.
