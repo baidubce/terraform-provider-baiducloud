@@ -1,4 +1,9 @@
-	## 1.19.25 (Unreleased)
+	## 1.19.26 (Unreleased)
+	
+## 1.19.25 (December 26, 2023)
+NOTES:
+- ADD ET Gateway.
+
 ## 1.19.24 (December 25, 2023)
 NOTES:
 - The nat gateway now supports the DNAT and SNAT eips.
