@@ -12,29 +12,30 @@ import (
 type ServiceCode string
 
 const (
-	BCCCode      = ServiceCode("BCC")
-	VPCCode      = ServiceCode("VPC")
-	EIPCode      = ServiceCode("EIP")
-	APPBLBCode   = ServiceCode("APPBLB")
-	BLBCode      = ServiceCode("BLB")
-	BOSCode      = ServiceCode("BOS")
-	CERTCode     = ServiceCode("CERT")
-	CFCCode      = ServiceCode("CFC")
-	CCECode      = ServiceCode("CCE")
-	CCEv2Code    = ServiceCode("CCEv2")
-	SCSCode      = ServiceCode("SCS")
-	RDSCode      = ServiceCode("RDS")
-	DTSCode      = ServiceCode("DTS")
-	IAMCode      = ServiceCode("IAM")
-	CDNCode      = ServiceCode("CDN")
-	LOCALDNSCode = ServiceCode("LOCALDNS")
-	BBCCode      = ServiceCode("BBC")
-	VPNCode      = ServiceCode("VPN")
-	ENICode      = ServiceCode("ENI")
-	CFSCode      = ServiceCode("CFS")
-	SMSCode      = ServiceCode("SMS")
-	BLSCode      = ServiceCode("BLS")
-	BECCode      = ServiceCode("BEC")
+	BCCCode       = ServiceCode("BCC")
+	VPCCode       = ServiceCode("VPC")
+	EIPCode       = ServiceCode("EIP")
+	APPBLBCode    = ServiceCode("APPBLB")
+	BLBCode       = ServiceCode("BLB")
+	BOSCode       = ServiceCode("BOS")
+	CERTCode      = ServiceCode("CERT")
+	CFCCode       = ServiceCode("CFC")
+	CCECode       = ServiceCode("CCE")
+	CCEv2Code     = ServiceCode("CCEv2")
+	SCSCode       = ServiceCode("SCS")
+	RDSCode       = ServiceCode("RDS")
+	DTSCode       = ServiceCode("DTS")
+	IAMCode       = ServiceCode("IAM")
+	CDNCode       = ServiceCode("CDN")
+	LOCALDNSCode  = ServiceCode("LOCALDNS")
+	BBCCode       = ServiceCode("BBC")
+	VPNCode       = ServiceCode("VPN")
+	ENICode       = ServiceCode("ENI")
+	CFSCode       = ServiceCode("CFS")
+	SMSCode       = ServiceCode("SMS")
+	BLSCode       = ServiceCode("BLS")
+	BECCode       = ServiceCode("BEC")
+	ETGATEWAYCode = ServiceCode("ETGATEWAY")
 )
 
 const (
@@ -145,26 +146,27 @@ var (
 		IAMCode:  DefaultIAMEndPoint,
 		CDNCode:  DefaultCDNEndPoint,
 
-		BCCCode:      DefaultBJRegionBccEndPoint,
-		BBCCode:      DefaultBJRegionBbcEndPoint,
-		VPNCode:      DefaultBJRegionVpnEndPoint,
-		VPCCode:      DefaultBJRegionBccEndPoint,
-		EIPCode:      DefaultBJRegionEipEndPoint,
-		ENICode:      DefaultBJRegionEniEndPoint,
-		APPBLBCode:   DefaultBJRegionBlbEndPoint,
-		BLBCode:      DefaultBJRegionBlbEndPoint,
-		BOSCode:      DefaultBJRegionBosEndPoint,
-		CFCCode:      DefaultBJRegionCfcEndPoint,
-		CCECode:      DefaultBJRegionCceEndPoint,
-		CCEv2Code:    DefaultBJRegionCceEndPoint,
-		SCSCode:      DefaultBJRegionScsEndPoint,
-		RDSCode:      DefaultBJRegionRdsEndPoint,
-		DTSCode:      DefaultBJRegionDtsEndPoint,
-		LOCALDNSCode: DefaultBJRegionBccEndPoint,
-		CFSCode:      DefaultBJRegionCfsEndPoint,
-		SMSCode:      DefaultBJRegionSmsEndPoint,
-		BLSCode:      DefaultBJRegionBlsEndPoint,
-		BECCode:      DefaultBJRegionBecEndPoint,
+		BCCCode:       DefaultBJRegionBccEndPoint,
+		BBCCode:       DefaultBJRegionBbcEndPoint,
+		VPNCode:       DefaultBJRegionVpnEndPoint,
+		VPCCode:       DefaultBJRegionBccEndPoint,
+		EIPCode:       DefaultBJRegionEipEndPoint,
+		ENICode:       DefaultBJRegionEniEndPoint,
+		APPBLBCode:    DefaultBJRegionBlbEndPoint,
+		BLBCode:       DefaultBJRegionBlbEndPoint,
+		BOSCode:       DefaultBJRegionBosEndPoint,
+		CFCCode:       DefaultBJRegionCfcEndPoint,
+		CCECode:       DefaultBJRegionCceEndPoint,
+		CCEv2Code:     DefaultBJRegionCceEndPoint,
+		SCSCode:       DefaultBJRegionScsEndPoint,
+		RDSCode:       DefaultBJRegionRdsEndPoint,
+		DTSCode:       DefaultBJRegionDtsEndPoint,
+		LOCALDNSCode:  DefaultBJRegionBccEndPoint,
+		CFSCode:       DefaultBJRegionCfsEndPoint,
+		SMSCode:       DefaultBJRegionSmsEndPoint,
+		BLSCode:       DefaultBJRegionBlsEndPoint,
+		BECCode:       DefaultBJRegionBecEndPoint,
+		ETGATEWAYCode: DefaultBJRegionBccEndPoint,
 	}
 
 	// Region BD Service Endpoints
@@ -173,13 +175,14 @@ var (
 		IAMCode:  DefaultIAMEndPoint,
 		CDNCode:  DefaultCDNEndPoint,
 
-		BCCCode: DefaultBDRegionBccEndPoint,
-		VPCCode: DefaultBDRegionBccEndPoint,
-		VPNCode: DefaultBDRegionVpnEndPoint,
-		ENICode: DefaultBDRegionEniEndPoint,
-		BBCCode: DefaultBDRegionBbcEndPoint,
-		CFSCode: DefaultBDRegionCfsEndPoint,
-		EIPCode: DefaultBDRegionEipEndPoint,
+		BCCCode:       DefaultBDRegionBccEndPoint,
+		VPCCode:       DefaultBDRegionBccEndPoint,
+		VPNCode:       DefaultBDRegionVpnEndPoint,
+		ENICode:       DefaultBDRegionEniEndPoint,
+		BBCCode:       DefaultBDRegionBbcEndPoint,
+		CFSCode:       DefaultBDRegionCfsEndPoint,
+		EIPCode:       DefaultBDRegionEipEndPoint,
+		ETGATEWAYCode: DefaultBDRegionBccEndPoint,
 	}
 
 	// Region GZ Service Endpoints
@@ -188,21 +191,22 @@ var (
 		IAMCode:  DefaultIAMEndPoint,
 		CDNCode:  DefaultCDNEndPoint,
 
-		BCCCode:    DefaultGZRegionBccEndPoint,
-		VPNCode:    DefaultGZRegionVpnEndPoint,
-		BBCCode:    DefaultGZRegionBbcEndPoint,
-		VPCCode:    DefaultGZRegionBccEndPoint,
-		EIPCode:    DefaultGZRegionEipEndPoint,
-		ENICode:    DefaultGZRegionEniEndPoint,
-		APPBLBCode: DefaultGZRegionBlbEndPoint,
-		BLBCode:    DefaultGZRegionBlbEndPoint,
-		BOSCode:    DefaultGZRegionBosEndPoint,
-		CFCCode:    DefaultGZRegionCfcEndPoint,
-		CCECode:    DefaultGZRegionCceEndPoint,
-		CCEv2Code:  DefaultGZRegionCceEndPoint,
-		SCSCode:    DefaultGZRegionScsEndPoint,
-		RDSCode:    DefaultGZRegionRdsEndPoint,
-		BLSCode:    DefaultGZRegionBlsEndPoint,
+		BCCCode:       DefaultGZRegionBccEndPoint,
+		VPNCode:       DefaultGZRegionVpnEndPoint,
+		BBCCode:       DefaultGZRegionBbcEndPoint,
+		VPCCode:       DefaultGZRegionBccEndPoint,
+		EIPCode:       DefaultGZRegionEipEndPoint,
+		ENICode:       DefaultGZRegionEniEndPoint,
+		APPBLBCode:    DefaultGZRegionBlbEndPoint,
+		BLBCode:       DefaultGZRegionBlbEndPoint,
+		BOSCode:       DefaultGZRegionBosEndPoint,
+		CFCCode:       DefaultGZRegionCfcEndPoint,
+		CCECode:       DefaultGZRegionCceEndPoint,
+		CCEv2Code:     DefaultGZRegionCceEndPoint,
+		SCSCode:       DefaultGZRegionScsEndPoint,
+		RDSCode:       DefaultGZRegionRdsEndPoint,
+		BLSCode:       DefaultGZRegionBlsEndPoint,
+		ETGATEWAYCode: DefaultGZRegionBccEndPoint,
 	}
 
 	// Region SU Service Endpoints
@@ -211,23 +215,24 @@ var (
 		IAMCode:  DefaultIAMEndPoint,
 		CDNCode:  DefaultCDNEndPoint,
 
-		BCCCode:    DefaultSURegionBccEndPoint,
-		BBCCode:    DefaultSURegionBbcEndPoint,
-		VPNCode:    DefaultSURegionVPNEndPoint,
-		VPCCode:    DefaultSURegionBccEndPoint,
-		EIPCode:    DefaultSURegionEipEndPoint,
-		ENICode:    DefaultSURegionEniEndPoint,
-		APPBLBCode: DefaultSURegionBlbEndPoint,
-		BLBCode:    DefaultSURegionBlbEndPoint,
-		BOSCode:    DefaultSURegionBosEndPoint,
-		CFCCode:    DefaultSURegionCfcEndPoint,
-		CCECode:    DefaultSURegionCceEndPoint,
-		CCEv2Code:  DefaultSURegionCceEndPoint,
-		SCSCode:    DefaultSURegionScsEndPoint,
-		RDSCode:    DefaultSURegionRdsEndPoint,
-		CFSCode:    DefaultSURegionCfsEndPoint,
-		SMSCode:    DefaultSURegionSmsEndPoint,
-		BLSCode:    DefaultSURegionBlsEndPoint,
+		BCCCode:       DefaultSURegionBccEndPoint,
+		BBCCode:       DefaultSURegionBbcEndPoint,
+		VPNCode:       DefaultSURegionVPNEndPoint,
+		VPCCode:       DefaultSURegionBccEndPoint,
+		EIPCode:       DefaultSURegionEipEndPoint,
+		ENICode:       DefaultSURegionEniEndPoint,
+		APPBLBCode:    DefaultSURegionBlbEndPoint,
+		BLBCode:       DefaultSURegionBlbEndPoint,
+		BOSCode:       DefaultSURegionBosEndPoint,
+		CFCCode:       DefaultSURegionCfcEndPoint,
+		CCECode:       DefaultSURegionCceEndPoint,
+		CCEv2Code:     DefaultSURegionCceEndPoint,
+		SCSCode:       DefaultSURegionScsEndPoint,
+		RDSCode:       DefaultSURegionRdsEndPoint,
+		CFSCode:       DefaultSURegionCfsEndPoint,
+		SMSCode:       DefaultSURegionSmsEndPoint,
+		BLSCode:       DefaultSURegionBlsEndPoint,
+		ETGATEWAYCode: DefaultSURegionBccEndPoint,
 	}
 
 	// Region FSH Service Endpoints
@@ -248,21 +253,22 @@ var (
 		IAMCode:  DefaultIAMEndPoint,
 		CDNCode:  DefaultCDNEndPoint,
 
-		BCCCode:    DefaultFWHRegionBccEndPoint,
-		BBCCode:    DefaultFWHRegionBbcEndPoint,
-		VPNCode:    DefaultFWHRegionVPNEndPoint,
-		VPCCode:    DefaultFWHRegionBccEndPoint,
-		EIPCode:    DefaultFWHRegionEipEndPoint,
-		ENICode:    DefaultFWHRegionEniEndPoint,
-		APPBLBCode: DefaultFWHRegionBlbEndPoint,
-		BLBCode:    DefaultFWHRegionBlbEndPoint,
-		BOSCode:    DefaultFWHRegionBosEndPoint,
-		CFCCode:    DefaultFWHRegionCfcEndPoint,
-		CCECode:    DefaultFWHRegionCceEndPoint,
-		CCEv2Code:  DefaultFWHRegionCceEndPoint,
-		SCSCode:    DefaultFWHRegionScsEndPoint,
-		RDSCode:    DefaultFWHRegionRdsEndPoint,
-		CFSCode:    DefaultFWHRegionCfsEndPoint,
+		BCCCode:       DefaultFWHRegionBccEndPoint,
+		BBCCode:       DefaultFWHRegionBbcEndPoint,
+		VPNCode:       DefaultFWHRegionVPNEndPoint,
+		VPCCode:       DefaultFWHRegionBccEndPoint,
+		EIPCode:       DefaultFWHRegionEipEndPoint,
+		ENICode:       DefaultFWHRegionEniEndPoint,
+		APPBLBCode:    DefaultFWHRegionBlbEndPoint,
+		BLBCode:       DefaultFWHRegionBlbEndPoint,
+		BOSCode:       DefaultFWHRegionBosEndPoint,
+		CFCCode:       DefaultFWHRegionCfcEndPoint,
+		CCECode:       DefaultFWHRegionCceEndPoint,
+		CCEv2Code:     DefaultFWHRegionCceEndPoint,
+		SCSCode:       DefaultFWHRegionScsEndPoint,
+		RDSCode:       DefaultFWHRegionRdsEndPoint,
+		CFSCode:       DefaultFWHRegionCfsEndPoint,
+		ETGATEWAYCode: DefaultFWHRegionBccEndPoint,
 	}
 
 	// Region HKG Service Endpoints
@@ -271,18 +277,19 @@ var (
 		IAMCode:  DefaultIAMEndPoint,
 		CDNCode:  DefaultCDNEndPoint,
 
-		BCCCode:    DefaultHKGRegionBccEndPoint,
-		BBCCode:    DefaultHKGRegionBbcEndPoint,
-		VPCCode:    DefaultHKGRegionBccEndPoint,
-		VPNCode:    DefaultHKGRegionVPNEndPoint,
-		ENICode:    DefaultHKGRegionEniEndPoint,
-		CFSCode:    DefaultHKGRegionCfsEndPoint,
-		EIPCode:    DefaultHKGRegionEipEndPoint,
-		CCECode:    DefaultHKGRegionCceEndPoint,
-		CCEv2Code:  DefaultHKGRegionCceEndPoint,
-		BLBCode:    DefaultHKGRegionBlbEndPoint,
-		APPBLBCode: DefaultHKGRegionBlbEndPoint,
-		BOSCode:    DefaultHKGRegionBosEndPoint,
+		BCCCode:       DefaultHKGRegionBccEndPoint,
+		BBCCode:       DefaultHKGRegionBbcEndPoint,
+		VPCCode:       DefaultHKGRegionBccEndPoint,
+		VPNCode:       DefaultHKGRegionVPNEndPoint,
+		ENICode:       DefaultHKGRegionEniEndPoint,
+		CFSCode:       DefaultHKGRegionCfsEndPoint,
+		EIPCode:       DefaultHKGRegionEipEndPoint,
+		CCECode:       DefaultHKGRegionCceEndPoint,
+		CCEv2Code:     DefaultHKGRegionCceEndPoint,
+		BLBCode:       DefaultHKGRegionBlbEndPoint,
+		APPBLBCode:    DefaultHKGRegionBlbEndPoint,
+		BOSCode:       DefaultHKGRegionBosEndPoint,
+		ETGATEWAYCode: DefaultHKGRegionBccEndPoint,
 	}
 
 	// Region SIN Service Endpoints

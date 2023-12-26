@@ -237,6 +237,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_bec_vm_instances":               bec.DataSourceVMInstances(),
 			"baiducloud_bcc_key_pairs":                  bcc.DataSourceKeyPairs(),
 			"baiducloud_iam_access_keys":                iam.DataSourceAccessKeys(),
+			"baiducloud_et_gateways":                    dataSourceBaiduCloudEtGateways(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -313,6 +314,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_bec_vm_instance":             bec.ResourceVMInstance(),
 			"baiducloud_bcc_key_pair":                bcc.ResourceKeyPair(),
 			"baiducloud_iam_access_key":              iam.ResourceAccessKey(),
+			"baiducloud_et_gateway":                  resourceBaiduCloudEtGateway(),
 		},
 
 		ConfigureFunc: providerConfigure,

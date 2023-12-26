@@ -2,8 +2,6 @@ package connectivity
 
 import (
 	"fmt"
-	"sync"
-
 	"github.com/baidubce/bce-sdk-go/auth"
 	"github.com/baidubce/bce-sdk-go/services/appblb"
 	"github.com/baidubce/bce-sdk-go/services/bbc"
@@ -22,6 +20,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/eip"
 	"github.com/baidubce/bce-sdk-go/services/endpoint"
 	"github.com/baidubce/bce-sdk-go/services/eni"
+	"github.com/baidubce/bce-sdk-go/services/etGateway"
 	"github.com/baidubce/bce-sdk-go/services/iam"
 	"github.com/baidubce/bce-sdk-go/services/localDns"
 	"github.com/baidubce/bce-sdk-go/services/rds"
@@ -32,6 +31,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/vpc"
 	"github.com/baidubce/bce-sdk-go/services/vpn"
 	"github.com/baidubce/bce-sdk-go/util/log"
+	"sync"
 )
 
 // BaiduClient of BaiduCloud
@@ -42,37 +42,38 @@ type BaiduClient struct {
 
 	Credentials *auth.BceCredentials
 
-	bccConn      *bcc.Client
-	vpcConn      *vpc.Client
-	eipConn      *eip.Client
-	blbConn      *blb.Client
-	appBlbConn   *appblb.Client
-	bosConn      *bos.Client
-	certConn     *cert.Client
-	cfcConn      *cfc.Client
-	scsConn      *scs.Client
-	cceConn      *cce.Client
-	ccev2Conn    *ccev2.Client
-	rdsConn      *rds.Client
-	dtsConn      *dts.Client
-	iamConn      *iam.Client
-	cdnConn      *cdn.Client
-	localDnsConn *localDns.Client
-	smsConn      *sms.Client
-	bbcConn      *bbc.Client
-	vpnConn      *vpn.Client
-	eniConn      *eni.Client
-	cfsConn      *cfs.Client
-	snicConn     *endpoint.Client
-	blsConn      *bls.Client
-	becConn      *bec.Client
+	bccConn       *bcc.Client
+	vpcConn       *vpc.Client
+	eipConn       *eip.Client
+	blbConn       *blb.Client
+	appBlbConn    *appblb.Client
+	bosConn       *bos.Client
+	certConn      *cert.Client
+	cfcConn       *cfc.Client
+	scsConn       *scs.Client
+	cceConn       *cce.Client
+	ccev2Conn     *ccev2.Client
+	rdsConn       *rds.Client
+	dtsConn       *dts.Client
+	iamConn       *iam.Client
+	cdnConn       *cdn.Client
+	localDNSConn  *localDns.Client
+	smsConn       *sms.Client
+	bbcConn       *bbc.Client
+	vpnConn       *vpn.Client
+	eniConn       *eni.Client
+	cfsConn       *cfs.Client
+	snicConn      *endpoint.Client
+	blsConn       *bls.Client
+	becConn       *bec.Client
+	etGatewayConn *etGateway.Client
 }
 
 type ApiVersion string
 
 var goSdkMutex = sync.RWMutex{} // The Go SDK is not thread-safe
 
-var providerVersion = "1.19.18"
+var providerVersion = "1.13.0"
 
 // Client for BaiduCloudClient
 func (c *Config) Client() (*BaiduClient, error) {
@@ -427,7 +428,7 @@ func (client *BaiduClient) WithLocalDnsClient(do func(*localDns.Client) (interfa
 	defer goSdkMutex.Unlock()
 
 	// Initialize the LOCALDNS client if necessary
-	if client.localDnsConn == nil {
+	if client.localDNSConn == nil {
 		client.WithCommonClient(LOCALDNSCode)
 		localDnsClient, err := localDns.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
 		if err != nil {
@@ -435,10 +436,10 @@ func (client *BaiduClient) WithLocalDnsClient(do func(*localDns.Client) (interfa
 		}
 		localDnsClient.Config.Credentials = client.Credentials
 		localDnsClient.Config.UserAgent = buildUserAgent()
-		client.localDnsConn = localDnsClient
+		client.localDNSConn = localDnsClient
 	}
 
-	return do(client.localDnsConn)
+	return do(client.localDNSConn)
 }
 
 func (client *BaiduClient) WithSMSClient(do func(*sms.Client) (interface{}, error)) (interface{}, error) {
@@ -585,6 +586,24 @@ func (client *BaiduClient) WithBECClient(do func(*bec.Client) (interface{}, erro
 	}
 	goSdkMutex.Unlock()
 	return do(client.becConn)
+}
+
+func (client *BaiduClient) WithEtGatewayClient(do func(*etGateway.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	// Initialize the VPN client if necessary
+	if client.etGatewayConn == nil {
+		client.WithCommonClient(ETGATEWAYCode)
+		etGatewayClient, err := etGateway.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			goSdkMutex.Unlock()
+			return nil, err
+		}
+		etGatewayClient.Config.Credentials = client.Credentials
+		etGatewayClient.Config.UserAgent = buildUserAgent()
+		client.etGatewayConn = etGatewayClient
+	}
+	goSdkMutex.Unlock()
+	return do(client.etGatewayConn)
 }
 
 func buildUserAgent() string {
