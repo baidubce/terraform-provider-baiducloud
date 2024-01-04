@@ -243,20 +243,6 @@ func buildBaiduCloudRouteRuleArgs(d *schema.ResourceData, meta interface{}) *vpc
 	}
 	if v := d.Get("next_hop_type").(string); v != "" {
 		request.NexthopType = vpc.NexthopType(v)
-		if len(d.Get("next_hop_list").([]interface{})) > 0 {
-			nextHopList := d.Get("next_hop_list").([]interface{})
-			result := make([]vpc.NextHop, len(nextHopList))
-			for _, item := range nextHopList {
-				itemMap := item.(map[string]interface{})
-				temp := vpc.NextHop{
-					NexthopId:   itemMap["next_hop_id"].(string),
-					NexthopType: vpc.NexthopType(itemMap["next_hop_type"].(string)),
-					PathType:    itemMap["path_type"].(string),
-				}
-				result = append(result, temp)
-			}
-			request.NextHopList = result
-		}
 	}
 	if v := d.Get("description").(string); v != "" {
 		request.Description = v

@@ -1,14 +1,11 @@
 /*
-Provide a resource to manage an et gateway.
+Provide a resource to manage an et gateway association.
 
 Example Usage
 
 ```hcl
-resource "baiducloud_et_gateway" "default" {
-  name = "my_name"
-  vpc_id = "vpc-xxx"
-  speed = 200
-  description = "description"
+resource "baiducloud_et_gateway_association" "default" {
+  et_gateway_id = "xxx"
   et_id = "xxx"
   channel_id = "xxx"
   local_cidrs = ["192.168.0.0/20"]
@@ -17,14 +14,12 @@ resource "baiducloud_et_gateway" "default" {
 
 Import
 
-ET Gateway can be imported, e.g.
+ET Gateway Association can be imported, e.g.
 
 ```hcl
-$ terraform import baiducloud_et_gateway.default et_gateway_id
+$ terraform import baiducloud_et_gateway_association.default et_gateway_id
 ```
-
 */
-
 package baiducloud
 
 import (
@@ -37,12 +32,11 @@ import (
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 )
 
-func resourceBaiduCloudEtGateway() *schema.Resource {
+func resourceBaiduCloudEtGatewayAssociation() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceBaiduCloudEtGatewayCreate,
-		Read:   resourceBaiduCloudEtGatewayRead,
-		Update: resourceBaiduCloudEtGatewayUpdate,
-		Delete: resourceBaiduCloudEtGatewayDelete,
+		Create: resourceBaiduCloudEtGatewayAssociationCreate,
+		Read:   resourceBaiduCloudEtGatewayAssociationRead,
+		Delete: resourceBaiduCloudEtGatewayAssociationDelete,
 
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -55,26 +49,11 @@ func resourceBaiduCloudEtGateway() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"et_gateway_id": {
 				Type:        schema.TypeString,
-				Description: "name of the et gateway",
-				Required:    true,
-			},
-			"vpc_id": {
-				Type:        schema.TypeString,
-				Description: "vpc id of the et gateway",
+				Description: "ID of et gateway.",
 				Required:    true,
 				ForceNew:    true,
-			},
-			"speed": {
-				Type:        schema.TypeInt,
-				Description: "speed of the et gateway (Mbps)",
-				Required:    true,
-			},
-			"description": {
-				Type:        schema.TypeString,
-				Description: "description of the et gateway",
-				Optional:    true,
 			},
 			"et_id": {
 				Type:        schema.TypeString,
@@ -97,9 +76,19 @@ func resourceBaiduCloudEtGateway() *schema.Resource {
 					Type: schema.TypeString,
 				},
 			},
-			"et_gateway_id": {
+			"name": {
 				Type:        schema.TypeString,
-				Description: "ID of et gateway.",
+				Description: "name of et gateway.",
+				Computed:    true,
+			},
+			"vpc_id": {
+				Type:        schema.TypeString,
+				Description: "vpc id of et gateway.",
+				Computed:    true,
+			},
+			"speed": {
+				Type:        schema.TypeInt,
+				Description: "speed of et gateway.",
 				Computed:    true,
 			},
 			"status": {
@@ -146,23 +135,23 @@ func resourceBaiduCloudEtGateway() *schema.Resource {
 	}
 }
 
-func resourceBaiduCloudEtGatewayCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceBaiduCloudEtGatewayAssociationCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
 
-	createArgs, err := buildBaiduCloudEtGatewayArgs(d, meta)
+	createArgs, err := buildBaiduCloudEtGatewayAssociationArgs(d, meta)
 
 	if err != nil {
 		return WrapError(err)
 	}
 
-	action := "Create ET gateway " + createArgs.Name
+	action := "Create ET gateway Association" + createArgs.EtGatewayId
 
 	addDebug(action, createArgs)
 
 	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
-		raw, err := client.WithEtGatewayClient(func(etGatewayClient *etGateway.Client) (interface{}, error) {
+		_, err := client.WithEtGatewayClient(func(etGatewayClient *etGateway.Client) (interface{}, error) {
 
-			return etGatewayClient.CreateEtGateway(createArgs)
+			return nil, etGatewayClient.BindEt(createArgs)
 		})
 		if err != nil {
 			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
@@ -170,24 +159,23 @@ func resourceBaiduCloudEtGatewayCreate(d *schema.ResourceData, meta interface{})
 			}
 			return resource.NonRetryableError(err)
 		}
-		addDebug(action, raw)
+		addDebug(action, err)
 
-		result, _ := raw.(*etGateway.CreateEtGatewayResult)
-		d.SetId(result.EtGatewayId)
+		d.SetId(createArgs.EtGatewayId)
 		return nil
 	})
 	if err != nil {
-		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_et_gateway", action, BCESDKGoERROR)
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_et_gateway_association", action, BCESDKGoERROR)
 	}
 
 	return resourceBaiduCloudEtGatewayRead(d, meta)
 }
 
-func resourceBaiduCloudEtGatewayRead(d *schema.ResourceData, meta interface{}) error {
+func resourceBaiduCloudEtGatewayAssociationRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
 
 	etGatewayId := d.Id()
-	action := "Query et gatewaty etGatewayId is " + etGatewayId
+	action := "Query et gatewaty association info etGatewayId is " + etGatewayId
 
 	raw, err := client.WithEtGatewayClient(func(etGatewayClient *etGateway.Client) (interface{}, error) {
 		return etGatewayClient.GetEtGatewayDetail(etGatewayId)
@@ -200,28 +188,20 @@ func resourceBaiduCloudEtGatewayRead(d *schema.ResourceData, meta interface{}) e
 			d.SetId("")
 			return nil
 		}
-		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_et_gateway", action, BCESDKGoERROR)
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_et_gateway_association", action, BCESDKGoERROR)
 	}
 
 	result, _ := raw.(*etGateway.EtGatewayDetail)
-
-	d.Set("name", result.Name)
 
 	d.Set("status", result.Status)
 
 	d.Set("speed", result.Speed)
 
-	d.Set("create_time", result.CreateTime)
-
 	d.Set("description", result.Description)
 
 	d.Set("vpc_id", result.VpcId)
 
-	d.Set("et_id", result.EtId)
-
-	d.Set("channel_id", result.ChannelId)
-
-	d.Set("local_cidrs", result.LocalCidrs)
+	d.Set("create_time", result.CreateTime)
 
 	d.Set("health_check_source_ip", result.HealthCheckSourceIp)
 
@@ -238,42 +218,8 @@ func resourceBaiduCloudEtGatewayRead(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func resourceBaiduCloudEtGatewayUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceBaiduCloudEtGatewayAssociationDelete(d *schema.ResourceData, meta interface{}) error {
 
-	client := meta.(*connectivity.BaiduClient)
-	etGatewayId := d.Id()
-
-	updateArgs, err := buildBaiduCloudEtGatewayUpdateArgs(d, meta)
-
-	if err != nil {
-		return WrapError(err)
-	}
-
-	updateArgs.EtGatewayId = etGatewayId
-	action := "Update et gateway etGatewayId is" + etGatewayId
-	addDebug(action, updateArgs)
-
-	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
-		_, err := client.WithEtGatewayClient(func(etGatewayClient *etGateway.Client) (interface{}, error) {
-			return nil, etGatewayClient.UpdateEtGateway(updateArgs)
-		})
-		if err != nil {
-			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
-				return resource.RetryableError(err)
-			}
-			return resource.NonRetryableError(err)
-		}
-		addDebug(action, err)
-		return nil
-	})
-	if err != nil {
-		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_et_gateway", action, BCESDKGoERROR)
-	}
-
-	return resourceBaiduCloudEtGatewayRead(d, meta)
-}
-
-func resourceBaiduCloudEtGatewayDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
 
 	etGatewayId := d.Id()
@@ -298,31 +244,19 @@ func resourceBaiduCloudEtGatewayDelete(d *schema.ResourceData, meta interface{})
 	})
 
 	if err != nil {
-		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_et_gateway", action, BCESDKGoERROR)
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_et_gateway_association", action, BCESDKGoERROR)
 	}
 
 	return nil
 }
 
-func buildBaiduCloudEtGatewayArgs(d *schema.ResourceData, meta interface{}) (*etGateway.CreateEtGatewayArgs, error) {
-	request := &etGateway.CreateEtGatewayArgs{
+func buildBaiduCloudEtGatewayAssociationArgs(d *schema.ResourceData, meta interface{}) (*etGateway.BindEtArgs, error) {
+	request := &etGateway.BindEtArgs{
 		ClientToken: buildClientToken(),
 	}
 
-	if v := d.Get("name").(string); v != "" {
-		request.Name = v
-	}
-
-	if v := d.Get("vpc_id").(string); v != "" {
-		request.VpcId = v
-	}
-
-	if v := d.Get("speed").(int); v != 0 {
-		request.Speed = v
-	}
-
-	if v := d.Get("description").(string); v != "" {
-		request.Description = v
+	if v := d.Get("et_gateway_id").(string); v != "" {
+		request.EtGatewayId = v
 	}
 
 	if v := d.Get("et_id").(string); v != "" {
@@ -336,36 +270,7 @@ func buildBaiduCloudEtGatewayArgs(d *schema.ResourceData, meta interface{}) (*et
 	if localCidrs, ok := d.GetOk("local_cidrs"); ok {
 
 		cidrs := make([]string, 0)
-		for _, ip := range localCidrs.(*schema.Set).List() {
-			cidrs = append(cidrs, ip.(string))
-		}
-		request.LocalCidrs = cidrs
-	}
 
-	return request, nil
-
-}
-
-func buildBaiduCloudEtGatewayUpdateArgs(d *schema.ResourceData, meta interface{}) (*etGateway.UpdateEtGatewayArgs, error) {
-	request := &etGateway.UpdateEtGatewayArgs{
-		ClientToken: buildClientToken(),
-	}
-
-	if v := d.Get("name").(string); v != "" {
-		request.Name = v
-	}
-
-	if v := d.Get("speed").(int); v != 0 {
-		request.Speed = v
-	}
-
-	if v := d.Get("description").(string); v != "" {
-		request.Description = v
-	}
-
-	if localCidrs, ok := d.GetOk("local_cidrs"); ok {
-
-		cidrs := make([]string, 0)
 		for _, ip := range localCidrs.(*schema.Set).List() {
 			cidrs = append(cidrs, ip.(string))
 		}
