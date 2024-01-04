@@ -180,6 +180,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_nat_gateways":                   dataSourceBaiduCloudNatGateways(),
 			"baiducloud_nat_snat_rules":                 dataSourceBaiduCloudNatSnatRules(),
 			"baiducloud_peer_conns":                     dataSourceBaiduCloudPeerConns(),
+			"baiducloud_peer_conn_acceptors":            dataSourceBaiduCloudPeerConnAcceptors(),
 			"baiducloud_bos_buckets":                    dataSourceBaiduCloudBosBuckets(),
 			"baiducloud_bos_bucket_objects":             dataSourceBaiduCloudBosBucketObjects(),
 			"baiducloud_appblbs":                        dataSourceBaiduCloudAppBLBs(),
@@ -238,6 +239,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_bcc_key_pairs":                  bcc.DataSourceKeyPairs(),
 			"baiducloud_iam_access_keys":                iam.DataSourceAccessKeys(),
 			"baiducloud_et_gateways":                    dataSourceBaiduCloudEtGateways(),
+			"baiducloud_et_gateway_associations":        dataSourceBaiduCloudEtGatewayAssociations(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -315,6 +317,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_bcc_key_pair":                bcc.ResourceKeyPair(),
 			"baiducloud_iam_access_key":              iam.ResourceAccessKey(),
 			"baiducloud_et_gateway":                  resourceBaiduCloudEtGateway(),
+			"baiducloud_et_gateway_association":      resourceBaiduCloudEtGatewayAssociation(),
 		},
 
 		ConfigureFunc: providerConfigure,
