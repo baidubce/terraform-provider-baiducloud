@@ -1,5 +1,10 @@
-	## 1.19.26 (Unreleased)
-	
+	## 1.19.27 (Unreleased)
+## 1.19.26 (January 04, 2024)
+NOTES:
+- ADD ET Gateway Association.
+- ADD Peer Conn Acceptor.
+- fix some bugs.
+
 ## 1.19.25 (December 26, 2023)
 NOTES:
 - ADD ET Gateway.
