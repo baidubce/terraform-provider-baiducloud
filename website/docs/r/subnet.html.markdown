@@ -3,7 +3,7 @@ layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_subnet"
 sidebar_current: "docs-baiducloud-resource-subnet"
 description: |-
-Provide a resource to create a VPC subnet.
+  Provide a resource to create a VPC subnet.
 ---
 
 # baiducloud_subnet
@@ -36,6 +36,8 @@ The following arguments are supported:
 * `zone_name` - (Required, ForceNew) The availability zone name within which the subnet should be created.
 * `description` - (Optional) Description of the subnet, and the value must be no more than 200 characters.
 * `subnet_type` - (Optional, ForceNew) Type of the subnet, valid values are BCC, BCC_NAT and BBC. Default to BCC.
+* `enable_ipv6` - (Optional) Whether to enable the IPv6 subnet. 'true' indicates enabled, by default it is 'false' which means not enabled.
+* `vpc_secondary_cidr` - (Optional, ForceNew) The CIDR of the secondary subnet belonging to the VPC.
 * `tags` - (Optional, ForceNew) Tags, do not support modify
 
 

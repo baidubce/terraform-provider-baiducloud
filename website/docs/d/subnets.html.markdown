@@ -1,6 +1,5 @@
 ---
 layout: "baiducloud"
-subcategory: "Virtual private Cloud (VPC)"
 page_title: "BaiduCloud: baiducloud_subnets"
 sidebar_current: "docs-baiducloud-datasource-subnets"
 description: |-
@@ -46,6 +45,7 @@ In addition to all arguments above, the following attributes are exported:
 * `subnets` - Result of the subnets.
   * `available_ip` - Available IP address of the subnet.
   * `cidr` - CIDR block of the subnet.
+  * `ipv6_cidr` - IPV6 CIDR block of the subnet.
   * `description` - Description of the subnet.
   * `name` - Name of the subnet.
   * `subnet_id` - ID of the subnet.

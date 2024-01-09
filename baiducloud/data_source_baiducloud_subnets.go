@@ -88,6 +88,11 @@ func dataSourceBaiduCloudSubnets() *schema.Resource {
 							Description: "CIDR block of the subnet.",
 							Computed:    true,
 						},
+						"ipv6_cidr": {
+							Type:        schema.TypeString,
+							Description: "IPV6 CIDR block of the subnet.",
+							Computed:    true,
+						},
 						"vpc_id": {
 							Type:        schema.TypeString,
 							Description: "VPC ID of the subnet.",
@@ -167,6 +172,7 @@ func dataSourceBaiduCloudSubnetsRead(d *schema.ResourceData, meta interface{}) e
 		subnetMap["subnet_id"] = subnet.SubnetId
 		subnetMap["zone_name"] = subnet.ZoneName
 		subnetMap["cidr"] = subnet.Cidr
+		subnetMap["ipv6_cidr"] = subnet.Ipv6Cidr
 		subnetMap["vpc_id"] = subnet.VPCId
 		subnetMap["subnet_type"] = subnet.SubnetType
 		subnetMap["description"] = subnet.Description

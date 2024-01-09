@@ -73,6 +73,11 @@ func resourceBaiduCloudSubnet() *schema.Resource {
 				Required:    true,
 				ForceNew:    true,
 			},
+			"ipv6_cidr": {
+				Type:        schema.TypeString,
+				Description: "CIDR block of the subnet.",
+				Computed:    true,
+			},
 			"vpc_id": {
 				Type:        schema.TypeString,
 				Description: "The VPC ID that the subnet belongs to.",
@@ -86,6 +91,19 @@ func resourceBaiduCloudSubnet() *schema.Resource {
 				Computed:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSubnetType(),
+			},
+			"enable_ipv6": {
+				Type:        schema.TypeBool,
+				Description: "Whether to enable the IPv6 subnet. 'true' indicates enabled, by default it is 'false' which means not enabled.",
+				Optional:    true,
+				Computed:    true,
+			},
+			"vpc_secondary_cidr": {
+				Type:        schema.TypeString,
+				Description: "The CIDR of the secondary subnet belonging to the VPC.",
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
 			},
 			"description": {
 				Type:        schema.TypeString,
@@ -147,6 +165,7 @@ func resourceBaiduCloudSubnetRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("name", result.Subnet.Name)
 	d.Set("zone_name", result.Subnet.ZoneName)
 	d.Set("cidr", result.Subnet.Cidr)
+	d.Set("ipv6_cidr", result.Subnet.Ipv6Cidr)
 	d.Set("vpc_id", result.Subnet.VPCId)
 	d.Set("subnet_type", result.Subnet.SubnetType)
 	d.Set("description", result.Subnet.Description)
@@ -164,6 +183,7 @@ func resourceBaiduCloudSubnetUpdate(d *schema.ResourceData, meta interface{}) er
 	if d.HasChange("name") || d.HasChange("description") {
 		updateSubnetArgs := &vpc.UpdateSubnetArgs{
 			Name:        d.Get("name").(string),
+			EnableIpv6:  d.Get("enable_ipv6").(bool),
 			Description: d.Get("description").(string),
 		}
 
@@ -230,6 +250,12 @@ func buildBaiduCloudSubnetArgs(d *schema.ResourceData, meta interface{}) *vpc.Cr
 	}
 	if v := d.Get("vpc_id").(string); v != "" {
 		request.VpcId = v
+	}
+	if v, ok := d.Get("enable_ipv6").(bool); ok {
+		request.EnableIpv6 = v
+	}
+	if v := d.Get("vpc_secondary_cidr").(string); v != "" {
+		request.VpcSecondaryCidr = v
 	}
 	if v := d.Get("subnet_type").(string); v != "" {
 		request.SubnetType = vpc.SubnetType(v)
