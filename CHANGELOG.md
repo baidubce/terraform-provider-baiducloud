@@ -1,4 +1,9 @@
-	## 1.19.27 (Unreleased)
+	## 1.19.28 (Unreleased)
+## 1.19.27 (January 11, 2024)
+NOTES:
+- ADD EIP GROUP
+- Supplement for the IPv6 and secondary subnet fields.
+
 ## 1.19.26 (January 04, 2024)
 NOTES:
 - ADD ET Gateway Association.
