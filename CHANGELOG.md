@@ -1,4 +1,8 @@
-	## 1.19.29 (Unreleased)
+	## 1.19.30 (Unreleased)
+## 1.19.29 (January 16, 2024)
+NOTES:
+- Fix some doc bugs.
+
 ## 1.19.28 (January 16, 2024)
 NOTES:
 - Enhanced some capabilities for RDS instance, please see the documentation for details
