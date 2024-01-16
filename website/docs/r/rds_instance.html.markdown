@@ -1,6 +1,5 @@
 ---
 layout: "baiducloud"
-subcategory: "Relational Database Service (RDS)"
 page_title: "BaiduCloud: baiducloud_rds_instance"
 sidebar_current: "docs-baiducloud-resource-rds_instance"
 description: |-
@@ -14,7 +13,31 @@ Use this resource to get information about a RDS instance.
 ~> **NOTE:** The terminate operation of rds instance does NOT take effect immediately，maybe takes for several minites.
 
 ## Example Usage
+```hcl
+resource "baiducloud_rds_instance" "default" {
+  billing = {
+    payment_timing        = "Prepaid"
+  }
+  reservation = {
+    reservation_length = 1
+    reservation_time_unit = "Month"
+  }
+  engine_version            = "5.6"
+  engine                    = "MySQL"
+  cpu_count                 = 1
+  memory_capacity           = 1
+  volume_capacity           = 5
+  lower_case_table_names = 1
+  disk_io_type = "normal_io"
+  parameter_template_id = "rpt-HxxxEa"
+  resource_group_id = "RESG-ohxxxxxqb"
+  public_access = true
+  auto_renew_time_unit = "month"
+  auto_renew_time_length = 1
+}
+```
 
+If you want to create a new instance postpaid, you can use the following configuration:
 ```hcl
 resource "baiducloud_rds_instance" "default" {
     billing = {
@@ -25,7 +48,11 @@ resource "baiducloud_rds_instance" "default" {
     cpu_count                 = 1
     memory_capacity           = 1
     volume_capacity           = 5
-    disk_io_type              = "normal_io"
+    lower_case_table_names = 1
+    disk_io_type = "normal_io"
+    parameter_template_id = "rpt-Hhwxxa"
+    resource_group_id = "RESG-ohqzxcxxrkLqb"
+    public_access = true
 }
 ```
 
@@ -35,14 +62,22 @@ The following arguments are supported:
 
 * `billing` - (Required) Billing information of the Rds.
 * `cpu_count` - (Required) The number of CPU
+* `disk_io_type` - (Required, ForceNew) Type of disk, Available values are normal_io,cloud_high,cloud_nor,cloud_enha
 * `engine_version` - (Required, ForceNew) Engine version of the instance. MySQL support 5.5、5.6、5.7, SQLServer support 2008r2、2012sp3、2016sp1, PostgreSQL support 9.4
 * `engine` - (Required, ForceNew) Engine of the instance. Available values are MySQL、SQLServer、PostgreSQL.
 * `memory_capacity` - (Required) Memory capacity(GB) of the instance.
 * `volume_capacity` - (Required) Volume capacity(GB) of the instance
-* `disk_io_type` - (Required, ForceNew) Type of disk, Available values are normal_io,cloud_high,cloud_nor,cloud_enha
+* `auto_renew_time_length` - (Optional, ForceNew) The time length of automatic renewal. It is valid when payment_timing is Prepaid, and the value should be 1-9 when the auto_renew_time_unit is month and 1-3 when the auto_renew_time_unit is year. Default to 1.
+* `auto_renew_time_unit` - (Optional, ForceNew) Time unit of automatic renewal, the value can be month or year. The default value is empty, indicating no automatic renewal. It is valid only when the payment_timing is Prepaid.
 * `category` - (Optional, ForceNew) Category of the instance. Available values are Basic、Standard(Default), only SQLServer 2012sp3 support Basic.
 * `instance_name` - (Optional) Name of the instance. Support for uppercase and lowercase letters, numbers, Chinese and special characters, such as "-","_","/",".", the value must start with a letter, length 1-65.
+* `lower_case_table_names` - (Optional) Whether the table name is case-sensitive. The default value is 0, which means case-sensitive; passing 1 means case-insensitive.
+* `parameter_template_id` - (Optional) Parameter template id.
+* `public_access` - (Optional) public access.
 * `purchase_count` - (Optional) Count of the instance to buy
+* `replication_type` - (Optional) Data replication method. Asynchronous replication: async, Semi-synchronous replication: semi_sync.
+* `reservation` - (Optional) Reservation of the Rds.
+* `resource_group_id` - (Optional) resource group id.
 * `subnets` - (Optional) Subnets of the instance.
 * `tags` - (Optional, ForceNew) Tags, do not support modify
 * `vpc_id` - (Optional, ForceNew) ID of the specific VPC
@@ -50,7 +85,6 @@ The following arguments are supported:
 The `billing` object supports the following:
 
 * `payment_timing` - (Required) Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.
-* `reservation` - (Optional) Reservation of the Rds.
 
 The `reservation` object supports the following:
 

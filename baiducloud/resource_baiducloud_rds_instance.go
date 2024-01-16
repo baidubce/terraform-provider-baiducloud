@@ -29,6 +29,7 @@ $ terraform import baiducloud_rds_instance.default id
 package baiducloud
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/baidubce/bce-sdk-go/bce"
@@ -211,6 +212,33 @@ func resourceBaiduCloudRdsInstance() *schema.Resource {
 				Description: "Type of the instance,  Available values are Master, ReadReplica, RdsProxy.",
 				Computed:    true,
 			},
+			"lower_case_table_names": {
+				Type: schema.TypeInt,
+				Description: "Whether the table name is case-sensitive. The default value is 0, " +
+					"which means case-sensitive; passing 1 means case-insensitive.",
+				Optional: true,
+			},
+			"parameter_template_id": {
+				Type:        schema.TypeString,
+				Description: "Parameter template id.",
+				Optional:    true,
+			},
+			"replication_type": {
+				Type: schema.TypeString,
+				Description: "Data replication method. Asynchronous replication: async, " +
+					"Semi-synchronous replication: semi_sync.",
+				Optional: true,
+			},
+			"resource_group_id": {
+				Type:        schema.TypeString,
+				Description: "resource group id.",
+				Optional:    true,
+			},
+			"public_access": {
+				Type:        schema.TypeBool,
+				Description: "public access.",
+				Optional:    true,
+			},
 			"billing": {
 				Type:        schema.TypeMap,
 				Description: "Billing information of the Rds.",
@@ -224,31 +252,35 @@ func resourceBaiduCloudRdsInstance() *schema.Resource {
 							Default:      PaymentTimingPostpaid,
 							ValidateFunc: validatePaymentTiming(),
 						},
-						"reservation": {
-							Type:             schema.TypeMap,
-							Description:      "Reservation of the Rds.",
-							Optional:         true,
+					},
+				},
+			},
+			"reservation": {
+				Type:             schema.TypeMap,
+				Description:      "Reservation of the Rds.",
+				Optional:         true,
+				DiffSuppressFunc: postPaidDiffSuppressFunc,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"reservation_length": {
+							Type: schema.TypeInt,
+							Description: "The reservation length that you will pay for your resource. " +
+								"It is valid when payment_timing is Prepaid. " +
+								"Valid values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36].",
+							Required:         true,
+							Default:          1,
+							ValidateFunc:     validateReservationLength(),
 							DiffSuppressFunc: postPaidDiffSuppressFunc,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"reservation_length": {
-										Type:             schema.TypeInt,
-										Description:      "The reservation length that you will pay for your resource. It is valid when payment_timing is Prepaid. Valid values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36].",
-										Required:         true,
-										Default:          1,
-										ValidateFunc:     validateReservationLength(),
-										DiffSuppressFunc: postPaidDiffSuppressFunc,
-									},
-									"reservation_time_unit": {
-										Type:             schema.TypeString,
-										Description:      "The reservation time unit that you will pay for your resource. It is valid when payment_timing is Prepaid. The value can only be month currently, which is also the default value.",
-										Required:         true,
-										Default:          "Month",
-										ValidateFunc:     validateReservationUnit(),
-										DiffSuppressFunc: postPaidDiffSuppressFunc,
-									},
-								},
-							},
+						},
+						"reservation_time_unit": {
+							Type: schema.TypeString,
+							Description: "The reservation time unit that you will pay for your resource. " +
+								"It is valid when payment_timing is Prepaid. " +
+								"The value can only be month currently, which is also the default value.",
+							Required:         true,
+							Default:          "Month",
+							ValidateFunc:     validateReservationUnit(),
+							DiffSuppressFunc: postPaidDiffSuppressFunc,
 						},
 					},
 				},
@@ -257,6 +289,25 @@ func resourceBaiduCloudRdsInstance() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "RDS payment timing",
 				Computed:    true,
+			},
+			"auto_renew_time_unit": {
+				Type: schema.TypeString,
+				Description: "Time unit of automatic renewal, the value can be month or year. " +
+					"The default value is empty, indicating no automatic renewal. " +
+					"It is valid only when the payment_timing is Prepaid.",
+				Optional:     true,
+				ForceNew:     true,
+				ValidateFunc: validation.StringInSlice([]string{"month", "year"}, false),
+			},
+			"auto_renew_time_length": {
+				Type: schema.TypeInt,
+				Description: "The time length of automatic renewal. It is valid when payment_timing is Prepaid, " +
+					"and the value should be 1-9 when the auto_renew_time_unit is month and 1-3 when the " +
+					"auto_renew_time_unit is year. Default to 1.",
+				Optional:     true,
+				ForceNew:     true,
+				Default:      1,
+				ValidateFunc: validation.IntBetween(1, 9),
 			},
 		},
 	}
@@ -301,6 +352,59 @@ func resourceBaiduCloudRdsInstanceCreate(d *schema.ResourceData, meta interface{
 	)
 	if _, err := stateConf.WaitForState(); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_rds_instance", action, BCESDKGoERROR)
+	}
+	// 开启公网访问
+	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+		raw, err := client.WithRdsClient(func(rdsClient *rds.Client) (interface{}, error) {
+			var publicAccess bool
+			if v, ok := d.GetOk("public_access"); ok {
+				publicAccess = v.(bool)
+			}
+			args := &rds.ModifyPublicAccessArgs{
+				PublicAccess: publicAccess,
+			}
+			return nil, rdsClient.ModifyPublicAccess(d.Id(), args)
+		})
+		if err != nil {
+			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
+		}
+		addDebug(action, raw)
+		return nil
+	})
+	if err != nil {
+		addDebug(action, err)
+	}
+	// 开启自动续费
+	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+		raw, err := client.WithRdsClient(func(rdsClient *rds.Client) (interface{}, error) {
+			args := &rds.AutoRenewArgs{
+				InstanceIds: []string{d.Id()},
+			}
+			// if the field is set, then auto-renewal is effective.
+			if v, ok := d.GetOk("auto_renew_time_unit"); ok {
+				args.AutoRenewTimeUnit = v.(string)
+				if v, ok := d.GetOk("auto_renew_time_length"); ok {
+					args.AutoRenewTime = v.(int)
+				}
+			} else {
+				return nil, nil
+			}
+			return nil, rdsClient.AutoRenew(args)
+		})
+		if err != nil {
+			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
+		}
+		addDebug(action, raw)
+		return nil
+	})
+	if err != nil {
+		addDebug(action, err)
 	}
 
 	return resourceBaiduCloudRdsInstanceRead(d, meta)
@@ -351,7 +455,7 @@ func resourceBaiduCloudRdsInstanceRead(d *schema.ResourceData, meta interface{})
 	d.Set("v_net_ip", result.Endpoint.VnetIp)
 	d.Set("volume_capacity", result.VolumeCapacity)
 	d.Set("subnets", transRdsSubnetsToSchema(result.Subnets))
-
+	d.Set("public_access", result.PublicAccessStatus)
 	return nil
 }
 
@@ -368,12 +472,39 @@ func transRdsSubnetsToSchema(subnets []rds.Subnet) []map[string]string {
 
 func resourceBaiduCloudRdsInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
 	instanceID := d.Id()
+	action := "Update RDS Instance " + instanceID
+	client := meta.(*connectivity.BaiduClient)
 
 	d.Partial(true)
 
 	// resize instance
 	if err := resizeRds(d, meta, instanceID); err != nil {
 		return err
+	}
+	if d.HasChange("public_access") {
+		err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+			raw, err := client.WithRdsClient(func(rdsClient *rds.Client) (interface{}, error) {
+				var publicAccess bool
+				if v, ok := d.GetOk("public_access"); ok {
+					publicAccess = v.(bool)
+				}
+				args := &rds.ModifyPublicAccessArgs{
+					PublicAccess: publicAccess,
+				}
+				return nil, rdsClient.ModifyPublicAccess(d.Id(), args)
+			})
+			if err != nil {
+				if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
+					return resource.RetryableError(err)
+				}
+				return resource.NonRetryableError(err)
+			}
+			addDebug(action, raw)
+			return nil
+		})
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_rds_instance", action, BCESDKGoERROR)
+		}
 	}
 
 	d.Partial(false)
@@ -426,11 +557,15 @@ func buildBaiduCloudRdsInstanceArgs(d *schema.ResourceData, meta interface{}) (*
 			paymentTiming := p.(string)
 			billingRequest.PaymentTiming = paymentTiming
 		}
-		if billingRequest.PaymentTiming == PaymentTimingPostpaid {
-			if r, ok := billing["reservation"]; ok {
+		if billingRequest.PaymentTiming == PaymentTimingPrepaid {
+			if r, ok := d.GetOk("reservation"); ok {
 				reservation := r.(map[string]interface{})
 				if reservationLength, ok := reservation["reservation_length"]; ok {
-					billingRequest.Reservation.ReservationLength = reservationLength.(int)
+					reservationLengthInt, err := strconv.Atoi(reservationLength.(string))
+					billingRequest.Reservation.ReservationLength = reservationLengthInt
+					if err != nil {
+						return nil, err
+					}
 				}
 				if reservationTimeUnit, ok := reservation["reservation_time_unit"]; ok {
 					billingRequest.Reservation.ReservationTimeUnit = reservationTimeUnit.(string)
@@ -470,6 +605,22 @@ func buildBaiduCloudRdsInstanceArgs(d *schema.ResourceData, meta interface{}) (*
 
 	if memoryCapacity, ok := d.GetOk("memory_capacity"); ok {
 		request.MemoryCapacity = memoryCapacity.(float64)
+	}
+
+	if lowerCaseTableNames, ok := d.GetOk("lower_case_table_names"); ok {
+		request.LowerCaseTableNames = lowerCaseTableNames.(int)
+	}
+
+	if parameterTemplateId, ok := d.GetOk("parameter_template_id"); ok {
+		request.ParameterTemplateId = parameterTemplateId.(string)
+	}
+
+	if replicationType, ok := d.GetOk("replication_type"); ok {
+		request.ReplicationType = replicationType.(string)
+	}
+
+	if resourceGroupId, ok := d.GetOk("resource_group_id"); ok {
+		request.ResourceGroupId = resourceGroupId.(string)
 	}
 
 	if volumeCapacity, ok := d.GetOk("volume_capacity"); ok {
