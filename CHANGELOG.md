@@ -1,4 +1,13 @@
-	## 1.19.27 (Unreleased)
+	## 1.19.29 (Unreleased)
+## 1.19.28 (January 16, 2024)
+NOTES:
+- Enhanced some capabilities for RDS instance, please see the documentation for details
+
+## 1.19.27 (January 11, 2024)
+NOTES:
+- ADD EIP GROUP
+- Supplement for the IPv6 and secondary subnet fields.
+
 ## 1.19.26 (January 04, 2024)
 NOTES:
 - ADD ET Gateway Association.
