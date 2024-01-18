@@ -1,4 +1,8 @@
-	## 1.19.30 (Unreleased)
+	## 1.19.31 (Unreleased)
+## 1.19.30 (January 18, 2024)
+NOTES:
+- ADD EIP BP
+
 ## 1.19.29 (January 16, 2024)
 NOTES:
 - Fix some doc bugs.
