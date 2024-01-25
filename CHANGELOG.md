@@ -1,4 +1,8 @@
-	## 1.19.31 (Unreleased)
+	## 1.19.32 (Unreleased)
+## 1.19.31 (January 25, 2024)
+NOTES:
+- ADD DNS ZONE
+
 ## 1.19.30 (January 18, 2024)
 NOTES:
 - ADD EIP BP
