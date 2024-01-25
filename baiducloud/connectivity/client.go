@@ -16,6 +16,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/cert"
 	"github.com/baidubce/bce-sdk-go/services/cfc"
 	"github.com/baidubce/bce-sdk-go/services/cfs"
+	"github.com/baidubce/bce-sdk-go/services/dns"
 	"github.com/baidubce/bce-sdk-go/services/dts"
 	"github.com/baidubce/bce-sdk-go/services/eip"
 	"github.com/baidubce/bce-sdk-go/services/endpoint"
@@ -67,6 +68,7 @@ type BaiduClient struct {
 	blsConn       *bls.Client
 	becConn       *bec.Client
 	etGatewayConn *etGateway.Client
+	dnsConn       *dns.Client
 }
 
 type ApiVersion string
@@ -604,6 +606,24 @@ func (client *BaiduClient) WithEtGatewayClient(do func(*etGateway.Client) (inter
 	}
 	goSdkMutex.Unlock()
 	return do(client.etGatewayConn)
+}
+
+func (client *BaiduClient) WithDNSClient(do func(*dns.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	// Initialize the VPN client if necessary
+	if client.dnsConn == nil {
+		client.WithCommonClient(DNSCode)
+		dnsClient, err := dns.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			goSdkMutex.Unlock()
+			return nil, err
+		}
+		dnsClient.Config.Credentials = client.Credentials
+		dnsClient.Config.UserAgent = buildUserAgent()
+		client.dnsConn = dnsClient
+	}
+	goSdkMutex.Unlock()
+	return do(client.dnsConn)
 }
 
 func buildUserAgent() string {

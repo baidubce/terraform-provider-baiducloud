@@ -36,6 +36,7 @@ const (
 	BLSCode       = ServiceCode("BLS")
 	BECCode       = ServiceCode("BEC")
 	ETGATEWAYCode = ServiceCode("ETGATEWAY")
+	DNSCode       = ServiceCode("DNS")
 )
 
 const (
@@ -125,6 +126,7 @@ const (
 	DefaultCERTEndPoint = "certificate.baidubce.com"
 	DefaultIAMEndPoint  = "iam.bj.baidubce.com"
 	DefaultCDNEndPoint  = "cdn.baidubce.com"
+	DefaultDNSEndPoint  = "dns.baidubce.com"
 )
 
 var (
@@ -145,6 +147,7 @@ var (
 		CERTCode: DefaultCERTEndPoint,
 		IAMCode:  DefaultIAMEndPoint,
 		CDNCode:  DefaultCDNEndPoint,
+		DNSCode:  DefaultDNSEndPoint,
 
 		BCCCode:       DefaultBJRegionBccEndPoint,
 		BBCCode:       DefaultBJRegionBbcEndPoint,
@@ -174,6 +177,7 @@ var (
 		CERTCode: DefaultCERTEndPoint,
 		IAMCode:  DefaultIAMEndPoint,
 		CDNCode:  DefaultCDNEndPoint,
+		DNSCode:  DefaultDNSEndPoint,
 
 		BCCCode:       DefaultBDRegionBccEndPoint,
 		VPCCode:       DefaultBDRegionBccEndPoint,
@@ -190,6 +194,7 @@ var (
 		CERTCode: DefaultCERTEndPoint,
 		IAMCode:  DefaultIAMEndPoint,
 		CDNCode:  DefaultCDNEndPoint,
+		DNSCode:  DefaultDNSEndPoint,
 
 		BCCCode:       DefaultGZRegionBccEndPoint,
 		VPNCode:       DefaultGZRegionVpnEndPoint,
@@ -214,6 +219,7 @@ var (
 		CERTCode: DefaultCERTEndPoint,
 		IAMCode:  DefaultIAMEndPoint,
 		CDNCode:  DefaultCDNEndPoint,
+		DNSCode:  DefaultDNSEndPoint,
 
 		BCCCode:       DefaultSURegionBccEndPoint,
 		BBCCode:       DefaultSURegionBbcEndPoint,
@@ -240,6 +246,7 @@ var (
 		CERTCode: DefaultCERTEndPoint,
 		IAMCode:  DefaultIAMEndPoint,
 		CDNCode:  DefaultCDNEndPoint,
+		DNSCode:  DefaultDNSEndPoint,
 
 		BCCCode: DefaultFSHRegionBccEndPoint,
 		VPNCode: DefaultFSHRegionVPNEndPoint,
@@ -252,6 +259,7 @@ var (
 		CERTCode: DefaultCERTEndPoint,
 		IAMCode:  DefaultIAMEndPoint,
 		CDNCode:  DefaultCDNEndPoint,
+		DNSCode:  DefaultDNSEndPoint,
 
 		BCCCode:       DefaultFWHRegionBccEndPoint,
 		BBCCode:       DefaultFWHRegionBbcEndPoint,
@@ -276,6 +284,7 @@ var (
 		CERTCode: DefaultCERTEndPoint,
 		IAMCode:  DefaultIAMEndPoint,
 		CDNCode:  DefaultCDNEndPoint,
+		DNSCode:  DefaultDNSEndPoint,
 
 		BCCCode:       DefaultHKGRegionBccEndPoint,
 		BBCCode:       DefaultHKGRegionBbcEndPoint,
@@ -297,6 +306,7 @@ var (
 		CERTCode: DefaultCERTEndPoint,
 		IAMCode:  DefaultIAMEndPoint,
 		CDNCode:  DefaultCDNEndPoint,
+		DNSCode:  DefaultDNSEndPoint,
 
 		BCCCode: DefaultSINRegionBccEndPoint,
 		VPCCode: DefaultSINRegionBccEndPoint,

@@ -218,6 +218,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_rdss":                           dataSourceBaiduCloudRdss(),
 			"baiducloud_rds_security_ips":               dataSourceBaiduCloudRdsSecurityIps(),
 			"baiducloud_dtss":                           dataSourceBaiduCloudDtss(),
+			"baiducloud_dns_zones":                      dataSourceBaiduCloudDnsZones(),
 			"baiducloud_cdn_domains":                    cdn.DataSourceDomains(),
 			"baiducloud_cdn_domain_certificate":         cdn.DataSourceDomainCertificate(),
 			"baiducloud_localdns_privatezones":          dataSourceBaiduCloudLocalDnsPrivateZones(),
@@ -289,6 +290,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_rds_account":                 resourceBaiduCloudRdsAccount(),
 			"baiducloud_rds_security_ip":             resourceBaiduCloudRdsSecurityIp(),
 			"baiducloud_dts":                         resourceBaiduCloudDts(),
+			"baiducloud_dns_zone":                    resourceBaiduCloudDnsZone(),
 			"baiducloud_iam_user":                    resourceBaiduCloudIamUser(),
 			"baiducloud_iam_group":                   resourceBaiduCloudIamGroup(),
 			"baiducloud_iam_group_membership":        resourceBaiduCloudIamGroupMembership(),
@@ -561,6 +563,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints[connectivity.CDNCode] = strings.TrimSpace(endpoints["cdn"].(string))
 		config.ConfigEndpoints[connectivity.BBCCode] = strings.TrimSpace(endpoints["bbc"].(string))
 		config.ConfigEndpoints[connectivity.VPNCode] = strings.TrimSpace(endpoints["vpn"].(string))
+		config.ConfigEndpoints[connectivity.DNSCode] = strings.TrimSpace(endpoints["dns"].(string))
 	}
 
 	client, err := config.Client()
