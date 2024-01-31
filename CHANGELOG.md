@@ -1,4 +1,8 @@
-	## 1.19.32 (Unreleased)
+	## 1.19.33 (Unreleased)
+## 1.19.32 (January 31, 2024)
+NOTES:
+- Support automatic backup capability of scs
+
 ## 1.19.31 (January 25, 2024)
 NOTES:
 - ADD DNS ZONE
