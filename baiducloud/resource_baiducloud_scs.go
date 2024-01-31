@@ -5,74 +5,78 @@ More information about SCS can be found in the [Developer Guide](https://cloud.b
 
 ~> **NOTE:** The terminate operation of scs does NOT take effect immediately，maybe takes for several minites.
 
-
-Example Usage
+# Example Usage
 
 ### Memcache
 ~> **NOTE:** Memcache currently does NOT support specifying `node_type`, set to `cache.n1.micro` directly.
 ```terraform
-resource "baiducloud_scs" "default" {
-	payment_timing = "Postpaid"
-	instance_name = "terraform-memcache"
-	engine = "memcache"
-	port = 11211
-	node_type = "cache.n1.micro"
-	cluster_type = "defalut"
-	shard_num = 2
-}
+
+	resource "baiducloud_scs" "default" {
+		payment_timing = "Postpaid"
+		instance_name = "terraform-memcache"
+		engine = "memcache"
+		port = 11211
+		node_type = "cache.n1.micro"
+		cluster_type = "defalut"
+		shard_num = 2
+	}
+
 ```
 
 ### Redis
 ```terraform
-resource "baiducloud_scs" "default" {
-	payment_timing = "Postpaid"
-	instance_name = "terraform-redis"
-	port = 6379
-	engine_version = "3.2"
-	node_type = "cache.n1.micro"
-	cluster_type = "master_slave"
-	replication_num = 1
-	shard_num = 1
-}
+
+	resource "baiducloud_scs" "default" {
+		payment_timing = "Postpaid"
+		instance_name = "terraform-redis"
+		port = 6379
+		engine_version = "3.2"
+		node_type = "cache.n1.micro"
+		cluster_type = "master_slave"
+		replication_num = 1
+		shard_num = 1
+	}
+
 ```
 
 ### PegaDb
 ```terraform
-resource "baiducloud_scs" "default" {
-	payment_timing = "Prepaid"
-	reservation_length = 2
-	reservation_time_unit = "month"
-	instance_name = "terraform-pegadb"
-	purchase_count = 1
-	engine = "PegaDB"
-	node_type = "pega.g4s1.micro"
-	cluster_type = "cluster"
-	store_type = 3
-	disk_flavor = 60
-	port = 6379
-	replication_num = 2
-	shard_num = 1
-	proxy_num = 2
-	vpc_id = "vpc-ne32rahkaceu"
-	subnets {
-		subnet_id = "sbn-vhnqd71mivjq"
-		zone_name = "cn-bj-d"
+
+	resource "baiducloud_scs" "default" {
+		payment_timing = "Prepaid"
+		reservation_length = 2
+		reservation_time_unit = "month"
+		instance_name = "terraform-pegadb"
+		purchase_count = 1
+		engine = "PegaDB"
+		node_type = "pega.g4s1.micro"
+		cluster_type = "cluster"
+		store_type = 3
+		disk_flavor = 60
+		port = 6379
+		replication_num = 2
+		shard_num = 1
+		proxy_num = 2
+		vpc_id = "vpc-ne32rahkaceu"
+		subnets {
+			subnet_id = "sbn-vhnqd71mivjq"
+			zone_name = "cn-bj-d"
+		}
+		replication_info {
+			availability_zone = "cn-bj-d"
+			is_master         = 1
+			subnet_id         = "sbn-vhnqd71mivjq"
+		}
+		replication_info {
+			availability_zone = "cn-bj-d"
+			is_master         = 0
+			subnet_id         = "sbn-vhnqd71mivjq"
+		}
 	}
-	replication_info {
-		availability_zone = "cn-bj-d"
-		is_master         = 1
-		subnet_id         = "sbn-vhnqd71mivjq"
-	}
-	replication_info {
-		availability_zone = "cn-bj-d"
-		is_master         = 0
-		subnet_id         = "sbn-vhnqd71mivjq"
-	}
-}
+
 ```
 
-
-Import
+# Import
 
 SCS can be imported, e.g.
 
@@ -107,9 +111,9 @@ func resourceBaiduCloudScs() *schema.Resource {
 		},
 
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(20 * time.Minute),
-			Update: schema.DefaultTimeout(30 * time.Minute),
-			Delete: schema.DefaultTimeout(20 * time.Minute),
+			Create: schema.DefaultTimeout(120 * time.Minute),
+			Update: schema.DefaultTimeout(120 * time.Minute),
+			Delete: schema.DefaultTimeout(120 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -349,9 +353,10 @@ func resourceBaiduCloudScs() *schema.Resource {
 				ValidateFunc: validation.IntInSlice([]int{1, 2}),
 			},
 			"disk_flavor": {
-				Type:        schema.TypeInt,
-				Description: "Storage size(GB) when use PegaDB.",
-				Optional:    true,
+				Type:         schema.TypeInt,
+				Description:  "Storage size(GB) when use PegaDB. Must be between `50` and `160`",
+				Optional:     true,
+				ValidateFunc: validation.IntBetween(50, 160),
 			},
 			"disk_type": {
 				Type:        schema.TypeString,
@@ -398,6 +403,27 @@ func resourceBaiduCloudScs() *schema.Resource {
 					Type: schema.TypeString,
 				},
 				Set: schema.HashString,
+			},
+			"backup_days": {
+				Type: schema.TypeString,
+				Description: "Identifies which days of the week the backup cycle is performed: Mon (Monday) " +
+					"Tue (Tuesday) Wed (Wednesday) Thu (Thursday) Fri (Friday) Sat (Saturday) Sun (Sunday) " +
+					"comma separated, the values are as follows: Sun,Mon,Tue,Wed,Thu,Fri,Sta. Note: Automatic backup is " +
+					"only supported if the number of slave nodes is greater than 1",
+				ValidateFunc: validation.StringInSlice([]string{"Mon", "Tue", "Wed",
+					"Thu", "Fri", "Sat", "Sun"}, false),
+				Optional: true,
+			},
+			"backup_time": {
+				Type: schema.TypeString,
+				Description: "Identifies when to perform backup in a day, UTC time (+8 is Beijing time) " +
+					"value such as: 01:05:00",
+				Optional: true,
+			},
+			"expire_day": {
+				Type:        schema.TypeInt,
+				Description: "Backup file expiration time, value such as: 3",
+				Optional:    true,
 			},
 		},
 	}
@@ -453,6 +479,11 @@ func resourceBaiduCloudScsCreate(d *schema.ResourceData, meta interface{}) error
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
 	}
 	err = updateInstanceSecurityIPs(d, meta, d.Id())
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
+	}
+
+	err = setScsBackupPolicy(d, meta, d.Id())
 	if err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
 	}
@@ -576,6 +607,11 @@ func resourceBaiduCloudScsUpdate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	if err := updateInstanceSecurityIPs(d, meta, instanceID); err != nil {
+		return err
+	}
+
+	// update back policy
+	if err := setScsBackupPolicy(d, meta, instanceID); err != nil {
 		return err
 	}
 
@@ -1003,5 +1039,42 @@ func updateInstanceSecurityIPs(d *schema.ResourceData, meta interface{}, instanc
 	}); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
 	}
+	return nil
+}
+
+func setScsBackupPolicy(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	action := "Set scs backup policy " + instanceID
+	client := meta.(*connectivity.BaiduClient)
+
+	if d.HasChange("backup_days") || d.HasChange("backup_time") || d.HasChange("expire_in_days") {
+		args := &scs.ModifyBackupPolicyArgs{
+			BackupDays: d.Get("backup_days").(string),
+			BackupTime: d.Get("backup_time").(string),
+			ExpireDay:  d.Get("expire_day").(int),
+		}
+
+		addDebug(action, args)
+		err := resource.Retry(d.Timeout(schema.TimeoutUpdate), func() *resource.RetryError {
+			_, err := client.WithScsClient(func(scsClient *scs.Client) (interface{}, error) {
+				return nil, scsClient.ModifyBackupPolicy(instanceID, args)
+			})
+			if err != nil {
+				if IsExceptedErrors(err, []string{InvalidInstanceStatus, OperationException, bce.EINTERNAL_ERROR}) {
+					return resource.RetryableError(err)
+				}
+				return resource.NonRetryableError(err)
+			}
+			return nil
+		})
+
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs_instance", action, BCESDKGoERROR)
+		}
+
+		d.SetPartial("backup_days")
+		d.SetPartial("backup_time")
+		d.SetPartial("expire_day")
+	}
+
 	return nil
 }

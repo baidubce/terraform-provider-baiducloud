@@ -98,14 +98,17 @@ The following arguments are supported:
 
 * `instance_name` - (Required) Name of the instance. Support for uppercase and lowercase letters, numbers, Chinese and special characters, such as `-`, `_`, `/`, `.`. Must start with a letter, length 1-65.
 * `node_type` - (Required) Node type of the instance. e.g. `cache.n1.micro`. To learn about supported node type, see documentation on [Supported Node Types](https://cloud.baidu.com/doc/SCS/s/1jwvxtsh0#%E5%AE%9E%E4%BE%8B%E8%A7%84%E6%A0%BC)
+* `backup_days` - (Optional) Identifies which days of the week the backup cycle is performed: Mon (Monday) Tue (Tuesday) Wed (Wednesday) Thu (Thursday) Fri (Friday) Sat (Saturday) Sun (Sunday) comma separated, the values are as follows: Sun,Mon,Tue,Wed,Thu,Fri,Sta. Note: Automatic backup is only supported if the number of slave nodes is greater than 1
+* `backup_time` - (Optional) Identifies when to perform backup in a day, UTC time (+8 is Beijing time) value such as: 01:05:00
 * `billing` - (Optional) **Deprecated**. Use `payment_timing`, `reservation_length`, `reservation_time_unit` instead. Billing information of the Scs.
 * `client_auth` - (Optional, Sensitive) Access password of the instance. Should be 8-16 characters, and contains at least two types of letters, numbers and symbols. Allowed symbols include `$ ^ * ( ) _ + - =`.
 * `cluster_type` - (Optional, ForceNew) Type of the instance. If `engine` is `memcache`, must be `default`. Valid values for other engine type: `cluster`, `master_slave`.  Defaults to `master_slave`.
-* `disk_flavor` - (Optional) Storage size(GB) when use PegaDB.
+* `disk_flavor` - (Optional) Storage size(GB) when use PegaDB. Must be between `50` and `160`
 * `disk_type` - (Optional) Disk type of the instance. Valid values: `cloud_hp1`, `enhanced_ssd_pl1`.
 * `enable_read_only` - (Optional) Whether the copies are read only. Valid values: `1`(enabled), `2`(disabled). Defaults to `2`.
 * `engine_version` - (Optional) Engine version of the instance. Must be set when `engine` is `redis`. Valid values: `3.2`, `4.0`, `5.0`, `6.0`.
 * `engine` - (Optional) Engine of the instance. Valid values: `memcache`, `redis`, `PegaDB`. Defaults to `redis`.
+* `expire_day` - (Optional) Backup file expiration time, value such as: 3
 * `payment_timing` - (Optional) Payment timing of billing, Valid values: `Prepaid`, `Postpaid`.
 * `port` - (Optional, ForceNew) Port number used to access the instance. Must be between `1025` and `65534`. Defaults to `6379`.
 * `proxy_num` - (Optional, ForceNew) The number of instance proxy. If `cluster_type` is `cluster`, set to the value of `shard_num` (if `shard_num` equals `1`, set to `2`). If `cluster_type` is `master_slave`, set to `0`. Defaults to `0`.
@@ -115,12 +118,12 @@ The following arguments are supported:
 * `replication_resize_type` - (Optional) Replica resize type. Must set when change `replication_info`. Valid values: `add`, `delete`.
 * `reservation_length` - (Optional) Prepaid billing reservation length, only useful when `payment_timing` is `Prepaid`. Valid values: `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `12`, `24`, `36`
 * `reservation_time_unit` - (Optional) Prepaid billing reservation time unit, only useful when `payment_timing` is `Prepaid`. Only support `month` now.
+* `security_ips` - (Optional) Security ips of the scs.
 * `shard_num` - (Optional) The number of instance shard. Defaults to `1`. To learn about supported shard number, see documentation on [Supported Node Types](https://cloud.baidu.com/doc/SCS/s/1jwvxtsh0#%E5%AE%9E%E4%BE%8B%E8%A7%84%E6%A0%BC)
 * `store_type` - (Optional) Store type of the instance. Valid values: `0`(high performance memory), `1`(ssd local disk), `3`(capacity storage, only for PegaDB).
 * `subnets` - (Optional) Subnets of the instance.
 * `tags` - (Optional) Tags, support setting when creating instance, do not support modify
 * `vpc_id` - (Optional) ID of the specific VPC
-* `security_ips` - (Optional) Security ips of the scs.
 
 The `billing` object supports the following:
 
