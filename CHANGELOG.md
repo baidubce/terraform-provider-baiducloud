@@ -1,4 +1,8 @@
-	## 1.19.33 (Unreleased)
+	## 1.19.34 (Unreleased)
+## 1.19.33 (February 01, 2024)
+NOTES:
+- ADD DNS CUSTOMLINE
+
 ## 1.19.32 (January 31, 2024)
 NOTES:
 - Support automatic backup capability of scs
