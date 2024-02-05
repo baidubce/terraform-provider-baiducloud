@@ -70,6 +70,8 @@ The following arguments are supported:
 * `volume_capacity` - (Required) Volume capacity(GB) of the instance
 * `auto_renew_time_length` - (Optional, ForceNew) The time length of automatic renewal. It is valid when payment_timing is Prepaid, and the value should be 1-9 when the auto_renew_time_unit is month and 1-3 when the auto_renew_time_unit is year. Default to 1.
 * `auto_renew_time_unit` - (Optional, ForceNew) Time unit of automatic renewal, the value can be month or year. The default value is empty, indicating no automatic renewal. It is valid only when the payment_timing is Prepaid.
+* `backup_days` - (Optional) Backup date and time separated by English half-width commas, Sunday is the first day, the value is 0 Example: 0,1,2,3,5,6
+* `backup_time` - (Optional) Backup start time, the time here is UTC time
 * `category` - (Optional, ForceNew) Category of the instance. Available values are Basic、Standard(Default), only SQLServer 2012sp3 support Basic.
 * `instance_name` - (Optional) Name of the instance. Support for uppercase and lowercase letters, numbers, Chinese and special characters, such as "-","_","/",".", the value must start with a letter, length 1-65.
 * `lower_case_table_names` - (Optional) Whether the table name is case-sensitive. The default value is 0, which means case-sensitive; passing 1 means case-insensitive.
@@ -103,6 +105,7 @@ In addition to all arguments above, the following attributes are exported:
 
 * `address` - The domain used to access a instance.
 * `create_time` - Create time of the instance.
+* `expire_in_days` - Number of persistence days, range 1-730 days; if not enabled, it is 0 or left blank
 * `expire_time` - Expire time of the instance.
 * `instance_id` - ID of the instance.
 * `instance_status` - Status of the instance.

@@ -3,22 +3,24 @@ Use this resource to get information about a RDS instance.
 
 ~> **NOTE:** The terminate operation of rds instance does NOT take effect immediately，maybe takes for several minites.
 
-Example Usage
+# Example Usage
 
 ```hcl
-resource "baiducloud_rds_instance" "default" {
-    billing = {
-        payment_timing        = "Postpaid"
-    }
-    engine_version            = "5.6"
-    engine                    = "MySQL"
-    cpu_count                 = 1
-    memory_capacity           = 1
-    volume_capacity           = 5
-}
+
+	resource "baiducloud_rds_instance" "default" {
+	    billing = {
+	        payment_timing        = "Postpaid"
+	    }
+	    engine_version            = "5.6"
+	    engine                    = "MySQL"
+	    cpu_count                 = 1
+	    memory_capacity           = 1
+	    volume_capacity           = 5
+	}
+
 ```
 
-Import
+# Import
 
 RDS instance can be imported, e.g.
 
@@ -309,6 +311,22 @@ func resourceBaiduCloudRdsInstance() *schema.Resource {
 				Default:      1,
 				ValidateFunc: validation.IntBetween(1, 9),
 			},
+			"backup_days": {
+				Type: schema.TypeString,
+				Description: "Backup date and time separated by English half-width commas, " +
+					"Sunday is the first day, the value is 0 Example: 0,1,2,3,5,6 ",
+				Optional: true,
+			},
+			"backup_time": {
+				Type:        schema.TypeString,
+				Description: "Backup start time, the time here is UTC time",
+				Optional:    true,
+			},
+			"expire_in_days": {
+				Type:        schema.TypeInt,
+				Description: "Number of persistence days, range 1-730 days; if not enabled, it is 0 or left blank",
+				Optional:    true,
+			},
 		},
 	}
 }
@@ -406,7 +424,11 @@ func resourceBaiduCloudRdsInstanceCreate(d *schema.ResourceData, meta interface{
 	if err != nil {
 		addDebug(action, err)
 	}
-
+	// 设置备份策略
+	err = setBackupPolicy(d, meta, d.Id())
+	if err != nil {
+		addDebug(action, err)
+	}
 	return resourceBaiduCloudRdsInstanceRead(d, meta)
 }
 
@@ -456,6 +478,9 @@ func resourceBaiduCloudRdsInstanceRead(d *schema.ResourceData, meta interface{})
 	d.Set("volume_capacity", result.VolumeCapacity)
 	d.Set("subnets", transRdsSubnetsToSchema(result.Subnets))
 	d.Set("public_access", result.PublicAccessStatus)
+	d.Set("backup_days", result.BackupPolicy.BackupDays)
+	d.Set("backup_time", result.BackupPolicy.BackupTime)
+	d.Set("expire_in_days", result.BackupPolicy.ExpireInDays)
 	return nil
 }
 
@@ -481,6 +506,7 @@ func resourceBaiduCloudRdsInstanceUpdate(d *schema.ResourceData, meta interface{
 	if err := resizeRds(d, meta, instanceID); err != nil {
 		return err
 	}
+	// 公网访问权限
 	if d.HasChange("public_access") {
 		err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 			raw, err := client.WithRdsClient(func(rdsClient *rds.Client) (interface{}, error) {
@@ -507,6 +533,11 @@ func resourceBaiduCloudRdsInstanceUpdate(d *schema.ResourceData, meta interface{
 		}
 	}
 
+	// 设置备份策略
+	err := setBackupPolicy(d, meta, d.Id())
+	if err != nil {
+		addDebug(action, err)
+	}
 	d.Partial(false)
 
 	return resourceBaiduCloudRdsInstanceRead(d, meta)
@@ -694,6 +725,43 @@ func resizeRds(d *schema.ResourceData, meta interface{}, instanceID string) erro
 		d.SetPartial("cpu_count")
 		d.SetPartial("memory_capacity")
 		d.SetPartial("volume_capacity")
+	}
+
+	return nil
+}
+
+func setBackupPolicy(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	action := "Set rds backup policy " + instanceID
+	client := meta.(*connectivity.BaiduClient)
+
+	if d.HasChange("backup_days") || d.HasChange("backup_time") || d.HasChange("expire_in_days") {
+		args := &rds.ModifyBackupPolicyArgs{
+			BackupDays:   d.Get("backup_days").(string),
+			BackupTime:   d.Get("backup_time").(string),
+			ExpireInDays: d.Get("expire_in_days").(int),
+		}
+
+		addDebug(action, args)
+		err := resource.Retry(d.Timeout(schema.TimeoutUpdate), func() *resource.RetryError {
+			_, err := client.WithRdsClient(func(rdsClient *rds.Client) (interface{}, error) {
+				return nil, rdsClient.ModifyBackupPolicy(instanceID, args)
+			})
+			if err != nil {
+				if IsExceptedErrors(err, []string{InvalidInstanceStatus, OperationException, bce.EINTERNAL_ERROR}) {
+					return resource.RetryableError(err)
+				}
+				return resource.NonRetryableError(err)
+			}
+			return nil
+		})
+
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_rds_instance", action, BCESDKGoERROR)
+		}
+
+		d.SetPartial("backup_days")
+		d.SetPartial("backup_time")
+		d.SetPartial("expire_in_days")
 	}
 
 	return nil
