@@ -5,19 +5,21 @@ Use this resource to create a BCC instance.
 Example Usage
 
 ```hcl
-resource "baiducloud_instance" "my-server" {
-  image_id = "m-A4jJpFzi"
-  name = "my-instance"
-  availability_zone = "cn-bj-a"
-  cpu_count = "2"
-  memory_capacity_in_gb = "8"
-  billing = {
-    payment_timing = "Postpaid"
-  }
-}
+
+	resource "baiducloud_instance" "my-server" {
+	  image_id = "m-A4jJpFzi"
+	  name = "my-instance"
+	  availability_zone = "cn-bj-a"
+	  cpu_count = "2"
+	  memory_capacity_in_gb = "8"
+	  billing = {
+	    payment_timing = "Postpaid"
+	  }
+	}
+
 ```
 
-Import
+# Import
 
 BCC instance can be imported, e.g.
 
@@ -520,6 +522,11 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 		return err
 	}
 
+	// check tag bind
+	if err := checkTagBind(d, meta); err != nil {
+		return err
+	}
+
 	// stop the instance if the action field is stop.
 	if d.Get("action").(string) == INSTANCE_ACTION_STOP {
 		stopWithNoCharge := d.Get("stop_with_no_charge").(bool)
@@ -529,6 +536,40 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 	}
 
 	return resourceBaiduCloudInstanceRead(d, meta)
+}
+
+func checkTagBind(d *schema.ResourceData, meta interface{}) error {
+	if v, ok := d.GetOk("tags"); ok {
+		client := meta.(*connectivity.BaiduClient)
+		instanceID := d.Id()
+		action := "Retry BCC Instance tags bind " + instanceID
+		raw, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
+			return bccClient.GetInstanceDetail(instanceID)
+		})
+		addDebug(action, raw)
+
+		if err != nil {
+			if NotFoundError(err) {
+				d.SetId("")
+				return nil
+			}
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+		}
+		response, _ := raw.(*api.GetInstanceDetailResult)
+		if response.Instance.Tags == nil || len(response.Instance.Tags) == 0 {
+			// bind tags failed, retry
+			_, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
+				tagArgs := &api.BindTagsRequest{
+					ChangeTags: tranceTagMapToModel(v.(map[string]interface{})),
+				}
+				return nil, bccClient.BindInstanceToTags(instanceID, tagArgs)
+			})
+			if err != nil {
+				return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+			}
+		}
+	}
+	return nil
 }
 
 func resourceBaiduCloudInstanceRead(d *schema.ResourceData, meta interface{}) error {
