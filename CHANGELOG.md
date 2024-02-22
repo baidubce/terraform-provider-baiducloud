@@ -1,5 +1,10 @@
-	## 1.19.35 (Unreleased)
-## 1.19.34 (February 01, 2024)
+	## 1.19.36 (Unreleased)
+## 1.19.35 (February 22, 2024)
+NOTES:
+- BCC tag logic enhance to prevent tag binding failure
+- Support DNS record
+
+## 1.19.34 (February 05, 2024)
 NOTES:
 - Support automatic backup capability of RDS
 
