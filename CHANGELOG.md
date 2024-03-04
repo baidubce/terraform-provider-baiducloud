@@ -1,4 +1,9 @@
-	## 1.19.36 (Unreleased)
+	## 1.19.37 (Unreleased)
+## 1.19.36 (March 04, 2024)
+NOTES:
+- Fix some bugs
+- For the SCS standard version cluster, the security IP field has been disabled;
+
 ## 1.19.35 (February 22, 2024)
 NOTES:
 - BCC tag logic enhance to prevent tag binding failure
