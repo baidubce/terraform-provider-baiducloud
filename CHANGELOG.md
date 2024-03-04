@@ -1,4 +1,8 @@
-	## 1.19.37 (Unreleased)
+	## 1.19.38 (Unreleased)
+## 1.19.37 (March 04, 2024)
+NOTES:
+- retry version published to the community
+
 ## 1.19.36 (March 04, 2024)
 NOTES:
 - Fix some bugs
