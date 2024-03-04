@@ -44,7 +44,7 @@ The following arguments are supported:
 
 The `billing` object supports the following:
 
-* `payment_timing` - (Required) Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.
+* `payment_timing` - (Required) Payment timing of billing, only support Postpaid.
 * `reservation` - (Optional) Reservation of the Rds.
 
 The `reservation` object supports the following:

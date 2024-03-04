@@ -410,8 +410,8 @@ func resourceBaiduCloudScs() *schema.Resource {
 					"Tue (Tuesday) Wed (Wednesday) Thu (Thursday) Fri (Friday) Sat (Saturday) Sun (Sunday) " +
 					"comma separated, the values are as follows: Sun,Mon,Tue,Wed,Thu,Fri,Sta. Note: Automatic backup is " +
 					"only supported if the number of slave nodes is greater than 1",
-				ValidateFunc: validation.StringInSlice([]string{"Mon", "Tue", "Wed",
-					"Thu", "Fri", "Sat", "Sun"}, false),
+				//ValidateFunc: validation.StringInSlice([]string{"Mon", "Tue", "Wed",
+				//	"Thu", "Fri", "Sat", "Sun"}, false),
 				Optional: true,
 			},
 			"backup_time": {
@@ -478,10 +478,11 @@ func resourceBaiduCloudScsCreate(d *schema.ResourceData, meta interface{}) error
 	if _, err := stateConf.WaitForState(); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
 	}
-	err = updateInstanceSecurityIPs(d, meta, d.Id())
-	if err != nil {
-		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
-	}
+	// 标准版集群，已经禁用白名单功能了；console对应功能已经禁用，openapi也废弃了
+	//err = updateInstanceSecurityIPs(d, meta, d.Id())
+	//if err != nil {
+	//	return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
+	//}
 
 	err = setScsBackupPolicy(d, meta, d.Id())
 	if err != nil {

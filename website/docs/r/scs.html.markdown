@@ -28,10 +28,6 @@ resource "baiducloud_scs" "default" {
 	node_type = "cache.n1.micro"
 	cluster_type = "default"
 	shard_num = 2
-    security_ips = [
-      "192.168.1.1",
-      "172.16.2.1/24",
-    ]
 }
 ```
 
@@ -46,10 +42,6 @@ resource "baiducloud_scs" "default" {
 	cluster_type = "master_slave"
 	replication_num = 1
 	shard_num = 1
-    security_ips = [
-      "192.168.1.1",
-      "172.16.2.1/24",
-    ]
 }
 ```
 
@@ -85,10 +77,6 @@ resource "baiducloud_scs" "default" {
 		is_master         = 0
 		subnet_id         = "sbn-vhnqd71mivjq"
 	}
-    security_ips = [
-      "192.168.1.1",
-      "172.16.2.1/24",
-    ]
 }
 ```
 
@@ -118,7 +106,6 @@ The following arguments are supported:
 * `replication_resize_type` - (Optional) Replica resize type. Must set when change `replication_info`. Valid values: `add`, `delete`.
 * `reservation_length` - (Optional) Prepaid billing reservation length, only useful when `payment_timing` is `Prepaid`. Valid values: `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `12`, `24`, `36`
 * `reservation_time_unit` - (Optional) Prepaid billing reservation time unit, only useful when `payment_timing` is `Prepaid`. Only support `month` now.
-* `security_ips` - (Optional) Security ips of the scs.
 * `shard_num` - (Optional) The number of instance shard. Defaults to `1`. To learn about supported shard number, see documentation on [Supported Node Types](https://cloud.baidu.com/doc/SCS/s/1jwvxtsh0#%E5%AE%9E%E4%BE%8B%E8%A7%84%E6%A0%BC)
 * `store_type` - (Optional) Store type of the instance. Valid values: `0`(high performance memory), `1`(ssd local disk), `3`(capacity storage, only for PegaDB).
 * `subnets` - (Optional) Subnets of the instance.

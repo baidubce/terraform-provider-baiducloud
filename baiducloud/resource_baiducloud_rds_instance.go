@@ -481,6 +481,7 @@ func resourceBaiduCloudRdsInstanceRead(d *schema.ResourceData, meta interface{})
 	d.Set("backup_days", result.BackupPolicy.BackupDays)
 	d.Set("backup_time", result.BackupPolicy.BackupTime)
 	d.Set("expire_in_days", result.BackupPolicy.ExpireInDays)
+	d.Set("tags", flattenTagsToMap(result.Tag))
 	return nil
 }
 
@@ -660,6 +661,9 @@ func buildBaiduCloudRdsInstanceArgs(d *schema.ResourceData, meta interface{}) (*
 
 	if vpcID, ok := d.GetOk("vpc_id"); ok {
 		request.VpcId = vpcID.(string)
+	}
+	if tags, ok := d.GetOk("tags"); ok {
+		request.Tags = tranceTagMapToModel(tags.(map[string]interface{}))
 	}
 
 	if v, ok := d.GetOk("subnets"); ok {
