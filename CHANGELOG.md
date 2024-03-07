@@ -1,4 +1,8 @@
-	## 1.19.38 (Unreleased)
+	## 1.19.39 (Unreleased)
+## 1.19.38 (March 07, 2024)
+NOTES:
+- Support SCS security group
+
 ## 1.19.37 (March 04, 2024)
 NOTES:
 - retry version published to the community
