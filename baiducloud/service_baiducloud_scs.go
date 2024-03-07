@@ -106,19 +106,22 @@ func (e *ScsService) FlattenScsModelsToMap(scss []scs.InstanceModel) []map[strin
 	return result
 }
 
-func (s *ScsService) GetSecurityIPs(instanceId string) ([]string, error) {
+func (s *ScsService) GetSecurityGroups(instanceId string) ([]string, error) {
 	result := make([]string, 0)
 
-	action := "List all SCS instance "
+	action := "List all SCS instance security groups"
 	raw, err := s.client.WithScsClient(func(scsClient *scs.Client) (interface{}, error) {
-		return scsClient.GetSecurityIp(instanceId)
+		return scsClient.ListSecurityGroupByInstanceId(instanceId)
 	})
 	if err != nil {
 		return nil, err
 	}
 	addDebug(action, raw)
 
-	response := raw.(*scs.GetSecurityIpResult)
-	result = append(result, response.SecurityIps...)
+	response := raw.(*scs.ListSecurityGroupResult)
+	for _, group := range response.Groups {
+		result = append(result, group.SecurityGroupID)
+	}
+	addDebug(action, result)
 	return result, nil
 }

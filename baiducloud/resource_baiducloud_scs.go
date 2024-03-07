@@ -284,17 +284,20 @@ func resourceBaiduCloudScs() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Time unit of automatic renewal, the value can be month or year. The default value is empty, indicating no automatic renewal. It is valid only when the payment_timing is Prepaid.",
 				Computed:    true,
+				Optional:    true,
 			},
 			"auto_renew_time_length": {
 				Type:        schema.TypeInt,
 				Description: "The time length of automatic renewal. It is valid when payment_timing is Prepaid, and the value should be 1-9 when the auto_renew_time_unit is month and 1-3 when the auto_renew_time_unit is year.",
 				Computed:    true,
+				Optional:    true,
 			},
 			"tags": tagsCreationSchema(),
 			"auto_renew": {
 				Type:        schema.TypeBool,
 				Description: "Whether to automatically renew.",
 				Computed:    true,
+				Optional:    true,
 			},
 			"instance_id": {
 				Type:        schema.TypeString,
@@ -394,16 +397,6 @@ func resourceBaiduCloudScs() *schema.Resource {
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice([]string{"add", "delete"}, false),
 			},
-			"security_ips": {
-				Type:        schema.TypeSet,
-				Description: "Security ips of the scs.",
-				Optional:    true,
-				Computed:    true,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-				Set: schema.HashString,
-			},
 			"backup_days": {
 				Type: schema.TypeString,
 				Description: "Identifies which days of the week the backup cycle is performed: Mon (Monday) " +
@@ -424,6 +417,15 @@ func resourceBaiduCloudScs() *schema.Resource {
 				Type:        schema.TypeInt,
 				Description: "Backup file expiration time, value such as: 3",
 				Optional:    true,
+			},
+			"security_groups": {
+				Type:        schema.TypeSet,
+				Description: "Security groups of the scs instance.",
+				Optional:    true,
+				Computed:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 			},
 		},
 	}
@@ -489,6 +491,11 @@ func resourceBaiduCloudScsCreate(d *schema.ResourceData, meta interface{}) error
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
 	}
 
+	err = updateScsSecurityGroups(d, meta, d.Id())
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
+	}
+
 	return resourceBaiduCloudScsRead(d, meta)
 }
 
@@ -536,11 +543,11 @@ func resourceBaiduCloudScsRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("tags", flattenTagsToMap(result.Tags))
 	d.Set("replication_info", transReplicationInfoToSchema(result.ReplicationInfo))
 	d.Set("shard_num", result.ShardNum)
-	ips, err := scsService.GetSecurityIPs(d.Id())
+	securityIds, err := scsService.GetSecurityGroups(d.Id())
 	if err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
 	}
-	d.Set("security_ips", ips)
+	d.Set("security_groups", securityIds)
 
 	return nil
 }
@@ -607,12 +614,13 @@ func resourceBaiduCloudScsUpdate(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	if err := updateInstanceSecurityIPs(d, meta, instanceID); err != nil {
+	// update back policy
+	if err := setScsBackupPolicy(d, meta, instanceID); err != nil {
 		return err
 	}
 
-	// update back policy
-	if err := setScsBackupPolicy(d, meta, instanceID); err != nil {
+	// update security groups
+	if err := updateScsSecurityGroups(d, meta, instanceID); err != nil {
 		return err
 	}
 
@@ -995,50 +1003,55 @@ func updateInstanceReplicationInfo(d *schema.ResourceData, meta interface{}, ins
 	return nil
 }
 
-func updateInstanceSecurityIPs(d *schema.ResourceData, meta interface{}, instanceID string) error {
-	action := "Update scs security ips " + instanceID
+func updateScsSecurityGroups(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	action := "Update scs security groups " + instanceID
 	client := meta.(*connectivity.BaiduClient)
-	scsService := ScsService{
-		client: client,
-	}
-	ips, err := scsService.GetSecurityIPs(d.Id())
-	if err != nil {
-		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
-	}
-	os := &schema.Set{
-		F: schema.HashString,
-	}
-	for _, ip := range ips {
-		os.Add(ip)
-	}
-	ns := d.Get("security_ips").(*schema.Set)
-	addIPs := ns.Difference(os).List()
-	deleteIPs := os.Difference(ns).List()
+	if d.HasChange("security_groups") {
+		// 获取旧值和新值
+		oldRaw, newRaw := d.GetChange("security_groups")
+		oldSet := oldRaw.(*schema.Set)
+		newSet := newRaw.(*schema.Set)
 
-	addIPsArg := make([]string, 0)
-	for _, ips := range addIPs {
-		addIPsArg = append(addIPsArg, ips.(string))
-	}
-	// Add security IPs
-	if _, err := client.WithScsClient(func(scsClient *scs.Client) (i interface{}, e error) {
-		return nil, scsClient.AddSecurityIp(instanceID, &scs.SecurityIpArgs{
-			SecurityIps: addIPsArg,
-		})
-	}); err != nil {
-		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
-	}
+		// 计算需要添加的安全组（在新值中但不在旧值中的）
+		add := newSet.Difference(oldSet).List()
+		// 计算需要删除的安全组（在旧值中但不在新值中的）
+		remove := oldSet.Difference(newSet).List()
 
-	deleteIPsArg := make([]string, 0)
-	for _, ips := range deleteIPs {
-		deleteIPsArg = append(deleteIPsArg, ips.(string))
-	}
-	// Delete security IPs
-	if _, err := client.WithScsClient(func(scsClient *scs.Client) (i interface{}, e error) {
-		return nil, scsClient.DeleteSecurityIp(instanceID, &scs.SecurityIpArgs{
-			SecurityIps: deleteIPsArg,
-		})
-	}); err != nil {
-		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
+		// 处理添加的安全组
+		addGroupsArg := make([]string, 0)
+		for _, ids := range add {
+			addGroupsArg = append(addGroupsArg, ids.(string))
+		}
+		// Add security groups
+		args := &scs.SecurityGroupArgs{
+			InstanceIds:      []string{d.Id()},
+			SecurityGroupIds: addGroupsArg,
+		}
+		if len(addGroupsArg) > 0 {
+			if _, err := client.WithScsClient(func(scsClient *scs.Client) (i interface{}, e error) {
+				return nil, scsClient.BindSecurityGroups(args)
+			}); err != nil {
+				return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
+			}
+		}
+
+		// 处理删除的安全组
+		deleteGroupsArg := make([]string, 0)
+		for _, ips := range remove {
+			deleteGroupsArg = append(deleteGroupsArg, ips.(string))
+		}
+		// Delete security Groups
+		deleteArgs := &scs.UnbindSecurityGroupArgs{
+			InstanceId:       d.Id(),
+			SecurityGroupIds: deleteGroupsArg,
+		}
+		if len(deleteGroupsArg) > 0 {
+			if _, err := client.WithScsClient(func(scsClient *scs.Client) (i interface{}, e error) {
+				return nil, scsClient.UnBindSecurityGroups(deleteArgs)
+			}); err != nil {
+				return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
+			}
+		}
 	}
 	return nil
 }

@@ -1,14 +1,15 @@
 /*
 Use this data source to query SCS list.
 
-Example Usage
+# Example Usage
 
 ```hcl
 data "baiducloud_scss" "default" {}
 
-output "scss" {
- value = "${data.baiducloud_scss.default.scss}"
-}
+	output "scss" {
+	 value = "${data.baiducloud_scss.default.scss}"
+	}
+
 ```
 */
 package baiducloud
@@ -152,7 +153,7 @@ func dataSourceBaiduCloudScss() *schema.Resource {
 							Description: "Whether to automatically renew.",
 							Computed:    true,
 						},
-						"security_ips": {
+						"security_groups": {
 							Type:        schema.TypeSet,
 							Description: "Security ips of the scs.",
 							Computed:    true,
@@ -196,7 +197,7 @@ func dataSourceBaiduCloudScssRead(d *schema.ResourceData, meta interface{}) erro
 				continue
 			}
 		}
-		ips, err := scsService.GetSecurityIPs(e.InstanceID)
+		ips, err := scsService.GetSecurityGroups(e.InstanceID)
 		if err != nil {
 			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scss", action, BCESDKGoERROR)
 		}
@@ -215,7 +216,7 @@ func dataSourceBaiduCloudScssRead(d *schema.ResourceData, meta interface{}) erro
 			"used_capacity":   e.UsedCapacity,
 			"payment_timing":  e.PaymentTiming,
 			"zone_names":      e.ZoneNames,
-			"security_ips":    ips,
+			"security_groups": ips,
 			"tags":            flattenTagsToMap(e.Tags),
 		})
 	}
