@@ -28,6 +28,8 @@ $ terraform import baiducloud_subnet.default subnet_id
 package baiducloud
 
 import (
+	"fmt"
+	"net"
 	"time"
 
 	"github.com/baidubce/bce-sdk-go/bce"
@@ -166,11 +168,29 @@ func resourceBaiduCloudSubnetRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("zone_name", result.Subnet.ZoneName)
 	d.Set("cidr", result.Subnet.Cidr)
 	d.Set("ipv6_cidr", result.Subnet.Ipv6Cidr)
+	d.Set("enable_ipv6", result.Subnet.Ipv6Cidr != "")
 	d.Set("vpc_id", result.Subnet.VPCId)
 	d.Set("subnet_type", result.Subnet.SubnetType)
 	d.Set("description", result.Subnet.Description)
 	d.Set("tags", flattenTagsToMap(result.Subnet.Tags))
 
+	raw, err = client.WithVpcClient(func(vpcClient *vpc.Client) (i interface{}, e error) {
+		return vpcClient.GetVPCDetail(result.Subnet.VPCId)
+	})
+	addDebug(action, raw)
+	if err != nil {
+		if NotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_subnet", action, BCESDKGoERROR)
+	}
+	vpcResult, _ := raw.(*vpc.GetVPCDetailResult)
+	cidr, err := findParentCidr(append(vpcResult.VPC.SecondaryCidr, vpcResult.VPC.Cidr), result.Subnet.Cidr)
+	if err != nil {
+		return WrapError(err)
+	}
+	d.Set("vpc_secondary_cidr", cidr)
 	return nil
 }
 
@@ -180,7 +200,7 @@ func resourceBaiduCloudSubnetUpdate(d *schema.ResourceData, meta interface{}) er
 	subnetId := d.Id()
 	action := "Update Subnet " + subnetId
 
-	if d.HasChange("name") || d.HasChange("description") {
+	if d.HasChange("name") || d.HasChange("description") || d.HasChange("enable_ipv6") {
 		updateSubnetArgs := &vpc.UpdateSubnetArgs{
 			Name:        d.Get("name").(string),
 			EnableIpv6:  d.Get("enable_ipv6").(bool),
@@ -268,4 +288,32 @@ func buildBaiduCloudSubnetArgs(d *schema.ResourceData, meta interface{}) *vpc.Cr
 	}
 
 	return request
+}
+
+func findParentCidr(cidrs []string, subnetCidr string) (string, error) {
+	// 解析子网的 *net.IPNet
+	_, subnet, err := net.ParseCIDR(subnetCidr)
+	if err != nil {
+		return "", fmt.Errorf("can not resolve subnet CIDR: %v", err)
+	}
+
+	// 遍历所有 CIDR，查找匹配的父网段
+	for _, cidr := range cidrs {
+		_, parentNet, err := net.ParseCIDR(cidr)
+		if err != nil {
+			return "", fmt.Errorf("can not resolve subnet CIDR '%s': %v", cidr, err)
+		}
+
+		// 检查子网的 IP 是否在父网段范围内
+		if parentNet.Contains(subnet.IP) {
+			// 检查子网掩码长度是否大于等于父网段掩码长度
+			subnetOnes, _ := subnet.Mask.Size()
+			parentOnes, _ := parentNet.Mask.Size()
+			if subnetOnes >= parentOnes {
+				return cidr, nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("can not find vpc cidr")
 }

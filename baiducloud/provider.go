@@ -206,7 +206,6 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_cfc_function":                   dataSourceBaiduCloudCFCFunction(),
 			"baiducloud_scs_specs":                      dataSourceBaiduCloudScsSpecs(),
 			"baiducloud_scss":                           dataSourceBaiduCloudScss(),
-			"baiducloud_scs_security_ips":               dataSourceBaiduCloudScsSecurityIps(),
 			"baiducloud_cce_versions":                   dataSourceBaiduCloudCceKubernetesVersion(),
 			"baiducloud_cce_container_net":              dataSourceBaiduCloudCceContainerNet(),
 			"baiducloud_cce_cluster_nodes":              dataSourceBaiduCloudCCEClusterNodes(),
@@ -282,7 +281,6 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_cfc_version":                 resourceBaiduCloudCFCVersion(),
 			"baiducloud_cfc_trigger":                 resourceBaiduCloudCFCTrigger(),
 			"baiducloud_scs":                         resourceBaiduCloudScs(),
-			"baiducloud_scs_security_ip":             resourceBaiduCloudScsSecurityIp(),
 			"baiducloud_cce_cluster":                 resourceBaiduCloudCCECluster(),
 			"baiducloud_ccev2_cluster":               resourceBaiduCloudCCEv2Cluster(),
 			"baiducloud_ccev2_instance":              resourceBaiduCloudCCEv2Instance(),
@@ -379,6 +377,8 @@ func init() {
 		"cdn_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CDN endpoints.",
 
 		"bbc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BBC endpoints.",
+
+		"dns_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom DNS endpoints.",
 	}
 }
 
@@ -478,6 +478,12 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["vpn_endpoint"],
 				},
+				"dns": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["dns_endpoint"],
+				},
 			},
 		},
 		Set: endpointsToHash,
@@ -501,6 +507,7 @@ func endpointsToHash(v interface{}) int {
 	buf.WriteString(fmt.Sprintf("%s-", m["dts"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["cdn"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["bbc"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["dns"].(string)))
 	return hashcode.String(buf.String())
 }
 
