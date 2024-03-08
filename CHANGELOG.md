@@ -1,4 +1,10 @@
-	## 1.19.39 (Unreleased)
+	## 1.19.40 (Unreleased)
+## 1.19.39 (March 08, 2024)
+NOTES:
+- vpc & subnet bug fix
+- resource baiducloud_scs_security_ip will no longer be supported
+- datasource baiducloud_scs_security_ips will no longer be supported
+
 ## 1.19.38 (March 07, 2024)
 NOTES:
 - Support SCS security group
