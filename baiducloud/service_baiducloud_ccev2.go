@@ -68,7 +68,7 @@ func resourceCCEv2ClusterSpec() *schema.Resource {
 			},
 			"k8s_version": {
 				Type:         schema.TypeString,
-				Description:  "Kubernetes Version. Available Value: [1.18.9, 1.20.8, 1.22.5].",
+				Description:  "Kubernetes Version. Available Value: [1.18.9, 1.20.8, 1.22.5, 1.24.4].",
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice(K8SVersionPermitted, false),
 			},
@@ -2761,6 +2761,7 @@ var K8SVersionPermitted = []string{
 	"1.18.9",
 	"1.20.8",
 	"1.22.5",
+	"1.24.4",
 }
 
 var RuntimeTypePermitted = []string{
