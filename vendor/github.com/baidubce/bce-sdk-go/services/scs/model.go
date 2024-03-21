@@ -57,6 +57,7 @@ type CreateInstanceArgs struct {
 	BgwGroupId        string           `json:"bgwGroupId,omitempty"`
 	ClientToken       string           `json:"-"`
 	ClientAuth        string           `json:"clientAuth"`
+	ResourceGroupId   string           `json:"resourceGroupId"`
 	StoreType         int              `json:"storeType"`
 	EnableReadOnly    int              `json:"enableReadOnly,omitempty"`
 	Tags              []model.TagModel `json:"tags"`
@@ -80,11 +81,13 @@ type InstanceModel struct {
 	Domain             string           `json:"domain"`
 	Port               int              `json:"port"`
 	InstanceCreateTime string           `json:"instanceCreateTime"`
-	Capacity           int              `json:"capacity"`
+	Capacity           float64          `json:"capacity"`
 	UsedCapacity       float64          `json:"usedCapacity"`
 	PaymentTiming      string           `json:"paymentTiming"`
 	ZoneNames          []string         `json:"zoneNames"`
 	Tags               []model.TagModel `json:"tags"`
+	ResourceGroupId    string           `json:"resourceGroupId"`
+	ResourceGroupName  string           `json:"resourceGroupName"`
 }
 
 type ListInstancesArgs struct {
@@ -136,7 +139,7 @@ type GetInstanceDetailResult struct {
 	Port               int              `json:"port"`
 	InstanceCreateTime string           `json:"instanceCreateTime"`
 	InstanceExpireTime string           `json:"instanceExpireTime"`
-	Capacity           int              `json:"capacity"`
+	Capacity           float64          `json:"capacity"`
 	UsedCapacity       float64          `json:"usedCapacity"`
 	PaymentTiming      string           `json:"paymentTiming"`
 	VpcID              string           `json:"vpcId"`
@@ -155,6 +158,8 @@ type GetInstanceDetailResult struct {
 	EnableReadOnly     int              `json:"enableReadOnly"`
 	ReplicationInfo    []Replication    `json:"replicationInfo"`
 	BnsGroup           string           `json:"bnsGroup"`
+	ResourceGroupId    string           `json:"resourceGroupId"`
+	ResourceGroupName  string           `json:"resourceGroupName"`
 }
 
 type UpdateInstanceNameArgs struct {
@@ -163,7 +168,7 @@ type UpdateInstanceNameArgs struct {
 }
 
 type NodeType struct {
-	InstanceFlavor          int     `json:"instanceFlavor"`
+	InstanceFlavor          float64 `json:"instanceFlavor"`
 	NodeType                string  `json:"nodeType"`
 	CPUNum                  int     `json:"cpuNum"`
 	NetworkThroughputInGbps float64 `json:"networkThroughputInGbps"`
@@ -377,7 +382,7 @@ type RecycleInstance struct {
 	Domain             string           `json:"domain"`
 	Port               string           `json:"port"`
 	InstanceCreateTime string           `json:"instanceCreateTime"`
-	Capacity           int              `json:"capacity"`
+	Capacity           float64          `json:"capacity"`
 	UsedCapacity       float64          `json:"usedCapacity"`
 	PaymentTiming      string           `json:"paymentTiming"`
 	ZoneNames          []string         `json:"zoneNames"`
@@ -584,36 +589,36 @@ type GroupDetailResult struct {
 	Followers       []GroupFollowerInfo `json:"followers"`
 }
 type GroupLeaderInfo struct {
-	ClusterName       string `json:"clusterName"`
-	ClusterShowId     string `json:"clusterShowId"`
-	Region            string `json:"region"`
-	Status            string `json:"status"`
-	TotalCapacityInGB int    `json:"totalCapacityInGB"`
-	UsedCapacityInGB  int    `json:"usedCapacityInGB"`
-	ShardNum          int    `json:"shardNum"`
-	Flavor            int    `json:"flavor"`
-	QpsWrite          int64  `json:"qpsWrite"`
-	QpsRead           int64  `json:"qpsRead"`
-	StableReadable    bool   `json:"stableReadable"`
-	ForbidWrite       int    `json:"forbidWrite"`
-	AvailabilityZone  string `json:"availabilityZone"`
-	ExpiredTime       string `json:"expiredTime"`
+	ClusterName       string  `json:"clusterName"`
+	ClusterShowId     string  `json:"clusterShowId"`
+	Region            string  `json:"region"`
+	Status            string  `json:"status"`
+	TotalCapacityInGB float64 `json:"totalCapacityInGB"`
+	UsedCapacityInGB  int     `json:"usedCapacityInGB"`
+	ShardNum          int     `json:"shardNum"`
+	Flavor            float64 `json:"flavor"`
+	QpsWrite          int64   `json:"qpsWrite"`
+	QpsRead           int64   `json:"qpsRead"`
+	StableReadable    bool    `json:"stableReadable"`
+	ForbidWrite       int     `json:"forbidWrite"`
+	AvailabilityZone  string  `json:"availabilityZone"`
+	ExpiredTime       string  `json:"expiredTime"`
 }
 type GroupFollowerInfo struct {
-	ClusterName       string `json:"clusterName"`
-	ClusterShowId     string `json:"clusterShowId"`
-	Region            string `json:"region"`
-	Status            string `json:"status"`
-	TotalCapacityInGB int    `json:"totalCapacityInGB"`
-	UsedCapacityInGB  int    `json:"usedCapacityInGB"`
-	ShardNum          int    `json:"shardNum"`
-	Flavor            int    `json:"flavor"`
-	QpsWrite          int64  `json:"qpsWrite"`
-	QpsRead           int64  `json:"qpsRead"`
-	StableReadable    bool   `json:"stableReadable"`
-	ForbidWrite       int    `json:"forbidWrite"`
-	AvailabilityZone  string `json:"availabilityZone"`
-	ExpiredTime       string `json:"expiredTime"`
+	ClusterName       string  `json:"clusterName"`
+	ClusterShowId     string  `json:"clusterShowId"`
+	Region            string  `json:"region"`
+	Status            string  `json:"status"`
+	TotalCapacityInGB float64 `json:"totalCapacityInGB"`
+	UsedCapacityInGB  int     `json:"usedCapacityInGB"`
+	ShardNum          int     `json:"shardNum"`
+	Flavor            float64 `json:"flavor"`
+	QpsWrite          int64   `json:"qpsWrite"`
+	QpsRead           int64   `json:"qpsRead"`
+	StableReadable    bool    `json:"stableReadable"`
+	ForbidWrite       int     `json:"forbidWrite"`
+	AvailabilityZone  string  `json:"availabilityZone"`
+	ExpiredTime       string  `json:"expiredTime"`
 }
 
 type FollowerInfo struct {

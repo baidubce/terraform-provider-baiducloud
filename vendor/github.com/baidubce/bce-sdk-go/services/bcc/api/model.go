@@ -139,6 +139,9 @@ type InstanceModel struct {
 	DedicatedHostId       string                 `json:"dedicatedHostId"`
 	Tags                  []model.TagModel       `json:"tags"`
 	Ipv6                  string                 `json:"ipv6"`
+	EniQuota              int                    `json:"eniQuota"`
+	EriQuota              int                    `json:"eriQuota"`
+	RdmaTypeApi           string                 `json:"rdmaTypeApi"`
 	SwitchId              string                 `json:"switchId"`
 	HostId                string                 `json:"hostId"`
 	DeploysetId           string                 `json:"deploysetId"`
@@ -148,6 +151,7 @@ type InstanceModel struct {
 	DeploySetList         []DeploySetSimpleModel `json:"deploysetList"`
 	DeletionProtection    int                    `json:"deletionProtection"`
 	NetEthQueueCount      string                 `json:"netEthQueueCount"`
+	Volumes               []VolumeModel          `json:"volumes"`
 }
 
 type DeploySetSimpleModel struct {
@@ -967,6 +971,27 @@ type DeleteInstanceWithRelateResourceArgs struct {
 	DeleteImmediate       bool `json:"deleteImmediate"`
 }
 
+type DeletePrepaidInstanceWithRelateResourceArgs struct {
+	InstanceId            string `json:"instanceId"`
+	RelatedReleaseFlag    bool   `json:"relatedReleaseFlag"`
+	DeleteCdsSnapshotFlag bool   `json:"deleteCdsSnapshotFlag"`
+	DeleteRelatedEnisFlag bool   `json:"deleteRelatedEnisFlag"`
+}
+
+type ReleasePrepaidInstanceResponse struct {
+	SuccessResources   InstanceDeleteResultModel `json:"successResources"`
+	FailResources      InstanceDeleteResultModel `json:"failResources"`
+	InstanceRefundFlag bool                      `json:"instanceRefundFlag"`
+}
+
+type InstanceDeleteResultModel struct {
+	InstanceId  string   `json:"instanceId"`
+	Eip         string   `json:"eip"`
+	InsnapIds   []string `json:"insnapIds"`
+	SnapshotIds []string `json:"snapshotIds"`
+	VolumeIds   []string `json:"volumeIds"`
+}
+
 type InstanceChangeVpcArgs struct {
 	InstanceId                 string   `json:"instanceId"`
 	SubnetId                   string   `json:"subnetId"`
@@ -1108,6 +1133,7 @@ type VolumeModel struct {
 	PaymentTiming      string                   `json:"paymentTiming"`
 	ExpireTime         string                   `json:"expireTime"`
 	Status             VolumeStatus             `json:"status"`
+	EbcDiskSize        int                      `json:"ebcDiskSize"`
 	Desc               string                   `json:"desc"`
 	Attachments        []VolumeAttachmentModel  `json:"attachments"`
 	ZoneName           string                   `json:"zoneName"`
@@ -1125,6 +1151,7 @@ type VolumeModel struct {
 	RoleName           string                   `json:"roleName"`
 	CreatedFrom        string                   `json:"createdFrom"`
 	ReleaseTime        string                   `json:"releaseTime"`
+	VolumeId           string                   `json:"volumeId"`
 }
 
 type VolumeModelV3 struct {
