@@ -281,7 +281,11 @@ func resourceBaiduCloudRdsReadOnlyInstanceCreate(d *schema.ResourceData, meta in
 	if _, err := stateConf.WaitForState(); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_rds_readonly_instance", action, BCESDKGoERROR)
 	}
-
+	// check tags and resource group bind
+	err = rdsService.checkRdsTagsAndResourceGroupBind(d, meta)
+	if err != nil {
+		return err
+	}
 	return resourceBaiduCloudRdsReadOnlyInstanceRead(d, meta)
 }
 
@@ -331,6 +335,7 @@ func resourceBaiduCloudRdsReadOnlyInstanceRead(d *schema.ResourceData, meta inte
 	d.Set("address", result.Endpoint.Address)
 	d.Set("v_net_ip", result.Endpoint.VnetIp)
 	d.Set("subnets", transRdsSubnetsToSchema(result.Subnets))
+	d.Set("tags", flattenTagsToMap(result.Tags))
 
 	return nil
 }
@@ -454,6 +459,10 @@ func buildBaiduCloudRdsReadOnlyInstanceArgs(d *schema.ResourceData, meta interfa
 			subnetRequests[id] = subnetRequest
 		}
 		request.Subnets = subnetRequests
+	}
+
+	if tags, ok := d.GetOk("tags"); ok {
+		request.Tags = tranceTagMapToModel(tags.(map[string]interface{}))
 	}
 
 	return request, nil

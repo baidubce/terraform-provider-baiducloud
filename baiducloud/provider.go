@@ -378,6 +378,8 @@ func init() {
 
 		"bbc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BBC endpoints.",
 
+		"vpn_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom VPN endpoints.",
+
 		"dns_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom DNS endpoints.",
 	}
 }
@@ -507,6 +509,7 @@ func endpointsToHash(v interface{}) int {
 	buf.WriteString(fmt.Sprintf("%s-", m["dts"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["cdn"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["bbc"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["vpn"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["dns"].(string)))
 	return hashcode.String(buf.String())
 }

@@ -3,6 +3,7 @@ package baiducloud
 import (
 	"github.com/baidubce/bce-sdk-go/services/rds"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 )
@@ -97,4 +98,36 @@ func (e *RdsService) FlattenRdsModelsToMap(rdss []rds.Instance) []map[string]int
 		})
 	}
 	return result
+}
+
+func (s *RdsService) checkRdsTagsAndResourceGroupBind(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*connectivity.BaiduClient)
+	instanceID := d.Id()
+	action := "check RDS Instance tags and resource group bind " + instanceID
+	raw, err := client.WithRdsClient(func(rdsClient *rds.Client) (interface{}, error) {
+		return rdsClient.GetDetail(instanceID)
+	})
+	addDebug(action, raw)
+
+	if err != nil {
+		if NotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_rds_instance", action, BCESDKGoERROR)
+	}
+	response, _ := raw.(*rds.Instance)
+	// RDS的tags和resource group是在到达运行状态之前绑定的
+	if _, ok := d.GetOk("tags"); ok {
+		if response.Tags == nil || len(response.Tags) == 0 {
+			// bind tags failed
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_rds_instance", "tags bind", BCESDKGoERROR)
+		}
+	}
+	if v, ok := d.GetOk("resource_group_id"); ok {
+		if response.ResourceGroupId == "" || response.ResourceGroupId != v.(string) {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_rds_instance", "resource group bind", BCESDKGoERROR)
+		}
+	}
+	return nil
 }

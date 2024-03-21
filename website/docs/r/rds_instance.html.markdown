@@ -80,7 +80,7 @@ The following arguments are supported:
 * `purchase_count` - (Optional) Count of the instance to buy
 * `replication_type` - (Optional) Data replication method. Asynchronous replication: async, Semi-synchronous replication: semi_sync.
 * `reservation` - (Optional) Reservation of the Rds.
-* `resource_group_id` - (Optional) resource group id.
+* `resource_group_id` - (Optional, ForceNew) resource group id, support setting when creating instance, do not support modify!
 * `subnets` - (Optional) Subnets of the instance.
 * `tags` - (Optional, ForceNew) Tags, do not support modify
 * `vpc_id` - (Optional, ForceNew) ID of the specific VPC

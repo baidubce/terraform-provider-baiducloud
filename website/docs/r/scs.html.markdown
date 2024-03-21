@@ -112,6 +112,7 @@ The following arguments are supported:
 * `tags` - (Optional) Tags, support setting when creating instance, do not support modify
 * `vpc_id` - (Optional) ID of the specific VPC
 * `security_groups` - (Optional) Security group ids of the scs.
+* `resource_group_id` - (Optional, ForceNew) ID of the resource group, support setting when creating instance, do not support modify!
 
 
 The `billing` object supports the following:

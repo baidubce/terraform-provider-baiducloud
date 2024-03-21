@@ -155,11 +155,16 @@ func dataSourceBaiduCloudScss() *schema.Resource {
 						},
 						"security_groups": {
 							Type:        schema.TypeSet,
-							Description: "Security ips of the scs.",
+							Description: "Security groups of the scs.",
 							Computed:    true,
 							Elem: &schema.Schema{
 								Type: schema.TypeString,
 							},
+						},
+						"resource_group_id": {
+							Type:        schema.TypeString,
+							Description: "resource group id.",
+							Computed:    true,
 						},
 						"tags": tagsComputedSchema(),
 					},
@@ -202,22 +207,23 @@ func dataSourceBaiduCloudScssRead(d *schema.ResourceData, meta interface{}) erro
 			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scss", action, BCESDKGoERROR)
 		}
 		scsMap = append(scsMap, map[string]interface{}{
-			"instance_id":     e.InstanceID,
-			"instance_name":   e.InstanceName,
-			"instance_status": e.InstanceStatus,
-			"cluster_type":    e.ClusterType,
-			"engine":          e.Engine,
-			"engine_version":  e.EngineVersion,
-			"v_net_ip":        e.VnetIP,
-			"domain":          e.Domain,
-			"port":            e.Port,
-			"create_time":     e.InstanceCreateTime,
-			"capacity":        e.Capacity,
-			"used_capacity":   e.UsedCapacity,
-			"payment_timing":  e.PaymentTiming,
-			"zone_names":      e.ZoneNames,
-			"security_groups": ips,
-			"tags":            flattenTagsToMap(e.Tags),
+			"instance_id":       e.InstanceID,
+			"instance_name":     e.InstanceName,
+			"instance_status":   e.InstanceStatus,
+			"cluster_type":      e.ClusterType,
+			"engine":            e.Engine,
+			"engine_version":    e.EngineVersion,
+			"v_net_ip":          e.VnetIP,
+			"domain":            e.Domain,
+			"port":              e.Port,
+			"create_time":       e.InstanceCreateTime,
+			"capacity":          e.Capacity,
+			"used_capacity":     e.UsedCapacity,
+			"payment_timing":    e.PaymentTiming,
+			"zone_names":        e.ZoneNames,
+			"security_groups":   ips,
+			"tags":              flattenTagsToMap(e.Tags),
+			"resource_group_id": e.ResourceGroupId,
 		})
 	}
 

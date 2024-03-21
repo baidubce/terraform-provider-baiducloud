@@ -97,9 +97,9 @@ func dataSourceBaiduCloudScsSpecsRead(d *schema.ResourceData, meta interface{}) 
 		nodeTypeList = getNodeTypeListResult.DefaultNodeTypeList
 	}
 
-	var nodeCapacity int
+	var nodeCapacity float64
 	if value, ok := d.GetOk("node_capacity"); ok {
-		nodeCapacity = value.(int)
+		nodeCapacity = value.(float64)
 	}
 
 	specMapOrigin := make([]map[string]interface{}, 0, len(nodeTypeList))

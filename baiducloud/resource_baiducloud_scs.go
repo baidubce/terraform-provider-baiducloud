@@ -337,6 +337,12 @@ func resourceBaiduCloudScs() *schema.Resource {
 					Type: schema.TypeString,
 				},
 			},
+			"resource_group_id": {
+				Type:        schema.TypeString,
+				Description: "resource group id, support setting when creating instance, do not support modify!",
+				Optional:    true,
+				ForceNew:    true,
+			},
 			"client_auth": {
 				Type:        schema.TypeString,
 				Description: "Access password of the instance. Should be 8-16 characters, and contains at least two types of letters, numbers and symbols. Allowed symbols include `$ ^ * ( ) _ + - =`.",
@@ -480,6 +486,10 @@ func resourceBaiduCloudScsCreate(d *schema.ResourceData, meta interface{}) error
 	if _, err := stateConf.WaitForState(); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
 	}
+	err = scsService.checkScsTagsAndResourceGroupBind(d, meta)
+	if err != nil {
+		return err
+	}
 	// 标准版集群，已经禁用白名单功能了；console对应功能已经禁用，openapi也废弃了
 	//err = updateInstanceSecurityIPs(d, meta, d.Id())
 	//if err != nil {
@@ -548,6 +558,7 @@ func resourceBaiduCloudScsRead(d *schema.ResourceData, meta interface{}) error {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_scs", action, BCESDKGoERROR)
 	}
 	d.Set("security_groups", securityIds)
+	d.Set("resource_group_id", result.ResourceGroupId)
 
 	return nil
 }
@@ -814,6 +825,10 @@ func buildBaiduCloudScsArgs(d *schema.ResourceData, meta interface{}) (*scs.Crea
 	if info, ok := d.GetOk("replication_info"); ok {
 		inputList := info.([]interface{})
 		request.ReplicationInfo = transSchemaToReplicationInfo(inputList)
+	}
+
+	if v, ok := d.GetOk("resource_group_id"); ok {
+		request.ResourceGroupId = v.(string)
 	}
 
 	if tags, ok := d.GetOk("tags"); ok {

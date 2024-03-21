@@ -233,8 +233,9 @@ func resourceBaiduCloudRdsInstance() *schema.Resource {
 			},
 			"resource_group_id": {
 				Type:        schema.TypeString,
-				Description: "resource group id.",
+				Description: "Resource group id, support setting when creating instance, do not support modify!",
 				Optional:    true,
+				ForceNew:    true,
 			},
 			"public_access": {
 				Type:        schema.TypeBool,
@@ -371,6 +372,11 @@ func resourceBaiduCloudRdsInstanceCreate(d *schema.ResourceData, meta interface{
 	if _, err := stateConf.WaitForState(); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_rds_instance", action, BCESDKGoERROR)
 	}
+	// check tags and resource group bind
+	err = rdsService.checkRdsTagsAndResourceGroupBind(d, meta)
+	if err != nil {
+		return err
+	}
 	// 开启公网访问
 	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 		raw, err := client.WithRdsClient(func(rdsClient *rds.Client) (interface{}, error) {
@@ -481,7 +487,8 @@ func resourceBaiduCloudRdsInstanceRead(d *schema.ResourceData, meta interface{})
 	d.Set("backup_days", result.BackupPolicy.BackupDays)
 	d.Set("backup_time", result.BackupPolicy.BackupTime)
 	d.Set("expire_in_days", result.BackupPolicy.ExpireInDays)
-	d.Set("tags", flattenTagsToMap(result.Tag))
+	d.Set("tags", flattenTagsToMap(result.Tags))
+	d.Set("resource_group_id", result.ResourceGroupId)
 	return nil
 }
 

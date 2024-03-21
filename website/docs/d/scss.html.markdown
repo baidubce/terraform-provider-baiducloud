@@ -60,6 +60,6 @@ In addition to all arguments above, the following attributes are exported:
   * `used_capacity` - Memory capacity(GB) of the instance to be used.
   * `v_net_ip` - ID of the specific vnet.
   * `zone_names` - Zone name list
-  * `security_groups` - Security ips of the scs.
-
+  * `security_groups` - Security group ids of the scs.
+  * `resource_group_id` - ID of the resource group.
 
