@@ -1,4 +1,10 @@
-	## 1.19.40 (Unreleased)
+	## 1.19.41 (Unreleased)
+## 1.19.40 (March 21, 2024)
+NOTES:
+- resource_baiducloud_scs support attribute resource_group_id
+- resource_baiducloud_rds_readonly_instance support tags
+- rds bug fix
+
 ## 1.19.39 (March 08, 2024)
 NOTES:
 - vpc & subnet bug fix
