@@ -2819,7 +2819,7 @@ var ClusterRolePermitted = []string{
 var MachineTypePermitted = []string{
 	string(ccev2types.MachineTypeBBC),
 	string(ccev2types.MachineTypeBCC),
-	string(ccev2types.MachineTypeMetal),
+	string(ccev2types.MachineTypeEBC),
 }
 
 var BCCInstanceTypePermitted = []string{

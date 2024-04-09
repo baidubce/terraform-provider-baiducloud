@@ -132,8 +132,10 @@ The following arguments are supported:
 * `lifecycle_rule` - (Optional) Configuration of object lifecycle management.
 * `logging` - (Optional) Settings of the bucket logging.
 * `replication_configuration` - (Optional) Replication configuration of the BOS bucket.
+* `resource_group` - (Optional, ForceNew) resource group of bucket.
 * `server_side_encryption_rule` - (Optional) Encryption rule for the server side, which can only be AES256 currently.
 * `storage_class` - (Optional) Storage class of the BOS bucket, available values are STANDARD, STANDARD_IA, COLD or ARCHIVE.
+* `tags` - (Optional, ForceNew) Tags, do not support modify
 * `website` - (Optional) Website of the BOS bucket.
 
 The `copyright_protection` object supports the following:

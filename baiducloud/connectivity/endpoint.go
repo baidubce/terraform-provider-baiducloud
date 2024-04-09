@@ -14,6 +14,7 @@ type ServiceCode string
 const (
 	BCCCode       = ServiceCode("BCC")
 	VPCCode       = ServiceCode("VPC")
+	ESGCode       = ServiceCode("ESG")
 	EIPCode       = ServiceCode("EIP")
 	APPBLBCode    = ServiceCode("APPBLB")
 	BLBCode       = ServiceCode("BLB")
@@ -37,6 +38,8 @@ const (
 	BECCode       = ServiceCode("BEC")
 	ETGATEWAYCode = ServiceCode("ETGATEWAY")
 	DNSCode       = ServiceCode("DNS")
+	ETCode        = ServiceCode("ET")
+	ResourceManagerCode        = ServiceCode("ResourceManager")
 )
 
 const (
@@ -56,6 +59,7 @@ const (
 	DefaultBJRegionSmsEndPoint = "smsv3.bj.baidubce.com"
 	DefaultBJRegionBlsEndPoint = "bls-log.bj.baidubce.com"
 	DefaultBJRegionBecEndPoint = "bec.baidubce.com"
+	DefaultBJRegionResourceManagerEndPoint = "resourcemanager.baidubce.com"
 
 	DefaultBDRegionBccEndPoint = "bcc.bd.baidubce.com"
 	DefaultBDRegionBbcEndPoint = "bbc.bd.baidubce.com"
@@ -170,6 +174,9 @@ var (
 		BLSCode:       DefaultBJRegionBlsEndPoint,
 		BECCode:       DefaultBJRegionBecEndPoint,
 		ETGATEWAYCode: DefaultBJRegionBccEndPoint,
+		ETCode:        DefaultBJRegionBccEndPoint,
+		ESGCode:       DefaultBJRegionBccEndPoint,
+		ResourceManagerCode: 	DefaultBJRegionResourceManagerEndPoint,
 	}
 
 	// Region BD Service Endpoints
@@ -187,6 +194,8 @@ var (
 		CFSCode:       DefaultBDRegionCfsEndPoint,
 		EIPCode:       DefaultBDRegionEipEndPoint,
 		ETGATEWAYCode: DefaultBDRegionBccEndPoint,
+		ETCode:        DefaultBJRegionBccEndPoint,
+		ESGCode:       DefaultBJRegionBccEndPoint,
 	}
 
 	// Region GZ Service Endpoints
@@ -212,6 +221,8 @@ var (
 		RDSCode:       DefaultGZRegionRdsEndPoint,
 		BLSCode:       DefaultGZRegionBlsEndPoint,
 		ETGATEWAYCode: DefaultGZRegionBccEndPoint,
+		ETCode:        DefaultBJRegionBccEndPoint,
+		ESGCode:       DefaultBJRegionBccEndPoint,
 	}
 
 	// Region SU Service Endpoints
@@ -239,6 +250,8 @@ var (
 		SMSCode:       DefaultSURegionSmsEndPoint,
 		BLSCode:       DefaultSURegionBlsEndPoint,
 		ETGATEWAYCode: DefaultSURegionBccEndPoint,
+		ETCode:        DefaultBJRegionBccEndPoint,
+		ESGCode:       DefaultBJRegionBccEndPoint,
 	}
 
 	// Region FSH Service Endpoints
@@ -252,6 +265,7 @@ var (
 		VPNCode: DefaultFSHRegionVPNEndPoint,
 		VPCCode: DefaultFSHRegionBccEndPoint,
 		ENICode: DefaultFSHRegionEniEndPoint,
+		ESGCode: DefaultFSHRegionEniEndPoint,
 	}
 
 	// Region FWH Service Endpoints
@@ -277,6 +291,8 @@ var (
 		RDSCode:       DefaultFWHRegionRdsEndPoint,
 		CFSCode:       DefaultFWHRegionCfsEndPoint,
 		ETGATEWAYCode: DefaultFWHRegionBccEndPoint,
+		ETCode:        DefaultBJRegionBccEndPoint,
+		ESGCode:       DefaultBJRegionBccEndPoint,
 	}
 
 	// Region HKG Service Endpoints
@@ -299,6 +315,8 @@ var (
 		APPBLBCode:    DefaultHKGRegionBlbEndPoint,
 		BOSCode:       DefaultHKGRegionBosEndPoint,
 		ETGATEWAYCode: DefaultHKGRegionBccEndPoint,
+		ETCode:        DefaultBJRegionBccEndPoint,
+		ESGCode:       DefaultBJRegionBccEndPoint,
 	}
 
 	// Region SIN Service Endpoints
@@ -312,6 +330,7 @@ var (
 		VPCCode: DefaultSINRegionBccEndPoint,
 		VPNCode: DefaultSINRegionVPNEndPoint,
 		ENICode: DefaultSINRegionEniEndPoint,
+		ESGCode: DefaultSINRegionEniEndPoint,
 	}
 )
 

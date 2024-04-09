@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"io"
 	"io/ioutil"
 	"log"
@@ -214,4 +215,88 @@ func zipFileDir(path string) ([]byte, error) {
 		return nil, err
 	}
 	return zipFileBuffer.Bytes(), err
+}
+
+// SecurityGroupAction defines the interface for security group operations.
+type SecurityGroupAction interface {
+	AddSecurityGroups(instanceID string, securityGroupIDs []string) error
+	RemoveSecurityGroups(instanceID string, securityGroupIDs []string) error
+	AddEnterpriseSecurityGroups(instanceID string, securityGroupIDs []string) error
+	RemoveEnterpriseSecurityGroups(instanceID string, securityGroupIDs []string) error
+}
+
+func updateSecurityGroups(filed string, d *schema.ResourceData, instanceID string, action SecurityGroupAction) error {
+	// 安全组要使用security_groups字段
+	if d.HasChange(filed) {
+		// 获取旧值和新值
+		oldRaw, newRaw := d.GetChange(filed)
+		oldSet := oldRaw.(*schema.Set)
+		newSet := newRaw.(*schema.Set)
+
+		// 计算需要添加的安全组（在新值中但不在旧值中的）
+		add := newSet.Difference(oldSet).List()
+		// 计算需要删除的安全组（在旧值中但不在新值中的）
+		remove := oldSet.Difference(newSet).List()
+
+		// 处理添加的安全组
+		if len(add) > 0 {
+			addGroupsArg := make([]string, len(add))
+			for i, id := range add {
+				addGroupsArg[i] = id.(string)
+			}
+			if err := action.AddSecurityGroups(instanceID, addGroupsArg); err != nil {
+				return err
+			}
+		}
+
+		// 处理删除的安全组
+		if len(remove) > 0 {
+			deleteGroupsArg := make([]string, len(remove))
+			for i, id := range remove {
+				deleteGroupsArg[i] = id.(string)
+			}
+			if err := action.RemoveSecurityGroups(instanceID, deleteGroupsArg); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func updateEnterpriseSecurityGroups(filed string, d *schema.ResourceData, instanceID string, action SecurityGroupAction) error {
+	// 企业安全组要使用enterprise_security_groups字段
+	if d.HasChange(filed) {
+		// 获取旧值和新值
+		oldRaw, newRaw := d.GetChange(filed)
+		oldSet := oldRaw.(*schema.Set)
+		newSet := newRaw.(*schema.Set)
+
+		// 计算需要添加的企业安全组（在新值中但不在旧值中的）
+		add := newSet.Difference(oldSet).List()
+		// 计算需要删除的企业安全组（在旧值中但不在新值中的）
+		remove := oldSet.Difference(newSet).List()
+
+		// 处理添加的企业安全组
+		if len(add) > 0 {
+			addGroupsArg := make([]string, len(add))
+			for i, id := range add {
+				addGroupsArg[i] = id.(string)
+			}
+			if err := action.AddEnterpriseSecurityGroups(instanceID, addGroupsArg); err != nil {
+				return err
+			}
+		}
+
+		// 处理删除的企业安全组
+		if len(remove) > 0 {
+			deleteGroupsArg := make([]string, len(remove))
+			for i, id := range remove {
+				deleteGroupsArg[i] = id.(string)
+			}
+			if err := action.RemoveEnterpriseSecurityGroups(instanceID, deleteGroupsArg); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }

@@ -78,13 +78,54 @@ func resourceBaiduCloudBLB() *schema.Resource {
 			"address": {
 				Type:        schema.TypeString,
 				Description: "LoadBalance instance's service IP, instance can be accessed through this IP",
-				Computed:    true,
+				Optional:    true,
 			},
 			"vpc_id": {
 				Type:        schema.TypeString,
 				Description: "The VPC short ID to which the LoadBalance instance belongs",
 				Required:    true,
 				ForceNew:    true,
+			},
+			"eip": {
+				Type:        schema.TypeString,
+				Description: "eip of the LoadBalance",
+				Optional:    true,
+			},
+			"auto_renew_length": {
+				Type:         schema.TypeInt,
+				Description:  "The automatic renewal time is 1-9 per month and 1-3 per year.",
+				Optional:     true,
+				ValidateFunc: validation.IntBetween(1, 9),
+			},
+			"auto_renew_time_unit": {
+				Type:         schema.TypeString,
+				Description:  "Monthly payment or annual payment, month is \"month\" and year is \"year\".",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice([]string{"month", "year"}, false),
+			},
+			"security_groups": {
+				Type:        schema.TypeSet,
+				Description: "security groups of the LoadBalance.",
+				Optional:    true,
+				Computed:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"enterprise_security_groups": {
+				Type:        schema.TypeSet,
+				Description: "enterprise security group ids of the LoadBalance",
+				Optional:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"performance_level": {
+				Type:        schema.TypeString,
+				Description: "performance level, available values are small1, small2, medium1, medium2, large1, large2, large3",
+				Optional:    true,
+				ForceNew:    true,
+				ValidateFunc: validation.StringInSlice([]string{"small1", "small2", "medium1", "medium2", "large1", "large2", "large3",}, false),
 			},
 			"vpc_name": {
 				Type:        schema.TypeString,
@@ -175,6 +216,20 @@ func resourceBaiduCloudBLBCreate(d *schema.ResourceData, meta interface{}) error
 		return WrapError(err)
 	}
 
+	if _, ok := d.GetOk("security_groups"); ok {
+		err := blbService.updateBlbSecurityGroups(d, meta)
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_blb", action, BCESDKGoERROR)
+		}
+	}
+
+	if _, ok := d.GetOk("enterprise_security_groups"); ok {
+		err := blbService.updateBlbEnterpriseSecurityGroups(d, meta)
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_blb", action, BCESDKGoERROR)
+		}
+	}
+
 	return resourceBaiduCloudBLBRead(d, meta)
 }
 func resourceBaiduCloudBLBRead(d *schema.ResourceData, meta interface{}) error {
@@ -203,8 +258,25 @@ func resourceBaiduCloudBLBRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("cidr", blbDetail.Cidr)
 	d.Set("public_ip", blbDetail.PublicIp)
 	d.Set("create_time", blbDetail.CreateTime)
+	d.Set("performance_level", blbDetail.PerformanceLevel)
 	d.Set("listener", blbService.FlattenListenerModelToMap(blbDetail.Listener))
+	if v, ok := d.GetOk("tags"); ok {
+		if !slicesContainSameElements(blbDetail.Tags, tranceTagMapToModel(v.(map[string]interface{}))) {
+			return WrapErrorf(Error("Tags bind failed."), DefaultErrorMsg, "baiducloud_blb", action, BCESDKGoERROR)
+		}
+	}
 	d.Set("tags", flattenTagsToMap(blbModel.Tags))
+	securityIds, err := blbService.getBlbSecurityGroupIds(d.Id(), meta)
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_blb", action, BCESDKGoERROR)
+	}
+	d.Set("security_groups", securityIds)
+
+	enterpriseSecurityIds, err := blbService.getBlbEnterpriseSecurityGroupIds(d.Id(), meta)
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_blb", action, BCESDKGoERROR)
+	}
+	d.Set("enterprise_security_groups", enterpriseSecurityIds)
 
 	return nil
 }
@@ -257,6 +329,19 @@ func resourceBaiduCloudBLBUpdate(d *schema.ResourceData, meta interface{}) error
 
 		d.SetPartial("name")
 		d.SetPartial("description")
+	}
+	if d.HasChange("security_groups") {
+		err := blbService.updateBlbSecurityGroups(d, meta)
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_blb", action, BCESDKGoERROR)
+		}
+	}
+
+	if d.HasChange("enterprise_security_groups") {
+		err := blbService.updateBlbEnterpriseSecurityGroups(d, meta)
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_blb", action, BCESDKGoERROR)
+		}
 	}
 
 	d.Partial(false)
@@ -317,6 +402,31 @@ func buildBaiduCloudCreateBlbArgs(d *schema.ResourceData) *blb.CreateLoadBalance
 
 	if v, ok := d.GetOk("tags"); ok {
 		result.Tags = tranceTagMapToModel(v.(map[string]interface{}))
+	}
+
+	if v, ok := d.GetOk("eip"); ok {
+		result.Eip = v.(string)
+	}
+
+	if v, ok := d.GetOk("address"); ok {
+		result.Address = v.(string)
+	}
+
+	if v, ok := d.GetOk("performance_level"); ok {
+		result.PerformanceLevel = v.(string)
+	}
+
+	if v, ok := d.GetOk("type"); ok {
+		result.Type = v.(string)
+	}
+
+	if v, ok := d.GetOk("auto_renew_length"); ok {
+		result.AutoRenewLength = v.(int)
+		if result.AutoRenewLength > 0 {
+			if v, ok := d.GetOk("auto_renew_time_unit"); ok {
+				result.AutoRenewTimeUnit = v.(string)
+			}
+		}
 	}
 
 	return result

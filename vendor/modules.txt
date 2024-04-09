@@ -77,7 +77,7 @@ github.com/aws/aws-sdk-go/service/sso
 github.com/aws/aws-sdk-go/service/sso/ssoiface
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
-# github.com/baidubce/bce-sdk-go v0.9.170
+# github.com/baidubce/bce-sdk-go v0.9.173
 github.com/baidubce/bce-sdk-go/auth
 github.com/baidubce/bce-sdk-go/bce
 github.com/baidubce/bce-sdk-go/http
@@ -107,11 +107,14 @@ github.com/baidubce/bce-sdk-go/services/dts
 github.com/baidubce/bce-sdk-go/services/eip
 github.com/baidubce/bce-sdk-go/services/endpoint
 github.com/baidubce/bce-sdk-go/services/eni
+github.com/baidubce/bce-sdk-go/services/esg
+github.com/baidubce/bce-sdk-go/services/et
 github.com/baidubce/bce-sdk-go/services/etGateway
 github.com/baidubce/bce-sdk-go/services/iam
 github.com/baidubce/bce-sdk-go/services/iam/api
 github.com/baidubce/bce-sdk-go/services/localDns
 github.com/baidubce/bce-sdk-go/services/rds
+github.com/baidubce/bce-sdk-go/services/resmanager
 github.com/baidubce/bce-sdk-go/services/scs
 github.com/baidubce/bce-sdk-go/services/sms
 github.com/baidubce/bce-sdk-go/services/sms/api

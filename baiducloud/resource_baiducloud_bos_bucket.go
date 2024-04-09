@@ -122,6 +122,7 @@ package baiducloud
 
 import (
 	"encoding/json"
+	"github.com/baidubce/bce-sdk-go/services/resmanager"
 	"time"
 
 	"github.com/baidubce/bce-sdk-go/services/bos"
@@ -481,6 +482,13 @@ func resourceBaiduCloudBosBucket() *schema.Resource {
 				Description: "Owner name of the BOS bucket.",
 				Computed:    true,
 			},
+			"tags": tagsSchema(),
+			"resource_group": {
+				Type:        schema.TypeString,
+				Description: "resource group of bucket.",
+				ForceNew:    true,
+				Optional:    true,
+			},
 		},
 	}
 }
@@ -692,6 +700,21 @@ func resourceBaiduCloudBosBucketUpdate(d *schema.ResourceData, meta interface{})
 		d.SetPartial("copyright_protection")
 	}
 
+	// update bucket tags
+	if d.HasChange("tags"){
+		if err := resourceBosBucketTagsUpdate(d, client); err != nil {
+			return err
+		}
+		d.SetPartial("tags")
+	}
+
+	// update bucket resource group
+	if d.HasChange("resource_group"){
+		if err := resourceBosBucketResourceGroupUpdate(d, client); err != nil {
+			return err
+		}
+		d.SetPartial("resource_group")
+	}
 	d.Partial(false)
 
 	return resourceBaiduCloudBosBucketRead(d, meta)
@@ -1145,5 +1168,48 @@ func resourceBaiduCloudBosBucketCopyrightProtectionUpdate(d *schema.ResourceData
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_bucket", action, BCESDKGoERROR)
 	}
 
+	return nil
+}
+
+func resourceBosBucketTagsUpdate(d *schema.ResourceData, client *connectivity.BaiduClient) error {
+	bucket := d.Get("bucket").(string)
+	action := "Update BOS Bucket tags"
+	tags := tranceTagMapToModel(d.Get("tags").(map[string]interface{}))
+	bosTags := make([]api.Tag, 0)
+	for _,item := range tags{
+		bosTags = append(bosTags, api.Tag{
+			TagKey: item.TagKey,
+			TagValue: item.TagValue,
+		})
+	}
+	putBucketTagArgs := &api.PutBucketTagArgs{
+		Tags: bosTags,
+	}
+	if _, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
+		return nil, bosClient.PutBucketTag(bucket, putBucketTagArgs)
+	}); err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_bucket", action, BCESDKGoERROR)
+	}
+	return nil
+}
+
+func resourceBosBucketResourceGroupUpdate(d *schema.ResourceData, client *connectivity.BaiduClient) error {
+	action := "Update BOS Bucket resource group"
+	region := string(client.Region)
+	if _, err := client.WithResourceManagerClient(func(client *resmanager.Client) (i interface{}, e error) {
+		args := &resmanager.BindResourceToGroupArgs{
+			Bindings: []resmanager.Binding{
+				{
+					ResourceId:     d.Id(),
+					ResourceType:   "BOS",
+					ResourceRegion: region,
+					GroupId:        d.Get("resource_group").(string),
+				},
+			},
+		}
+		return client.BindResourceToGroup(args)
+	}); err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_bucket", action, BCESDKGoERROR)
+	}
 	return nil
 }

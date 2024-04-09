@@ -58,6 +58,10 @@ type PrefixType struct {
 	Prefix string `json:"prefix"`
 }
 
+type PutBucketArgs struct {
+	TagList string
+}
+
 // ListObjectsResult defines the result structure of ListObjects api.
 type ListObjectsResult struct {
 	Name           string              `json:"name"`
@@ -628,4 +632,17 @@ type Tag struct {
 type BosContext struct {
 	Bucket string 
 	PathStyleEnable bool
+}
+
+type PutObjectTagArgs struct {
+	ObjectTags []ObjectTags `json:"tagSet"`
+}
+
+type ObjectTags struct {
+	TagInfo []ObjectTag `json:"tagInfo"`
+}
+
+type ObjectTag struct {
+	Key string `json:"key"`
+	Value string `json:"value"`
 }

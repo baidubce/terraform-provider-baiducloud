@@ -21,10 +21,13 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/eip"
 	"github.com/baidubce/bce-sdk-go/services/endpoint"
 	"github.com/baidubce/bce-sdk-go/services/eni"
+	"github.com/baidubce/bce-sdk-go/services/esg"
+	"github.com/baidubce/bce-sdk-go/services/et"
 	"github.com/baidubce/bce-sdk-go/services/etGateway"
 	"github.com/baidubce/bce-sdk-go/services/iam"
 	"github.com/baidubce/bce-sdk-go/services/localDns"
 	"github.com/baidubce/bce-sdk-go/services/rds"
+	"github.com/baidubce/bce-sdk-go/services/resmanager"
 	"github.com/baidubce/bce-sdk-go/services/scs"
 	"github.com/baidubce/bce-sdk-go/services/sms"
 	"github.com/baidubce/bce-sdk-go/services/sts"
@@ -45,6 +48,7 @@ type BaiduClient struct {
 
 	bccConn       *bcc.Client
 	vpcConn       *vpc.Client
+	esgConn       *esg.Client
 	eipConn       *eip.Client
 	blbConn       *blb.Client
 	appBlbConn    *appblb.Client
@@ -69,6 +73,8 @@ type BaiduClient struct {
 	becConn       *bec.Client
 	etGatewayConn *etGateway.Client
 	dnsConn       *dns.Client
+	etConn        *et.Client
+	resourceManagerConn        *resmanager.Client
 }
 
 type ApiVersion string
@@ -178,6 +184,25 @@ func (client *BaiduClient) WithVpcClient(do func(*vpc.Client) (interface{}, erro
 	}
 
 	return do(client.vpcConn)
+}
+
+func (client *BaiduClient) WithEsgClient(do func(*esg.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the VPC client if necessary
+	if client.esgConn == nil {
+		client.WithCommonClient(ESGCode)
+		esgClient, err := esg.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		esgClient.Config.Credentials = client.Credentials
+		esgClient.Config.UserAgent = buildUserAgent()
+		client.esgConn = esgClient
+	}
+
+	return do(client.esgConn)
 }
 
 func (client *BaiduClient) WithEipClient(do func(*eip.Client) (interface{}, error)) (interface{}, error) {
@@ -408,6 +433,25 @@ func (client *BaiduClient) WithIamClient(do func(*iam.Client) (interface{}, erro
 	return do(client.iamConn)
 }
 
+func (client *BaiduClient) WithResourceManagerClient(do func(client *resmanager.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the resource manager client if necessary
+	if client.resourceManagerConn == nil {
+		client.WithCommonClient(ResourceManagerCode)
+		resourceManagerClient, err := resmanager.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey,
+			client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		resourceManagerClient.Config.UserAgent = buildUserAgent()
+		client.resourceManagerConn = resourceManagerClient
+	}
+
+	return do(client.resourceManagerConn)
+}
+
 func (client *BaiduClient) WithCdnClient(do func(*cdn.Client) (interface{}, error)) (interface{}, error) {
 	goSdkMutex.Lock()
 	defer goSdkMutex.Unlock()
@@ -606,6 +650,24 @@ func (client *BaiduClient) WithEtGatewayClient(do func(*etGateway.Client) (inter
 	}
 	goSdkMutex.Unlock()
 	return do(client.etGatewayConn)
+}
+
+func (client *BaiduClient) WithEtClient(do func(*et.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	// Initialize the VPN client if necessary
+	if client.etConn == nil {
+		client.WithCommonClient(ETCode)
+		etClient, err := et.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			goSdkMutex.Unlock()
+			return nil, err
+		}
+		etClient.Config.Credentials = client.Credentials
+		etClient.Config.UserAgent = buildUserAgent()
+		client.etConn = etClient
+	}
+	goSdkMutex.Unlock()
+	return do(client.etConn)
 }
 
 func (client *BaiduClient) WithDNSClient(do func(*dns.Client) (interface{}, error)) (interface{}, error) {
