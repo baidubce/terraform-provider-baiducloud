@@ -1,4 +1,13 @@
-	## 1.19.41 (Unreleased)
+	## 1.20.1 (Unreleased)
+## 1.20.0 (April 09, 2024)
+ENHANCEMENTS:
+- resource_baiducloud_appblb support attribute `address`, `eip`, `auto_renew_length`, `auto_renew_time_unit`,
+`security_groups`, `enterprise_security_groups`, `performance_level`
+- resource_baiducloud_blb support attribute `address`, `eip`, `auto_renew_length`, `auto_renew_time_unit`,
+`security_groups`, `enterprise_security_groups`, `performance_level`
+- resource_baiducloud_bos_bucket support attribute `tags`, `resource_group`
+- Update `baidubce/bce-sdk-go` to v0.9.173
+
 ## 1.19.40 (March 21, 2024)
 NOTES:
 - resource_baiducloud_scs support attribute resource_group_id
