@@ -1,23 +1,21 @@
 /*
 Provide a resource to create a Peer Conn.
 
-# Example Usage
+Example Usage
 
 ```hcl
-
-	resource "baiducloud_peer_conn" "default" {
-	  bandwidth_in_mbps = 10
-	  local_vpc_id = "vpc-y4p102r3mz6m"
-	  peer_vpc_id = "vpc-4njbqurm0uag"
-	  peer_region = "bj"
-	  billing = {
-	    payment_timing = "Postpaid"
-	  }
-	}
-
+resource "baiducloud_peer_conn" "default" {
+  bandwidth_in_mbps = 10
+  local_vpc_id = "vpc-y4p102r3mz6m"
+  peer_vpc_id = "vpc-4njbqurm0uag"
+  peer_region = "bj"
+  billing = {
+    payment_timing = "Postpaid"
+  }
+}
 ```
 
-# Import
+Import
 
 Peer Conn instance can be imported, e.g.
 
@@ -258,6 +256,12 @@ func resourceBaiduCloudPeerConnRead(d *schema.ResourceData, meta interface{}) er
 	}
 
 	peerConn := result.(*vpc.PeerConn)
+	result, _, err = vpcService.PeerConnStateRefresh(peerConnId, vpc.PEERCONN_ROLE_ACCEPTOR)()
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_peer_conn", action, BCESDKGoERROR)
+	}
+	peerConnAcceptor := result.(*vpc.PeerConn)
+	d.Set("peer_if_name", peerConnAcceptor.LocalIfName)
 	setAttributeForPeerConn(d, peerConn)
 
 	return nil
@@ -469,9 +473,12 @@ func setAttributeForPeerConn(d *schema.ResourceData, peerConn *vpc.PeerConn) {
 	d.Set("created_time", peerConn.CreatedTime)
 	d.Set("expired_time", peerConn.ExpiredTime)
 	d.Set("dns_status", peerConn.DnsStatus)
-	//d.Set("dns_sync", peerConn.DnsStatus)
+	if peerConn.DnsStatus == vpc.DNS_STATUS_CLOSE || peerConn.DnsStatus == vpc.DNS_STATUS_CLOSING{
+		d.Set("dns_sync", false)
+	} else {
+		d.Set("dns_sync", true)
+	}
 	d.Set("peer_conn_id", peerConn.PeerConnId)
-
 	billingMap := map[string]interface{}{"payment_timing": peerConn.PaymentTiming}
 	d.Set("billing", billingMap)
 }

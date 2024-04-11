@@ -2,11 +2,13 @@ package cdn
 
 import (
 	"fmt"
+	"github.com/baidubce/bce-sdk-go/model"
 	"github.com/baidubce/bce-sdk-go/services/cdn"
 	"github.com/baidubce/bce-sdk-go/services/cdn/api"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
+	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/flex"
 	"log"
 )
 
@@ -109,6 +111,7 @@ func ResourceDomain() *schema.Resource {
 				Description: "Whether the acceleration domain is blocked. `YES` means blocked, and `NO` means not blocked.",
 				Computed:    true,
 			},
+			"tags": flex.TagsSchema(),
 		},
 	}
 
@@ -123,7 +126,12 @@ func resourceDomainCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Create CDN Domain: %s %+v", domain, input)
 
 	_, err := conn.WithCdnClient(func(cdnClient *cdn.Client) (interface{}, error) {
-		return cdnClient.CreateDomain(domain, input)
+		tags := make([]model.TagModel, 0)
+		if v, ok := d.GetOk("tags"); ok {
+			tags = flex.TranceTagMapToModel(v.(map[string]interface{}))
+		}
+		return cdnClient.CreateDomainWithOptions(domain, input.Origin, cdn.CreateDomainWithTags(tags),
+			cdn.CreateDomainWithForm(input.Form), cdn.CreateDomainWithOriginDefaultHost(input.DefaultHost))
 	})
 
 	if err != nil {
@@ -155,6 +163,13 @@ func resourceDomainRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("create_time", config.CreateTime)
 	d.Set("last_modify_time", config.LastModifyTime)
 	d.Set("is_ban", config.IsBan)
+
+	if v, ok := d.GetOk("tags"); ok {
+		if !flex.SlicesContainSameElements(config.Tags, flex.TranceTagMapToModel(v.(map[string]interface{}))) {
+			return fmt.Errorf("error binding CDN Domain tags (%s)", domain)
+		}
+	}
+	d.Set("tags", flex.FlattenTagsToMap(config.Tags))
 
 	return nil
 }

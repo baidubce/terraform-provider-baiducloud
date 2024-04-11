@@ -56,6 +56,7 @@ resource "baiducloud_cdn_domain" "example" {
 
 - `default_host` (String) Domain-level host. Priority is lower than origin server host(ie origin.host).
 - `form` (String) Business type of the domain name. Defaults to `default`. Valid values: `image`(small image file), `download`(large file downloading), `media` (streaming media on demand), `dynamic`(dynamic and static acceleration).
+- `tags` - (Optional, ForceNew) Tags, do not support modify
 
 ### Read-Only
 

@@ -220,6 +220,19 @@ func resourceBaiduCloudPeerConnAcceptorRead(d *schema.ResourceData, meta interfa
 
 	peerConn := result.(*vpc.PeerConn)
 	setAttributeForPeerConn(d, peerConn)
+	result, _, err = vpcService.PeerConnStateRefresh(peerConnId, vpc.PEERCONN_ROLE_INITIATOR)()
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_peer_conn_acceptor", action, BCESDKGoERROR)
+	}
+	initiatorConn := result.(*vpc.PeerConn)
+	autoAccept := true
+	autoReject := false
+	if initiatorConn.PeerAccountId != peerConn.PeerAccountId && peerConn.Status == vpc.PEERCONN_STATUS_CONSULTING {
+		autoAccept = false
+		autoReject = true
+	}
+	d.Set("auto_accept", autoAccept)
+	d.Set("auto_reject", autoReject)
 
 	return nil
 }
