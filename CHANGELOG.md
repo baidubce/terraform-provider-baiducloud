@@ -1,4 +1,12 @@
-	## 1.20.1 (Unreleased)
+	## 1.20.2 (Unreleased)
+## 1.20.1 (April 11, 2024)
+NOTES:
+- resource_peer_connection and resource_peer_connection_acceptor fix some bugs
+
+ENHANCEMENTS:
+- resource baiducloud_cdn_domain support attribute `tags`
+- Update `baidubce/bce-sdk-go` to v0.9.174
+
 ## 1.20.0 (April 09, 2024)
 ENHANCEMENTS:
 - resource_baiducloud_appblb support attribute `address`, `eip`, `auto_renew_length`, `auto_renew_time_unit`,
