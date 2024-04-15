@@ -28,6 +28,7 @@ $ terraform import baiducloud_rds_readonly_instance.default id
 package baiducloud
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/baidubce/bce-sdk-go/bce"
@@ -98,15 +99,13 @@ func resourceBaiduCloudRdsReadOnlyInstance() *schema.Resource {
 			"vpc_id": {
 				Type:        schema.TypeString,
 				Description: "ID of the specific VPC",
-				Optional:    true,
-				Computed:    true,
+				Required:    true,
 				ForceNew:    true,
 			},
 			"subnets": {
 				Type:        schema.TypeList,
 				Description: "Subnets of the instance.",
-				Optional:    true,
-				Computed:    true,
+				Required:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"subnet_id": {
@@ -203,39 +202,38 @@ func resourceBaiduCloudRdsReadOnlyInstance() *schema.Resource {
 							Default:      PaymentTimingPostpaid,
 							ValidateFunc: validatePaymentTiming(),
 						},
-						"reservation": {
-							Type:             schema.TypeMap,
-							Description:      "Reservation of the Rds.",
-							Optional:         true,
-							DiffSuppressFunc: postPaidDiffSuppressFunc,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"reservation_length": {
-										Type:             schema.TypeInt,
-										Description:      "The reservation length that you will pay for your resource. It is valid when payment_timing is Prepaid. Valid values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36].",
-										Required:         true,
-										Default:          1,
-										ValidateFunc:     validateReservationLength(),
-										DiffSuppressFunc: postPaidDiffSuppressFunc,
-									},
-									"reservation_time_unit": {
-										Type:             schema.TypeString,
-										Description:      "The reservation time unit that you will pay for your resource. It is valid when payment_timing is Prepaid. The value can only be month currently, which is also the default value.",
-										Required:         true,
-										Default:          "Month",
-										ValidateFunc:     validateReservationUnit(),
-										DiffSuppressFunc: postPaidDiffSuppressFunc,
-									},
-								},
-							},
-						},
 					},
 				},
 			},
-			"payment_timing": {
-				Type:        schema.TypeString,
-				Description: "RDS payment timing",
-				Computed:    true,
+			"reservation": {
+				Type:             schema.TypeMap,
+				Description:      "Reservation of the Rds.",
+				Optional:         true,
+				DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"reservation_length": {
+							Type: schema.TypeInt,
+							Description: "The reservation length that you will pay for your resource. " +
+								"It is valid when payment_timing is Prepaid. " +
+								"Valid values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36].",
+							Required:         true,
+							Default:          1,
+							ValidateFunc:     validateReservationLength(),
+							DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
+						},
+						"reservation_time_unit": {
+							Type: schema.TypeString,
+							Description: "The reservation time unit that you will pay for your resource. " +
+								"It is valid when payment_timing is Prepaid. " +
+								"The value can only be month currently, which is also the default value.",
+							Required:         true,
+							Default:          "month",
+							ValidateFunc:     validateReservationUnit(),
+							DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
+						},
+					},
+				},
 			},
 		},
 	}
@@ -250,20 +248,15 @@ func resourceBaiduCloudRdsReadOnlyInstanceCreate(d *schema.ResourceData, meta in
 		return WrapError(err)
 	}
 
-	action := "Create RDS Instance " + createRdsArgs.InstanceName
-	addDebug(action, createRdsArgs)
+	action := "Create RDS read only Instance " + createRdsArgs.InstanceName
 
 	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 		raw, err := client.WithRdsClient(func(rdsClient *rds.Client) (interface{}, error) {
 			return rdsClient.CreateReadReplica(createRdsArgs)
 		})
 		if err != nil {
-			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
-				return resource.RetryableError(err)
-			}
 			return resource.NonRetryableError(err)
 		}
-		addDebug(action, raw)
 		response, _ := raw.(*rds.CreateResult)
 		d.SetId(response.InstanceIds[0])
 		return nil
@@ -387,6 +380,7 @@ func resourceBaiduCloudRdsReadOnlyInstanceDelete(d *schema.ResourceData, meta in
 func buildBaiduCloudRdsReadOnlyInstanceArgs(d *schema.ResourceData, meta interface{}) (*rds.CreateReadReplicaArgs, error) {
 	request := &rds.CreateReadReplicaArgs{
 		ClientToken: buildClientToken(),
+		IsDirectPay: true,
 	}
 
 	if v, ok := d.GetOk("billing"); ok {
@@ -399,11 +393,15 @@ func buildBaiduCloudRdsReadOnlyInstanceArgs(d *schema.ResourceData, meta interfa
 			paymentTiming := p.(string)
 			billingRequest.PaymentTiming = paymentTiming
 		}
-		if billingRequest.PaymentTiming == PaymentTimingPostpaid {
-			if r, ok := billing["reservation"]; ok {
+		if billingRequest.PaymentTiming == PaymentTimingPrepaid {
+			if r, ok := d.GetOk("reservation"); ok {
 				reservation := r.(map[string]interface{})
 				if reservationLength, ok := reservation["reservation_length"]; ok {
-					billingRequest.Reservation.ReservationLength = reservationLength.(int)
+					reservationLengthInt, err := strconv.Atoi(reservationLength.(string))
+					billingRequest.Reservation.ReservationLength = reservationLengthInt
+					if err != nil {
+						return nil, err
+					}
 				}
 				if reservationTimeUnit, ok := reservation["reservation_time_unit"]; ok {
 					billingRequest.Reservation.ReservationTimeUnit = reservationTimeUnit.(string)
@@ -437,9 +435,7 @@ func buildBaiduCloudRdsReadOnlyInstanceArgs(d *schema.ResourceData, meta interfa
 		request.IsDirectPay = isDirectPay.(bool)
 	}
 
-	if purchaseCount, ok := d.GetOk("purchase_count"); ok {
-		request.PurchaseCount = purchaseCount.(int)
-	}
+	request.PurchaseCount = 1
 
 	if vpcID, ok := d.GetOk("vpc_id"); ok {
 		request.VpcId = vpcID.(string)

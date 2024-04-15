@@ -35,17 +35,17 @@ The following arguments are supported:
 * `cpu_count` - (Required) The number of CPU
 * `memory_capacity` - (Required) Memory capacity(GB) of the instance.
 * `source_instance_id` - (Required, ForceNew) ID of the master instance
+* `subnets` - (Required) Subnets of the instance.
 * `volume_capacity` - (Required) Volume capacity(GB) of the instance
+* `vpc_id` - (Required, ForceNew) ID of the specific VPC
 * `category` - (Optional, ForceNew) Category of the instance. Available values are Basic、Standard(Default), only SQLServer 2012sp3 support Basic.
 * `instance_name` - (Optional) Name of the instance. Support for uppercase and lowercase letters, numbers, Chinese and special characters, such as "-","_","/",".", the value must start with a letter, length 1-65.
-* `subnets` - (Optional) Subnets of the instance.
+* `reservation` - (Optional) Reservation of the Rds.
 * `tags` - (Optional, ForceNew) Tags, do not support modify
-* `vpc_id` - (Optional, ForceNew) ID of the specific VPC
 
 The `billing` object supports the following:
 
-* `payment_timing` - (Required) Payment timing of billing, only support Postpaid.
-* `reservation` - (Optional) Reservation of the Rds.
+* `payment_timing` - (Required) Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.
 
 The `reservation` object supports the following:
 
@@ -68,7 +68,6 @@ In addition to all arguments above, the following attributes are exported:
 * `instance_status` - Status of the instance.
 * `instance_type` - Type of the instance,  Available values are Master, ReadReplica, RdsProxy.
 * `node_amount` - Number of proxy node.
-* `payment_timing` - RDS payment timing
 * `port` - The port used to access a instance.
 * `region` - Region of the instance.
 * `used_storage` - Memory capacity(GB) of the instance to be used.

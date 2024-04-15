@@ -56,6 +56,7 @@ The following arguments are supported:
 
 * `cluster_spec` - (Required, ForceNew) Specification of the cluster
 * `master_specs` - (Optional, ForceNew) Specification of master nodes cluster
+* `tags` - (Optional, ForceNew) Tags, do not support modify
 
 The `cluster_spec` object supports the following:
 
@@ -65,7 +66,7 @@ The `cluster_spec` object supports the following:
 * `container_network_config` - (Optional) Container Network Config
 * `description` - (Optional) Cluster Description
 * `k8s_custom_config` - (Optional) Cluster k8s custom config
-* `k8s_version` - (Optional) Kubernetes Version. Available Value: [1.18.9, 1.20.8, 1.22.5].
+* `k8s_version` - (Optional) Kubernetes Version. Available Value: [1.18.9, 1.20.8, 1.21.14, 1.22.5, 1.24.4, 1.26.9].
 * `master_config` - (Optional) Cluster Master Config
 * `plugins` - (Optional) Plugin List
 * `runtime_type` - (Optional) Container Runtime Type. Available Value: [docker].

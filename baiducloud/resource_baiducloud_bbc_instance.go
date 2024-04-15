@@ -64,6 +64,7 @@ $ terraform import baiducloud_bbc_instance.my-server id
 package baiducloud
 
 import (
+	"encoding/json"
 	"github.com/baidubce/bce-sdk-go/bce"
 	"github.com/baidubce/bce-sdk-go/services/bbc"
 	"github.com/baidubce/bce-sdk-go/services/bcc"
@@ -72,6 +73,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
+	"log"
 	"strconv"
 	"time"
 )
@@ -223,6 +225,12 @@ func resourceBaiduCloudBccInstance() *schema.Resource {
 				Description: "enableNuma.",
 				Optional:    true,
 			},
+			"enable_ht": {
+				Type:        schema.TypeBool,
+				Description: "enableHt",
+				Optional:    true,
+				Default:     true,
+			},
 			"root_partition_type": {
 				Type:        schema.TypeString,
 				Description: "namroot_partition_type.",
@@ -333,6 +341,8 @@ func resourceBaiduCloudBccInstanceCreate(d *schema.ResourceData, meta interface{
 	if len(securityGroups) > 0 {
 		createInstanceArgs.SecurityGroupId = securityGroups[0].(string)
 	}
+	jsonData,_ := json.Marshal(createInstanceArgs)
+	log.Print("BBC args is ", string(jsonData))
 	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 		res, err := client.WithBbcClient(func(bbcClient *bbc.Client) (i interface{}, e error) {
 			return bbcClient.CreateInstance(createInstanceArgs)
@@ -612,6 +622,9 @@ func buildBaiduCloudBbcInstanceArgs(d *schema.ResourceData, meta interface{}) (*
 	}
 	if v, ok := d.GetOk("tags"); ok {
 		request.Tags = tranceTagMapToModel(v.(map[string]interface{}))
+	}
+	if v, ok := d.GetOk("enable_ht"); ok {
+		request.EnableHt = v.(bool)
 	}
 	return request, nil
 }

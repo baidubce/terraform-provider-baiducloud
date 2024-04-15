@@ -262,7 +262,7 @@ func resourceBaiduCloudRdsInstance() *schema.Resource {
 				Type:             schema.TypeMap,
 				Description:      "Reservation of the Rds.",
 				Optional:         true,
-				DiffSuppressFunc: postPaidDiffSuppressFunc,
+				DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"reservation_length": {
@@ -273,7 +273,7 @@ func resourceBaiduCloudRdsInstance() *schema.Resource {
 							Required:         true,
 							Default:          1,
 							ValidateFunc:     validateReservationLength(),
-							DiffSuppressFunc: postPaidDiffSuppressFunc,
+							DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
 						},
 						"reservation_time_unit": {
 							Type: schema.TypeString,
@@ -283,7 +283,7 @@ func resourceBaiduCloudRdsInstance() *schema.Resource {
 							Required:         true,
 							Default:          "Month",
 							ValidateFunc:     validateReservationUnit(),
-							DiffSuppressFunc: postPaidDiffSuppressFunc,
+							DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
 						},
 					},
 				},

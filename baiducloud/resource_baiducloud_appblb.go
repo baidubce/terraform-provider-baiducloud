@@ -28,6 +28,7 @@ $ terraform import baiducloud_appblb.default id
 package baiducloud
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/baidubce/bce-sdk-go/bce"
@@ -68,6 +69,53 @@ func resourceBaiduCloudAppBLB() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "eip of the LoadBalance",
 				Optional:    true,
+			},
+			"billing": {
+				Type:        schema.TypeMap,
+				Description: "Billing information of the APPBLB.",
+				Required:    true,
+				ForceNew:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"payment_timing": {
+							Type:         schema.TypeString,
+							Description:  "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.",
+							Required:     true,
+							Default:      PaymentTimingPostpaid,
+							ValidateFunc: validatePaymentTiming(),
+						},
+					},
+				},
+			},
+			"reservation": {
+				Type:             schema.TypeMap,
+				Description:      "Reservation of the APPBLB.",
+				Optional:         true,
+				DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"reservation_length": {
+							Type: schema.TypeInt,
+							Description: "The reservation length that you will pay for your resource. " +
+								"It is valid when payment_timing is Prepaid. " +
+								"Valid values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36].",
+							Required:         true,
+							Default:          1,
+							ValidateFunc:     validateReservationLength(),
+							DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
+						},
+						"reservation_time_unit": {
+							Type: schema.TypeString,
+							Description: "The reservation time unit that you will pay for your resource. " +
+								"It is valid when payment_timing is Prepaid. " +
+								"The value can only be month currently, which is also the default value.",
+							Required:         true,
+							Default:          "month",
+							ValidateFunc:     validateReservationUnit(),
+							DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
+						},
+					},
+				},
 			},
 			"auto_renew_length": {
 				Type:         schema.TypeInt,
@@ -120,6 +168,11 @@ func resourceBaiduCloudAppBLB() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "LoadBalance instance's service IP, instance can be accessed through this IP",
 				Optional:    true,
+			},
+			"ipv6_address": {
+				Type:        schema.TypeString,
+				Description: "LoadBalance instance's ipv6 ip address",
+				Computed:    true,
 			},
 			"vpc_id": {
 				Type:        schema.TypeString,
@@ -188,6 +241,20 @@ func resourceBaiduCloudAppBLB() *schema.Resource {
 				},
 			},
 			"tags": tagsSchema(),
+			"allow_delete": {
+				Type:        schema.TypeBool,
+				Default:     true,
+				Description: "Whether to allow deletion, default value is true, do not support modify",
+				Optional:    true,
+				ForceNew:    true,
+			},
+			"allocate_ipv6": {
+				Type:        schema.TypeBool,
+				Default:     false,
+				Description: "Whether to allocated ipv6, default value is false, do not support modify",
+				Optional:    true,
+				ForceNew:    true,
+			},
 		},
 	}
 }
@@ -211,9 +278,11 @@ func resourceBaiduCloudAppBLBCreate(d *schema.ResourceData, meta interface{}) er
 		}
 
 		addDebug(action, raw)
+		addDebug(action, createArgs)
 		response, _ := raw.(*appblb.CreateLoadBalanceResult)
 		d.SetId(response.BlbId)
 		d.Set("address", response.Address)
+		d.Set("ipv6_address", response.Ipv6)
 		return nil
 	})
 
@@ -276,9 +345,11 @@ func resourceBaiduCloudAppBLBRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("release_time", blbDetail.ReleaseTime)
 	d.Set("performance_level", blbDetail.PerformanceLevel)
 	d.Set("listener", appblbService.FlattenListenerModelToMap(blbDetail.Listener))
-	if v, ok := d.GetOk("tags"); ok {
-		if !slicesContainSameElements(blbDetail.Tags, tranceTagMapToModel(v.(map[string]interface{}))) {
-			return WrapErrorf(Error("Tags bind failed."), DefaultErrorMsg, "baiducloud_appblb", action, BCESDKGoERROR)
+	if d.HasChange("tags") {
+		if v, ok := d.GetOk("tags"); ok {
+			if !slicesContainSameElements(blbDetail.Tags, tranceTagMapToModel(v.(map[string]interface{}))) {
+				return WrapErrorf(Error("Tags bind failed."), DefaultErrorMsg, "baiducloud_appblb", action, BCESDKGoERROR)
+			}
 		}
 	}
 	d.Set("tags", flattenTagsToMap(blbModel.Tags))
@@ -420,13 +491,48 @@ func buildBaiduCloudCreateAppBlbArgs(d *schema.ResourceData) *appblb.CreateLoadB
 		result.PerformanceLevel = v.(string)
 	}
 
-	if v, ok := d.GetOk("auto_renew_length"); ok {
-		result.AutoRenewLength = v.(int)
-		if result.AutoRenewLength > 0 {
-			if v, ok := d.GetOk("auto_renew_time_unit"); ok {
-				result.AutoRenewTimeUnit = v.(string)
+	if v, ok := d.GetOk("billing"); ok {
+		billing := v.(map[string]interface{})
+		billingRequest := &appblb.Billing{
+			PaymentTiming: "",
+		}
+		if p, ok := billing["payment_timing"]; ok {
+			paymentTiming := p.(string)
+			billingRequest.PaymentTiming = paymentTiming
+		}
+		if billingRequest.PaymentTiming == PaymentTimingPrepaid {
+			if r, ok := d.GetOk("reservation"); ok {
+				reservation := r.(map[string]interface{})
+				billingRequest.Reservation = &appblb.Reservation{}
+				if reservationLength, ok := reservation["reservation_length"]; ok {
+					reservationLengthInt, _ := strconv.Atoi(reservationLength.(string))
+					billingRequest.Reservation.ReservationLength = reservationLengthInt
+				}
+				if reservationTimeUnit, ok := reservation["reservation_time_unit"]; ok {
+					billingRequest.Reservation.ReservationTimeUnit = reservationTimeUnit.(string)
+				}
+			}
+			if v, ok := d.GetOk("auto_renew_length"); ok {
+				result.AutoRenewLength = v.(int)
+				if result.AutoRenewLength > 0 {
+					if v, ok := d.GetOk("auto_renew_time_unit"); ok {
+						result.AutoRenewTimeUnit = v.(string)
+					}
+				}
 			}
 		}
+		result.Billing = billingRequest
+	}
+
+
+	if v := d.Get("allow_delete"); true{
+		allowDelete := v.(bool)
+		result.AllowDelete = &allowDelete
+	}
+
+	if v := d.Get("allocate_ipv6"); true {
+		allocateIpv6 := v.(bool)
+		result.AllocateIpv6 = &allocateIpv6
 	}
 
 	return result

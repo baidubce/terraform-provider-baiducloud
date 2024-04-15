@@ -68,7 +68,7 @@ func resourceCCEv2ClusterSpec() *schema.Resource {
 			},
 			"k8s_version": {
 				Type:         schema.TypeString,
-				Description:  "Kubernetes Version. Available Value: [1.18.9, 1.20.8, 1.22.5].",
+				Description:  "Kubernetes Version. Available Value: [1.18.9, 1.20.8, 1.21.14, 1.22.5, 1.24.4, 1.26.9].",
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice(K8SVersionPermitted, false),
 			},
@@ -2704,6 +2704,9 @@ func buildCCEv2CreateClusterArgs(d *schema.ResourceData) (*ccev2.CreateClusterAr
 
 	clusterSpecRaw := d.Get("cluster_spec.0").(map[string]interface{})
 	clusterSpec, err := buildCCEv2CreateClusterClusterSpec(clusterSpecRaw)
+	if v,ok := d.GetOk("tags"); ok{
+		clusterSpec.Tags = tranceCCETagMapToModel(v.(map[string]interface{}))
+	}
 	if err != nil {
 		log.Printf("Build CreateClusterArgs ClusterSpec Fail:" + err.Error())
 		return nil, err
@@ -2751,6 +2754,53 @@ func buildCCEv2DeleteClusterArgs(d *schema.ResourceData) (*ccev2.DeleteClusterAr
 	return args, nil
 }
 
+func tranceCCETagMapToModel(tagMaps map[string]interface{}) []ccev2types.Tag {
+	tags := make([]ccev2types.Tag, 0, len(tagMaps))
+	for k, v := range tagMaps {
+		tags = append(tags, ccev2types.Tag{
+			TagKey:   k,
+			TagValue: v.(string),
+		})
+	}
+	return tags
+}
+
+func flattenCCETagsToMap(tags []ccev2types.Tag) map[string]string {
+	tagMap := make(map[string]string)
+	for _, tag := range tags {
+		tagMap[tag.TagKey] = tag.TagValue
+	}
+	return tagMap
+}
+
+// 判断两个tag切片是否包含相同的元素
+func slicesContainSameElementsInCCETags(a, b []ccev2types.Tag) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	// 创建映射来存储每个 TagModel 出现的次数
+	counts := make(map[ccev2types.Tag]int)
+	// 计算第一个切片中每个元素出现的次数
+	for _, item := range a {
+		counts[item]++
+	}
+	// 减去第二个切片中每个元素出现的次数
+	for _, item := range b {
+		counts[item]--
+		if counts[item] < 0 {
+			// 如果某个元素在第二个切片中出现的次数多于第一个切片，返回 false
+			return false
+		}
+	}
+	// 检查所有元素的计数是否为 0
+	for _, count := range counts {
+		if count != 0 {
+			return false
+		}
+	}
+	return true
+}
+
 var ClusterTypePermitted = []string{
 	string(ccev2types.ClusterTypeNormal),
 }
@@ -2760,7 +2810,10 @@ var K8SVersionPermitted = []string{
 	//string(ccev2types.K8S_1_16_8),
 	"1.18.9",
 	"1.20.8",
+	"1.21.14",
 	"1.22.5",
+	"1.24.4",
+	"1.26.9",
 }
 
 var RuntimeTypePermitted = []string{

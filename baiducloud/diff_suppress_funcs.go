@@ -9,6 +9,9 @@ import (
 func postPaidDiffSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
 	return d.Get("payment_timing").(string) == PaymentTimingPostpaid
 }
+func postPaidBillingDiffSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
+	return d.Get("billing").(map[string]interface{})["payment_timing"].(string) == PaymentTimingPostpaid
+}
 
 func specDiffSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
 	return d.Get("instance_spec").(string) != ""

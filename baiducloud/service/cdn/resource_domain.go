@@ -164,9 +164,11 @@ func resourceDomainRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("last_modify_time", config.LastModifyTime)
 	d.Set("is_ban", config.IsBan)
 
-	if v, ok := d.GetOk("tags"); ok {
-		if !flex.SlicesContainSameElements(config.Tags, flex.TranceTagMapToModel(v.(map[string]interface{}))) {
-			return fmt.Errorf("error binding CDN Domain tags (%s)", domain)
+	if d.HasChange("tags") {
+		if v, ok := d.GetOk("tags"); ok {
+			if !flex.SlicesContainSameElements(config.Tags, flex.TranceTagMapToModel(v.(map[string]interface{}))) {
+				return fmt.Errorf("error binding CDN Domain tags (%s)", domain)
+			}
 		}
 	}
 	d.Set("tags", flex.FlattenTagsToMap(config.Tags))
