@@ -1,4 +1,12 @@
-	## 1.20.2 (Unreleased)
+	## 1.20.3 (Unreleased)
+## 1.20.2 (April 15, 2024)
+NOTES:
+- resource_baiducloud_ccev2 support attribute `tags`
+- resource_baiducloud_rds_readonly_instance support prepaid
+- resource_baiducloud_blb support prepaid
+- resource_baiducloud_bbc_instance bug fix
+
+
 ## 1.20.1 (April 11, 2024)
 NOTES:
 - resource_peer_connection and resource_peer_connection_acceptor fix some bugs
