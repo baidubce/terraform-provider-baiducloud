@@ -72,8 +72,8 @@ func resourceBaiduCloudCDS() *schema.Resource {
 				ValidateFunc: validation.IntBetween(5, 32768),
 			},
 			"storage_type": {
-				Type: schema.TypeString,
-				Description: "CDS dist storage type, support hp1, std1, cloud_hp1, hdd and enhanced_ssd_pl1, default hp1, " +
+				Type:         schema.TypeString,
+				Description:  "CDS dist storage type, support hp1, std1, cloud_hp1, hdd and enhanced_ssd_pl1, default hp1, " +
 					"see https://cloud.baidu.com/doc/BCC/s/6jwvyo0q2/#storagetype for detail",
 				Optional:     true,
 				Computed:     true,
@@ -98,6 +98,25 @@ func resourceBaiduCloudCDS() *schema.Resource {
 				Optional:         true,
 				ValidateFunc:     validateReservationUnit(),
 				DiffSuppressFunc: postPaidDiffSuppressFunc,
+			},
+			"auto_renew_length": {
+				Type:         schema.TypeInt,
+				Description:  "The automatic renewal time is 1-9 per month and 1-3 per year.",
+				Optional:     true,
+				ValidateFunc: validation.IntBetween(1, 9),
+				DiffSuppressFunc: postPaidDiffSuppressFunc,
+			},
+			"auto_renew_time_unit": {
+				Type:         schema.TypeString,
+				Description:  "Monthly payment or annual payment, month is \"month\" and year is \"year\".",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice([]string{"month", "year"}, false),
+				DiffSuppressFunc: postPaidDiffSuppressFunc,
+			},
+			"instance_id":{
+				Type:         schema.TypeString,
+				Description:  "Create a disk and mount it to the instance.",
+				Optional:     true,
 			},
 			"snapshot_id": {
 				Type:        schema.TypeString,
@@ -155,6 +174,7 @@ func resourceBaiduCloudCDS() *schema.Resource {
 				Description: "CDS volume status",
 				Computed:    true,
 			},
+			"tags": tagsSchema(),
 		},
 	}
 }
@@ -193,8 +213,8 @@ func resourceBaiduCloudCDSCreate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	stateConf := buildStateConf(
-		[]string{string(api.VolumeStatusCREATING)},
-		[]string{string(api.VolumeStatusAVAILABLE)},
+		[]string{string(api.VolumeStatusCREATING), string(api.VolumeStatusATTACHING)},
+		[]string{string(api.VolumeStatusAVAILABLE), string(api.VolumeStatusINUSE)},
 		d.Timeout(schema.TimeoutCreate),
 		bccService.CDSVolumeStateRefreshFunc(d.Id(), CDSFailedStatus))
 	if _, err := stateConf.WaitForState(); err != nil {
@@ -233,6 +253,14 @@ func resourceBaiduCloudCDSRead(d *schema.ResourceData, meta interface{}) error {
 
 	if volume.AutoSnapshotPolicy != nil {
 		d.Set("auto_snapshot_policy_id", volume.AutoSnapshotPolicy.Id)
+	}
+
+	if d.HasChange("tags") {
+		if v, ok := d.GetOk("tags"); ok {
+			if !slicesContainSameElements(volume.Tags, tranceTagMapToModel(v.(map[string]interface{}))) {
+				return WrapErrorf(Error("Tags bind failed."), DefaultErrorMsg, "baiducloud_cds", action, BCESDKGoERROR)
+			}
+		}
 	}
 
 	return nil
@@ -393,7 +421,7 @@ func buildBaiduCloudCreateCDSArgs(d *schema.ResourceData, meta interface{}) (*ap
 	}
 
 	if v, ok := d.GetOk("payment_timing"); ok {
-		result.Billing.PaymentTiming = api.PaymentTimingType(v.(string))
+		result.ChargeType = v.(string)
 	}
 
 	reservation := &api.Reservation{}
@@ -408,5 +436,21 @@ func buildBaiduCloudCreateCDSArgs(d *schema.ResourceData, meta interface{}) (*ap
 		result.Billing.Reservation = reservation
 	}
 
+	if v, ok := d.GetOk("tags"); ok {
+		result.Tags = tranceTagMapToModel(v.(map[string]interface{}))
+	}
+
+	if v, ok := d.GetOk("instance_id"); ok {
+		result.InstanceId = v.(string)
+	}
+
+	if v, ok := d.GetOk("auto_renew_length"); ok {
+		result.RenewTime = v.(int)
+		if result.RenewTime > 0 {
+			if v, ok := d.GetOk("auto_renew_time_unit"); ok {
+				result.RenewTimeUnit = v.(string)
+			}
+		}
+	}
 	return result, nil
 }

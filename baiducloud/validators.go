@@ -37,7 +37,9 @@ func validateHttpMethod() schema.SchemaValidateFunc {
 }
 
 func validateStorageType() schema.SchemaValidateFunc {
-	return validateStringFormat()
+	return validation.StringInSlice([]string{
+		"enhanced_ssd_pl1", "cloud_hp1", "hp1", "hdd", "std1",
+	}, false)
 }
 
 func validateNameRegex(v interface{}, k string) (ws []string, errors []error) {
