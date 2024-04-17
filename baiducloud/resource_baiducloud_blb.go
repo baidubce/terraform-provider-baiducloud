@@ -28,6 +28,7 @@ $ terraform import baiducloud_blb.default id
 package baiducloud
 
 import (
+	"github.com/baidubce/bce-sdk-go/services/resmanager"
 	"strconv"
 	"time"
 
@@ -240,6 +241,12 @@ func resourceBaiduCloudBLB() *schema.Resource {
 				ForceNew:    true,
 			},
 			"tags": tagsSchema(),
+			"resource_group_id": {
+				Type:        schema.TypeString,
+				Description: "Resource group id, support setting when creating instance, do not support modify!",
+				Optional:    true,
+				ForceNew:    true,
+			},
 		},
 	}
 }
@@ -336,6 +343,18 @@ func resourceBaiduCloudBLBRead(d *schema.ResourceData, meta interface{}) error {
 			}
 		}
 	}
+	resourceGroupId, err := getResourceGroup(d, client, action, "baiducloud_blb")
+	if err != nil {
+		return err
+	}
+	if d.HasChange("resource_group_id") {
+		if v, ok := d.GetOk("resource_group_id"); ok {
+			if resourceGroupId != v.(string) {
+				return WrapErrorf(Error("Resource group bind failed."), DefaultErrorMsg, "baiducloud_blb", action, BCESDKGoERROR)
+			}
+		}
+	}
+	d.Set("resource_group_id", resourceGroupId)
 	d.Set("tags", flattenTagsToMap(blbModel.Tags))
 	securityIds, err := blbService.getBlbSecurityGroupIds(d.Id(), meta)
 	if err != nil {
@@ -350,6 +369,30 @@ func resourceBaiduCloudBLBRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("enterprise_security_groups", enterpriseSecurityIds)
 
 	return nil
+}
+
+func getResourceGroup(d *schema.ResourceData, client *connectivity.BaiduClient, action string, product string) (string, error) {
+	region := string(client.Region)
+	raw, err := client.WithResourceManagerClient(func(client *resmanager.Client) (i interface{}, e error) {
+		args := &resmanager.ResGroupDetailRequest{
+			ResourceBrief: []resmanager.ResourceBrief{
+				{
+					ResourceId:     d.Id(),
+					ResourceType:   "BLB",
+					ResourceRegion: region,
+				},
+			},
+		}
+		return client.GetResGroupBatch(args)
+	})
+	if err != nil {
+		return "",WrapErrorf(err, DefaultErrorMsg, product, action, BCESDKGoERROR)
+	}
+	resp := raw.(*resmanager.ResGroupDetailResponse)
+	if len(resp.ResourceGroupsDetailFull)>0 && len(resp.ResourceGroupsDetailFull[0].BindGroupInfo)> 0 {
+		return resp.ResourceGroupsDetailFull[0].BindGroupInfo[0].GroupId, nil
+	}
+	return "", nil
 }
 
 func resourceBaiduCloudBLBUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -532,6 +575,10 @@ func buildBaiduCloudCreateBlbArgs(d *schema.ResourceData) *blb.CreateLoadBalance
 	if v := d.Get("allocate_ipv6"); true {
 		allocateIpv6 := v.(bool)
 		result.AllocateIpv6 = &allocateIpv6
+	}
+
+	if v := d.Get("resource_group_id"); true {
+		result.ResourceGroupId = v.(string)
 	}
 
 	return result

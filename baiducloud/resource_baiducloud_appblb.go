@@ -255,6 +255,12 @@ func resourceBaiduCloudAppBLB() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 			},
+			"resource_group_id": {
+				Type:        schema.TypeString,
+				Description: "Resource group id, support setting when creating instance, do not support modify!",
+				Optional:    true,
+				ForceNew:    true,
+			},
 		},
 	}
 }
@@ -352,6 +358,18 @@ func resourceBaiduCloudAppBLBRead(d *schema.ResourceData, meta interface{}) erro
 			}
 		}
 	}
+	resourceGroupId, err := getResourceGroup(d, client, action, "baiducloud_appblb")
+	if err != nil {
+		return err
+	}
+	if d.HasChange("resource_group_id") {
+		if v, ok := d.GetOk("resource_group_id"); ok {
+			if resourceGroupId != v.(string) {
+				return WrapErrorf(Error("Resource group bind failed."), DefaultErrorMsg, "baiducloud_blb", action, BCESDKGoERROR)
+			}
+		}
+	}
+	d.Set("resource_group_id", resourceGroupId)
 	d.Set("tags", flattenTagsToMap(blbModel.Tags))
 	d.Set("address", blbDetail.Address)
 
@@ -533,6 +551,10 @@ func buildBaiduCloudCreateAppBlbArgs(d *schema.ResourceData) *appblb.CreateLoadB
 	if v := d.Get("allocate_ipv6"); true {
 		allocateIpv6 := v.(bool)
 		result.AllocateIpv6 = &allocateIpv6
+	}
+
+	if v := d.Get("resource_group_id"); true {
+		result.ResourceGroupId = v.(string)
 	}
 
 	return result

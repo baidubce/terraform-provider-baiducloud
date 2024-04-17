@@ -64,6 +64,7 @@ type ListAccessKeyResult struct {
 type LoginProfileModel struct {
 	Password          string `json:"password,omitempty"`
 	NeedResetPassword bool   `json:"needResetPassword"`
+	EnabledLogin      bool   `json:"enabledLogin"`
 	EnabledLoginMfa   bool   `json:"enabledLoginMfa"`
 	LoginMfaType      string `json:"loginMfaType,omitempty"`
 	ThirdPartyType    bool   `json:"thirdPartyType,omitempty"`
@@ -224,4 +225,15 @@ type UpdateSubUserArgs struct {
 	Password string `json:"password,omitempty"`
 	Provider string `json:"provider,omitempty"`
 	Enable   bool   `json:"enable"`
+}
+
+type PolicyAttachedEntity struct {
+	Id         string    `json:"id,omitempty"`
+	Name       string    `json:"name,omitempty"`
+	Type       string    `json:"type,omitempty"`
+	AttachTime time.Time `json:"attachTime,omitempty"`
+}
+
+type ListPolicyAttachedEntityResult struct {
+	PolicyAttachedEntities []PolicyAttachedEntity `json:"entities"`
 }

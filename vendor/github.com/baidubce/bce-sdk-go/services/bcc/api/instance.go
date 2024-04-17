@@ -249,6 +249,9 @@ func ListInstances(cli bce.Client, args *ListInstanceArgs) (*ListInstanceResult,
 		if len(args.VpcId) != 0 {
 			req.SetParam("vpcId", args.VpcId)
 		}
+		if len(args.Ipv6Addresses) != 0 {
+			req.SetParam("ipv6Addresses", args.Ipv6Addresses)
+		}
 	}
 	if args == nil || args.MaxKeys == 0 {
 		req.SetParam("maxKeys", "1000")
@@ -1067,7 +1070,6 @@ func DeletePrepaidInstanceWithRelatedResource(cli bce.Client, reqBody *bce.Body)
 	return jsonBody, nil
 }
 
-
 // InstanceChangeSubnet - change the subnet to which the instance belongs
 //
 // PARAMS:
@@ -1620,6 +1622,38 @@ func GetStockWithDeploySet(cli bce.Client, args *GetStockWithDeploySetArgs) (*Ge
 	}
 
 	jsonBody := &GetStockWithDeploySetResults{}
+	if err := resp.ParseJsonBody(jsonBody); err != nil {
+		return nil, err
+	}
+	return jsonBody, nil
+}
+
+func GetAvailableStockWithSpec(cli bce.Client, args *GetAvailableStockWithSpecArgs) (*GetAvailableStockWithSpecResults, error) {
+	// Build the request
+	req := &bce.BceRequest{}
+	req.SetUri(getAvailableStockWithSpec())
+	req.SetMethod(http.POST)
+
+	jsonBytes, err := json.Marshal(args)
+	if err != nil {
+		return nil, err
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	req.SetBody(body)
+
+	// Send request and get response
+	resp := &bce.BceResponse{}
+	if err := cli.SendRequest(req, resp); err != nil {
+		return nil, err
+	}
+	if resp.IsFail() {
+		return nil, resp.ServiceError()
+	}
+
+	jsonBody := &GetAvailableStockWithSpecResults{}
 	if err := resp.ParseJsonBody(jsonBody); err != nil {
 		return nil, err
 	}

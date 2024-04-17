@@ -45,6 +45,7 @@ The following arguments are supported:
 * `name` - (Optional) LoadBalance instance's name, length must be between 1 and 65 bytes, and will be automatically generated if not set
 * `performance_level` - (Optional, ForceNew) performance level, available values are small1, small2, medium1, medium2, large1, large2, large3
 * `reservation` - (Optional) Reservation of the APPBLB.
+* `resource_group_id` - (Optional, ForceNew) Resource group id, support setting when creating instance, do not support modify!
 * `security_groups` - (Optional) security group ids of the APPBLB.
 * `tags` - (Optional, ForceNew) Tags, do not support modify
 
