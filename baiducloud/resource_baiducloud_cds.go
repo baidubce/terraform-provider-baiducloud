@@ -262,6 +262,7 @@ func resourceBaiduCloudCDSRead(d *schema.ResourceData, meta interface{}) error {
 			}
 		}
 	}
+	d.Set("tags", flattenTagsToMap(volume.Tags))
 
 	return nil
 }
