@@ -1,4 +1,9 @@
-	## 1.20.4 (Unreleased)
+	## 1.20.5 (Unreleased)
+## 1.20.4 (April 17, 2024)
+NOTES:
+- resource_baiducloud_blb support attribute `resource_group_id`
+- resource_baiducloud_appblb support attribute `resource_group_id`
+
 ## 1.20.3 (April 17, 2024)
 NOTES:
 - resource_baiducloud_cds support attribute tags, auto_renew_length, auto_renew_time_unit, instance_id
