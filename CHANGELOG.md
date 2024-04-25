@@ -1,4 +1,10 @@
-	## 1.20.5 (Unreleased)
+	## 1.20.6 (Unreleased)
+## 1.20.5 (April 25, 2024)
+FEATURES:
+- **New Resource:** `baiducloud_mongodb_instance`
+- **New Resource:** `baiducloud_mongodb_sharding_instance`
+- **New Data Source:** `baiducloud_mongodb_instances`
+
 ## 1.20.4 (April 17, 2024)
 NOTES:
 - resource_baiducloud_blb support attribute `resource_group_id`
