@@ -126,6 +126,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/bec"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/cdn"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/iam"
+	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/mongodb"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/snic"
 	"os"
 	"strings"
@@ -244,6 +245,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_iam_access_keys":                iam.DataSourceAccessKeys(),
 			"baiducloud_et_gateways":                    dataSourceBaiduCloudEtGateways(),
 			"baiducloud_et_gateway_associations":        dataSourceBaiduCloudEtGatewayAssociations(),
+			"baiducloud_mongodb_instances":              mongodb.DataSourceInstances(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -326,6 +328,8 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_iam_access_key":              iam.ResourceAccessKey(),
 			"baiducloud_et_gateway":                  resourceBaiduCloudEtGateway(),
 			"baiducloud_et_gateway_association":      resourceBaiduCloudEtGatewayAssociation(),
+			"baiducloud_mongodb_instance":            mongodb.ResourceInstance(),
+			"baiducloud_mongodb_sharding_instance":   mongodb.ResourceShardingInstance(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -381,6 +385,9 @@ func init() {
 		"vpn_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom VPN endpoints.",
 
 		"dns_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom DNS endpoints.",
+
+		"mongodb_endpoint": "Use this to override the default endpoint URL constructed from the `region`. " +
+			"It's typically used to connect to custom MONGODB endpoints.",
 	}
 }
 
@@ -486,6 +493,12 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["dns_endpoint"],
 				},
+				"mongodb": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["mongodb_endpoint"],
+				},
 			},
 		},
 		Set: endpointsToHash,
@@ -511,6 +524,7 @@ func endpointsToHash(v interface{}) int {
 	buf.WriteString(fmt.Sprintf("%s-", m["bbc"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["vpn"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["dns"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["mongodb"].(string)))
 	return hashcode.String(buf.String())
 }
 
@@ -578,6 +592,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints[connectivity.BBCCode] = strings.TrimSpace(endpoints["bbc"].(string))
 		config.ConfigEndpoints[connectivity.VPNCode] = strings.TrimSpace(endpoints["vpn"].(string))
 		config.ConfigEndpoints[connectivity.DNSCode] = strings.TrimSpace(endpoints["dns"].(string))
+		config.ConfigEndpoints[connectivity.MONGODBCode] = strings.TrimSpace(endpoints["mongodb"].(string))
 	}
 
 	client, err := config.Client()

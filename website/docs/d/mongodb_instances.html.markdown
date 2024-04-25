@@ -48,7 +48,7 @@ Read-Only:
 - `instance_id` (String) ID of the instance.
 - `memory_capacity` (Number) Memory size (GB) of the instance.
 - `mongos_count` (Number) Number of mongos nodes in the sharding instance.
-- `name` (String) Name of the instance. If not specified, it will be randomly generated.
+- `name` (String) Name of the instance.
 - `payment_timing` (String) Payment timing of billing. Possible values: `Prepaid`, `Postpaid`.
 - `port` (String) Connection port of the instance.
 - `readonly_node_num` (Number) Number of readonly nodes in the instance. Possible values: `0`~`5`.

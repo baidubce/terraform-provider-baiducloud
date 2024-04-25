@@ -58,7 +58,7 @@ func schemaInstance() *schema.Resource {
 		},
 		"name": {
 			Type:        schema.TypeString,
-			Description: "Name of the instance. If not specified, it will be randomly generated.",
+			Description: "Name of the instance.",
 			Computed:    true,
 		},
 		"payment_timing": flex.ComputedSchemaPaymentTiming(),

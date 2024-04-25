@@ -1,5 +1,5 @@
-	## 1.20.6 (Unreleased)
-## 1.20.5 (April 25, 2024)
+	## 1.20.7 (Unreleased)
+## 1.20.6 (April 25, 2024)
 FEATURES:
 - **New Resource:** `baiducloud_mongodb_instance`
 - **New Resource:** `baiducloud_mongodb_sharding_instance`
