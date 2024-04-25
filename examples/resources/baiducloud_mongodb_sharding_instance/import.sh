@@ -1,0 +1,1 @@
+terraform import baiducloud_mongodb_sharding_instance.example m-abc123

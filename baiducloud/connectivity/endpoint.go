@@ -12,106 +12,112 @@ import (
 type ServiceCode string
 
 const (
-	BCCCode       = ServiceCode("BCC")
-	VPCCode       = ServiceCode("VPC")
-	ESGCode       = ServiceCode("ESG")
-	EIPCode       = ServiceCode("EIP")
-	APPBLBCode    = ServiceCode("APPBLB")
-	BLBCode       = ServiceCode("BLB")
-	BOSCode       = ServiceCode("BOS")
-	CERTCode      = ServiceCode("CERT")
-	CFCCode       = ServiceCode("CFC")
-	CCECode       = ServiceCode("CCE")
-	CCEv2Code     = ServiceCode("CCEv2")
-	SCSCode       = ServiceCode("SCS")
-	RDSCode       = ServiceCode("RDS")
-	DTSCode       = ServiceCode("DTS")
-	IAMCode       = ServiceCode("IAM")
-	CDNCode       = ServiceCode("CDN")
-	LOCALDNSCode  = ServiceCode("LOCALDNS")
-	BBCCode       = ServiceCode("BBC")
-	VPNCode       = ServiceCode("VPN")
-	ENICode       = ServiceCode("ENI")
-	CFSCode       = ServiceCode("CFS")
-	SMSCode       = ServiceCode("SMS")
-	BLSCode       = ServiceCode("BLS")
-	BECCode       = ServiceCode("BEC")
-	ETGATEWAYCode = ServiceCode("ETGATEWAY")
-	DNSCode       = ServiceCode("DNS")
-	ETCode        = ServiceCode("ET")
-	ResourceManagerCode        = ServiceCode("ResourceManager")
+	BCCCode             = ServiceCode("BCC")
+	VPCCode             = ServiceCode("VPC")
+	ESGCode             = ServiceCode("ESG")
+	EIPCode             = ServiceCode("EIP")
+	APPBLBCode          = ServiceCode("APPBLB")
+	BLBCode             = ServiceCode("BLB")
+	BOSCode             = ServiceCode("BOS")
+	CERTCode            = ServiceCode("CERT")
+	CFCCode             = ServiceCode("CFC")
+	CCECode             = ServiceCode("CCE")
+	CCEv2Code           = ServiceCode("CCEv2")
+	SCSCode             = ServiceCode("SCS")
+	RDSCode             = ServiceCode("RDS")
+	DTSCode             = ServiceCode("DTS")
+	IAMCode             = ServiceCode("IAM")
+	CDNCode             = ServiceCode("CDN")
+	LOCALDNSCode        = ServiceCode("LOCALDNS")
+	BBCCode             = ServiceCode("BBC")
+	VPNCode             = ServiceCode("VPN")
+	ENICode             = ServiceCode("ENI")
+	CFSCode             = ServiceCode("CFS")
+	SMSCode             = ServiceCode("SMS")
+	BLSCode             = ServiceCode("BLS")
+	BECCode             = ServiceCode("BEC")
+	ETGATEWAYCode       = ServiceCode("ETGATEWAY")
+	DNSCode             = ServiceCode("DNS")
+	ETCode              = ServiceCode("ET")
+	ResourceManagerCode = ServiceCode("ResourceManager")
+	MONGODBCode         = ServiceCode("MONGODB")
 )
 
 const (
-	DefaultBJRegionBccEndPoint = "bcc.bj.baidubce.com"
-	DefaultBJRegionBbcEndPoint = "bbc.bj.baidubce.com"
-	DefaultBJRegionVpnEndPoint = "bcc.bj.baidubce.com"
-	DefaultBJRegionEniEndPoint = "bcc.bj.baidubce.com"
-	DefaultBJRegionEipEndPoint = "eip.bj.baidubce.com"
-	DefaultBJRegionBlbEndPoint = "blb.bj.baidubce.com"
-	DefaultBJRegionBosEndPoint = "bj.bcebos.com"
-	DefaultBJRegionCfcEndPoint = "cfc.bj.baidubce.com"
-	DefaultBJRegionCfsEndPoint = "cfs.bj.baidubce.com"
-	DefaultBJRegionCceEndPoint = "cce.bj.baidubce.com"
-	DefaultBJRegionScsEndPoint = "redis.bj.baidubce.com"
-	DefaultBJRegionRdsEndPoint = "rds.bj.baidubce.com"
-	DefaultBJRegionDtsEndPoint = "rds.bj.baidubce.com"
-	DefaultBJRegionSmsEndPoint = "smsv3.bj.baidubce.com"
-	DefaultBJRegionBlsEndPoint = "bls-log.bj.baidubce.com"
-	DefaultBJRegionBecEndPoint = "bec.baidubce.com"
+	DefaultBJRegionBccEndPoint             = "bcc.bj.baidubce.com"
+	DefaultBJRegionBbcEndPoint             = "bbc.bj.baidubce.com"
+	DefaultBJRegionVpnEndPoint             = "bcc.bj.baidubce.com"
+	DefaultBJRegionEniEndPoint             = "bcc.bj.baidubce.com"
+	DefaultBJRegionEipEndPoint             = "eip.bj.baidubce.com"
+	DefaultBJRegionBlbEndPoint             = "blb.bj.baidubce.com"
+	DefaultBJRegionBosEndPoint             = "bj.bcebos.com"
+	DefaultBJRegionCfcEndPoint             = "cfc.bj.baidubce.com"
+	DefaultBJRegionCfsEndPoint             = "cfs.bj.baidubce.com"
+	DefaultBJRegionCceEndPoint             = "cce.bj.baidubce.com"
+	DefaultBJRegionScsEndPoint             = "redis.bj.baidubce.com"
+	DefaultBJRegionRdsEndPoint             = "rds.bj.baidubce.com"
+	DefaultBJRegionDtsEndPoint             = "rds.bj.baidubce.com"
+	DefaultBJRegionSmsEndPoint             = "smsv3.bj.baidubce.com"
+	DefaultBJRegionBlsEndPoint             = "bls-log.bj.baidubce.com"
+	DefaultBJRegionBecEndPoint             = "bec.baidubce.com"
 	DefaultBJRegionResourceManagerEndPoint = "resourcemanager.baidubce.com"
+	DefaultBJRegionMongoDBEndPoint         = "mongodb.bj.baidubce.com"
 
-	DefaultBDRegionBccEndPoint = "bcc.bd.baidubce.com"
-	DefaultBDRegionBbcEndPoint = "bbc.bd.baidubce.com"
-	DefaultBDRegionVpnEndPoint = "bcc.bd.baidubce.com"
-	DefaultBDRegionEniEndPoint = "bcc.bd.baidubce.com"
-	DefaultBDRegionCfsEndPoint = "cfs.bd.baidubce.com"
-	DefaultBDRegionEipEndPoint = "eip.bd.baidubce.com"
+	DefaultBDRegionBccEndPoint     = "bcc.bd.baidubce.com"
+	DefaultBDRegionBbcEndPoint     = "bbc.bd.baidubce.com"
+	DefaultBDRegionVpnEndPoint     = "bcc.bd.baidubce.com"
+	DefaultBDRegionEniEndPoint     = "bcc.bd.baidubce.com"
+	DefaultBDRegionCfsEndPoint     = "cfs.bd.baidubce.com"
+	DefaultBDRegionEipEndPoint     = "eip.bd.baidubce.com"
+	DefaultBDRegionMongoDBEndPoint = "mongodb.bd.baidubce.com"
 
-	DefaultGZRegionBccEndPoint = "bcc.gz.baidubce.com"
-	DefaultGZRegionBbcEndPoint = "bbc.gz.baidubce.com"
-	DefaultGZRegionVpnEndPoint = "bcc.gz.baidubce.com"
-	DefaultGZRegionEipEndPoint = "eip.gz.baidubce.com"
-	DefaultGZRegionEniEndPoint = "bcc.gz.baidubce.com"
-	DefaultGZRegionBlbEndPoint = "blb.gz.baidubce.com"
-	DefaultGZRegionBosEndPoint = "gz.bcebos.com"
-	DefaultGZRegionCfcEndPoint = "cfc.gz.baidubce.com"
-	DefaultGZRegionCceEndPoint = "cce.gz.baidubce.com"
-	DefaultGZRegionScsEndPoint = "redis.gz.baidubce.com"
-	DefaultGZRegionRdsEndPoint = "rds.gz.baidubce.com"
-	DefaultGZRegionBlsEndPoint = "bls-log.gz.baidubce.com"
+	DefaultGZRegionBccEndPoint     = "bcc.gz.baidubce.com"
+	DefaultGZRegionBbcEndPoint     = "bbc.gz.baidubce.com"
+	DefaultGZRegionVpnEndPoint     = "bcc.gz.baidubce.com"
+	DefaultGZRegionEipEndPoint     = "eip.gz.baidubce.com"
+	DefaultGZRegionEniEndPoint     = "bcc.gz.baidubce.com"
+	DefaultGZRegionBlbEndPoint     = "blb.gz.baidubce.com"
+	DefaultGZRegionBosEndPoint     = "gz.bcebos.com"
+	DefaultGZRegionCfcEndPoint     = "cfc.gz.baidubce.com"
+	DefaultGZRegionCceEndPoint     = "cce.gz.baidubce.com"
+	DefaultGZRegionScsEndPoint     = "redis.gz.baidubce.com"
+	DefaultGZRegionRdsEndPoint     = "rds.gz.baidubce.com"
+	DefaultGZRegionBlsEndPoint     = "bls-log.gz.baidubce.com"
+	DefaultGZRegionMongoDBEndPoint = "mongodb.gz.baidubce.com"
 
-	DefaultSURegionBccEndPoint = "bcc.su.baidubce.com"
-	DefaultSURegionBbcEndPoint = "bbc.su.baidubce.com"
-	DefaultSURegionVPNEndPoint = "bcc.su.baidubce.com"
-	DefaultSURegionEipEndPoint = "eip.su.baidubce.com"
-	DefaultSURegionEniEndPoint = "bcc.su.baidubce.com"
-	DefaultSURegionBlbEndPoint = "blb.su.baidubce.com"
-	DefaultSURegionBosEndPoint = "su.bcebos.com"
-	DefaultSURegionCfcEndPoint = "cfc.su.baidubce.com"
-	DefaultSURegionCfsEndPoint = "cfs.su.baidubce.com"
-	DefaultSURegionCceEndPoint = "cce.su.baidubce.com"
-	DefaultSURegionScsEndPoint = "redis.su.baidubce.com"
-	DefaultSURegionRdsEndPoint = "rds.su.baidubce.com"
-	DefaultSURegionSmsEndPoint = "smsv3.su.baidubce.com"
-	DefaultSURegionBlsEndPoint = "bls-log.su.baidubce.com"
+	DefaultSURegionBccEndPoint     = "bcc.su.baidubce.com"
+	DefaultSURegionBbcEndPoint     = "bbc.su.baidubce.com"
+	DefaultSURegionVPNEndPoint     = "bcc.su.baidubce.com"
+	DefaultSURegionEipEndPoint     = "eip.su.baidubce.com"
+	DefaultSURegionEniEndPoint     = "bcc.su.baidubce.com"
+	DefaultSURegionBlbEndPoint     = "blb.su.baidubce.com"
+	DefaultSURegionBosEndPoint     = "su.bcebos.com"
+	DefaultSURegionCfcEndPoint     = "cfc.su.baidubce.com"
+	DefaultSURegionCfsEndPoint     = "cfs.su.baidubce.com"
+	DefaultSURegionCceEndPoint     = "cce.su.baidubce.com"
+	DefaultSURegionScsEndPoint     = "redis.su.baidubce.com"
+	DefaultSURegionRdsEndPoint     = "rds.su.baidubce.com"
+	DefaultSURegionSmsEndPoint     = "smsv3.su.baidubce.com"
+	DefaultSURegionBlsEndPoint     = "bls-log.su.baidubce.com"
+	DefaultSURegionMongoDBEndPoint = "mongodb.su.baidubce.com"
 
 	DefaultFSHRegionBccEndPoint = "bcc.fsh.baidubce.com"
 	DefaultFSHRegionVPNEndPoint = "bcc.fsh.baidubce.com"
 	DefaultFSHRegionEniEndPoint = "bcc.fsh.baidubce.com"
 
-	DefaultFWHRegionBccEndPoint = "bcc.fwh.baidubce.com"
-	DefaultFWHRegionBbcEndPoint = "bbc.fwh.baidubce.com"
-	DefaultFWHRegionVPNEndPoint = "bbc.fwh.baidubce.com"
-	DefaultFWHRegionEipEndPoint = "eip.fwh.baidubce.com"
-	DefaultFWHRegionEniEndPoint = "bcc.fwh.baidubce.com"
-	DefaultFWHRegionBlbEndPoint = "blb.fwh.baidubce.com"
-	DefaultFWHRegionBosEndPoint = "fwh.bcebos.com"
-	DefaultFWHRegionCfcEndPoint = "cfc.fwh.baidubce.com"
-	DefaultFWHRegionCceEndPoint = "cce.fwh.baidubce.com"
-	DefaultFWHRegionCfsEndPoint = "cfs.fwh.baidubce.com"
-	DefaultFWHRegionScsEndPoint = "redis.fwh.baidubce.com"
-	DefaultFWHRegionRdsEndPoint = "rds.fwh.baidubce.com"
+	DefaultFWHRegionBccEndPoint     = "bcc.fwh.baidubce.com"
+	DefaultFWHRegionBbcEndPoint     = "bbc.fwh.baidubce.com"
+	DefaultFWHRegionVPNEndPoint     = "bbc.fwh.baidubce.com"
+	DefaultFWHRegionEipEndPoint     = "eip.fwh.baidubce.com"
+	DefaultFWHRegionEniEndPoint     = "bcc.fwh.baidubce.com"
+	DefaultFWHRegionBlbEndPoint     = "blb.fwh.baidubce.com"
+	DefaultFWHRegionBosEndPoint     = "fwh.bcebos.com"
+	DefaultFWHRegionCfcEndPoint     = "cfc.fwh.baidubce.com"
+	DefaultFWHRegionCceEndPoint     = "cce.fwh.baidubce.com"
+	DefaultFWHRegionCfsEndPoint     = "cfs.fwh.baidubce.com"
+	DefaultFWHRegionScsEndPoint     = "redis.fwh.baidubce.com"
+	DefaultFWHRegionRdsEndPoint     = "rds.fwh.baidubce.com"
+	DefaultFWHRegionMongoDBEndPoint = "mongodb.fwh.baidubce.com"
 
 	DefaultHKGRegionBccEndPoint = "bcc.hkg.baidubce.com"
 	DefaultHKGRegionBbcEndPoint = "bbc.hkg.baidubce.com"
@@ -153,30 +159,31 @@ var (
 		CDNCode:  DefaultCDNEndPoint,
 		DNSCode:  DefaultDNSEndPoint,
 
-		BCCCode:       DefaultBJRegionBccEndPoint,
-		BBCCode:       DefaultBJRegionBbcEndPoint,
-		VPNCode:       DefaultBJRegionVpnEndPoint,
-		VPCCode:       DefaultBJRegionBccEndPoint,
-		EIPCode:       DefaultBJRegionEipEndPoint,
-		ENICode:       DefaultBJRegionEniEndPoint,
-		APPBLBCode:    DefaultBJRegionBlbEndPoint,
-		BLBCode:       DefaultBJRegionBlbEndPoint,
-		BOSCode:       DefaultBJRegionBosEndPoint,
-		CFCCode:       DefaultBJRegionCfcEndPoint,
-		CCECode:       DefaultBJRegionCceEndPoint,
-		CCEv2Code:     DefaultBJRegionCceEndPoint,
-		SCSCode:       DefaultBJRegionScsEndPoint,
-		RDSCode:       DefaultBJRegionRdsEndPoint,
-		DTSCode:       DefaultBJRegionDtsEndPoint,
-		LOCALDNSCode:  DefaultBJRegionBccEndPoint,
-		CFSCode:       DefaultBJRegionCfsEndPoint,
-		SMSCode:       DefaultBJRegionSmsEndPoint,
-		BLSCode:       DefaultBJRegionBlsEndPoint,
-		BECCode:       DefaultBJRegionBecEndPoint,
-		ETGATEWAYCode: DefaultBJRegionBccEndPoint,
-		ETCode:        DefaultBJRegionBccEndPoint,
-		ESGCode:       DefaultBJRegionBccEndPoint,
-		ResourceManagerCode: 	DefaultBJRegionResourceManagerEndPoint,
+		BCCCode:             DefaultBJRegionBccEndPoint,
+		BBCCode:             DefaultBJRegionBbcEndPoint,
+		VPNCode:             DefaultBJRegionVpnEndPoint,
+		VPCCode:             DefaultBJRegionBccEndPoint,
+		EIPCode:             DefaultBJRegionEipEndPoint,
+		ENICode:             DefaultBJRegionEniEndPoint,
+		APPBLBCode:          DefaultBJRegionBlbEndPoint,
+		BLBCode:             DefaultBJRegionBlbEndPoint,
+		BOSCode:             DefaultBJRegionBosEndPoint,
+		CFCCode:             DefaultBJRegionCfcEndPoint,
+		CCECode:             DefaultBJRegionCceEndPoint,
+		CCEv2Code:           DefaultBJRegionCceEndPoint,
+		SCSCode:             DefaultBJRegionScsEndPoint,
+		RDSCode:             DefaultBJRegionRdsEndPoint,
+		DTSCode:             DefaultBJRegionDtsEndPoint,
+		LOCALDNSCode:        DefaultBJRegionBccEndPoint,
+		CFSCode:             DefaultBJRegionCfsEndPoint,
+		SMSCode:             DefaultBJRegionSmsEndPoint,
+		BLSCode:             DefaultBJRegionBlsEndPoint,
+		BECCode:             DefaultBJRegionBecEndPoint,
+		ETGATEWAYCode:       DefaultBJRegionBccEndPoint,
+		ETCode:              DefaultBJRegionBccEndPoint,
+		ESGCode:             DefaultBJRegionBccEndPoint,
+		ResourceManagerCode: DefaultBJRegionResourceManagerEndPoint,
+		MONGODBCode:         DefaultBJRegionMongoDBEndPoint,
 	}
 
 	// Region BD Service Endpoints
@@ -196,6 +203,7 @@ var (
 		ETGATEWAYCode: DefaultBDRegionBccEndPoint,
 		ETCode:        DefaultBJRegionBccEndPoint,
 		ESGCode:       DefaultBJRegionBccEndPoint,
+		MONGODBCode:   DefaultBDRegionMongoDBEndPoint,
 	}
 
 	// Region GZ Service Endpoints
@@ -223,6 +231,7 @@ var (
 		ETGATEWAYCode: DefaultGZRegionBccEndPoint,
 		ETCode:        DefaultBJRegionBccEndPoint,
 		ESGCode:       DefaultBJRegionBccEndPoint,
+		MONGODBCode:   DefaultGZRegionMongoDBEndPoint,
 	}
 
 	// Region SU Service Endpoints
@@ -252,6 +261,7 @@ var (
 		ETGATEWAYCode: DefaultSURegionBccEndPoint,
 		ETCode:        DefaultBJRegionBccEndPoint,
 		ESGCode:       DefaultBJRegionBccEndPoint,
+		MONGODBCode:   DefaultSURegionMongoDBEndPoint,
 	}
 
 	// Region FSH Service Endpoints
@@ -293,6 +303,7 @@ var (
 		ETGATEWAYCode: DefaultFWHRegionBccEndPoint,
 		ETCode:        DefaultBJRegionBccEndPoint,
 		ESGCode:       DefaultBJRegionBccEndPoint,
+		MONGODBCode:   DefaultFWHRegionMongoDBEndPoint,
 	}
 
 	// Region HKG Service Endpoints

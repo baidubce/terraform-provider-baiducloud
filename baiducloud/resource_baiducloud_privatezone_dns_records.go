@@ -163,7 +163,7 @@ func resourceBaiduCloudPrivateZoneRecordRead(d *schema.ResourceData, meta interf
 		if v, ok := d.GetOk("zone_id"); ok {
 			zoneId = v.(string)
 		}
-		return localDnsClient.ListRecord(zoneId)
+		return localDnsClient.ListRecord(zoneId, nil)
 	})
 	addDebug(action, raw)
 	if err != nil {

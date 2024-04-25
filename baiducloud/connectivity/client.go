@@ -26,6 +26,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/etGateway"
 	"github.com/baidubce/bce-sdk-go/services/iam"
 	"github.com/baidubce/bce-sdk-go/services/localDns"
+	"github.com/baidubce/bce-sdk-go/services/mongodb"
 	"github.com/baidubce/bce-sdk-go/services/rds"
 	"github.com/baidubce/bce-sdk-go/services/resmanager"
 	"github.com/baidubce/bce-sdk-go/services/scs"
@@ -46,35 +47,36 @@ type BaiduClient struct {
 
 	Credentials *auth.BceCredentials
 
-	bccConn       *bcc.Client
-	vpcConn       *vpc.Client
-	esgConn       *esg.Client
-	eipConn       *eip.Client
-	blbConn       *blb.Client
-	appBlbConn    *appblb.Client
-	bosConn       *bos.Client
-	certConn      *cert.Client
-	cfcConn       *cfc.Client
-	scsConn       *scs.Client
-	cceConn       *cce.Client
-	ccev2Conn     *ccev2.Client
-	rdsConn       *rds.Client
-	dtsConn       *dts.Client
-	iamConn       *iam.Client
-	cdnConn       *cdn.Client
-	localDNSConn  *localDns.Client
-	smsConn       *sms.Client
-	bbcConn       *bbc.Client
-	vpnConn       *vpn.Client
-	eniConn       *eni.Client
-	cfsConn       *cfs.Client
-	snicConn      *endpoint.Client
-	blsConn       *bls.Client
-	becConn       *bec.Client
-	etGatewayConn *etGateway.Client
-	dnsConn       *dns.Client
-	etConn        *et.Client
-	resourceManagerConn        *resmanager.Client
+	bccConn             *bcc.Client
+	vpcConn             *vpc.Client
+	esgConn             *esg.Client
+	eipConn             *eip.Client
+	blbConn             *blb.Client
+	appBlbConn          *appblb.Client
+	bosConn             *bos.Client
+	certConn            *cert.Client
+	cfcConn             *cfc.Client
+	scsConn             *scs.Client
+	cceConn             *cce.Client
+	ccev2Conn           *ccev2.Client
+	rdsConn             *rds.Client
+	dtsConn             *dts.Client
+	iamConn             *iam.Client
+	cdnConn             *cdn.Client
+	localDNSConn        *localDns.Client
+	smsConn             *sms.Client
+	bbcConn             *bbc.Client
+	vpnConn             *vpn.Client
+	eniConn             *eni.Client
+	cfsConn             *cfs.Client
+	snicConn            *endpoint.Client
+	blsConn             *bls.Client
+	becConn             *bec.Client
+	etGatewayConn       *etGateway.Client
+	dnsConn             *dns.Client
+	etConn              *et.Client
+	resourceManagerConn *resmanager.Client
+	mongodbConn         *mongodb.Client
 }
 
 type ApiVersion string
@@ -601,7 +603,7 @@ func (client *BaiduClient) WithBLSClient(do func(*bls.Client) (interface{}, erro
 	goSdkMutex.Lock()
 	defer goSdkMutex.Unlock()
 
-	// Initialize the LOCALDNS client if necessary
+	// Initialize the BLS client if necessary
 	if client.blsConn == nil {
 		client.WithCommonClient(BLSCode)
 		blsClient, err := bls.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
@@ -636,7 +638,7 @@ func (client *BaiduClient) WithBECClient(do func(*bec.Client) (interface{}, erro
 
 func (client *BaiduClient) WithEtGatewayClient(do func(*etGateway.Client) (interface{}, error)) (interface{}, error) {
 	goSdkMutex.Lock()
-	// Initialize the VPN client if necessary
+	// Initialize the ET Gateway client if necessary
 	if client.etGatewayConn == nil {
 		client.WithCommonClient(ETGATEWAYCode)
 		etGatewayClient, err := etGateway.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
@@ -654,7 +656,7 @@ func (client *BaiduClient) WithEtGatewayClient(do func(*etGateway.Client) (inter
 
 func (client *BaiduClient) WithEtClient(do func(*et.Client) (interface{}, error)) (interface{}, error) {
 	goSdkMutex.Lock()
-	// Initialize the VPN client if necessary
+	// Initialize the ET client if necessary
 	if client.etConn == nil {
 		client.WithCommonClient(ETCode)
 		etClient, err := et.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
@@ -686,6 +688,24 @@ func (client *BaiduClient) WithDNSClient(do func(*dns.Client) (interface{}, erro
 	}
 	goSdkMutex.Unlock()
 	return do(client.dnsConn)
+}
+
+func (client *BaiduClient) WithMongoDBClient(do func(*mongodb.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	// Initialize the MongoDB client if necessary
+	if client.mongodbConn == nil {
+		client.WithCommonClient(MONGODBCode)
+		mongodbClient, err := mongodb.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			goSdkMutex.Unlock()
+			return nil, err
+		}
+		mongodbClient.Config.Credentials = client.Credentials
+		mongodbClient.Config.UserAgent = buildUserAgent()
+		client.mongodbConn = mongodbClient
+	}
+	goSdkMutex.Unlock()
+	return do(client.mongodbConn)
 }
 
 func buildUserAgent() string {

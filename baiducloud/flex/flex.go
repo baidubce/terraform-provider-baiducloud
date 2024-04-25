@@ -92,3 +92,9 @@ func SlicesContainSameElements(a, b []model.TagModel) bool {
 	}
 	return true
 }
+
+func MergeSchema(origin map[string]*schema.Schema, adding map[string]*schema.Schema) {
+	for k, v := range adding {
+		origin[k] = v
+	}
+}

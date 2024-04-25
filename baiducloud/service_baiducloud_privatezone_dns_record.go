@@ -20,7 +20,7 @@ func (s *PrivateZoneDnsService) ListAlDnsRecords(zoneId string) ([]localDns.Reco
 
 	action := "Get private zone records list " + zoneId
 	raw, err := s.client.WithLocalDnsClient(func(localDnsClient *localDns.Client) (i interface{}, e error) {
-		return localDnsClient.ListRecord(zoneId)
+		return localDnsClient.ListRecord(zoneId, nil)
 	})
 	if err != nil {
 		return nil, err
