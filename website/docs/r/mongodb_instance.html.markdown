@@ -55,6 +55,7 @@ resource "baiducloud_mongodb_instance" "example" {
 - `engine_version` (String) Database version of the instance. Valid values: `3.4`, `3.6`.
 - `name` (String) Name of the instance. If not specified, it will be randomly generated.
 - `payment_timing` (String) Payment timing of billing. Valid values: `Prepaid`, `Postpaid`. Defaults to `Postpaid`.
+- `auto_renew_time_length` - (Optional, ForceNew)The automatic renewal time (month). Effective when `payment_timing` is `Prepaid`. Valid values: `1`~`9`, `12`, `24`, `36`.
 - `readonly_node_num` (Number) Number of readonly nodes in the instance. Only effective when `voting_member_num` is set to `2` or `3`. Valid values: `0`~`5`. Defaults to `0`.
 - `reservation_length` (Number) The reservation length (month) will pay. Effective when `payment_timing` is `Prepaid`. Valid values: `1`~`9`, `12`, `24`, `36`. Defaults to `1`.
 - `resource_group_id` (String) Resource group id of the resource. Effective upon creation, modifications are not supported currently.

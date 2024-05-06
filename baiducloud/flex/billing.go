@@ -40,6 +40,26 @@ func SchemaReservationLength() *schema.Schema {
 	}
 }
 
+func SchemaAutoRenewLength() *schema.Schema {
+	return &schema.Schema{
+		Type: schema.TypeInt,
+		Description: "The automatic renewal time (month). Effective when `payment_timing` is `Prepaid`. " +
+			"Valid values: `1`~`9`, `12`, `24`, `36`. Defaults to `1`.",
+		Optional:     true,
+		ForceNew:     true,
+		ValidateFunc: ValidateReservationLength(),
+	}
+}
+
+func SchemaAutoRenewTimeUnit() *schema.Schema {
+	return &schema.Schema{
+		Type:         schema.TypeString,
+		Description:  "Auto renew time unit, currently only supports monthly.",
+		Optional:     true,
+		ForceNew:     true,
+		ValidateFunc: validation.StringInSlice([]string{"month"}, false),
+	}
+}
 func ValidatePaymentTiming() schema.SchemaValidateFunc {
 	return validation.StringInSlice([]string{PaymentTimingPostpaid, PaymentTimingPrepaid}, false)
 }

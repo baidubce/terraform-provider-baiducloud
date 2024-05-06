@@ -138,6 +138,13 @@ func buildCreationArgs(d *schema.ResourceData) *mongodb.CreateReplicaArgs {
 			ReservationTimeUnit: "month",
 		}
 		billing.Reservation = reservation
+		if v, ok := d.GetOk("auto_renew_length"); ok {
+			autoRenew := mongodb.AutoRenewModel{
+				AutoRenewLength:   v.(int),
+				AutoRenewTimeUnit: "month",
+			}
+			billing.AutoRenew = autoRenew
+		}
 	}
 	args := &mongodb.CreateReplicaArgs{
 		Billing:         billing,
