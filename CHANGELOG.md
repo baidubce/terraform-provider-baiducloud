@@ -1,4 +1,9 @@
-	## 1.20.7 (Unreleased)
+	## 1.20.8 (Unreleased)
+## 1.20.7 (May 06, 2024)
+FEATURES:
+- baiducloud_mongodb_instance support attribute `auto_renew_length`
+- baiducloud_mongodb_sharding_instance support attribute `auto_renew_length`
+
 ## 1.20.6 (April 25, 2024)
 FEATURES:
 - **New Resource:** `baiducloud_mongodb_instance`
