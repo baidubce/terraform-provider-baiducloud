@@ -1,4 +1,8 @@
-	## 1.20.8 (Unreleased)
+	## 1.21.1 (Unreleased)
+## 1.21.0 (May 08, 2024)
+FEATURES:
+- **New Resource:** `baiducloud_abroad_cdn_domain`
+
 ## 1.20.7 (May 06, 2024)
 FEATURES:
 - baiducloud_mongodb_instance support attribute `auto_renew_length`
