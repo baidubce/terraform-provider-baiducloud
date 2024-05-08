@@ -13,6 +13,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/cce"
 	ccev2 "github.com/baidubce/bce-sdk-go/services/cce/v2"
 	"github.com/baidubce/bce-sdk-go/services/cdn"
+	"github.com/baidubce/bce-sdk-go/services/cdn/abroad"
 	"github.com/baidubce/bce-sdk-go/services/cert"
 	"github.com/baidubce/bce-sdk-go/services/cfc"
 	"github.com/baidubce/bce-sdk-go/services/cfs"
@@ -63,6 +64,7 @@ type BaiduClient struct {
 	dtsConn             *dts.Client
 	iamConn             *iam.Client
 	cdnConn             *cdn.Client
+	abroadCdnConn       *abroad.Client
 	localDNSConn        *localDns.Client
 	smsConn             *sms.Client
 	bbcConn             *bbc.Client
@@ -83,7 +85,7 @@ type ApiVersion string
 
 var goSdkMutex = sync.RWMutex{} // The Go SDK is not thread-safe
 
-var providerVersion = "1.20.6"
+var providerVersion = "1.13.0"
 
 // Client for BaiduCloudClient
 func (c *Config) Client() (*BaiduClient, error) {
@@ -471,6 +473,23 @@ func (client *BaiduClient) WithCdnClient(do func(*cdn.Client) (interface{}, erro
 	return do(client.cdnConn)
 }
 
+func (client *BaiduClient) WithAbroadCdnClient(do func(*abroad.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	defer goSdkMutex.Unlock()
+
+	// Initialize the abroad CDN client if necessary
+	if client.abroadCdnConn == nil {
+		client.WithCommonClient(AbroadCDNCode)
+		abroadCDNClient, err := abroad.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			return nil, err
+		}
+		abroadCDNClient.Config.UserAgent = buildUserAgent()
+		client.abroadCdnConn = abroadCDNClient
+	}
+	return do(client.abroadCdnConn)
+}
+
 func (client *BaiduClient) WithLocalDnsClient(do func(*localDns.Client) (interface{}, error)) (interface{}, error) {
 	goSdkMutex.Lock()
 	defer goSdkMutex.Unlock()
@@ -603,7 +622,7 @@ func (client *BaiduClient) WithBLSClient(do func(*bls.Client) (interface{}, erro
 	goSdkMutex.Lock()
 	defer goSdkMutex.Unlock()
 
-	// Initialize the BLS client if necessary
+	// Initialize the LOCALDNS client if necessary
 	if client.blsConn == nil {
 		client.WithCommonClient(BLSCode)
 		blsClient, err := bls.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
@@ -674,7 +693,7 @@ func (client *BaiduClient) WithEtClient(do func(*et.Client) (interface{}, error)
 
 func (client *BaiduClient) WithDNSClient(do func(*dns.Client) (interface{}, error)) (interface{}, error) {
 	goSdkMutex.Lock()
-	// Initialize the VPN client if necessary
+	// Initialize the DNS client if necessary
 	if client.dnsConn == nil {
 		client.WithCommonClient(DNSCode)
 		dnsClient, err := dns.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)

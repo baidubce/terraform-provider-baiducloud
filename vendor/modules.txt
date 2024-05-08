@@ -97,6 +97,8 @@ github.com/baidubce/bce-sdk-go/services/cce
 github.com/baidubce/bce-sdk-go/services/cce/v2
 github.com/baidubce/bce-sdk-go/services/cce/v2/types
 github.com/baidubce/bce-sdk-go/services/cdn
+github.com/baidubce/bce-sdk-go/services/cdn/abroad
+github.com/baidubce/bce-sdk-go/services/cdn/abroad/api
 github.com/baidubce/bce-sdk-go/services/cdn/api
 github.com/baidubce/bce-sdk-go/services/cert
 github.com/baidubce/bce-sdk-go/services/cfc

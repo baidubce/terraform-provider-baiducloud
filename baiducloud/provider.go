@@ -6,116 +6,131 @@ The provider needs to be configured with the proper credentials before it can be
 
 Use the navigation to the left to read about the available resources.
 
-Example Usage
+# Example Usage
 
 ```hcl
 # Configure the BaiduCloud Provider
-provider "baiducloud" {
-  access_key  = "${var.access_key}"
-  secret_key = "${var.secret_key}"
-  region     = "${var.region}"
-}
+
+	provider "baiducloud" {
+	  access_key  = "${var.access_key}"
+	  secret_key = "${var.secret_key}"
+	  region     = "${var.region}"
+	}
+
 ```
 
-Resources List
+# Resources List
 
 Data Sources
-  baiducloud_vpcs
-  baiducloud_subnets
-  baiducloud_route_rules
-  baiducloud_acls
-  baiducloud_nat_gateways
-  baiducloud_peer_conns
-  baiducloud_bos_buckets
-  baiducloud_bos_bucket_objects
-  baiducloud_appblbs
-  baiducloud_appblb_listeners
-  baiducloud_appblb_server_groups
-  baiducloud_eips
-  baiducloud_instances
-  baiducloud_cdss
-  baiducloud_security_groups
-  baiducloud_security_group_rules
-  baiducloud_snapshots
-  baiducloud_auto_snapshot_policies
-  baiducloud_zones
-  baiducloud_specs
-  baiducloud_images
-  baiducloud_certs
-  baiducloud_cfc_function
-  baiducloud_scs_specs
-  baiducloud_scss
-  baiducloud_cce_versions
-  baiducloud_cce_container_net
-  baiducloud_cce_cluster_nodes
-  baiducloud_cce_kubeconfig
-  baiducloud_ccev2_container_cidr
-  baiducloud_ccev2_clusterip_cidr
-  baiducloud_ccev2_cluster_instances
-  baiducloud_ccev2_instance_group_instances
-  baiducloud_dtss
+
+	baiducloud_vpcs
+	baiducloud_subnets
+	baiducloud_route_rules
+	baiducloud_acls
+	baiducloud_nat_gateways
+	baiducloud_peer_conns
+	baiducloud_bos_buckets
+	baiducloud_bos_bucket_objects
+	baiducloud_appblbs
+	baiducloud_appblb_listeners
+	baiducloud_appblb_server_groups
+	baiducloud_eips
+	baiducloud_instances
+	baiducloud_cdss
+	baiducloud_security_groups
+	baiducloud_security_group_rules
+	baiducloud_snapshots
+	baiducloud_auto_snapshot_policies
+	baiducloud_zones
+	baiducloud_specs
+	baiducloud_images
+	baiducloud_certs
+	baiducloud_cfc_function
+	baiducloud_scs_specs
+	baiducloud_scss
+	baiducloud_cce_versions
+	baiducloud_cce_container_net
+	baiducloud_cce_cluster_nodes
+	baiducloud_cce_kubeconfig
+	baiducloud_ccev2_container_cidr
+	baiducloud_ccev2_clusterip_cidr
+	baiducloud_ccev2_cluster_instances
+	baiducloud_ccev2_instance_group_instances
+	baiducloud_dtss
 
 CERT Resources
-  baiducloud_cert
+
+	baiducloud_cert
 
 EIP Resources
-  baiducloud_eip
-  baiducloud_eip_association
+
+	baiducloud_eip
+	baiducloud_eip_association
 
 APPBLB Resources
-  baiducloud_appblb
-  baiducloud_appblb_server_group
-  baiducloud_appblb_listener
+
+	baiducloud_appblb
+	baiducloud_appblb_server_group
+	baiducloud_appblb_listener
 
 BCC Resources
-  baiducloud_instance
-  baiducloud_security_group
-  baiducloud_security_group_rule
-  baiducloud_cds
-  baiducloud_cds_attachment
-  baiducloud_snapshot
-  baiducloud_auto_snapshot_policy
+
+	baiducloud_instance
+	baiducloud_security_group
+	baiducloud_security_group_rule
+	baiducloud_cds
+	baiducloud_cds_attachment
+	baiducloud_snapshot
+	baiducloud_auto_snapshot_policy
 
 VPC Resources
-  baiducloud_vpc
-  baiducloud_subnet
-  baiducloud_route_rule
-  baiducloud_acl
-  baiducloud_nat_gateway
-  baiducloud_nat_snat_rule
-  baiducloud_peer_conn
-  baiducloud_peer_conn_acceptor
+
+	baiducloud_vpc
+	baiducloud_subnet
+	baiducloud_route_rule
+	baiducloud_acl
+	baiducloud_nat_gateway
+	baiducloud_nat_snat_rule
+	baiducloud_peer_conn
+	baiducloud_peer_conn_acceptor
 
 BOS Resources
-  baiducloud_bos_bucket
-  baiducloud_bos_bucket_object
+
+	baiducloud_bos_bucket
+	baiducloud_bos_bucket_object
 
 CFC Resources
-  baiducloud_cfc_function
-  baiducloud_cfc_alias
-  baiducloud_cfc_trigger
-  baiducloud_cfc_version
+
+	baiducloud_cfc_function
+	baiducloud_cfc_alias
+	baiducloud_cfc_trigger
+	baiducloud_cfc_version
 
 SCS Resources
-  baiducloud_scs
+
+	baiducloud_scs
 
 DTS Resources
-  baiducloud_dts
+
+	baiducloud_dts
 
 CCE Resources
-  baiducloud_cce_cluster
+
+	baiducloud_cce_cluster
 
 CCEv2 Resources
-  baiducloud_ccev2_cluster
-  baiducloud_ccev2_instance_group
+
+	baiducloud_ccev2_cluster
+	baiducloud_ccev2_instance_group
 
 IAM Resources
-  baiducloud_iam_user
-  baiducloud_iam_group
-  baiducloud_iam_group_membership
-  baiducloud_iam_policy
-  baiducloud_iam_user_policy_attachment
-  baiducloud_iam_group_policy_attachment
+
+	baiducloud_iam_user
+	baiducloud_iam_group
+	baiducloud_iam_group_membership
+	baiducloud_iam_policy
+	baiducloud_iam_user_policy_attachment
+	baiducloud_iam_group_policy_attachment
 */
 package baiducloud
 
@@ -125,6 +140,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/bcc"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/bec"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/cdn"
+	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/cdn/abroad"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/iam"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/mongodb"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/snic"
@@ -302,6 +318,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_iam_user_policy_attachment":  resourceBaiduCloudIamUserPolicyAttachment(),
 			"baiducloud_iam_group_policy_attachment": resourceBaiduCloudIamGroupPolicyAttachment(),
 			"baiducloud_cdn_domain":                  cdn.ResourceDomain(),
+			"baiducloud_abroad_cdn_domain":           abroad.ResourceAbroadDomain(),
 			"baiducloud_cdn_domain_config_cache":     cdn.ResourceDomainConfigCache(),
 			"baiducloud_cdn_domain_config_acl":       cdn.ResourceDomainConfigACL(),
 			"baiducloud_cdn_domain_config_origin":    cdn.ResourceDomainConfigOrigin(),
@@ -379,6 +396,9 @@ func init() {
 		"dts_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom DTS endpoints.",
 
 		"cdn_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CDN endpoints.",
+
+		"abroad_cdn_endpoint": "Use this to override the default endpoint URL constructed from the `region`." +
+			" It's typically used to connect to custom Abroad CDN endpoints.",
 
 		"bbc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BBC endpoints.",
 
@@ -475,6 +495,12 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["cdn_endpoint"],
 				},
+				"abroad_cdn": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["abroad_cdn_endpoint"],
+				},
 				"bbc": {
 					Type:        schema.TypeString,
 					Optional:    true,
@@ -521,6 +547,7 @@ func endpointsToHash(v interface{}) int {
 	buf.WriteString(fmt.Sprintf("%s-", m["rds"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["dts"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["cdn"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["abroad_cdn"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["bbc"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["vpn"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["dns"].(string)))
@@ -589,6 +616,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints[connectivity.RDSCode] = strings.TrimSpace(endpoints["rds"].(string))
 		config.ConfigEndpoints[connectivity.DTSCode] = strings.TrimSpace(endpoints["dts"].(string))
 		config.ConfigEndpoints[connectivity.CDNCode] = strings.TrimSpace(endpoints["cdn"].(string))
+		config.ConfigEndpoints[connectivity.AbroadCDNCode] = strings.TrimSpace(endpoints["abroad_cdn"].(string))
 		config.ConfigEndpoints[connectivity.BBCCode] = strings.TrimSpace(endpoints["bbc"].(string))
 		config.ConfigEndpoints[connectivity.VPNCode] = strings.TrimSpace(endpoints["vpn"].(string))
 		config.ConfigEndpoints[connectivity.DNSCode] = strings.TrimSpace(endpoints["dns"].(string))

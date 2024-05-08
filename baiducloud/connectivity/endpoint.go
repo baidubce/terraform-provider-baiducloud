@@ -28,6 +28,7 @@ const (
 	DTSCode             = ServiceCode("DTS")
 	IAMCode             = ServiceCode("IAM")
 	CDNCode             = ServiceCode("CDN")
+	AbroadCDNCode       = ServiceCode("ABROADCDN")
 	LOCALDNSCode        = ServiceCode("LOCALDNS")
 	BBCCode             = ServiceCode("BBC")
 	VPNCode             = ServiceCode("VPN")
@@ -133,10 +134,11 @@ const (
 	DefaultSINRegionVPNEndPoint = "bcc.sin.baidubce.com"
 	DefaultSINRegionEniEndPoint = "bcc.sin.baidubce.com"
 
-	DefaultCERTEndPoint = "certificate.baidubce.com"
-	DefaultIAMEndPoint  = "iam.bj.baidubce.com"
-	DefaultCDNEndPoint  = "cdn.baidubce.com"
-	DefaultDNSEndPoint  = "dns.baidubce.com"
+	DefaultCERTEndPoint      = "certificate.baidubce.com"
+	DefaultIAMEndPoint       = "iam.bj.baidubce.com"
+	DefaultCDNEndPoint       = "cdn.baidubce.com"
+	DefaultAbroadCDNEndPoint = "cdn.baidubce.com"
+	DefaultDNSEndPoint       = "dns.baidubce.com"
 )
 
 var (
@@ -154,10 +156,11 @@ var (
 
 	// Region BJ Service Endpoints
 	RegionBJEndpoints = map[ServiceCode]string{
-		CERTCode: DefaultCERTEndPoint,
-		IAMCode:  DefaultIAMEndPoint,
-		CDNCode:  DefaultCDNEndPoint,
-		DNSCode:  DefaultDNSEndPoint,
+		CERTCode:      DefaultCERTEndPoint,
+		IAMCode:       DefaultIAMEndPoint,
+		CDNCode:       DefaultCDNEndPoint,
+		AbroadCDNCode: DefaultAbroadCDNEndPoint,
+		DNSCode:       DefaultDNSEndPoint,
 
 		BCCCode:             DefaultBJRegionBccEndPoint,
 		BBCCode:             DefaultBJRegionBbcEndPoint,
@@ -188,10 +191,11 @@ var (
 
 	// Region BD Service Endpoints
 	RegionBDEndpoints = map[ServiceCode]string{
-		CERTCode: DefaultCERTEndPoint,
-		IAMCode:  DefaultIAMEndPoint,
-		CDNCode:  DefaultCDNEndPoint,
-		DNSCode:  DefaultDNSEndPoint,
+		CERTCode:      DefaultCERTEndPoint,
+		IAMCode:       DefaultIAMEndPoint,
+		CDNCode:       DefaultCDNEndPoint,
+		AbroadCDNCode: DefaultAbroadCDNEndPoint,
+		DNSCode:       DefaultDNSEndPoint,
 
 		BCCCode:       DefaultBDRegionBccEndPoint,
 		VPCCode:       DefaultBDRegionBccEndPoint,
@@ -208,10 +212,11 @@ var (
 
 	// Region GZ Service Endpoints
 	RegionGZEndpoints = map[ServiceCode]string{
-		CERTCode: DefaultCERTEndPoint,
-		IAMCode:  DefaultIAMEndPoint,
-		CDNCode:  DefaultCDNEndPoint,
-		DNSCode:  DefaultDNSEndPoint,
+		CERTCode:      DefaultCERTEndPoint,
+		IAMCode:       DefaultIAMEndPoint,
+		CDNCode:       DefaultCDNEndPoint,
+		AbroadCDNCode: DefaultAbroadCDNEndPoint,
+		DNSCode:       DefaultDNSEndPoint,
 
 		BCCCode:       DefaultGZRegionBccEndPoint,
 		VPNCode:       DefaultGZRegionVpnEndPoint,
@@ -236,10 +241,11 @@ var (
 
 	// Region SU Service Endpoints
 	RegionSUEndpoints = map[ServiceCode]string{
-		CERTCode: DefaultCERTEndPoint,
-		IAMCode:  DefaultIAMEndPoint,
-		CDNCode:  DefaultCDNEndPoint,
-		DNSCode:  DefaultDNSEndPoint,
+		CERTCode:      DefaultCERTEndPoint,
+		IAMCode:       DefaultIAMEndPoint,
+		CDNCode:       DefaultCDNEndPoint,
+		AbroadCDNCode: DefaultAbroadCDNEndPoint,
+		DNSCode:       DefaultDNSEndPoint,
 
 		BCCCode:       DefaultSURegionBccEndPoint,
 		BBCCode:       DefaultSURegionBbcEndPoint,
@@ -266,10 +272,11 @@ var (
 
 	// Region FSH Service Endpoints
 	RegionFSHEndpoints = map[ServiceCode]string{
-		CERTCode: DefaultCERTEndPoint,
-		IAMCode:  DefaultIAMEndPoint,
-		CDNCode:  DefaultCDNEndPoint,
-		DNSCode:  DefaultDNSEndPoint,
+		CERTCode:      DefaultCERTEndPoint,
+		IAMCode:       DefaultIAMEndPoint,
+		CDNCode:       DefaultCDNEndPoint,
+		AbroadCDNCode: DefaultAbroadCDNEndPoint,
+		DNSCode:       DefaultDNSEndPoint,
 
 		BCCCode: DefaultFSHRegionBccEndPoint,
 		VPNCode: DefaultFSHRegionVPNEndPoint,
@@ -280,10 +287,11 @@ var (
 
 	// Region FWH Service Endpoints
 	RegionFWHEndpoints = map[ServiceCode]string{
-		CERTCode: DefaultCERTEndPoint,
-		IAMCode:  DefaultIAMEndPoint,
-		CDNCode:  DefaultCDNEndPoint,
-		DNSCode:  DefaultDNSEndPoint,
+		CERTCode:      DefaultCERTEndPoint,
+		IAMCode:       DefaultIAMEndPoint,
+		CDNCode:       DefaultCDNEndPoint,
+		AbroadCDNCode: DefaultAbroadCDNEndPoint,
+		DNSCode:       DefaultDNSEndPoint,
 
 		BCCCode:       DefaultFWHRegionBccEndPoint,
 		BBCCode:       DefaultFWHRegionBbcEndPoint,
@@ -308,10 +316,11 @@ var (
 
 	// Region HKG Service Endpoints
 	RegionHKGEndpoints = map[ServiceCode]string{
-		CERTCode: DefaultCERTEndPoint,
-		IAMCode:  DefaultIAMEndPoint,
-		CDNCode:  DefaultCDNEndPoint,
-		DNSCode:  DefaultDNSEndPoint,
+		CERTCode:      DefaultCERTEndPoint,
+		IAMCode:       DefaultIAMEndPoint,
+		CDNCode:       DefaultCDNEndPoint,
+		AbroadCDNCode: DefaultAbroadCDNEndPoint,
+		DNSCode:       DefaultDNSEndPoint,
 
 		BCCCode:       DefaultHKGRegionBccEndPoint,
 		BBCCode:       DefaultHKGRegionBbcEndPoint,
@@ -332,10 +341,11 @@ var (
 
 	// Region SIN Service Endpoints
 	RegionSINEndpoints = map[ServiceCode]string{
-		CERTCode: DefaultCERTEndPoint,
-		IAMCode:  DefaultIAMEndPoint,
-		CDNCode:  DefaultCDNEndPoint,
-		DNSCode:  DefaultDNSEndPoint,
+		CERTCode:      DefaultCERTEndPoint,
+		IAMCode:       DefaultIAMEndPoint,
+		CDNCode:       DefaultCDNEndPoint,
+		AbroadCDNCode: DefaultAbroadCDNEndPoint,
+		DNSCode:       DefaultDNSEndPoint,
 
 		BCCCode: DefaultSINRegionBccEndPoint,
 		VPCCode: DefaultSINRegionBccEndPoint,
