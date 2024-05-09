@@ -1,11 +1,17 @@
-	## 1.21.1 (Unreleased)
+	## 1.21.2 (Unreleased)
+## 1.21.1 (May 09, 2024)
+FEATURES:
+- **New Resource:** `baiducloud_abroad_cdn_domain_config_cache`
+- baiducloud_rds_readonly_instance support attribute `auto_renew_time_unit`
+- baiducloud_rds_readonly_instance support attribute `auto_renew_length`
+
 ## 1.21.0 (May 08, 2024)
 FEATURES:
 - **New Resource:** `baiducloud_abroad_cdn_domain`
 
 ## 1.20.7 (May 06, 2024)
 FEATURES:
-- baiducloud_mongodb_instance support attribute `auto_renew_length`
+- baiducloud_mongodb_instance support attribute `auto_renew_time_unit`
 - baiducloud_mongodb_sharding_instance support attribute `auto_renew_length`
 
 ## 1.20.6 (April 25, 2024)
