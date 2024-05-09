@@ -54,7 +54,7 @@ func cacheTTLHash(v interface{}) int {
 		s = append(s, strconv.Itoa(v.(int)))
 	}
 	if v, ok := tfMap["override_origin"]; ok {
-		s = append(s, v.(string))
+		s = append(s, strconv.FormatBool(v.(bool)))
 	}
 	return hashcode.Strings(s)
 }

@@ -205,6 +205,26 @@ func resourceBaiduCloudRdsReadOnlyInstance() *schema.Resource {
 					},
 				},
 			},
+			"auto_renew_time_unit": {
+				Type: schema.TypeString,
+				Description: "Time unit of automatic renewal, the value can be month or year. " +
+					"The default value is month. " +
+					"It is valid only when the payment_timing is Prepaid.",
+				Optional:     true,
+				ForceNew:     true,
+				Default:      "month",
+				ValidateFunc: validation.StringInSlice([]string{"month", "year"}, false),
+			},
+			"auto_renew_time_length": {
+				Type: schema.TypeInt,
+				Description: "The time length of automatic renewal, empty indicating no automatic renewal." +
+					"It is valid when payment_timing is Prepaid, " +
+					"and the value should be 1-9 when the auto_renew_time_unit is month and 1-3 when the " +
+					"auto_renew_time_unit is year.",
+				Optional:     true,
+				ForceNew:     true,
+				ValidateFunc: validation.IntBetween(1, 9),
+			},
 			"reservation": {
 				Type:             schema.TypeMap,
 				Description:      "Reservation of the Rds.",
@@ -276,6 +296,39 @@ func resourceBaiduCloudRdsReadOnlyInstanceCreate(d *schema.ResourceData, meta in
 	}
 	// check tags and resource group bind
 	err = rdsService.checkRdsTagsAndResourceGroupBind(d, meta)
+	if err != nil {
+		return err
+	}
+	// 开启自动续费
+	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+		raw, err := client.WithRdsClient(func(rdsClient *rds.Client) (interface{}, error) {
+			args := &rds.AutoRenewArgs{
+				InstanceIds: []string{d.Id()},
+			}
+			if v, ok := d.GetOk("auto_renew_time_length"); ok {
+				args.AutoRenewTime = v.(int)
+				if args.AutoRenewTime > 0 {
+					if v, ok := d.GetOk("auto_renew_time_unit"); ok {
+						args.AutoRenewTimeUnit = v.(string)
+					}
+				} else {
+					return nil, WrapErrorf(nil, DefaultErrorMsg, "baiducloud_rds_readonly_instance",
+						action, "auto renew time invalid")
+				}
+			} else {
+				return nil, nil
+			}
+			return nil, rdsClient.AutoRenew(args)
+		})
+		if err != nil {
+			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
+		}
+		addDebug(action, raw)
+		return nil
+	})
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,5 @@
 ---
 layout: "baiducloud"
-subcategory: "Relational Database Service (RDS)"
 page_title: "BaiduCloud: baiducloud_rds_readonly_instance"
 sidebar_current: "docs-baiducloud-resource-rds_readonly_instance"
 description: |-
@@ -38,6 +37,8 @@ The following arguments are supported:
 * `subnets` - (Required) Subnets of the instance.
 * `volume_capacity` - (Required) Volume capacity(GB) of the instance
 * `vpc_id` - (Required, ForceNew) ID of the specific VPC
+* `auto_renew_time_length` - (Optional, ForceNew) The time length of automatic renewal, empty indicating no automatic renewal. It is valid when payment_timing is Prepaid, and the value should be 1-9 when the auto_renew_time_unit is month and 1-3 when the auto_renew_time_unit is year.
+* `auto_renew_time_unit` - (Optional, ForceNew) Time unit of automatic renewal, the value can be month or year. The default value is month. It is valid only when the payment_timing is Prepaid.
 * `category` - (Optional, ForceNew) Category of the instance. Available values are Basic、Standard(Default), only SQLServer 2012sp3 support Basic.
 * `instance_name` - (Optional) Name of the instance. Support for uppercase and lowercase letters, numbers, Chinese and special characters, such as "-","_","/",".", the value must start with a letter, length 1-65.
 * `reservation` - (Optional) Reservation of the Rds.
