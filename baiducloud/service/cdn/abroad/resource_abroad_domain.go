@@ -62,6 +62,11 @@ func ResourceAbroadDomain() *schema.Resource {
 					},
 				},
 			},
+			"designate_host_to_origin": {
+				Type:         schema.TypeString,
+				Description:  "Designate host to origin",
+				Optional:     true,
+			},
 			"tags": flex.TagsSchema(),
 		},
 	}
@@ -88,6 +93,11 @@ func resourceAbroadDomainCreate(d *schema.ResourceData, meta interface{}) error 
 
 	if err != nil {
 		return fmt.Errorf("error creating Abroad CDN Domain (%s): %w", domain, err)
+	}
+
+	// set host to origin
+	if err := updateDesignateHostToOrigin(d, conn, domain); err != nil {
+		return err
 	}
 
 	d.SetId(domain)
@@ -129,6 +139,9 @@ func resourceAbroadDomainUpdate(d *schema.ResourceData, meta interface{}) error 
 	domain := d.Id()
 
 	if err := updateAbroadOrigins(d, conn, domain); err != nil {
+		return err
+	}
+	if err := updateDesignateHostToOrigin(d, conn, domain); err != nil {
 		return err
 	}
 	return nil
@@ -174,6 +187,20 @@ func updateAbroadOrigins(d *schema.ResourceData, conn *connectivity.BaiduClient,
 		})
 		if err != nil {
 			return fmt.Errorf("error updating Abroad CDN Domain (%s) origins: %w", domain, err)
+		}
+	}
+	return nil
+}
+
+func updateDesignateHostToOrigin(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
+	if d.IsNewResource() || d.HasChange("designate_host_to_origin") {
+		log.Printf("[DEBUG] Update Abroad CDN Domain designate host to origin(%s)", domain)
+
+		_, err := conn.WithAbroadCdnClient(func(client *abroad.Client) (interface{}, error) {
+			return nil, client.SetHostToOrigin(domain, d.Get("designate_host_to_origin").(string))
+		})
+		if err != nil {
+			return fmt.Errorf("error updating Abroad CDN Domain (%s) designate host to origin: %w", domain, err)
 		}
 	}
 	return nil

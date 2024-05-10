@@ -320,6 +320,8 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_cdn_domain":                     cdn.ResourceDomain(),
 			"baiducloud_abroad_cdn_domain":              abroad.ResourceAbroadDomain(),
 			"baiducloud_abroad_cdn_domain_config_cache": abroad.ResourceAbroadDomainConfigCache(),
+			"baiducloud_abroad_cdn_domain_config_acl":   abroad.ResourceAbroadDomainConfigACL(),
+			"baiducloud_abroad_cdn_domain_config_https": abroad.ResourceAbroadDomainConfigHttps(),
 			"baiducloud_cdn_domain_config_cache":        cdn.ResourceDomainConfigCache(),
 			"baiducloud_cdn_domain_config_acl":          cdn.ResourceDomainConfigACL(),
 			"baiducloud_cdn_domain_config_origin":       cdn.ResourceDomainConfigOrigin(),

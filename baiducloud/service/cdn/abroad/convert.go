@@ -3,8 +3,8 @@ package abroad
 import (
 	"github.com/baidubce/bce-sdk-go/services/cdn/abroad/api"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/flex"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/hashcode"
-
 	"strconv"
 )
 
@@ -69,4 +69,66 @@ func flattenAbroadOriginPeers(originPeers []api.OriginPeer) interface{} {
 		})
 	}
 	return tfList
+}
+
+func expandRefererACL(tfList []interface{}) *api.RefererACL {
+	refererACL := &api.RefererACL{
+		AllowEmpty: true,
+	}
+	if len(tfList) == 0 || tfList[0] == nil {
+		refererACL.WhiteList = make([]string, 0)
+		return refererACL
+	}
+	tfMap := tfList[0].(map[string]interface{})
+	whiteList := flex.ExpandStringValueSet(tfMap["white_list"].(*schema.Set))
+	blackList := flex.ExpandStringValueSet(tfMap["black_list"].(*schema.Set))
+	if len(whiteList)> 0 {
+		refererACL.WhiteList = whiteList
+	}
+	if len(blackList)> 0 {
+		refererACL.BlackList = blackList
+	}
+	return refererACL
+}
+
+func expandIpACL(tfList []interface{}) *api.IpACL {
+	ipACL := &api.IpACL{
+
+	}
+	if len(tfList) == 0 || tfList[0] == nil {
+		ipACL.WhiteList = nil
+		return ipACL
+	}
+	tfMap := tfList[0].(map[string]interface{})
+	whiteList := flex.ExpandStringValueSet(tfMap["white_list"].(*schema.Set))
+	blackList := flex.ExpandStringValueSet(tfMap["black_list"].(*schema.Set))
+	if len(whiteList)> 0 {
+		ipACL.WhiteList = whiteList
+	}
+	if len(blackList)> 0 {
+		ipACL.BlackList = blackList
+	}
+	return ipACL
+}
+
+func flattenRefererACL(refererACL *api.RefererACL) []interface{} {
+	blackList := flex.FlattenStringValueSet(refererACL.BlackList)
+	whiteList := flex.FlattenStringValueSet(refererACL.WhiteList)
+	if blackList.Len() == 0 && whiteList.Len() == 0 {
+		return nil
+	}
+	return []interface{}{map[string]interface{}{
+		"black_list": blackList,
+		"white_list": whiteList,
+	}}
+}
+
+func flattenIpACL(ipACL *api.IpACL) []interface{} {
+	if ipACL == nil {
+		return nil
+	}
+	return []interface{}{map[string]interface{}{
+		"black_list": flex.FlattenStringValueSet(ipACL.BlackList),
+		"white_list": flex.FlattenStringValueSet(ipACL.WhiteList),
+	}}
 }
