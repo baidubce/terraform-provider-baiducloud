@@ -1,4 +1,9 @@
-	## 1.21.2 (Unreleased)
+	## 1.21.3 (Unreleased)
+## 1.21.2 (May 10, 2024)
+FEATURES:
+- **New Resource:** `baiducloud_abroad_cdn_domain_config_acl`
+- **New Resource:** `baiducloud_abroad_cdn_domain_config_https`
+
 ## 1.21.1 (May 09, 2024)
 FEATURES:
 - **New Resource:** `baiducloud_abroad_cdn_domain_config_cache`
