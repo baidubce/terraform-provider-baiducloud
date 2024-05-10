@@ -1,8 +1,7 @@
 ---
 layout: "baiducloud"
-subcategory: "Application Load Balance (APPBLB)"
 page_title: "BaiduCloud: baiducloud_appblb"
-sidebar_current: "docs-baiducloud-resource-appblb"
+subcategory: "Application Load Balance (APPBLB)"
 description: |-
   Provide a resource to create an APPBLB.
 ---
@@ -31,27 +30,23 @@ resource "baiducloud_appblb" "default" {
 
 The following arguments are supported:
 
-* `billing` - (Required, ForceNew) Billing information of the APPBLB.
 * `subnet_id` - (Required, ForceNew) The subnet ID to which the LoadBalance instance belongs
 * `vpc_id` - (Required, ForceNew) The VPC short ID to which the LoadBalance instance belongs
 * `address` - (Optional) LoadBalance instance's service IP, instance can be accessed through this IP
 * `allocate_ipv6` - (Optional, ForceNew) Whether to allocated ipv6, default value is false, do not support modify
-* `allow_delete` - (Optional, ForceNew) Whether to allow deletion, default value is true, do not support modify
+* `allow_delete` - (Optional) Whether to allow deletion, default value is true. 
 * `auto_renew_length` - (Optional) The automatic renewal time is 1-9 per month and 1-3 per year.
 * `auto_renew_time_unit` - (Optional) Monthly payment or annual payment, month is month and year is year.
 * `description` - (Optional) LoadBalance's description, length must be between 0 and 450 bytes, and support Chinese
 * `eip` - (Optional) eip of the LoadBalance
 * `enterprise_security_groups` - (Optional) enterprise security group ids of the APPBLB
 * `name` - (Optional) LoadBalance instance's name, length must be between 1 and 65 bytes, and will be automatically generated if not set
+* `payment_timing` - (Optional, ForceNew) Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.Do not support modify.
 * `performance_level` - (Optional, ForceNew) performance level, available values are small1, small2, medium1, medium2, large1, large2, large3
 * `reservation` - (Optional) Reservation of the APPBLB.
 * `resource_group_id` - (Optional, ForceNew) Resource group id, support setting when creating instance, do not support modify!
 * `security_groups` - (Optional) security group ids of the APPBLB.
 * `tags` - (Optional, ForceNew) Tags, do not support modify
-
-The `billing` object supports the following:
-
-* `payment_timing` - (Required) Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.
 
 The `reservation` object supports the following:
 

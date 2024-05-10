@@ -70,28 +70,20 @@ func resourceBaiduCloudAppBLB() *schema.Resource {
 				Description: "eip of the LoadBalance",
 				Optional:    true,
 			},
-			"billing": {
-				Type:        schema.TypeMap,
-				Description: "Billing information of the APPBLB.",
-				Required:    true,
-				ForceNew:    true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"payment_timing": {
-							Type:         schema.TypeString,
-							Description:  "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.",
-							Required:     true,
-							Default:      PaymentTimingPostpaid,
-							ValidateFunc: validatePaymentTiming(),
-						},
-					},
-				},
+			"payment_timing": {
+				Type: schema.TypeString,
+				Description: "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid." +
+					"Do not support modify.",
+				Optional:     true,
+				ForceNew:     true,
+				Default:      PaymentTimingPostpaid,
+				ValidateFunc: validatePaymentTiming(),
 			},
 			"reservation": {
 				Type:             schema.TypeMap,
 				Description:      "Reservation of the APPBLB.",
 				Optional:         true,
-				DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
+				DiffSuppressFunc: postPaidDiffSuppressFunc,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"reservation_length": {
@@ -102,7 +94,7 @@ func resourceBaiduCloudAppBLB() *schema.Resource {
 							Required:         true,
 							Default:          1,
 							ValidateFunc:     validateReservationLength(),
-							DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
+							DiffSuppressFunc: postPaidDiffSuppressFunc,
 						},
 						"reservation_time_unit": {
 							Type: schema.TypeString,
@@ -112,7 +104,7 @@ func resourceBaiduCloudAppBLB() *schema.Resource {
 							Required:         true,
 							Default:          "month",
 							ValidateFunc:     validateReservationUnit(),
-							DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
+							DiffSuppressFunc: postPaidDiffSuppressFunc,
 						},
 					},
 				},
@@ -147,10 +139,10 @@ func resourceBaiduCloudAppBLB() *schema.Resource {
 				},
 			},
 			"performance_level": {
-				Type:        schema.TypeString,
-				Description: "performance level, available values are small1, small2, medium1, medium2, large1, large2, large3",
-				Optional:    true,
-				ForceNew:    true,
+				Type:         schema.TypeString,
+				Description:  "performance level, available values are small1, small2, medium1, medium2, large1, large2, large3",
+				Optional:     true,
+				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{"small1", "small2", "medium1", "medium2", "large1", "large2", "large3",}, false),
 			},
 			"description": {
@@ -244,9 +236,8 @@ func resourceBaiduCloudAppBLB() *schema.Resource {
 			"allow_delete": {
 				Type:        schema.TypeBool,
 				Default:     true,
-				Description: "Whether to allow deletion, default value is true, do not support modify",
+				Description: "Whether to allow deletion, default value is true. ",
 				Optional:    true,
-				ForceNew:    true,
 			},
 			"allocate_ipv6": {
 				Type:        schema.TypeBool,
@@ -351,6 +342,8 @@ func resourceBaiduCloudAppBLBRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("release_time", blbDetail.ReleaseTime)
 	d.Set("performance_level", blbDetail.PerformanceLevel)
 	d.Set("listener", appblbService.FlattenListenerModelToMap(blbDetail.Listener))
+	d.Set("payment_timing", blbDetail.PaymentTiming)
+	d.Set("allow_delete", blbModel.AllowDelete)
 	if d.HasChange("tags") {
 		if v, ok := d.GetOk("tags"); ok {
 			if !slicesContainSameElements(blbDetail.Tags, tranceTagMapToModel(v.(map[string]interface{}))) {
@@ -405,6 +398,12 @@ func resourceBaiduCloudAppBLBUpdate(d *schema.ResourceData, meta interface{}) er
 	if d.HasChange("description") {
 		update = true
 		updateArgs.Description = d.Get("description").(string)
+	}
+
+	if d.HasChange("allow_delete") {
+		update = true
+		allowDelete := d.Get("allow_delete").(bool)
+		updateArgs.AllowDelete = &allowDelete
 	}
 
 	stateConf := buildStateConf(
@@ -509,15 +508,12 @@ func buildBaiduCloudCreateAppBlbArgs(d *schema.ResourceData) *appblb.CreateLoadB
 		result.PerformanceLevel = v.(string)
 	}
 
-	if v, ok := d.GetOk("billing"); ok {
-		billing := v.(map[string]interface{})
+	if v, ok := d.GetOk("payment_timing"); ok {
 		billingRequest := &appblb.Billing{
 			PaymentTiming: "",
 		}
-		if p, ok := billing["payment_timing"]; ok {
-			paymentTiming := p.(string)
-			billingRequest.PaymentTiming = paymentTiming
-		}
+		paymentTiming := v.(string)
+		billingRequest.PaymentTiming = paymentTiming
 		if billingRequest.PaymentTiming == PaymentTimingPrepaid {
 			if r, ok := d.GetOk("reservation"); ok {
 				reservation := r.(map[string]interface{})

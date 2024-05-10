@@ -98,28 +98,19 @@ func resourceBaiduCloudBLB() *schema.Resource {
 				Description: "eip of the LoadBalance",
 				Optional:    true,
 			},
-			"billing": {
-				Type:        schema.TypeMap,
-				Description: "Billing information of the BLB.",
-				Required:    true,
-				ForceNew:    true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"payment_timing": {
-							Type:         schema.TypeString,
-							Description:  "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.",
-							Required:     true,
-							Default:      PaymentTimingPostpaid,
-							ValidateFunc: validatePaymentTiming(),
-						},
-					},
-				},
+			"payment_timing": {
+				Type:         schema.TypeString,
+				Description:  "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.",
+				Optional:     true,
+				ForceNew:     true,
+				Default:      PaymentTimingPostpaid,
+				ValidateFunc: validatePaymentTiming(),
 			},
 			"reservation": {
 				Type:             schema.TypeMap,
 				Description:      "Reservation of the BLB.",
 				Optional:         true,
-				DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
+				DiffSuppressFunc: postPaidDiffSuppressFunc,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"reservation_length": {
@@ -130,7 +121,7 @@ func resourceBaiduCloudBLB() *schema.Resource {
 							Required:         true,
 							Default:          1,
 							ValidateFunc:     validateReservationLength(),
-							DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
+							DiffSuppressFunc: postPaidDiffSuppressFunc,
 						},
 						"reservation_time_unit": {
 							Type: schema.TypeString,
@@ -140,7 +131,7 @@ func resourceBaiduCloudBLB() *schema.Resource {
 							Required:         true,
 							Default:          "month",
 							ValidateFunc:     validateReservationUnit(),
-							DiffSuppressFunc: postPaidBillingDiffSuppressFunc,
+							DiffSuppressFunc: postPaidDiffSuppressFunc,
 						},
 					},
 				},
@@ -229,9 +220,8 @@ func resourceBaiduCloudBLB() *schema.Resource {
 			"allow_delete": {
 				Type:        schema.TypeBool,
 				Default:     true,
-				Description: "Whether to allow deletion, default value is true, do not support modify",
+				Description: "Whether to allow deletion, default value is true. ",
 				Optional:    true,
-				ForceNew:    true,
 			},
 			"allocate_ipv6": {
 				Type:        schema.TypeBool,
@@ -336,6 +326,8 @@ func resourceBaiduCloudBLBRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("create_time", blbDetail.CreateTime)
 	d.Set("performance_level", blbDetail.PerformanceLevel)
 	d.Set("listener", blbService.FlattenListenerModelToMap(blbDetail.Listener))
+	d.Set("payment_timing", blbDetail.PaymentTiming)
+	d.Set("allow_delete", blbModel.AllowDelete)
 	if d.HasChange("tags") {
 		if v, ok := d.GetOk("tags"); ok {
 			if !slicesContainSameElements(blbDetail.Tags, tranceTagMapToModel(v.(map[string]interface{}))) {
@@ -413,6 +405,12 @@ func resourceBaiduCloudBLBUpdate(d *schema.ResourceData, meta interface{}) error
 	if d.HasChange("description") {
 		update = true
 		updateArgs.Description = d.Get("description").(string)
+	}
+
+	if d.HasChange("allow_delete") {
+		update = true
+		allowDelete := d.Get("allow_delete").(bool)
+		updateArgs.AllowDelete = &allowDelete
 	}
 
 	stateConf := buildStateConf(
@@ -534,15 +532,12 @@ func buildBaiduCloudCreateBlbArgs(d *schema.ResourceData) *blb.CreateLoadBalance
 		result.Type = v.(string)
 	}
 
-	if v, ok := d.GetOk("billing"); ok {
-		billing := v.(map[string]interface{})
+	if v, ok := d.GetOk("payment_timing"); ok {
 		billingRequest := &blb.Billing{
 			PaymentTiming: "",
 		}
-		if p, ok := billing["payment_timing"]; ok {
-			paymentTiming := p.(string)
-			billingRequest.PaymentTiming = paymentTiming
-		}
+		paymentTiming := v.(string)
+		billingRequest.PaymentTiming = paymentTiming
 		if billingRequest.PaymentTiming == PaymentTimingPrepaid {
 			if r, ok := d.GetOk("reservation"); ok {
 				reservation := r.(map[string]interface{})
