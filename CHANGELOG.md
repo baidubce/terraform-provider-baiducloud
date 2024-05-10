@@ -1,4 +1,9 @@
-	## 1.21.3 (Unreleased)
+	## 1.21.4 (Unreleased)
+## 1.21.3 (May 10, 2024)
+FEATURES:
+- Optimize the `payment_timing` attribute of blb&appblb
+- some bug fix
+
 ## 1.21.2 (May 10, 2024)
 FEATURES:
 - **New Resource:** `baiducloud_abroad_cdn_domain_config_acl`
