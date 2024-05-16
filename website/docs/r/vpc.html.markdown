@@ -28,6 +28,8 @@ The following arguments are supported:
 * `cidr` - (Required, ForceNew) CIDR block for the VPC.
 * `name` - (Required) Name of the VPC, which cannot take the value "default", the length is no more than 65 characters, and the value can be composed of numbers, characters and underscores.
 * `description` - (Optional) Description of the VPC. The value is no more than 200 characters.
+* `enable_ipv6` - (Optional) Whether to enable ipv6.Default is false.
+* `secondary_cidrs` - (Optional) Secondary cidr list of the VPC. They will not be repeated. replacement update.
 * `tags` - (Optional, ForceNew) Tags, do not support modify
 
 ## Attributes Reference
@@ -35,7 +37,6 @@ The following arguments are supported:
 In addition to all arguments above, the following attributes are exported:
 
 * `route_table_id` - Route table ID created by default on VPC creation.
-* `secondary_cidrs` - Secondary cidr list of the VPC. They will not be repeated.
 
 
 ## Import

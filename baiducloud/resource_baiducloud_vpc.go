@@ -73,11 +73,17 @@ func resourceBaiduCloudVpc() *schema.Resource {
 			},
 			"secondary_cidrs": {
 				Type:        schema.TypeList,
-				Description: "Secondary cidr list of the VPC. They will not be repeated.",
+				Description: "Secondary cidr list of the VPC. They will not be repeated. replacement update.",
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
-				Computed: true,
+				Optional: true,
+			},
+			"enable_ipv6": {
+				Type:        schema.TypeBool,
+				Description: "Whether to enable ipv6.Default is false.",
+				Optional:    true,
+				Default:     false,
 			},
 			"tags": tagsSchema(),
 		},
@@ -108,7 +114,10 @@ func resourceBaiduCloudVpcCreate(d *schema.ResourceData, meta interface{}) error
 	if err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_vpc", action, BCESDKGoERROR)
 	}
-
+	err = resourceBaiduCloudVpcUpdate(d, meta)
+	if err != nil {
+		return err
+	}
 	return resourceBaiduCloudVpcRead(d, meta)
 }
 
@@ -153,27 +162,29 @@ func resourceBaiduCloudVpcUpdate(d *schema.ResourceData, meta interface{}) error
 
 	vpcId := d.Id()
 	action := "Update VPC " + vpcId
-	update := false
 
 	updateVpcArgs := &vpc.UpdateVPCArgs{}
-	if d.HasChange("name") || d.HasChange("description") {
-		update = true
-		updateVpcArgs.Name = d.Get("name").(string)
-		updateVpcArgs.Description = d.Get("description").(string)
+	updateVpcArgs.Name = d.Get("name").(string)
+	updateVpcArgs.Description = d.Get("description").(string)
+	updateVpcArgs.EnableIpv6 = d.Get("enable_ipv6").(bool)
+
+	secondaryCidrInterfaces := d.Get("secondary_cidr").([]interface{})
+	secondaryCidrStrings := make([]string, 0)
+	for _, cidr := range secondaryCidrInterfaces {
+		secondaryCidrStrings = append(secondaryCidrStrings, cidr.(string))
 	}
 
-	if update {
-		_, err := client.WithVpcClient(func(vpcClient *vpc.Client) (i interface{}, e error) {
-			return nil, vpcClient.UpdateVPC(vpcId, updateVpcArgs)
-		})
-		addDebug(action, updateVpcArgs)
-		if err != nil {
-			if NotFoundError(err) {
-				d.SetId("")
-				return nil
-			}
-			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_vpc", action, BCESDKGoERROR)
+	updateVpcArgs.SecondaryCidr = secondaryCidrStrings
+	_, err := client.WithVpcClient(func(vpcClient *vpc.Client) (i interface{}, e error) {
+		return nil, vpcClient.UpdateVPC(vpcId, updateVpcArgs)
+	})
+	addDebug(action, updateVpcArgs)
+	if err != nil {
+		if NotFoundError(err) {
+			d.SetId("")
+			return nil
 		}
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_vpc", action, BCESDKGoERROR)
 	}
 
 	return resourceBaiduCloudVpcRead(d, meta)
@@ -229,6 +240,10 @@ func buildBaiduCloudVpcArgs(d *schema.ResourceData, meta interface{}) *vpc.Creat
 
 	if v, ok := d.GetOk("tags"); ok {
 		request.Tags = tranceTagMapToModel(v.(map[string]interface{}))
+	}
+
+	if v, ok := d.GetOk("enable_ipv6"); ok {
+		request.EnableIpv6 = v.(bool)
 	}
 
 	return request

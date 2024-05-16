@@ -63,6 +63,10 @@ func resourceBaiduCloudVpnConn() *schema.Resource {
 			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"vpn_id": {
 				Type:        schema.TypeString,
