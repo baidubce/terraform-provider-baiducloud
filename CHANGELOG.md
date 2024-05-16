@@ -1,4 +1,8 @@
-	## 1.21.4 (Unreleased)
+	## 1.21.5 (Unreleased)
+## 1.21.4 (May 16, 2024)
+FEATURES:
+- baiducloud_vpc support attribute enable_ipv6 and secondary_cidrs
+
 ## 1.21.3 (May 10, 2024)
 FEATURES:
 - Optimize the `payment_timing` attribute of blb&appblb
