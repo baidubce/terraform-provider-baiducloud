@@ -1,4 +1,8 @@
-	## 1.21.5 (Unreleased)
+	## 1.21.6 (Unreleased)
+## 1.21.5 (May 20, 2024)
+NOTES:
+- fix md5 check inconsistency issue
+
 ## 1.21.4 (May 16, 2024)
 FEATURES:
 - baiducloud_vpc support attribute enable_ipv6 and secondary_cidrs
