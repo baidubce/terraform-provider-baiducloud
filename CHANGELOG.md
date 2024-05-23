@@ -1,4 +1,9 @@
-	## 1.21.6 (Unreleased)
+	## 1.21.7 (Unreleased)
+## 1.21.6 (May 23, 2024)
+NOTES:
+- baiducloud_mongodb_instance db security_ips
+- baiducloud_cds support attribute resource_group_id now.
+
 ## 1.21.5 (May 20, 2024)
 NOTES:
 - fix md5 check inconsistency issue
