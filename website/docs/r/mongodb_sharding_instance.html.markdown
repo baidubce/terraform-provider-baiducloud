@@ -63,7 +63,8 @@ resource "baiducloud_mongodb_sharding_instance" "example" {
 - `name` (String) Name of the instance. If not specified, it will be randomly generated.
 - `payment_timing` (String) Payment timing of billing. Valid values: `Prepaid`, `Postpaid`. Defaults to `Postpaid`.
 - `reservation_length` (Number) The reservation length (month) will pay. Effective when `payment_timing` is `Prepaid`. Valid values: `1`~`9`, `12`, `24`, `36`. Defaults to `1`.
-- `auto_renew_time_length` - (Optional, ForceNew)The automatic renewal time (month). Effective when `payment_timing` is `Prepaid`. Valid values: `1`~`9`, `12`, `24`, `36`.
+- `auto_renew_length` - (Optional, ForceNew) The automatic renewal time (month). Effective when `payment_timing` is `Prepaid`. Valid values: `1`~`9`, `12`, `24`, `36`.
+- `security_ip` - (Optional) Security ip list for instance.
 - `resource_group_id` (String) Resource group id of the resource. Effective upon creation, modifications are not supported currently.
 - `shard_storage_type` (String) Storage type of the instance. Valid values: `CDS_PREMIUM_SSD`, `CDS_ENHANCED_SSD`, `LOCAL_DISK`. Defaults to `CDS_PREMIUM_SSD`.
 - `storage_engine` (String) Storage engine of the instance. Valid values: `WiredTiger`.

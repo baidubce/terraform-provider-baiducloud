@@ -136,7 +136,9 @@ func resourceShardingInstanceCreate(d *schema.ResourceData, meta interface{}) er
 	if _, err = waitInstanceAvailable(conn, d.Id()); err != nil {
 		return fmt.Errorf("error waiting MongoDB Instance (%s) becoming available: %w", d.Id(), err)
 	}
-
+	if err = updateSecurityIps(d, meta); err != nil {
+		return fmt.Errorf("error set MongoDB Instance (%s) Security ips : %w", d.Id(), err)
+	}
 	return resourceShardingInstanceRead(d, meta)
 }
 
@@ -168,6 +170,9 @@ func resourceShardingInstanceUpdate(d *schema.ResourceData, meta interface{}) er
 	}
 	if err := updatePassword(d, conn); err != nil {
 		return fmt.Errorf("error updating MongoDB Sharding Instance (%s) password: %w", d.Id(), err)
+	}
+	if err := updateSecurityIps(d, meta); err != nil {
+		return fmt.Errorf("error updating MongoDB Sharding Instance (%s) security ips: %w", d.Id(), err)
 	}
 	return resourceShardingInstanceRead(d, meta)
 }

@@ -2,14 +2,13 @@ package mongodb
 
 import (
 	"fmt"
-	"log"
-
 	"github.com/baidubce/bce-sdk-go/services/mongodb"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/flex"
+	"log"
+	"time"
 )
 
 func basicResourceInstanceSchema() map[string]*schema.Schema {
@@ -36,11 +35,11 @@ func basicResourceInstanceSchema() map[string]*schema.Schema {
 			ValidateFunc: validation.StringInSlice([]string{"WiredTiger"}, false),
 		},
 		"engine_version": {
-			Type:         schema.TypeString,
-			Description:  "Database version of the instance. Valid values: `3.4`, `3.6`.",
-			Optional:     true,
-			Default:      "3.4",
-			ValidateFunc: validation.StringInSlice([]string{"3.4", "3.6"}, false),
+			Type:        schema.TypeString,
+			Description: "Database version of the instance. Valid values: `3.4`, `3.6`.",
+			Optional:    true,
+			Default:     "3.4",
+			//ValidateFunc: validation.StringInSlice([]string{"3.4", "3.6"}, false),
 		},
 		"account_password": {
 			Type: schema.TypeString,
@@ -53,6 +52,15 @@ func basicResourceInstanceSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Description: "Expiration time of the prepaid instance.",
 			Computed:    true,
+		},
+		"security_ip": {
+			Type:        schema.TypeSet,
+			Description: "Security ip list for instance.",
+			Optional:    true,
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+			Set: schema.HashString,
 		},
 	}
 	flex.MergeSchema(basicSchema, basicComputedOnlySchema())
@@ -166,6 +174,13 @@ func basicInstanceSchemaRead(d *schema.ResourceData, meta interface{}) (*mongodb
 	if err := d.Set("connection_string", detail.ConnectionString); err != nil {
 		return nil, fmt.Errorf("error setting connection_string: %w", err)
 	}
+	ips, err := basicInstanceSecurityIPRead(d, meta)
+	if err != nil {
+		return nil, err
+	}
+	if err := d.Set("security_ip", ips.SecurityIps); err != nil {
+		return nil, fmt.Errorf("error setting security_ip: %w", err)
+	}
 
 	layout := "2006-01-02 15:04:05"
 	if err := d.Set("create_time", detail.CreateTime.Local().Format(layout)); err != nil {
@@ -178,6 +193,18 @@ func basicInstanceSchemaRead(d *schema.ResourceData, meta interface{}) (*mongodb
 	}
 
 	return detail, nil
+}
+
+func basicInstanceSecurityIPRead(d *schema.ResourceData, meta interface{}) (*mongodb.SecurityIpModel, error) {
+	conn := meta.(*connectivity.BaiduClient)
+	raw, err := conn.WithMongoDBClient(func(client *mongodb.Client) (interface{}, error) {
+		return client.GetSecurityIps(d.Id())
+	})
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("[DEBUG] Query MongoDB Instance (%s) security_ip: %+v", d.Id(), raw)
+	return raw.(*mongodb.SecurityIpModel), nil
 }
 
 func updateName(d *schema.ResourceData, conn *connectivity.BaiduClient) error {
@@ -206,6 +233,60 @@ func updatePassword(d *schema.ResourceData, conn *connectivity.BaiduClient) erro
 			return nil, client.UpdateAccountPassword(d.Id(), args)
 		})
 		return err
+	}
+	return nil
+}
+
+func updateSecurityIps(d *schema.ResourceData, meta interface{}) error {
+	conn := meta.(*connectivity.BaiduClient)
+	ips, err := basicInstanceSecurityIPRead(d, meta)
+	if err != nil {
+		return err
+	}
+	os := &schema.Set{
+		F: schema.HashString,
+	}
+	for _, ip := range ips.SecurityIps {
+		os.Add(ip)
+	}
+	ns := d.Get("security_ip").(*schema.Set)
+	addIPs := ns.Difference(os).List()
+	deleteIPs := os.Difference(ns).List()
+
+	addIPsArg := make([]string, 0)
+	for _, ips := range addIPs {
+		addIPsArg = append(addIPsArg, ips.(string))
+	}
+	needWait := false
+	// Add security IPs
+	if len(addIPsArg) > 0 {
+		needWait = true
+		if _, err := conn.WithMongoDBClient(func(client *mongodb.Client) (interface{}, error) {
+			return nil, client.AddSecurityIps(d.Id(), &mongodb.SecurityIpModel{
+				SecurityIps: addIPsArg,
+			})
+		}); err != nil {
+			return fmt.Errorf("error add MongoDB security ips: %w", err)
+		}
+	}
+
+	deleteIPsArg := make([]string, 0)
+	for _, ips := range deleteIPs {
+		deleteIPsArg = append(deleteIPsArg, ips.(string))
+	}
+	// Delete security IPs
+	if len(deleteIPsArg) > 0 {
+		// 等待8s，两个接口调用间隔太短会导致第二个调用的接口400，需要等待5s以上.....
+		if needWait {
+			time.Sleep(8 * time.Second)
+		}
+		if _, err := conn.WithMongoDBClient(func(client *mongodb.Client) (interface{}, error) {
+			return nil, client.DeleteSecurityIps(d.Id(), &mongodb.SecurityIpModel{
+				SecurityIps: deleteIPsArg,
+			})
+		}); err != nil {
+			return fmt.Errorf("error delete MongoDB security ips: %w", err)
+		}
 	}
 	return nil
 }

@@ -1,19 +1,21 @@
 /*
 Provide a resource to create a CDS.
 
-Example Usage
+# Example Usage
 
 ```hcl
-resource "baiducloud_cds" "default" {
-  name                    = "terraformCreate"
-  description             = "terraform create cds"
-  payment_timing          = "Postpaid"
-  auto_snapshot_policy_id = "asp-xyYk0XFC"
-  snapshot_id             = "s-WTGlKBR1"
-}
+
+	resource "baiducloud_cds" "default" {
+	  name                    = "terraformCreate"
+	  description             = "terraform create cds"
+	  payment_timing          = "Postpaid"
+	  auto_snapshot_policy_id = "asp-xyYk0XFC"
+	  snapshot_id             = "s-WTGlKBR1"
+	}
+
 ```
 
-Import
+# Import
 
 CDS can be imported, e.g.
 
@@ -72,8 +74,8 @@ func resourceBaiduCloudCDS() *schema.Resource {
 				ValidateFunc: validation.IntBetween(5, 32768),
 			},
 			"storage_type": {
-				Type:         schema.TypeString,
-				Description:  "CDS dist storage type, support hp1, std1, cloud_hp1, hdd and enhanced_ssd_pl1, default hp1, " +
+				Type: schema.TypeString,
+				Description: "CDS dist storage type, support hp1, std1, cloud_hp1, hdd and enhanced_ssd_pl1, default hp1, " +
 					"see https://cloud.baidu.com/doc/BCC/s/6jwvyo0q2/#storagetype for detail",
 				Optional:     true,
 				Computed:     true,
@@ -100,23 +102,23 @@ func resourceBaiduCloudCDS() *schema.Resource {
 				DiffSuppressFunc: postPaidDiffSuppressFunc,
 			},
 			"auto_renew_length": {
-				Type:         schema.TypeInt,
-				Description:  "The automatic renewal time is 1-9 per month and 1-3 per year.",
-				Optional:     true,
-				ValidateFunc: validation.IntBetween(1, 9),
+				Type:             schema.TypeInt,
+				Description:      "The automatic renewal time is 1-9 per month and 1-3 per year.",
+				Optional:         true,
+				ValidateFunc:     validation.IntBetween(1, 9),
 				DiffSuppressFunc: postPaidDiffSuppressFunc,
 			},
 			"auto_renew_time_unit": {
-				Type:         schema.TypeString,
-				Description:  "Monthly payment or annual payment, month is \"month\" and year is \"year\".",
-				Optional:     true,
-				ValidateFunc: validation.StringInSlice([]string{"month", "year"}, false),
+				Type:             schema.TypeString,
+				Description:      "Monthly payment or annual payment, month is \"month\" and year is \"year\".",
+				Optional:         true,
+				ValidateFunc:     validation.StringInSlice([]string{"month", "year"}, false),
 				DiffSuppressFunc: postPaidDiffSuppressFunc,
 			},
-			"instance_id":{
-				Type:         schema.TypeString,
-				Description:  "Create a disk and mount it to the instance.",
-				Optional:     true,
+			"instance_id": {
+				Type:        schema.TypeString,
+				Description: "Create a disk and mount it to the instance.",
+				Optional:    true,
 			},
 			"snapshot_id": {
 				Type:        schema.TypeString,
@@ -174,6 +176,21 @@ func resourceBaiduCloudCDS() *schema.Resource {
 				Description: "CDS volume status",
 				Computed:    true,
 			},
+			"resource_group_id": {
+				Type:        schema.TypeSet,
+				Description: "Resource group id, support setting when creating CDS, do not support modify!",
+				Optional:    true,
+				MaxItems:    1,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					if d.Id() != "" {
+						return true
+					}
+					return false
+				},
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
 			"tags": tagsSchema(),
 		},
 	}
@@ -220,7 +237,11 @@ func resourceBaiduCloudCDSCreate(d *schema.ResourceData, meta interface{}) error
 	if _, err := stateConf.WaitForState(); err != nil {
 		return WrapError(err)
 	}
-
+	if _, ok := d.GetOk("resource_group_id"); ok {
+		if err := checkResourceBind(d, meta); err != nil {
+			return err
+		}
+	}
 	return resourceBaiduCloudCDSRead(d, meta)
 }
 
@@ -250,7 +271,11 @@ func resourceBaiduCloudCDSRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("payment_timing", volume.PaymentTiming)
 	d.Set("zone_name", volume.ZoneName)
 	d.Set("snapshot_id", volume.SourceSnapshotId)
-
+	resourceGroupIds := make([]string, 0)
+	for _, info := range volume.ResGroupInfos {
+		resourceGroupIds = append(resourceGroupIds, info.GroupId)
+	}
+	d.Set("resource_group_id", resourceGroupIds)
 	if volume.AutoSnapshotPolicy != nil {
 		d.Set("auto_snapshot_policy_id", volume.AutoSnapshotPolicy.Id)
 	}
@@ -441,6 +466,10 @@ func buildBaiduCloudCreateCDSArgs(d *schema.ResourceData, meta interface{}) (*ap
 		result.Tags = tranceTagMapToModel(v.(map[string]interface{}))
 	}
 
+	if v, ok := d.GetOk("resource_group_id"); ok {
+		result.ResGroupId = v.(*schema.Set).List()[0].(string)
+	}
+
 	if v, ok := d.GetOk("instance_id"); ok {
 		result.InstanceId = v.(string)
 	}
@@ -454,4 +483,25 @@ func buildBaiduCloudCreateCDSArgs(d *schema.ResourceData, meta interface{}) (*ap
 		}
 	}
 	return result, nil
+}
+
+func checkResourceBind(d *schema.ResourceData, meta interface{}) error {
+	action := "Check CDS resource group bind, id is "+d.Id()
+	client := meta.(*connectivity.BaiduClient)
+	raw, err := client.WithBccClient(func(client *bcc.Client) (i interface{}, e error) {
+		return client.GetCDSVolumeDetail(d.Id())
+	})
+
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_cds", action, BCESDKGoERROR)
+	}
+
+	volume := raw.(*api.GetVolumeDetailResult).Volume
+	v := d.Get("resource_group_id")
+	for _, item := range volume.ResGroupInfos {
+		if item.GroupId == v.(*schema.Set).List()[0].(string) {
+			return nil
+		}
+	}
+	return WrapErrorf(nil, DefaultErrorMsg, "baiducloud_cds", action, BCESDKGoERROR)
 }

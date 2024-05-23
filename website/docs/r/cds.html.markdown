@@ -20,6 +20,9 @@ resource "baiducloud_cds" "default" {
   payment_timing          = "Postpaid"
   auto_snapshot_policy_id = "asp-xyYk0XFC"
   snapshot_id             = "s-WTGlKBR1"
+  resource_group_id = [
+    "RESG-xxxxxx"
+  ]
 }
 ```
 
@@ -38,6 +41,7 @@ The following arguments are supported:
 * `name` - (Optional) CDS volume name
 * `reservation_length` - (Optional) Prepaid reservation length, support [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36], only useful when payment_timing is Prepaid
 * `reservation_time_unit` - (Optional) Prepaid reservation time unit, only support Month now
+* `resource_group_id` - (Optional) Resource group id, support setting when creating CDS, do not support modify!
 * `snapshot_id` - (Optional, ForceNew) Snapshot id, support create cds use snapshot, when set this parameter, cds_disk_size is ignored
 * `storage_type` - (Optional) CDS dist storage type, support hp1, std1, cloud_hp1, hdd and enhanced_ssd_pl1, default hp1, see https://cloud.baidu.com/doc/BCC/s/6jwvyo0q2/#storagetype for detail
 * `tags` - (Optional, ForceNew) Tags, do not support modify

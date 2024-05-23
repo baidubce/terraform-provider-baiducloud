@@ -81,6 +81,9 @@ func resourceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
 	if _, err = waitInstanceAvailable(conn, d.Id()); err != nil {
 		return fmt.Errorf("error waiting MongoDB Instance (%s) becoming available: %w", d.Id(), err)
 	}
+	if err = updateSecurityIps(d, meta); err != nil {
+		return fmt.Errorf("error set MongoDB Instance (%s) Security ips : %w", d.Id(), err)
+	}
 	return resourceInstanceRead(d, meta)
 }
 
@@ -121,6 +124,9 @@ func resourceInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 	if err := updatePassword(d, conn); err != nil {
 		return fmt.Errorf("error updating MongoDB Instance (%s) password: %w", d.Id(), err)
+	}
+	if err := updateSecurityIps(d, meta); err != nil {
+		return fmt.Errorf("error updating MongoDB Instance (%s) security ips: %w", d.Id(), err)
 	}
 	if err := resizeInstance(d, conn); err != nil {
 		return err
