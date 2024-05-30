@@ -1,4 +1,8 @@
-	## 1.21.7 (Unreleased)
+	## 1.21.8 (Unreleased)
+## 1.21.7 (May 30, 2024)
+NOTES:
+- support mongodb instance backup policy
+
 ## 1.21.6 (May 23, 2024)
 NOTES:
 - baiducloud_mongodb_instance db security_ips
