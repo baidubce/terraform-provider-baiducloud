@@ -3,6 +3,7 @@ package mongodb
 import (
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/baidubce/bce-sdk-go/services/mongodb"
@@ -38,6 +39,52 @@ func ResourceInstance() *schema.Resource {
 		"port": {
 			Type:        schema.TypeString,
 			Description: "Connection port of the instance.",
+			Computed:    true,
+		},
+		"auto_backup_enable": {
+			Type:         schema.TypeString,
+			Default:      "OFF",
+			Description:  "Auto backup status.Valid values: 'ON','OFF'. ",
+			ValidateFunc: validation.StringInSlice([]string{"ON", "OFF"}, false),
+			Optional:     true,
+		},
+		"preferred_backup_period": {
+			Type: schema.TypeSet,
+			Description: "Backup period. Value reference: Monday, Tuesday, Wednesday," +
+				" Thursday, Friday, Saturday, Sunday",
+			DiffSuppressFunc: backupPolicyDiffSuppressFunc,
+			Optional:         true,
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+				ValidateFunc: validation.StringInSlice([]string{"Monday", "Tuesday", "Wednesday",
+					"Thursday", "Friday", "Saturday", "Sunday"}, false),
+			},
+			Set: schema.HashString,
+		},
+		"preferred_backup_time": {
+			Type:             schema.TypeString,
+			Description:      "Backup time. The format is HH:mmZ-HH:mmZ. The time range is limited to 1 hour.",
+			DiffSuppressFunc: backupPolicyDiffSuppressFunc,
+			Optional:         true,
+		},
+		"enable_increment_backup": {
+			Type:             schema.TypeInt,
+			Description:      "Whether incremental backup is enabled. 0: disabled; 1: enabled",
+			DiffSuppressFunc: backupPolicyDiffSuppressFunc,
+			ValidateFunc:     validation.IntBetween(0, 1),
+			Optional:         true,
+		},
+		//"backup_method": {
+		//	Type:     schema.TypeString,
+		//	Computed: true,
+		//},
+		//"incr_backup_retention_period": {
+		//	Type:     schema.TypeInt,
+		//	Computed: true,
+		//},
+		"backup_retention_period": {
+			Type:        schema.TypeInt,
+			Description: "Number of days to keep backups",
 			Computed:    true,
 		},
 	}
@@ -84,6 +131,9 @@ func resourceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
 	if err = updateSecurityIps(d, meta); err != nil {
 		return fmt.Errorf("error set MongoDB Instance (%s) Security ips : %w", d.Id(), err)
 	}
+	if err = updateBackupPolicy(d, meta); err != nil {
+		return fmt.Errorf("error set MongoDB Instance (%s) Backup Policy : %w", d.Id(), err)
+	}
 	return resourceInstanceRead(d, meta)
 }
 
@@ -113,6 +163,31 @@ func resourceInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	if err := d.Set("port", detail.Port); err != nil {
 		return fmt.Errorf("error setting port: %w", err)
 	}
+	backupPolicy, err := basicInstanceBackupPolicyRead(d, meta)
+	if err != nil {
+		return err
+	}
+	if err := d.Set("auto_backup_enable", backupPolicy.AutoBackupEnable); err != nil {
+		return fmt.Errorf("error setting auto_backup_enable: %w", err)
+	}
+	if err := d.Set("backup_retention_period", backupPolicy.BackupRetentionPeriod); err != nil {
+		return fmt.Errorf("error setting backup_retention_period: %w", err)
+	}
+	if err := d.Set("preferred_backup_period", strings.Split(backupPolicy.PreferredBackupPeriod, ",")); err != nil {
+		return fmt.Errorf("error setting preferred_backup_period: %w", err)
+	}
+	if err := d.Set("preferred_backup_time", backupPolicy.PreferredBackupTime); err != nil {
+		return fmt.Errorf("error setting preferred_backup_time: %w", err)
+	}
+	if err := d.Set("enable_increment_backup", backupPolicy.EnableIncrementBackup); err != nil {
+		return fmt.Errorf("error setting enable_increment_backup: %w", err)
+	}
+	//if err := d.Set("backup_method", backupPolicy.BackupMethod); err != nil {
+	//	return fmt.Errorf("error setting backup_method: %w", err)
+	//}
+	//if err := d.Set("incr_backup_retention_period", backupPolicy.IncrBackupRetentionPeriod); err != nil {
+	//	return fmt.Errorf("error setting incr_backup_retention_period: %w", err)
+	//}
 	return nil
 }
 
@@ -127,6 +202,9 @@ func resourceInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 	if err := updateSecurityIps(d, meta); err != nil {
 		return fmt.Errorf("error updating MongoDB Instance (%s) security ips: %w", d.Id(), err)
+	}
+	if err := updateBackupPolicy(d, meta); err != nil {
+		return fmt.Errorf("error updating MongoDB Instance (%s) Backup Policy : %w", d.Id(), err)
 	}
 	if err := resizeInstance(d, conn); err != nil {
 		return err

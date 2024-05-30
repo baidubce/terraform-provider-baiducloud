@@ -8,6 +8,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/flex"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -207,6 +208,18 @@ func basicInstanceSecurityIPRead(d *schema.ResourceData, meta interface{}) (*mon
 	return raw.(*mongodb.SecurityIpModel), nil
 }
 
+func basicInstanceBackupPolicyRead(d *schema.ResourceData, meta interface{}) (*mongodb.BackupPolicy, error) {
+	conn := meta.(*connectivity.BaiduClient)
+	raw, err := conn.WithMongoDBClient(func(client *mongodb.Client) (interface{}, error) {
+		return client.GetBackupPolicy(d.Id())
+	})
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("[DEBUG] Query MongoDB Instance (%s) backup policy: %+v", d.Id(), raw)
+	return raw.(*mongodb.BackupPolicy), nil
+}
+
 func updateName(d *schema.ResourceData, conn *connectivity.BaiduClient) error {
 	if d.HasChange("name") {
 		args := &mongodb.UpdateInstanceNameArgs{
@@ -289,4 +302,39 @@ func updateSecurityIps(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 	return nil
+}
+
+func updateBackupPolicy(d *schema.ResourceData, meta interface{}) error {
+	conn := meta.(*connectivity.BaiduClient)
+	backupPolicy := &mongodb.BackupPolicy{}
+	if v, ok := d.GetOk("auto_backup_enable"); ok {
+		backupPolicy.AutoBackupEnable = v.(string)
+	}
+	if v, ok := d.GetOk("preferred_backup_period"); ok {
+		times := make([]string, 0)
+		for _, elem := range v.(*schema.Set).List() {
+			times = append(times, elem.(string))
+		}
+		backupPolicy.PreferredBackupPeriod = strings.Join(times, ",")
+	}
+	if v, ok := d.GetOk("preferred_backup_time"); ok {
+		backupPolicy.PreferredBackupTime = v.(string)
+	}
+	if v, ok := d.GetOk("enable_increment_backup"); ok {
+		backupPolicy.EnableIncrementBackup = v.(int)
+	}
+	if _, err := conn.WithMongoDBClient(func(client *mongodb.Client) (interface{}, error) {
+		return nil, client.ModifyBackupPolicy(d.Id(), backupPolicy)
+	}); err != nil {
+		return fmt.Errorf("error update MongoDB backup policy: %w", err)
+	}
+	time.Sleep(20 * time.Second)
+	if _, err := waitInstanceAvailable(conn, d.Id()); err != nil {
+		return fmt.Errorf("error waiting MongoDB Instance (%s) becoming available: %w", d.Id(), err)
+	}
+	return nil
+}
+
+func backupPolicyDiffSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
+	return d.Get("auto_backup_enable").(string) == "OFF"
 }

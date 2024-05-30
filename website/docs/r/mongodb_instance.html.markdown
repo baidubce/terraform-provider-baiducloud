@@ -9,7 +9,7 @@ description: |-
 
 # baiducloud_mongodb_instance (Resource)
 
-Use this resource to manage MongoDB Instance. 
+Use this resource to manage MongoDB Instance.
 
 More information can be found in the [Developer Guide](https://cloud.baidu.com/doc/MONGODB/s/Ekdgskkrk).
 
@@ -36,7 +36,6 @@ resource "baiducloud_mongodb_instance" "example" {
     TagA = "valueA"
     TagB = "valueB"
   }
-
 }
 ```
 
@@ -52,14 +51,18 @@ resource "baiducloud_mongodb_instance" "example" {
 ### Optional
 
 - `account_password` (String, Sensitive) Password for root account. If not specified, it will be randomly generated. Must be 8-32 characters, including letters, numbers, and symbols(`!#$%^*()`only).
+- `auto_backup_enable` (String) Auto backup status.Valid values: 'ON','OFF'.
+- `auto_renew_length` (Number) The automatic renewal time (month). Effective when `payment_timing` is `Prepaid`. Valid values: `1`~`9`, `12`, `24`, `36`. Defaults to `1`.
+- `enable_increment_backup` (Number) Whether incremental backup is enabled. 0: disabled; 1: enabled
 - `engine_version` (String) Database version of the instance. Valid values: `3.4`, `3.6`.
 - `name` (String) Name of the instance. If not specified, it will be randomly generated.
 - `payment_timing` (String) Payment timing of billing. Valid values: `Prepaid`, `Postpaid`. Defaults to `Postpaid`.
-- `auto_renew_length` - (Optional, ForceNew) The automatic renewal time (month). Effective when `payment_timing` is `Prepaid`. Valid values: `1`~`9`, `12`, `24`, `36`.
-- `security_ip` - (Optional) Security ip list for instance.
+- `preferred_backup_period` (Set of String) Backup period. Value reference: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
+- `preferred_backup_time` (String) Backup time. The format is HH:mmZ-HH:mmZ. The time range is limited to 1 hour.
 - `readonly_node_num` (Number) Number of readonly nodes in the instance. Only effective when `voting_member_num` is set to `2` or `3`. Valid values: `0`~`5`. Defaults to `0`.
 - `reservation_length` (Number) The reservation length (month) will pay. Effective when `payment_timing` is `Prepaid`. Valid values: `1`~`9`, `12`, `24`, `36`. Defaults to `1`.
 - `resource_group_id` (String) Resource group id of the resource. Effective upon creation, modifications are not supported currently.
+- `security_ip` (Set of String) Security ip list for instance.
 - `storage_engine` (String) Storage engine of the instance. Valid values: `WiredTiger`.
 - `storage_type` (String) Storage type of the instance. Valid values: `CDS_PREMIUM_SSD`, `CDS_ENHANCED_SSD`, `LOCAL_DISK`. Defaults to `CDS_PREMIUM_SSD`.
 - `subnets` (Block List) Subnets of the resource. (see [below for nested schema](#nestedblock--subnets))
@@ -69,6 +72,7 @@ resource "baiducloud_mongodb_instance" "example" {
 
 ### Read-Only
 
+- `backup_retention_period` (Number) Number of days to keep backups
 - `connection_string` (String) Connection address of the instance.
 - `create_time` (String) Creation time of the instance.
 - `expire_time` (String) Expiration time of the prepaid instance.

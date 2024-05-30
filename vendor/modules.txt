@@ -77,7 +77,7 @@ github.com/aws/aws-sdk-go/service/sso
 github.com/aws/aws-sdk-go/service/sso/ssoiface
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
-# github.com/baidubce/bce-sdk-go v0.9.180
+# github.com/baidubce/bce-sdk-go v0.9.182
 github.com/baidubce/bce-sdk-go/auth
 github.com/baidubce/bce-sdk-go/bce
 github.com/baidubce/bce-sdk-go/http

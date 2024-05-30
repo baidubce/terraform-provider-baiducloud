@@ -8,6 +8,7 @@ const (
 	InstanceStatusNodeCreating      = "NODE_CREATING"
 	InstanceStatusNodeRestarting    = "NODE_RESTARTING"
 	InstanceStatusNodeClassChanging = "NODE_CLASS_CHANGING"
+	InstanceStatusBackuping         = "BACKUPING"
 
 	StorageTypeSSD         = "CDS_PREMIUM_SSD"
 	StorageTypeEnhancedSSD = "CDS_ENHANCED_SSD"

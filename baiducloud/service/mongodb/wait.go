@@ -15,7 +15,7 @@ const (
 func pendingStatus() []string {
 	return []string{
 		InstanceStatusCreating, InstanceStatusRestarting, InstanceStatusClassChanging,
-		InstanceStatusNodeCreating, InstanceStatusNodeRestarting, InstanceStatusNodeClassChanging,
+		InstanceStatusNodeCreating, InstanceStatusNodeRestarting, InstanceStatusNodeClassChanging, InstanceStatusBackuping,
 	}
 }
 
