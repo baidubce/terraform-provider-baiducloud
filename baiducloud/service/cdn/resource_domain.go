@@ -10,6 +10,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/flex"
 	"log"
+	"time"
 )
 
 func ResourceDomain() *schema.Resource {
@@ -84,6 +85,61 @@ func ResourceDomain() *schema.Resource {
 				Default:      "default",
 				ValidateFunc: validation.StringInSlice(DomainFormValues(), false),
 			},
+			"drcdn_enabled": {
+				Type: schema.TypeBool,
+				Description: "Whether enable DRCDN, Value is true or false. When this field is true, " +
+					"it indicates that you wish to create a DRCDN domain and " +
+					"you must explicitly configure the dsa parameters.",
+				Optional: true,
+				Default:  "false",
+				ForceNew: true,
+			},
+			"dsa": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"rule": {
+							Type:     schema.TypeList,
+							Optional: true,
+							ForceNew: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"type": {
+										Type: schema.TypeString,
+										Description: "Rule type, Valid values: `suffix` indicates the file type, " +
+											"`path` indicates the dynamic path, " +
+											"`exactPath` indicates the dynamic URL," +
+											" `method` indicates the request method " +
+											"(supports `GET`, `POST`, `PUT`, `DELETE`, `OPTIONS`)",
+										ValidateFunc: validation.StringInSlice([]string{"suffix", "path", "exactPath",
+											"method"}, false),
+										Required: true,
+										ForceNew: true,
+									},
+									"value": {
+										Type: schema.TypeString,
+										Description: "type specifies the type of configuration rules. " +
+											"Multiple rules are separated by `;`. " +
+											"For example, when configuring multiple HTTP methods for CDN domain, " +
+											"its value may be `POST;PUT;DELETE`.",
+										Required: true,
+										ForceNew: true,
+									},
+								},
+							},
+						},
+						"comment": {
+							Type:        schema.TypeString,
+							Description: "Comment of the dsa config",
+							Optional:    true,
+							ForceNew:    true,
+						},
+					},
+				},
+			},
 
 			// computed
 			"status": {
@@ -113,8 +169,18 @@ func ResourceDomain() *schema.Resource {
 			},
 			"tags": flex.TagsSchema(),
 		},
+		CustomizeDiff: dsaConstraints,
 	}
 
+}
+
+func dsaConstraints(diff *schema.ResourceDiff, v interface{}) error {
+	if diff.Get("drcdn_enabled").(bool) {
+		if _, ok := diff.GetOk("dsa"); !ok {
+			return fmt.Errorf("'dsa' must be specified when 'drcdn_enabled' is true")
+		}
+	}
+	return nil
 }
 
 func resourceDomainCreate(d *schema.ResourceData, meta interface{}) error {
@@ -130,6 +196,15 @@ func resourceDomainCreate(d *schema.ResourceData, meta interface{}) error {
 		if v, ok := d.GetOk("tags"); ok {
 			tags = flex.TranceTagMapToModel(v.(map[string]interface{}))
 		}
+		if d.Get("drcdn_enabled").(bool) {
+			dsa, err := getDSAConfig(d)
+			if err != nil {
+				return nil, err
+			}
+			return cdnClient.CreateDomainWithOptions(domain, input.Origin, cdn.CreateDomainWithTags(tags),
+				cdn.CreateDomainWithForm(input.Form), cdn.CreateDomainWithOriginDefaultHost(input.DefaultHost),
+				cdn.CreateDomainAsDrcdnType(dsa))
+		}
 		return cdnClient.CreateDomainWithOptions(domain, input.Origin, cdn.CreateDomainWithTags(tags),
 			cdn.CreateDomainWithForm(input.Form), cdn.CreateDomainWithOriginDefaultHost(input.DefaultHost))
 	})
@@ -139,6 +214,8 @@ func resourceDomainCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.SetId(domain)
+	// may have several seconds delay, wait for it
+	time.Sleep(30 * time.Second)
 	return resourceDomainRead(d, meta)
 }
 

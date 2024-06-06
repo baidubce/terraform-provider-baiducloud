@@ -110,6 +110,10 @@ func resourceDomainConfigACLCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	d.SetId(domain)
+	// wait for running status
+	if _, err := waitAbroadCDNDomainAvailable(conn, domain); err != nil {
+		return fmt.Errorf("error waiting Abraod CDN domain (%s) becoming available: %w", d.Id(), err)
+	}
 	return resourceDomainConfigACLRead(d, meta)
 }
 
@@ -133,6 +137,10 @@ func resourceDomainConfigACLUpdate(d *schema.ResourceData, meta interface{}) err
 
 	if err := updateConfigACL(d, conn, domain); err != nil {
 		return err
+	}
+	// wait for running status
+	if _, err := waitAbroadCDNDomainAvailable(conn, domain); err != nil {
+		return fmt.Errorf("error waiting Abraod CDN domain (%s) becoming available: %w", d.Id(), err)
 	}
 	return resourceDomainConfigACLRead(d, meta)
 }

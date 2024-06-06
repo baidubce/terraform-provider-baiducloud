@@ -14,6 +14,7 @@ const (
 	DomainFormDownload = "download"
 	DomainFormMedia    = "media"
 	DomainFormDynamic  = "dynamic"
+	DomainFormDRCDN    = "drcdn"
 )
 
 func DomainFormValues() []string {
@@ -23,6 +24,7 @@ func DomainFormValues() []string {
 		DomainFormDownload,
 		DomainFormMedia,
 		DomainFormDynamic,
+		DomainFormDRCDN,
 	}
 }
 

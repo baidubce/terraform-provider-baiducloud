@@ -97,6 +97,10 @@ func resourceDomainConfigCacheCreate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	d.SetId(domain)
+	// wait for running status
+	if _, err := waitAbroadCDNDomainAvailable(conn, domain); err != nil {
+		return fmt.Errorf("error waiting Abraod CDN domain (%s) becoming available: %w", d.Id(), err)
+	}
 	return resourceDomainConfigCacheRead(d, meta)
 }
 
@@ -121,7 +125,10 @@ func resourceDomainConfigCacheUpdate(d *schema.ResourceData, meta interface{}) e
 	if err := updateConfigCache(d, conn, domain); err != nil {
 		return err
 	}
-
+	// wait for running status
+	if _, err := waitAbroadCDNDomainAvailable(conn, domain); err != nil {
+		return fmt.Errorf("error waiting Abraod CDN domain (%s) becoming available: %w", d.Id(), err)
+	}
 	return resourceDomainConfigCacheRead(d, meta)
 }
 

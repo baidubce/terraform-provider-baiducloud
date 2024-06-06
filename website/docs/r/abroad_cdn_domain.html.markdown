@@ -40,11 +40,14 @@ resource "baiducloud_abroad_cdn_domain" "default" {
 
 ### Optional
 
+- `designate_host_to_origin` (String) Designate host to origin
 - `tags` (Map of String) Tags, do not support modify
 
 ### Read-Only
 
+- `cname` (String) To accelerate the generation of a CNAME domain name, it is necessary to resolve the accelerated domain name CNAME to that domain name at the domain name resolution service provider
 - `id` (String) The ID of this resource.
+- `status` (String) Acceleration domain name running status: RUNNING, STOPPED, OPERATING
 
 <a id="nestedblock--origin"></a>
 ### Nested Schema for `origin`

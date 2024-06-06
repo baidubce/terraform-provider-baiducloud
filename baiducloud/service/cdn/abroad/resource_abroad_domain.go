@@ -2,6 +2,7 @@ package abroad
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/baidubce/bce-sdk-go/model"
 	"github.com/baidubce/bce-sdk-go/services/cdn/abroad"
@@ -28,6 +29,11 @@ func ResourceAbroadDomain() *schema.Resource {
 		Read:   resourceAbroadDomainRead,
 		Update: resourceAbroadDomainUpdate,
 		Delete: resourceAbroadDomainDelete,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(2 * time.Hour),
+			Update: schema.DefaultTimeout(10 * time.Minute),
+		},
 
 		Schema: map[string]*schema.Schema{
 			"domain": {
@@ -63,9 +69,20 @@ func ResourceAbroadDomain() *schema.Resource {
 				},
 			},
 			"designate_host_to_origin": {
-				Type:         schema.TypeString,
-				Description:  "Designate host to origin",
-				Optional:     true,
+				Type:        schema.TypeString,
+				Description: "Designate host to origin",
+				Optional:    true,
+			},
+			"cname": {
+				Type:        schema.TypeString,
+				Description: "The generated CNAME domain name, Users can enable acceleration for CDN domain" +
+					" by setting a CNAME record to point to this.",
+				Computed:    true,
+			},
+			"status": {
+				Type:        schema.TypeString,
+				Description: "Acceleration domain name running status: RUNNING, STOPPED, OPERATING",
+				Computed:    true,
 			},
 			"tags": flex.TagsSchema(),
 		},
@@ -94,14 +111,15 @@ func resourceAbroadDomainCreate(d *schema.ResourceData, meta interface{}) error 
 	if err != nil {
 		return fmt.Errorf("error creating Abroad CDN Domain (%s): %w", domain, err)
 	}
-
+	// wait for running status
+	if _, err = waitAbroadCDNDomainAvailable(conn, domain); err != nil {
+		return fmt.Errorf("error waiting Abraod CDN domain (%s) becoming available: %w", d.Id(), err)
+	}
 	// set host to origin
 	if err := updateDesignateHostToOrigin(d, conn, domain); err != nil {
 		return err
 	}
-
 	d.SetId(domain)
-
 	return resourceAbroadDomainRead(d, meta)
 }
 
@@ -126,6 +144,14 @@ func resourceAbroadDomainRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return fmt.Errorf("error reading tags for Abroad CDN Domain (%s): %w", domain, err)
 	}
+	err = d.Set("cname", config.Cname)
+	if err != nil {
+		return fmt.Errorf("error setting cname for Abroad CDN Domain (%s): %w", domain, err)
+	}
+	err = d.Set("status", config.Status)
+	if err != nil {
+		return fmt.Errorf("error setting status for Abroad CDN Domain (%s): %w", domain, err)
+	}
 	err = d.Set("tags", flex.FlattenTagsToMap(tags))
 	if err != nil {
 		return fmt.Errorf("error setting tag for Abroad CDN Domain (%s): %w", domain, err)
@@ -144,7 +170,11 @@ func resourceAbroadDomainUpdate(d *schema.ResourceData, meta interface{}) error 
 	if err := updateDesignateHostToOrigin(d, conn, domain); err != nil {
 		return err
 	}
-	return nil
+	// wait for running status
+	if _, err := waitAbroadCDNDomainAvailable(conn, d.Id()); err != nil {
+		return fmt.Errorf("error waiting Abraod CDN domain (%s) becoming available: %w", d.Id(), err)
+	}
+	return resourceAbroadDomainRead(d, meta)
 }
 
 func resourceAbroadDomainDelete(d *schema.ResourceData, meta interface{}) error {

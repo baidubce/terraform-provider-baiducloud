@@ -726,4 +726,22 @@ func expandOriginProtocol(tfList []interface{}) string {
 	return tfMap["value"].(string)
 }
 
+func getDSAConfig(d *schema.ResourceData) (*api.DSAConfig, error) {
+	var dsaConfig = &api.DSAConfig{}
+	if v, ok := d.GetOk("dsa"); ok {
+		dsaList := v.([]interface{})[0].(map[string]interface{})
+		dsaConfig.Enabled = true
+		dsaConfig.Comment = dsaList["comment"].(string)
+		for _, dsaItem := range dsaList["rule"].([]interface{}) {
+			ruleMap := dsaItem.(map[string]interface{})
+			dsaRule := api.DSARule{
+				Type:  ruleMap["type"].(string),
+				Value: ruleMap["value"].(string),
+			}
+			dsaConfig.Rules = append(dsaConfig.Rules, dsaRule)
+		}
+	}
+	return dsaConfig, nil
+}
+
 //</editor-fold>

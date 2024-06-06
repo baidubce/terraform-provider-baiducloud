@@ -38,6 +38,7 @@ resource "baiducloud_abroad_cdn_domain_config_https" "example" {
   enabled = true
   http_redirect = false
   http2_enabled = false
+  origin_protocol = "http"
 }
 ```
 
@@ -54,6 +55,7 @@ resource "baiducloud_abroad_cdn_domain_config_https" "example" {
 - `enabled` (Boolean) Whether https acceleration is enabled. Defaults to `false`.
 - `http2_enabled` (Boolean) Whether HTTP2 feature is enabled. Defaults to `true`. This item is invalid when enabled=false.
 - `http_redirect` (Boolean) Redirect HTTP requests to HTTPS (redirect status code is 301). Defaults to `false`. This item is invalid when enabled=false.
+- `origin_protocol` (String) Origin protocol, value is http or https
 
 ### Read-Only
 

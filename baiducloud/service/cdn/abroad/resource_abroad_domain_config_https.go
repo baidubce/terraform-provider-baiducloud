@@ -2,6 +2,7 @@ package abroad
 
 import (
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
 	"github.com/baidubce/bce-sdk-go/services/cdn/abroad"
 	"github.com/baidubce/bce-sdk-go/services/cdn/abroad/api"
@@ -60,6 +61,12 @@ func ResourceAbroadDomainConfigHttps() *schema.Resource {
 				Optional: true,
 				Default:  true,
 			},
+			"origin_protocol": {
+				Type:         schema.TypeString,
+				Description:  "Origin protocol, value is http or https",
+				ValidateFunc: validation.StringInSlice([]string{"http", "https"}, false),
+				Optional:     true,
+			},
 		},
 	}
 }
@@ -72,6 +79,10 @@ func resourceDomainConfigHttpsCreate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	d.SetId(domain)
+	// wait for running status
+	if _, err := waitAbroadCDNDomainAvailable(conn, d.Id()); err != nil {
+		return fmt.Errorf("error waiting Abraod CDN domain (%s) becoming available: %w", d.Id(), err)
+	}
 	return resourceDomainConfigHttpsRead(d, meta)
 }
 
@@ -100,6 +111,10 @@ func updateHttps(d *schema.ResourceData, conn *connectivity.BaiduClient, domain 
 	_, err := conn.WithAbroadCdnClient(func(client *abroad.Client) (interface{}, error) {
 		return nil, client.SetHTTPSConfigWithOptions(domain, enabled, options...)
 	})
+	// set origin protocol
+	if err := updateOriginProtocol(d, conn, domain); err != nil {
+		return fmt.Errorf("error updating abroad CDN Domain (%s) Config origin_protocol: %w", domain, err)
+	}
 	if err != nil {
 		return fmt.Errorf("error updating abroad CDN Domain (%s) Config Https: %w", domain, err)
 	}
@@ -126,6 +141,9 @@ func resourceDomainConfigHttpsRead(d *schema.ResourceData, meta interface{}) err
 	if err := d.Set("http2_enabled", domainConfig.HTTPSConfig.Http2Enabled); err != nil {
 		return fmt.Errorf("error reading abroad CDN Domain (%s) http2_enabled: %w", domain, err)
 	}
+	if err := d.Set("origin_protocol", domainConfig.OriginProtocol); err != nil {
+		return fmt.Errorf("error reading abroad CDN Domain (%s) origin_protocol: %w", domain, err)
+	}
 
 	return nil
 }
@@ -137,9 +155,28 @@ func resourceDomainConfigHttpsUpdate(d *schema.ResourceData, meta interface{}) e
 	if err := updateConfigHttps(d, conn, domain); err != nil {
 		return err
 	}
+	// wait for running status
+	if _, err := waitAbroadCDNDomainAvailable(conn, d.Id()); err != nil {
+		return fmt.Errorf("error waiting Abraod CDN domain (%s) becoming available: %w", d.Id(), err)
+	}
 	return resourceDomainConfigHttpsRead(d, meta)
 }
 
 func resourceDomainConfigHttpsDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
+
+func updateOriginProtocol(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
+	if d.IsNewResource() || d.HasChange("origin_protocol") {
+		log.Printf("[DEBUG] Update Abroad CDN Domain origin_protocol(%s)", domain)
+
+		_, err := conn.WithAbroadCdnClient(func(client *abroad.Client) (interface{}, error) {
+			return nil, client.SetOriginProtocol(domain, d.Get("origin_protocol").(string))
+		})
+		if err != nil {
+			return fmt.Errorf("error updating Abroad CDN Domain (%s) origin_protocol: %w", domain, err)
+		}
+	}
+	return nil
+}
+
