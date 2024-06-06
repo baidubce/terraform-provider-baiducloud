@@ -1,4 +1,10 @@
-	## 1.21.8 (Unreleased)
+	## 1.21.9 (Unreleased)
+## 1.21.8 (June 06, 2024)
+NOTES:
+- support DRCDN
+- baiducloud_abroad_cdn_domain support attribute cname, status
+- baiducloud_abroad_cdn_domain_config_https support attribute origin_protocol
+
 ## 1.21.7 (May 30, 2024)
 NOTES:
 - support mongodb instance backup policy
