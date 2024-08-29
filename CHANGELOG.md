@@ -1,4 +1,8 @@
-	## 1.21.9 (Unreleased)
+	## 1.21.10 (Unreleased)
+## 1.21.9 (August 29, 2024)
+NOTES:
+- bcc root_disk_size_in_gb support max 2048GB
+
 ## 1.21.8 (June 06, 2024)
 NOTES:
 - support DRCDN
