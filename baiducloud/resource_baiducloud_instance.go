@@ -145,11 +145,13 @@ func resourceBaiduCloudInstance() *schema.Resource {
 			},
 			"root_disk_size_in_gb": {
 				Type:         schema.TypeInt,
-				Description:  "System disk size(GB) of the instance to be created. The value range is [40,500]GB, Default to 40GB, and more than 40GB is charged according to the cloud disk price. Note that the specified system disk size needs to meet the minimum disk space limit of the mirror used.",
+				Description:  "System disk size(GB) of the instance to be created. The value range is [40,2048]GB," +
+					" Default to 40GB, and more than 40GB is charged according to the cloud disk price. " +
+					"Note that the specified system disk size needs to meet the minimum disk space limit of the mirror used.",
 				Optional:     true,
 				ForceNew:     true,
 				Default:      40,
-				ValidateFunc: validation.IntBetween(40, 500),
+				ValidateFunc: validation.IntBetween(40, 2048),
 			},
 			"root_disk_storage_type": {
 				Type:         schema.TypeString,
