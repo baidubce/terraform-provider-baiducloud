@@ -1,4 +1,9 @@
-	## 1.21.10 (Unreleased)
+	## 1.21.11 (Unreleased)
+## 1.21.10 (December 10, 2024)
+NOTES:
+- BOS multi-az support
+- update the k8s version supported by cce
+
 ## 1.21.9 (August 29, 2024)
 NOTES:
 - bcc root_disk_size_in_gb support max 2048GB
