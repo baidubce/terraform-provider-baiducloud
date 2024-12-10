@@ -135,6 +135,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 )
 
+var enableMultiAz = false
 func resourceBaiduCloudBosBucket() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceBaiduCloudBosBucketCreate,
@@ -158,6 +159,14 @@ func resourceBaiduCloudBosBucket() *schema.Resource {
 				Description: "Name of the bucket.",
 				Required:    true,
 				ForceNew:    true,
+			},
+			"enable_multi_az": {
+				Type:         schema.TypeBool,
+				Description:  "Whether to enable multi-az replication for the bucket.",
+				Optional:     true,
+				Default:      false,
+				ForceNew:     true,
+				ValidateFunc: validateBOSBucketEnableMultiAZ,
 			},
 			"acl": {
 				Type:         schema.TypeString,
@@ -211,7 +220,11 @@ func resourceBaiduCloudBosBucket() *schema.Resource {
 									},
 									"storage_class": {
 										Type:         schema.TypeString,
-										Description:  "Destination storage class of the replication configuration, the parameter does not need to be configured if it is consistent with the storage class of the source bucket, if you need to specify the storage class separately, it can be COLD, STANDARD, STANDARD_IA.",
+										Description:  "Destination storage class of the replication configuration, " +
+											"the parameter does not need to be configured if it is consistent with the " +
+											"storage class of the source bucket, if you need to specify the storage " +
+											"class separately, it can be COLD, STANDARD, STANDARD_IA, " +
+											"MAZ_STANDARD, MAZ_STANDARD_IA.",
 										Optional:     true,
 										ValidateFunc: validateBOSBucketRCStorageClass(),
 									},
@@ -232,7 +245,11 @@ func resourceBaiduCloudBosBucket() *schema.Resource {
 									},
 									"storage_class": {
 										Type:         schema.TypeString,
-										Description:  "Destination storage class of the replication configuration, the parameter does not need to be configured if it is consistent with the storage class of the source bucket, if you need to specify the storage class separately, it can be COLD, STANDARD, STANDARD_IA.",
+										Description:  "Destination storage class of the replication configuration, the " +
+											"parameter does not need to be configured if it is consistent with the " +
+											"storage class of the source bucket, if you need to specify the storage " +
+											"class separately, it can be COLD, STANDARD, STANDARD_IA, MAZ_STANDARD, " +
+											"MAZ_STANDARD_IA.",
 										Optional:     true,
 										ValidateFunc: validateBOSBucketRCStorageClass(),
 									},
@@ -357,9 +374,9 @@ func resourceBaiduCloudBosBucket() *schema.Resource {
 
 			"storage_class": {
 				Type:         schema.TypeString,
-				Description:  "Storage class of the BOS bucket, available values are STANDARD, STANDARD_IA, COLD or ARCHIVE.",
+				Description:  "Storage class of the BOS bucket, available values are STANDARD, STANDARD_IA, MAZ_STANDARD, MAZ_STANDARD_IA, COLD or ARCHIVE.",
 				Optional:     true,
-				Default:      api.STORAGE_CLASS_STANDARD,
+				DefaultFunc:  determineDefaultStorageClass,
 				ValidateFunc: validateBOSBucketStorageClass(),
 			},
 
@@ -497,10 +514,13 @@ func resourceBaiduCloudBosBucketCreate(d *schema.ResourceData, meta interface{})
 	client := meta.(*connectivity.BaiduClient)
 
 	bucket := d.Get("bucket").(string)
+	args := &api.PutBucketArgs{
+		EnableMultiAz: d.Get("enable_multi_az").(bool),
+	}
 	action := "Create Bucket " + bucket
 
 	location, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
-		return bosClient.PutBucket(bucket)
+		return bosClient.PutBucketWithArgs(bucket,args)
 	})
 	if err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_bucket", action, BCESDKGoERROR)
@@ -1212,4 +1232,12 @@ func resourceBosBucketResourceGroupUpdate(d *schema.ResourceData, client *connec
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_bucket", action, BCESDKGoERROR)
 	}
 	return nil
+}
+
+// determineDefaultStorageClass 根据 enable_multi_az 的值确定 storage_class 的默认值
+func determineDefaultStorageClass() (interface{}, error) {
+	if enableMultiAz {
+		return STORAGE_CLASS_MAZ_STANDARD, nil // 启用多可用区，返回 MAZ_STANDARD
+	}
+	return api.STORAGE_CLASS_STANDARD, nil // 默认返回 STANDARD
 }

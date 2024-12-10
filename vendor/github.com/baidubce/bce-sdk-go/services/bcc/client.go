@@ -21,6 +21,7 @@ package bcc
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/baidubce/bce-sdk-go/auth"
 	"github.com/baidubce/bce-sdk-go/bce"
 	"github.com/baidubce/bce-sdk-go/services/bcc/api"
@@ -604,10 +605,11 @@ func (c *Client) ModifyDeletionProtection(instanceId string, args *api.DeletionP
 // ModifyRelatedDeletePolicy - Modify RelatedDeletePolicy of specified instance
 //
 // PARAMS:
-//     - instanceId: id of the instance
-//	   - args: the arguments to ModifyRelatedDeletePolicy
+//   - instanceId: id of the instance
+//   - args: the arguments to ModifyRelatedDeletePolicy
+//
 // RETURNS:
-//     - error: nil if success otherwise the specific error
+//   - error: nil if success otherwise the specific error
 func (c *Client) ModifyRelatedDeletePolicy(instanceId string, args *api.RelatedDeletePolicy) error {
 	jsonBytes, jsonErr := json.Marshal(args)
 	if jsonErr != nil {
@@ -1245,6 +1247,17 @@ func (c *Client) DeleteImage(imageId string) error {
 	return api.DeleteImage(c, imageId)
 }
 
+// RenameImage - rename image
+//
+// PARAMS:
+//   - args: the arguments to rename image
+//
+// RETURNS:
+//   - error: nil if success otherwise the specific error
+func (c *Client) RenameImage(args *api.RenameImageArgs) error {
+	return api.RenameImage(c, args)
+}
+
 // RemoteCopyImage - copy an image from other region
 //
 // PARAMS:
@@ -1770,6 +1783,11 @@ func (c *Client) UnBindInstanceToTags(instanceId string, args *api.UnBindTagsReq
 	return api.UnBindInstanceToTags(c, instanceId, body)
 }
 
+
+func (c *Client) ListReservedInstances(args *api.ListReservedInstanceArgs) (*api.ListReservedInstanceResult, error) {
+	return api.ListReservedInstances(c, args)
+}
+
 func (c *Client) BindReservedInstanceToTags(args *api.ReservedTagsRequest) error {
 	jsonBytes, jsonErr := json.Marshal(args)
 	if jsonErr != nil {
@@ -2060,6 +2078,28 @@ func (c *Client) DeleteInstanceIngorePayment(args *api.DeleteInstanceIngorePayme
 //   - error: nil if success otherwise the specific error
 func (c *Client) DeleteRecycledInstance(instanceId string) error {
 	return api.DeleteRecycledInstance(c, instanceId)
+}
+
+// DescribeRegions - list all region's endpoint information with the specific parameters.
+//
+//	use global endpoint bcc.baidubce.com to get BCC,CDS and ReservedInstance's endpoint.
+//
+// PARAMS:
+//   - args: the arguments to list all region's endpoint information
+//
+// RETURNS:
+//   - *DescribeRegionsResult: the result of list all region's endpoint information
+//   - error: nil if success otherwise the specific error
+func (c *Client) DescribeRegions(args *api.DescribeRegionsArgs) (*api.DescribeRegionsResult, error) {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	return api.DescribeRegions(c, body)
 }
 
 func (c *Client) ListInstanceByInstanceIds(args *api.ListInstanceByInstanceIdArgs) (*api.ListInstancesResult, error) {
@@ -2354,7 +2394,6 @@ func (c *Client) ImportCustomImage(args *api.ImportCustomImageArgs) (*api.Import
 
 func (c *Client) BatchRefundResource(arg *api.BatchRefundResourceArg) (*api.BatchRefundResourceResult,
 	error) {
-
 	return api.BatchRefundResource(c, arg)
 }
 
@@ -2390,7 +2429,7 @@ func (c *Client) TransferReservedInstanceOrder(args *api.TransferReservedInstanc
 //
 // RETURNS:
 //   - error: nil if success otherwise the specific error
-func (c *Client) RevokeTransferReservedInstanceOrder(args *api.TransferReservedInstanceOperateRequest) (error) {
+func (c *Client) RevokeTransferReservedInstanceOrder(args *api.TransferReservedInstanceOperateRequest) error {
 	jsonBytes, jsonErr := json.Marshal(args)
 	if jsonErr != nil {
 		return jsonErr
@@ -2410,7 +2449,7 @@ func (c *Client) RevokeTransferReservedInstanceOrder(args *api.TransferReservedI
 //
 // RETURNS:
 //   - error: nil if success otherwise the specific error
-func (c *Client) RefuseTransferReservedInstanceOrder(args *api.TransferReservedInstanceOperateRequest) (error) {
+func (c *Client) RefuseTransferReservedInstanceOrder(args *api.TransferReservedInstanceOperateRequest) error {
 	jsonBytes, jsonErr := json.Marshal(args)
 	if jsonErr != nil {
 		return jsonErr
@@ -2430,7 +2469,7 @@ func (c *Client) RefuseTransferReservedInstanceOrder(args *api.TransferReservedI
 //
 // RETURNS:
 //   - error: nil if success otherwise the specific error
-func (c *Client) AcceptTransferReservedInstanceOrder(args *api.AcceptTransferReservedInstanceRequest) (error) {
+func (c *Client) AcceptTransferReservedInstanceOrder(args *api.AcceptTransferReservedInstanceRequest) error {
 	jsonBytes, jsonErr := json.Marshal(args)
 	if jsonErr != nil {
 		return jsonErr
@@ -2463,9 +2502,9 @@ func (c *Client) TransferInReservedInstanceOrders(args *api.DescribeTransferRese
 	result := &api.DescribeTransferInRecordsResponse{}
 	result, err = api.TransferInReservedInstanceOrders(c, body)
 
-	jsonString, err :=  json.Marshal(result);
+	jsonString, err := json.Marshal(result)
 	fmt.Println(string(jsonString))
-	return result, err;
+	return result, err
 }
 
 // TransferOutReservedInstanceOrders - Search transfer out reserved instance orders
@@ -2490,4 +2529,138 @@ func (c *Client) TransferOutReservedInstanceOrders(args *api.DescribeTransferRes
 
 func (c *Client) getCdsPrice(args *api.VolumePriceRequestArgs) (*api.VolumePriceResponse, error) {
 	return api.GetCdsPrice(c, args)
+}
+
+// CreateEhcCluster - create an ehcCluster
+//
+// PARAMS:
+//   - cli: the client agent which can perform sending request
+//   - args: the arguments to search transfer out reserved instance orders
+//
+// RETURNS:
+//   - error: nil if success otherwise the specific error
+//   - CreateEhcClusterResponse: result of the ehcCluster id newly created
+func (c *Client) CreateEhcCluster(args *api.CreateEhcClusterArg) (*api.CreateEhcClusterResponse, error) {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	return api.CreateEhcCluster(c, body)
+}
+
+func (c *Client) CreateReservedInstance(args *api.CreateReservedInstanceArgs) (*api.CreateReservedInstanceResponse, error) {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	return api.CreateReservedInstance(c, args.ClientToken, body)
+}
+
+func (c *Client) ModifyReservedInstances(args *api.ModifyReservedInstancesArgs) (*api.ModifyReservedInstancesResponse, error) {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	return api.ModifyReservedInstances(c, args.ClientToken, body)
+}
+
+func (c *Client) RenewReservedInstances(args *api.RenewReservedInstancesArgs) (*api.RenewReservedInstancesResponse, error) {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	return api.RenewReservedInstances(c, args.ClientToken, body)
+}
+
+func (c *Client) ListEhcCluster(args *api.DescribeEhcClusterListArg) (*api.DescribeEhcClusterListResponse, error) {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	return api.EhcClusterList(c, body)
+}
+
+// ModifyEhcCluster - modify ehcCluster
+//
+// PARAMS:
+//   - cli: the client agent which can perform sending request
+//   - args: the arguments of method
+//
+// RETURNS:
+//   - error: nil if success otherwise the specific error
+func (c *Client) ModifyEhcCluster(args *api.ModifyEhcClusterArg) error {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return err
+	}
+	return api.EhcClusterModify(c, body)
+}
+
+// DeleteEhcCluster - delete ehcCluster
+//
+// PARAMS:
+//   - cli: the client agent which can perform sending request
+//   - args: the arguments of method
+//
+// RETURNS:
+//   - error: nil if success otherwise the specific error
+func (c *Client) DeleteEhcCluster(args *api.DeleteEhcClusterArg) error {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return err
+	}
+	return api.EhcClusterDelete(c, body)
+}
+
+// GetSecurityGroupDetail - get security group detail
+//
+// PARAMS:
+//   - cli: the client agent which can perform sending request
+//   - securityGroupId: the id of security group
+//
+// RETURNS:
+//   - *GetSecurityGroupDetailResult: the result of get security group detail
+func (c *Client) GetSecurityGroupDetail(securityGroupId string) (*api.GetSecurityGroupDetailResult, error) {
+	return api.GetSecurityGroupDetail(c, securityGroupId)
+}
+
+// ModifySnapshotAttribute - modify snapshot attribute
+//
+// PARAMS:
+//   - cli: the client agent which can perform sending request
+//   - snapshotId: the id of snapshot
+//   - args: the arguments of method
+//
+// RETURNS:
+//   - error: nil if success otherwise the specific error
+func (c *Client) ModifySnapshotAttribute(snapshotId string, args *api.ModifySnapshotAttributeArgs) error {
+	return api.ModifySnapshotAttribute(c, snapshotId, args)
 }

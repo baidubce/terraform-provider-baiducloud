@@ -178,17 +178,18 @@ type ShowVPCModel struct {
 }
 
 type Subnet struct {
-	SubnetId    string           `json:"subnetId"`
-	Name        string           `json:"name"`
-	ZoneName    string           `json:"zoneName"`
-	Cidr        string           `json:"cidr"`
-	Ipv6Cidr    string           `json:"ipv6Cidr"`
-	VPCId       string           `json:"vpcId"`
-	SubnetType  SubnetType       `json:"subnetType"`
-	Description string           `json:"description"`
-	CreatedTime string           `json:"createdTime"`
-	AvailableIp int              `json:"availableIp"`
-	Tags        []model.TagModel `json:"tags"`
+	SubnetId              string           `json:"subnetId"`
+	Name                  string           `json:"name"`
+	ZoneName              string           `json:"zoneName"`
+	Cidr                  string           `json:"cidr"`
+	Ipv6Cidr              string           `json:"ipv6Cidr"`
+	VPCId                 string           `json:"vpcId"`
+	SubnetType            SubnetType       `json:"subnetType"`
+	Description           string           `json:"description"`
+	CreatedTime           string           `json:"createdTime"`
+	AvailableIp           int              `json:"availableIp"`
+	AvailableUnreservedIp int              `json:"availableUnreservedIp"`
+	Tags                  []model.TagModel `json:"tags"`
 }
 
 // UpdateVPCArgs defines the structure of the input parameters for the UpdateVPC api
@@ -861,11 +862,12 @@ type GetProbeDetailResult struct {
 
 // CreateIPv6GatewayArgs defines the structure of the input parameters for the CreateIPv6Gateway api
 type CreateIPv6GatewayArgs struct {
-	ClientToken     string   `json:"-"`
-	Name            string   `json:"name"`
-	VpcId           string   `json:"vpcId"`
-	BandwidthInMbps int      `json:"bandwidthInMbps"`
-	Billing         *Billing `json:"billing"`
+	ClientToken     string           `json:"-"`
+	Name            string           `json:"name"`
+	VpcId           string           `json:"vpcId"`
+	BandwidthInMbps int              `json:"bandwidthInMbps"`
+	Billing         *Billing         `json:"billing"`
+	Tags            []model.TagModel `json:"tags,omitempty"`
 }
 
 // CreateIPv6GatewayResult defines the structure of the output parameters for the CreateIPv6Gateway api

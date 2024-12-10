@@ -84,7 +84,17 @@ func validateBOSBucketStorageClass() schema.SchemaValidateFunc {
 		api.STORAGE_CLASS_STANDARD,
 		api.STORAGE_CLASS_STANDARD_IA,
 		STORAGE_CLASS_ARCHIVE,
+		STORAGE_CLASS_MAZ_STANDARD,
+		STORAGE_CLASS_MAZ_STANDARD_IA,
 	}, false)
+}
+
+func validateBOSBucketEnableMultiAZ(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(bool)
+	if value {
+		enableMultiAz = true
+	}
+	return
 }
 
 func validateBOSBucketRCStorageClass() schema.SchemaValidateFunc {
@@ -92,6 +102,8 @@ func validateBOSBucketRCStorageClass() schema.SchemaValidateFunc {
 		api.STORAGE_CLASS_COLD,
 		api.STORAGE_CLASS_STANDARD,
 		api.STORAGE_CLASS_STANDARD_IA,
+		STORAGE_CLASS_MAZ_STANDARD,
+		STORAGE_CLASS_MAZ_STANDARD_IA,
 	}, false)
 }
 

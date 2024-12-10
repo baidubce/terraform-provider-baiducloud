@@ -111,6 +111,14 @@ type InstanceSet struct {
 	Count        int                `json:"count"`
 }
 
+type ExistedInstanceInCluster struct {
+	ExistedInstanceID string `json:"existedInstanceID"`
+	MachineType       string `json:"machineType"`
+	Ip                string `json:"ip"`
+	Name              string `json:"name"`
+	InstanceName      string `json:"instanceName"`
+}
+
 // GetEventStepsResponse 查询 Cluster/Instance 创建/删除 返回
 type GetEventStepsResponse struct {
 	Status    string  `json:"status"`
@@ -343,7 +351,10 @@ const (
 	// InstanceKeywordTypeInstanceName 节点模糊查询字段: InstanceName
 	InstanceKeywordTypeInstanceName InstanceKeywordType = "instanceName"
 	// InstanceKeywordTypeInstanceID 节点模糊查询字段: InstanceID
-	InstanceKeywordTypeInstanceID InstanceKeywordType = "instanceID"
+	InstanceKeywordTypeInstanceID      InstanceKeywordType = "instanceID"
+	InstanceKeywordTypeK8sNodeName     InstanceKeywordType = "k8sNodeName"
+	InstanceKeywordTypeVpcIP           InstanceKeywordType = "vpcIP"
+	InstanceKeywordTypeInstanceGroupID InstanceKeywordType = "instanceGroupID"
 )
 
 // InstanceOrderBy 节点查询排序字段
@@ -630,6 +641,11 @@ type ShrinkPolicy string
 type UpdatePolicy string
 type CleanPolicy string
 
+const (
+	CleanPolicyRemain CleanPolicy = "Remain"
+	CleanPolicyDelete CleanPolicy = "Delete"
+)
+
 type ClusterAutoscalerSpec struct {
 	Enabled              bool `json:"enabled"`
 	MinReplicas          int  `json:"minReplicas"`
@@ -798,6 +814,9 @@ type ListInstanceByInstanceGroupIDArgs struct {
 	InstanceGroupID string
 	PageNo          int
 	PageSize        int
+	KeywordType     InstanceKeywordType
+	Keyword         string
+	Phases          string
 }
 
 type GetInstanceGroupArgs struct {
@@ -822,6 +841,24 @@ type DeleteInstanceGroupArgs struct {
 	InstanceGroupID     string
 	DeleteInstances     bool
 	ReleaseAllResources bool
+}
+
+type AttachInstancesToInstanceGroupArgs struct {
+	ClusterID       string
+	InstanceGroupID string
+	Request         *AttachInstancesToInstanceGroupRequest
+}
+
+type AttachInstancesToInstanceGroupRequest struct {
+	Incluster                 bool                        `json:"inCluster"`
+	UseInstanceGroupConfig    bool                        `json:"useInstanceGroupConfig"`
+	ExistedInstances          []*InstanceSet              `json:"existedInstances"`
+	ExistedInstancesInCluster []*ExistedInstanceInCluster `json:"existedInstancesInCluster"`
+}
+
+type AttachInstancesToInstanceGroupResponse struct {
+	CommonResponse
+	TaskID string `json:"taskID"`
 }
 
 // KubeConfigType - kube config 类型
@@ -866,9 +903,12 @@ type CreateScaleUpInstanceGroupTaskArgs struct {
 }
 
 type CreateScaleDownInstanceGroupTaskArgs struct {
-	ClusterID            string
-	InstanceGroupID      string
-	InstancesToBeRemoved []string
+	ClusterID            string              `json:"-"`
+	InstanceGroupID      string              `json:"-"`
+	InstancesToBeRemoved []string            `json:"instancesToBeRemoved"`
+	K8sNodesToBeRemoved  []string            `json:"k8sNodesToBeRemoved,omitempty"`
+	CleanPolicy          CleanPolicy         `json:"cleanPolicy"`
+	DeleteOption         *types.DeleteOption `json:"deleteOption,omitempty"`
 }
 
 type CreateTaskResp struct {

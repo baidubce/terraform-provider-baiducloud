@@ -2,6 +2,8 @@ package baiducloud
 
 const (
 	STORAGE_CLASS_ARCHIVE = "ARCHIVE"
+	STORAGE_CLASS_MAZ_STANDARD    = "MAZ_STANDARD"
+	STORAGE_CLASS_MAZ_STANDARD_IA    = "MAZ_STANDARD_IA"
 
 	ACTION_TRANSITION           = "Transition"
 	ACTION_DELETEOBJECT         = "DeleteObject"

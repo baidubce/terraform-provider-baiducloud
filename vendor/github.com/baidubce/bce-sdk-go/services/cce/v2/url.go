@@ -44,6 +44,8 @@ const (
 
 	REQUEST_INSTANCEGROUP_SCALE_DOWN_URL = "/scaledown"
 
+	REQUEST_INSTANCEGROUP_ATTACH_INSTANCE_URL = "/attachInstances"
+
 	REQUEST_QUOTA_URL = "/quota"
 
 	REQUEST_NODE_URL = "/node"
@@ -69,6 +71,8 @@ const (
 	REQUEST_EVENT_URL = "/event"
 
 	REQUEST_SYNC_URL = "/sync"
+
+	REQUEST_RBAC_URL = "/rbac"
 )
 
 var _ Interface = &Client{}
@@ -149,6 +153,10 @@ func getScaleDownInstanceGroupURI(clusterID, instanceGroupID string) string {
 	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_INSTANCEGROUP_URL + "/" + instanceGroupID + REQUEST_INSTANCEGROUP_SCALE_DOWN_URL
 }
 
+func getAttachInstancesToInstanceGroupURI(clusterID string, instanceGroupID string) string {
+	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_INSTANCEGROUP_URL + "/" + instanceGroupID + REQUEST_INSTANCEGROUP_ATTACH_INSTANCE_URL
+}
+
 func getInstanceGroupReplicasURI(clusterID, instanceGroupID string) string {
 	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_INSTANCEGROUP_URL + "/" + instanceGroupID + REQUEST_INSTANCEGROUP_REPLICAS_URL
 }
@@ -215,6 +223,10 @@ func genAddonUpgradeURI(clusterID string) string {
 
 func genUpdateClusterCRDURI(clusterID string) string {
 	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + "/crd"
+}
+
+func getRBACURI() string {
+	return URI_PREFIX + REQUEST_RBAC_URL
 }
 
 func encodeUserScriptInInstanceSet(instancesSets []*InstanceSet) error {

@@ -17,79 +17,52 @@
 package api
 
 import (
-	"strconv"
-
 	"github.com/baidubce/bce-sdk-go/bce"
 	"github.com/baidubce/bce-sdk-go/http"
 )
 
-// CreateLogStore - create logStore
+// CreateDownloadTask - create download task
 //
 // PARAMS:
 //   - cli: the client agent which can perform sending request
-//   - body: logStore parameters body
+//   - body: download task parameters body
 //
 // RETURNS:
+//   - string: download task uuid
 //   - error: nil if success otherwise the specific error
-func CreateLogStore(cli bce.Client, body *bce.Body) error {
+func CreateDownloadTask(cli bce.Client, body *bce.Body) (string, error) {
 	req := &bce.BceRequest{}
-	req.SetUri(LOGSTORE_PREFIX)
+	req.SetUri(DOWNLOAD_TASK_PREFIX)
 	req.SetMethod(http.POST)
 	if body != nil {
 		req.SetBody(body)
 	}
 	resp := &bce.BceResponse{}
 	if err := cli.SendRequest(req, resp); err != nil {
-		return err
+		return "", err
 	}
 	if resp.IsFail() {
-		return resp.ServiceError()
+		return "nil", resp.ServiceError()
 	}
-	defer func() { resp.Body().Close() }()
-	return nil
+	result := &CreateDownloadResponse{}
+	if err := resp.ParseJsonBody(result); err != nil {
+		return "", err
+	}
+	return result.Result.UUID, nil
 }
 
-// UpdateLogStore - update logStore retention
+// DescribeDownloadTask - get download task
 //
 // PARAMS:
 //   - cli: the client agent which can perform sending request
-//   - project: logstore project
-//   - logStore: logStore to update
-//   - body: logStore parameters body
+//   - uuid: download task uuid
 //
 // RETURNS:
+//   - *DownloadTask: download task
 //   - error: nil if success otherwise the specific error
-func UpdateLogStore(cli bce.Client, project string, logStore string, body *bce.Body) error {
+func DescribeDownloadTask(cli bce.Client, UUID string) (*DownloadTask, error) {
 	req := &bce.BceRequest{}
-	req.SetUri(getLogStoreUri(logStore))
-	req.SetMethod(http.PUT)
-	req.SetParam("project", project)
-	req.SetBody(body)
-	resp := &bce.BceResponse{}
-	if err := cli.SendRequest(req, resp); err != nil {
-		return err
-	}
-	if resp.IsFail() {
-		return resp.ServiceError()
-	}
-	defer func() { resp.Body().Close() }()
-	return nil
-}
-
-// DescribeLogStore - get logStore info
-//
-// PARAMS:
-//   - cli: the client agent which can perform sending request
-//   - project: logstore project
-//   - logStore: logStore to get
-//
-// RETURNS:
-//   - *LogStore: logStore info
-//   - error: nil if success otherwise the specific error
-func DescribeLogStore(cli bce.Client, project string, logStore string) (*LogStore, error) {
-	req := &bce.BceRequest{}
-	req.SetUri(getLogStoreUri(logStore))
-	req.SetParam("project", project)
+	req.SetUri(getDownloadTaskUri(UUID))
 	req.SetMethod(http.GET)
 	resp := &bce.BceResponse{}
 	if err := cli.SendRequest(req, resp); err != nil {
@@ -98,26 +71,51 @@ func DescribeLogStore(cli bce.Client, project string, logStore string) (*LogStor
 	if resp.IsFail() {
 		return nil, resp.ServiceError()
 	}
-	result := &LogStore{}
+	result := &DescribeDownloadTaskResponse{}
 	if err := resp.ParseJsonBody(result); err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.Result.Task, nil
 }
 
-// DeleteLogStore - delete logStore
+// GetDownloadTaskLink - get download link
 //
 // PARAMS:
 //   - cli: the client agent which can perform sending request
-//   - project: logstore project
-//   - logStore: logStore to delete
+//   - uuid: download task uuid
+//
+// RETURNS:
+//   - *GetDownloadTaskLinkResult: download link info
+//   - error: nil if success otherwise the specific error
+func GetDownloadTaskLink(cli bce.Client, UUID string) (*GetDownloadTaskLinkResult, error) {
+	req := &bce.BceRequest{}
+	req.SetUri(getDownloadTaskLinkUri(UUID))
+	req.SetMethod(http.GET)
+	resp := &bce.BceResponse{}
+	if err := cli.SendRequest(req, resp); err != nil {
+		return nil, err
+	}
+	if resp.IsFail() {
+		return nil, resp.ServiceError()
+	}
+	result := &GetDownloadTaskLinkResponse{}
+	if err := resp.ParseJsonBody(result); err != nil {
+		return nil, err
+	}
+	return result.Result, nil
+}
+
+// DeleteDownloadTask - delete download task
+//
+// PARAMS:
+//   - cli: the client agent which can perform sending request
+//   - uuid: download task uuid
 //
 // RETURNS:
 //   - error: nil if success otherwise the specific error
-func DeleteLogStore(cli bce.Client, project, logStore string) error {
+func DeleteDownloadTask(cli bce.Client, UUID string) error {
 	req := &bce.BceRequest{}
-	req.SetUri(getLogStoreUri(logStore))
-	req.SetParam("project", project)
+	req.SetUri(getDownloadTaskUri(UUID))
 	req.SetMethod(http.DELETE)
 	resp := &bce.BceResponse{}
 	if err := cli.SendRequest(req, resp); err != nil {
@@ -130,38 +128,21 @@ func DeleteLogStore(cli bce.Client, project, logStore string) error {
 	return nil
 }
 
-// ListLogStore - get all pattern-match logStore info
+// ListDownloadTask - get all pattern-match download tasks
 //
 // PARAMS:
 //   - cli: the client agent which can perform sending request
-//   - project: logstore project
-//   - args: conditions logStore should match
+//   - body: conditions download task should match
 //
 // RETURNS:
-//   - *ListLogStoreResult: logStore result set
+//   - *ListDownloadTaskResult: download task result set
 //   - error: nil if success otherwise the specific error
-func ListLogStore(cli bce.Client, project string, args *QueryConditions) (*ListLogStoreResult, error) {
+func ListDownloadTask(cli bce.Client, body *bce.Body) (*ListDownloadTaskResult, error) {
 	req := &bce.BceRequest{}
-	req.SetUri(LOGSTORE_PREFIX)
-	req.SetParam("project", project)
-	req.SetMethod(http.GET)
-	// Set optional args
-	if args != nil {
-		if args.NamePattern != "" {
-			req.SetParam("namePattern", args.NamePattern)
-		}
-		if args.Order != "" {
-			req.SetParam("order", args.Order)
-		}
-		if args.OrderBy != "" {
-			req.SetParam("orderBy", args.OrderBy)
-		}
-		if args.PageNo > 0 {
-			req.SetParam("pageNo", strconv.Itoa(args.PageNo))
-		}
-		if args.PageSize > 0 {
-			req.SetParam("pageSize", strconv.Itoa(args.PageSize))
-		}
+	req.SetUri(LIST_DOWNLOAD_TASK_PREFIX)
+	req.SetMethod(http.POST)
+	if body != nil {
+		req.SetBody(body)
 	}
 	resp := &bce.BceResponse{}
 	if err := cli.SendRequest(req, resp); err != nil {
@@ -170,9 +151,9 @@ func ListLogStore(cli bce.Client, project string, args *QueryConditions) (*ListL
 	if resp.IsFail() {
 		return nil, resp.ServiceError()
 	}
-	result := &ListLogStoreResult{}
+	result := &ListDownloadTaskResponse{}
 	if err := resp.ParseJsonBody(result); err != nil {
 		return nil, err
 	}
-	return result, nil
+	return result.Result, nil
 }

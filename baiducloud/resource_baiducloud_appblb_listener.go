@@ -650,8 +650,10 @@ func buildBaiduCloudCreateAppBlbHTTPListenerArgs(d *schema.ResourceData, meta in
 		return nil, fmt.Errorf("HTTP Listener scheduler only support [RoundRobin, LeastConnection], but you set: %s", result.Scheduler)
 	}
 
-	if v, ok := d.GetOk("keep_session"); ok {
-		result.KeepSession = v.(bool)
+	if v, ok := d.GetOkExists("keep_session"); ok {
+		if boolValue, ok := v.(bool); ok {
+			result.KeepSession = &boolValue
+		}
 	}
 
 	if v, ok := d.GetOk("keep_session_type"); ok {
@@ -666,8 +668,10 @@ func buildBaiduCloudCreateAppBlbHTTPListenerArgs(d *schema.ResourceData, meta in
 		result.KeepSessionCookieName = v.(string)
 	}
 
-	if v, ok := d.GetOk("x_forwarded_for"); ok {
-		result.XForwardedFor = v.(bool)
+	if v, ok := d.GetOkExists("x_forwarded_for"); ok {
+		if boolValue, ok := v.(bool); ok {
+			result.XForwardedFor = &boolValue
+		}
 	}
 
 	if v, ok := d.GetOk("server_timeout"); ok {
@@ -691,8 +695,10 @@ func buildBaiduCloudCreateAppBlbHTTPSListenerArgs(d *schema.ResourceData, meta i
 		return nil, fmt.Errorf("HTTPS Listener scheduler only support [RoundRobin, LeastConnection], but you set: %s", result.Scheduler)
 	}
 
-	if v, ok := d.GetOk("keep_session"); ok {
-		result.KeepSession = v.(bool)
+	if v, ok := d.GetOkExists("keep_session"); ok {
+		if boolValue, ok := v.(bool); ok {
+			result.KeepSession = &boolValue
+		}
 	}
 
 	if v, ok := d.GetOk("keep_session_type"); ok {
@@ -707,8 +713,10 @@ func buildBaiduCloudCreateAppBlbHTTPSListenerArgs(d *schema.ResourceData, meta i
 		result.KeepSessionCookieName = v.(string)
 	}
 
-	if v, ok := d.GetOk("x_forwarded_for"); ok {
-		result.XForwardedFor = v.(bool)
+	if v, ok := d.GetOkExists("x_forwarded_for"); ok {
+		if boolValue, ok := v.(bool); ok {
+			result.XForwardedFor = &boolValue
+		}
 	}
 
 	if v, ok := d.GetOk("server_timeout"); ok {
@@ -734,8 +742,10 @@ func buildBaiduCloudCreateAppBlbHTTPSListenerArgs(d *schema.ResourceData, meta i
 		}
 	}
 
-	if v, ok := d.GetOk("dual_auth"); ok {
-		result.DualAuth = v.(bool)
+	if v, ok := d.GetOkExists("dual_auth"); ok {
+		if boolValue, ok := v.(bool); ok {
+			result.DualAuth = &boolValue
+		}
 	}
 
 	if v, ok := d.GetOk("client_cert_ids"); ok {
@@ -773,8 +783,10 @@ func buildBaiduCloudCreateAppBlbSSLListenerArgs(d *schema.ResourceData, meta int
 		}
 	}
 
-	if v, ok := d.GetOk("dual_auth"); ok {
-		result.DualAuth = v.(bool)
+	if v, ok := d.GetOkExists("dual_auth"); ok {
+		if boolValue, ok := v.(bool); ok {
+			result.DualAuth = &boolValue
+		}
 	}
 
 	if v, ok := d.GetOk("client_cert_ids"); ok {
@@ -838,12 +850,14 @@ func buildBaiduCloudUpdateAppBlbHTTPListenerArgs(d *schema.ResourceData, meta in
 		return false, nil, fmt.Errorf("HTTP Listener scheduler only support [RoundRobin, LeastConnection], but you set: %s", result.Scheduler)
 	}
 
-	if v, ok := d.GetOk("keep_session"); ok {
+	if v, ok := d.GetOkExists("keep_session"); ok {
 		if !update {
 			update = d.HasChange("keep_session")
 		}
 
-		result.KeepSession = v.(bool)
+		if boolValue, ok := v.(bool); ok {
+			result.KeepSession = &boolValue
+		}
 	}
 
 	if v, ok := d.GetOk("keep_session_type"); ok {
@@ -870,12 +884,13 @@ func buildBaiduCloudUpdateAppBlbHTTPListenerArgs(d *schema.ResourceData, meta in
 		result.KeepSessionCookieName = v.(string)
 	}
 
-	if v, ok := d.GetOk("x_forwarded_for"); ok {
+	if v, ok := d.GetOkExists("x_forwarded_for"); ok {
 		if !update {
 			update = d.HasChange("x_forwarded_for")
 		}
-
-		result.XForwardedFor = v.(bool)
+		if boolValue, ok := v.(bool); ok {
+			result.XForwardedFor = &boolValue
+		}
 	}
 
 	if v, ok := d.GetOk("server_timeout"); ok {
@@ -910,12 +925,14 @@ func buildBaiduCloudUpdateAppBlbHTTPSListenerArgs(d *schema.ResourceData, meta i
 		return false, nil, fmt.Errorf("HTTPS Listener scheduler only support [RoundRobin, LeastConnection], but you set: %s", result.Scheduler)
 	}
 
-	if v, ok := d.GetOk("keep_session"); ok {
+	if v, ok := d.GetOkExists("keep_session"); ok {
 		if !update {
 			update = d.HasChange("keep_session")
 		}
 
-		result.KeepSession = v.(bool)
+		if boolValue, ok := v.(bool); ok {
+			result.KeepSession = &boolValue
+		}
 	}
 
 	if v, ok := d.GetOk("keep_session_type"); ok {
@@ -942,12 +959,14 @@ func buildBaiduCloudUpdateAppBlbHTTPSListenerArgs(d *schema.ResourceData, meta i
 		result.KeepSessionCookieName = v.(string)
 	}
 
-	if v, ok := d.GetOk("x_forwarded_for"); ok {
+	if v, ok := d.GetOkExists("x_forwarded_for"); ok {
 		if !update {
 			update = d.HasChange("x_forwarded_for")
 		}
 
-		result.XForwardedFor = v.(bool)
+		if boolValue, ok := v.(bool); ok {
+			result.XForwardedFor = &boolValue
+		}
 	}
 
 	if v, ok := d.GetOk("server_timeout"); ok {
@@ -988,12 +1007,14 @@ func buildBaiduCloudUpdateAppBlbHTTPSListenerArgs(d *schema.ResourceData, meta i
 		}
 	}
 
-	if v, ok := d.GetOk("dual_auth"); ok {
+	if v, ok := d.GetOkExists("dual_auth"); ok {
 		if !update {
 			update = d.HasChange("dual_auth")
 		}
 
-		result.DualAuth = v.(bool)
+		if boolValue, ok := v.(bool); ok {
+			result.DualAuth = &boolValue
+		}
 	}
 
 	if v, ok := d.GetOk("client_cert_ids"); ok {
@@ -1049,12 +1070,14 @@ func buildBaiduCloudUpdateAppBlbSSLListenerArgs(d *schema.ResourceData, meta int
 		}
 	}
 
-	if v, ok := d.GetOk("dual_auth"); ok {
+	if v, ok := d.GetOkExists("dual_auth"); ok {
 		if !update {
 			update = d.HasChange("dual_auth")
 		}
 
-		result.DualAuth = v.(bool)
+		if boolValue, ok := v.(bool); ok {
+			result.DualAuth = &boolValue
+		}
 	}
 
 	if v, ok := d.GetOk("client_cert_ids"); ok {
