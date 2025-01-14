@@ -1,4 +1,8 @@
-	## 1.21.11 (Unreleased)
+	## 1.21.12 (Unreleased)
+## 1.21.11 (January 14, 2025)
+NOTES:
+- update root_disk_storage_type range
+
 ## 1.21.10 (December 10, 2024)
 NOTES:
 - BOS multi-az support
