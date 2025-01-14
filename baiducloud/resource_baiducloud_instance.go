@@ -155,11 +155,15 @@ func resourceBaiduCloudInstance() *schema.Resource {
 			},
 			"root_disk_storage_type": {
 				Type:         schema.TypeString,
-				Description:  "System disk storage type of the instance. Available values are std1, hp1, cloud_hp1, local, sata, ssd. Default to cloud_hp1.",
+				Description:  "System disk storage type of the instance. " +
+					"Available values are " +
+					"enhanced_ssd_pl1, enhanced_ssd_pl2, cloud_hp1, premium_ssd, hp1, " +
+					"ssd, sata, hdd, local, sata, local-ssd, local-hdd, local-nvme. " +
+					"Default to cloud_hp1.",
 				Optional:     true,
 				ForceNew:     true,
 				Default:      api.StorageTypeCloudHP1,
-				ValidateFunc: validateStorageType(),
+				//ValidateFunc: validateStorageType(),
 			},
 			"ephemeral_disks": {
 				Type:        schema.TypeList,
