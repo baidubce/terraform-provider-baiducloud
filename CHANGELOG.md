@@ -1,4 +1,9 @@
-	## 1.21.12 (Unreleased)
+	## 1.21.13 (Unreleased)
+## 1.21.12 (January 23, 2025)
+NOTES:
+- custom endpoints support more products
+- BCC creation supports enabling IPv6
+
 ## 1.21.11 (January 14, 2025)
 NOTES:
 - update root_disk_storage_type range
