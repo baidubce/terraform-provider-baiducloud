@@ -406,6 +406,14 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Description: "Whether to automatically generate hostname domain.",
 				Optional:    true,
 			},
+			"is_open_ipv6": {
+				Type:        schema.TypeBool,
+				Description: "Whether to enable IPv6 for the instance to be created. " +
+					"It can be enabled only when both the image and the subnet support IPv6. " +
+					"True means enabled, false means disabled, " +
+					"undefined means automatically adapting to the IPv6 support of the image and subnet.",
+				Optional:    true,
+			},
 			"tags": tagsSchema(),
 			"resource_group_id": {
 				Type:        schema.TypeString,
@@ -954,6 +962,10 @@ func buildBaiduCloudInstanceArgs(d *schema.ResourceData, meta interface{}) (*api
 		request.IsOpenHostnameDomain = v.(bool)
 	}
 
+	if v, ok := d.GetOk("is_open_ipv6"); ok {
+		request.IsOpenIpv6 = v.(bool)
+	}
+
 	if v, ok := d.GetOk("cds_auto_renew"); ok {
 		request.CdsAutoRenew = v.(bool)
 	}
@@ -1098,6 +1110,10 @@ func buildBaiduCloudInstanceBySpecArgs(d *schema.ResourceData, meta interface{})
 
 	if v, ok := d.GetOk("is_open_hostname_domain"); ok {
 		request.IsOpenHostnameDomain = v.(bool)
+	}
+
+	if v, ok := d.GetOk("is_open_ipv6"); ok {
+		request.IsOpenIpv6 = v.(bool)
 	}
 
 	if v, ok := d.GetOk("cds_auto_renew"); ok {

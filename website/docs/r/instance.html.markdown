@@ -75,7 +75,8 @@ The following arguments are supported:
 * `hostname` - (Optional) Hostname of the instance.
 * `instance_spec` - (Optional) spec
 * `instance_type` - (Optional, ForceNew) Type of the instance to start. Available values are N1, N2, N3, N4, N5, C1, C2, S1, G1, F1. Default to N3.
-* `is_open_hostname_domain` - (Optional) Whether to automatically generate hostname domain.
+* `is_open_hostname_domain` - (Optional) Whether to automatically generate hostname domain
+* `is_open_ipv6` - (Optional) Whether to enable IPv6 for the instance to be created. It can be enabled only when both the image and the subnet support IPv6. True means enabled, false means disabled, undefined means automatically adapting to the IPv6 support of the image and subnet.
 * `keypair_id` - (Optional, ForceNew) Key pair id of the instance.
 * `memory_capacity_in_gb` - (Optional) Memory capacity(GB) of the instance to be created.
 * `name` - (Optional) Name of the instance. Support for uppercase and lowercase letters, numbers, Chinese and special characters, such as "-","_","/",".", the value must start with a letter, length 1-65.

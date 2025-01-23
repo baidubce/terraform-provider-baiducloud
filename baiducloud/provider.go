@@ -376,7 +376,11 @@ func init() {
 
 		"bcc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BCC endpoints.",
 
-		"vpc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom VPC endpoints.",
+		"vpc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. " +
+			"It's typically used to connect to custom VPC endpoints.",
+
+		"esg_endpoint": "Use this to override the default endpoint URL constructed from the `region`. " +
+			"It's typically used to connect to custom ESG endpoints.",
 
 		"eip_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom EIP endpoints.",
 
@@ -388,24 +392,39 @@ func init() {
 
 		"cfc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CFC endpoints.",
 
-		"scs_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom SCS endpoints.",
+		"cce_endpoint": "Use this to override the default endpoint URL constructed from the `region`. " +
+			"It's typically used to connect to custom CCE endpoints.",
 
-		"cce_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CCE endpoints.",
+		"ccev2_endpoint": "Use this to override the default endpoint URL constructed from the `region`. " +
+			"It's typically used to connect to custom CCEv2 endpoints.",
 
-		"ccev2_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CCEv2 endpoints.",
+		"scs_endpoint": "Use this to override the default endpoint URL constructed from the `region`. " +
+			"It's typically used to connect to custom SCS endpoints.",
 
 		"rds_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom RDS endpoints.",
 
 		"dts_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom DTS endpoints.",
+
+		"iam_endpoint": "Use this to override the default endpoint URL constructed from the `region`. " +
+			"It's typically used to connect to custom IAM endpoints.",
 
 		"cdn_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom CDN endpoints.",
 
 		"abroad_cdn_endpoint": "Use this to override the default endpoint URL constructed from the `region`." +
 			" It's typically used to connect to custom Abroad CDN endpoints.",
 
+		"local_dns_endpoint": "Use this to override the default endpoint URL constructed from the `region`." +
+			" It's typically used to connect to custom Abroad LOCALDNS endpoints.",
+
 		"bbc_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom BBC endpoints.",
 
 		"vpn_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom VPN endpoints.",
+
+		"eni_endpoint": "Use this to override the default endpoint URL constructed from the `region`. " +
+			"It's typically used to connect to custom ENI endpoints.",
+
+		"et_gateway_endpoint": "Use this to override the default endpoint URL constructed from the `region`. " +
+			"It's typically used to connect to custom ETGATEWAY endpoints.",
 
 		"dns_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom DNS endpoints.",
 
@@ -431,6 +450,12 @@ func endpointsSchema() *schema.Schema {
 					Optional:    true,
 					Default:     "",
 					Description: descriptions["vpc_endpoint"],
+				},
+				"esg": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["esg_endpoint"],
 				},
 				"eip": {
 					Type:        schema.TypeString,
@@ -462,12 +487,6 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["cfc_endpoint"],
 				},
-				"scs": {
-					Type:        schema.TypeString,
-					Optional:    true,
-					Default:     "",
-					Description: descriptions["scs_endpoint"],
-				},
 				"cce": {
 					Type:        schema.TypeString,
 					Optional:    true,
@@ -479,6 +498,12 @@ func endpointsSchema() *schema.Schema {
 					Optional:    true,
 					Default:     "",
 					Description: descriptions["ccev2_endpoint"],
+				},
+				"scs": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["scs_endpoint"],
 				},
 				"rds": {
 					Type:        schema.TypeString,
@@ -492,6 +517,12 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["dts_endpoint"],
 				},
+				"iam": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["iam_endpoint"],
+				},
 				"cdn": {
 					Type:        schema.TypeString,
 					Optional:    true,
@@ -504,6 +535,12 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["abroad_cdn_endpoint"],
 				},
+				"local_dns": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["local_dns_endpoint"],
+				},
 				"bbc": {
 					Type:        schema.TypeString,
 					Optional:    true,
@@ -515,6 +552,18 @@ func endpointsSchema() *schema.Schema {
 					Optional:    true,
 					Default:     "",
 					Description: descriptions["vpn_endpoint"],
+				},
+				"eni": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["eni_endpoint"],
+				},
+				"et_gateway": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["et_gateway_endpoint"],
 				},
 				"dns": {
 					Type:        schema.TypeString,
@@ -539,20 +588,25 @@ func endpointsToHash(v interface{}) int {
 	m := v.(map[string]interface{})
 	buf.WriteString(fmt.Sprintf("%s-", m["bcc"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["vpc"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["esg"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["eip"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["appblb"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["blb"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["bos"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["cfc"].(string)))
-	buf.WriteString(fmt.Sprintf("%s-", m["scs"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["cce"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["ccev2"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["scs"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["rds"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["dts"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["iam"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["cdn"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["abroad_cdn"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["local_dns"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["bbc"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["vpn"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["eni"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["et_gateway"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["dns"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["mongodb"].(string)))
 	return hashcode.String(buf.String())
@@ -608,20 +662,25 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints = make(map[connectivity.ServiceCode]string)
 		config.ConfigEndpoints[connectivity.BCCCode] = strings.TrimSpace(endpoints["bcc"].(string))
 		config.ConfigEndpoints[connectivity.VPCCode] = strings.TrimSpace(endpoints["vpc"].(string))
+		config.ConfigEndpoints[connectivity.ESGCode] = strings.TrimSpace(endpoints["esg"].(string))
 		config.ConfigEndpoints[connectivity.EIPCode] = strings.TrimSpace(endpoints["eip"].(string))
 		config.ConfigEndpoints[connectivity.APPBLBCode] = strings.TrimSpace(endpoints["appblb"].(string))
 		config.ConfigEndpoints[connectivity.BLBCode] = strings.TrimSpace(endpoints["blb"].(string))
 		config.ConfigEndpoints[connectivity.BOSCode] = strings.TrimSpace(endpoints["bos"].(string))
 		config.ConfigEndpoints[connectivity.CFCCode] = strings.TrimSpace(endpoints["cfc"].(string))
-		config.ConfigEndpoints[connectivity.SCSCode] = strings.TrimSpace(endpoints["scs"].(string))
 		config.ConfigEndpoints[connectivity.CCECode] = strings.TrimSpace(endpoints["cce"].(string))
 		config.ConfigEndpoints[connectivity.CCEv2Code] = strings.TrimSpace(endpoints["ccev2"].(string))
+		config.ConfigEndpoints[connectivity.SCSCode] = strings.TrimSpace(endpoints["scs"].(string))
 		config.ConfigEndpoints[connectivity.RDSCode] = strings.TrimSpace(endpoints["rds"].(string))
 		config.ConfigEndpoints[connectivity.DTSCode] = strings.TrimSpace(endpoints["dts"].(string))
+		config.ConfigEndpoints[connectivity.IAMCode] = strings.TrimSpace(endpoints["iam"].(string))
 		config.ConfigEndpoints[connectivity.CDNCode] = strings.TrimSpace(endpoints["cdn"].(string))
 		config.ConfigEndpoints[connectivity.AbroadCDNCode] = strings.TrimSpace(endpoints["abroad_cdn"].(string))
+		config.ConfigEndpoints[connectivity.LOCALDNSCode] = strings.TrimSpace(endpoints["local_dns"].(string))
 		config.ConfigEndpoints[connectivity.BBCCode] = strings.TrimSpace(endpoints["bbc"].(string))
 		config.ConfigEndpoints[connectivity.VPNCode] = strings.TrimSpace(endpoints["vpn"].(string))
+		config.ConfigEndpoints[connectivity.ENICode] = strings.TrimSpace(endpoints["eni"].(string))
+		config.ConfigEndpoints[connectivity.ETGATEWAYCode] = strings.TrimSpace(endpoints["et_gateway"].(string))
 		config.ConfigEndpoints[connectivity.DNSCode] = strings.TrimSpace(endpoints["dns"].(string))
 		config.ConfigEndpoints[connectivity.MONGODBCode] = strings.TrimSpace(endpoints["mongodb"].(string))
 	}
