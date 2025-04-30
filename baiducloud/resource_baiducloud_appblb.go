@@ -143,7 +143,7 @@ func resourceBaiduCloudAppBLB() *schema.Resource {
 				Description:  "performance level, available values are small1, small2, medium1, medium2, large1, large2, large3",
 				Optional:     true,
 				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice([]string{"small1", "small2", "medium1", "medium2", "large1", "large2", "large3",}, false),
+				ValidateFunc: validation.StringInSlice([]string{"small1", "small2", "medium1", "medium2", "large1", "large2", "large3"}, false),
 			},
 			"description": {
 				Type:         schema.TypeString,
@@ -538,8 +538,7 @@ func buildBaiduCloudCreateAppBlbArgs(d *schema.ResourceData) *appblb.CreateLoadB
 		result.Billing = billingRequest
 	}
 
-
-	if v := d.Get("allow_delete"); true{
+	if v := d.Get("allow_delete"); true {
 		allowDelete := v.(bool)
 		result.AllowDelete = &allowDelete
 	}

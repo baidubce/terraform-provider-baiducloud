@@ -260,6 +260,9 @@ func ListInstances(cli bce.Client, args *ListInstanceArgs) (*ListInstanceResult,
 		if len(args.EhcClusterId) != 0 {
 			req.SetParam("ehcClusterId", args.EhcClusterId)
 		}
+		if len(args.FuzzyInstanceName) != 0 {
+			req.SetParam("fuzzyInstanceName", args.FuzzyInstanceName)
+		}
 	}
 	if args == nil || args.MaxKeys == 0 {
 		req.SetParam("maxKeys", "1000")
@@ -1766,6 +1769,77 @@ func GetAvailableStockWithSpec(cli bce.Client, args *GetAvailableStockWithSpecAr
 	return jsonBody, nil
 }
 
+// GetSortedInstFlavors - get the sorted instance flavors
+//
+// PARAMS:
+//   - cli: the client agent which can perform sending request
+//
+// RETURNS:
+//   - *GetSortedInstFlavorsResults: the result of the sorted instance flavors
+//   - error: nil if success otherwise the specific error
+func GetSortedInstFlavors(cli bce.Client) (*GetSortedInstFlavorsResults, error) {
+	// Build the request
+	req := &bce.BceRequest{}
+	req.SetUri(getSortedInstFlavors())
+	req.SetMethod(http.POST)
+
+	// Send request and get response
+	resp := &bce.BceResponse{}
+	if err := cli.SendRequest(req, resp); err != nil {
+		return nil, err
+	}
+	if resp.IsFail() {
+		return nil, resp.ServiceError()
+	}
+
+	jsonBody := &GetSortedInstFlavorsResults{}
+	if err := resp.ParseJsonBody(jsonBody); err != nil {
+		return nil, err
+	}
+	return jsonBody, nil
+}
+
+// GetInstOccupyStocksOfVm - get the bcc's occupy stock with spec, logicalZone, rootOnLocal
+//
+// PARAMS:
+//   - cli: the client agent which can perform sending request
+//   - args: the arguments to get the bcc's occupy stock with spec, logicalZone, rootOnLocal
+//
+// RETURNS:
+//   - *GetInstOccupyStocksOfVmResults: the result of the bcc's occupy stock
+//   - error: nil if success otherwise the specific error
+func GetInstOccupyStocksOfVm(cli bce.Client, args *GetInstOccupyStocksOfVmArgs) (*GetInstOccupyStocksOfVmResults, error) {
+	// Build the request
+	req := &bce.BceRequest{}
+	req.SetUri(getInstOccupyStocksOfVm())
+	req.SetMethod(http.POST)
+
+	jsonBytes, err := json.Marshal(args)
+	if err != nil {
+		return nil, err
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	req.SetBody(body)
+
+	// Send request and get response
+	resp := &bce.BceResponse{}
+	if err := cli.SendRequest(req, resp); err != nil {
+		return nil, err
+	}
+	if resp.IsFail() {
+		return nil, resp.ServiceError()
+	}
+
+	jsonBody := &GetInstOccupyStocksOfVmResults{}
+	if err := resp.ParseJsonBody(jsonBody); err != nil {
+		return nil, err
+	}
+	return jsonBody, nil
+}
+
 // GetStockWithSpec - get the bcc's stock with spec
 //
 // PARAMS:
@@ -2657,4 +2731,172 @@ func EhcClusterDelete(cli bce.Client, reqBody *bce.Body) error {
 	}
 
 	return nil
+}
+
+func GetInstanceUserDataAttr(cli bce.Client, reqBody *bce.Body) (*InstanceUserDataAttrResult, error) {
+	// Build the request
+	req := &bce.BceRequest{}
+	req.SetUri(getInstanceUserDataUri())
+	req.SetMethod(http.POST)
+	req.SetBody(reqBody)
+	// Send request and get response
+	resp := &bce.BceResponse{}
+	if err := cli.SendRequest(req, resp); err != nil {
+		return nil, err
+	}
+	if resp.IsFail() {
+		return nil, resp.ServiceError()
+	}
+
+	jsonBody := &InstanceUserDataAttrResult{}
+	if err := resp.ParseJsonBody(jsonBody); err != nil {
+		return nil, err
+	}
+
+	return jsonBody, nil
+}
+
+func EnterRescueMode(cli bce.Client, body *EnterRescueModeReq) (*EnterRescueModeResp, error) {
+	req := &bce.BceRequest{}
+	req.SetMethod(http.PUT)
+	req.SetUri(getEnterRescueModeUri())
+
+	jsonBytes, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	jsonBody, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	req.SetBody(jsonBody)
+
+	resp := &bce.BceResponse{}
+	if err := cli.SendRequest(req, resp); err != nil {
+		return nil, err
+	}
+	if resp.IsFail() {
+		return nil, resp.ServiceError()
+	}
+	res := &EnterRescueModeResp{}
+	if err := resp.ParseJsonBody(res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func ExitRescueMode(cli bce.Client, body *ExitRescueModeReq) (*ExitRescueModeResp, error) {
+	req := &bce.BceRequest{}
+	req.SetMethod(http.PUT)
+	req.SetUri(getExitRescueModeUri())
+
+	jsonBytes, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	jsonBody, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	req.SetBody(jsonBody)
+
+	resp := &bce.BceResponse{}
+	if err := cli.SendRequest(req, resp); err != nil {
+		return nil, err
+	}
+	if resp.IsFail() {
+		return nil, resp.ServiceError()
+	}
+	res := &ExitRescueModeResp{}
+	if err := resp.ParseJsonBody(res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func InstanceBindSecurityGroup(cli bce.Client, body *BindSgV2Req) (*BindSgV2Resp, error) {
+	req := &bce.BceRequest{}
+	req.SetMethod(http.PUT)
+	req.SetUri(getBindSecurityGroupUrl())
+
+	jsonBytes, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	jsonBody, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	req.SetBody(jsonBody)
+
+	resp := &bce.BceResponse{}
+	if err := cli.SendRequest(req, resp); err != nil {
+		return nil, err
+	}
+	if resp.IsFail() {
+		return nil, resp.ServiceError()
+	}
+	res := &BindSgV2Resp{}
+	if err := resp.ParseJsonBody(res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func InstanceUnbindSecurityGroup(cli bce.Client, body *UnbindSgV2Req) (*UnbindSgV2Resp, error) {
+	req := &bce.BceRequest{}
+	req.SetMethod(http.PUT)
+	req.SetUri(getUnbindSecurityGroupUrl())
+
+	jsonBytes, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	jsonBody, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	req.SetBody(jsonBody)
+
+	resp := &bce.BceResponse{}
+	if err := cli.SendRequest(req, resp); err != nil {
+		return nil, err
+	}
+	if resp.IsFail() {
+		return nil, resp.ServiceError()
+	}
+	res := &UnbindSgV2Resp{}
+	if err := resp.ParseJsonBody(res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func InstanceReplaceSecurityGroup(cli bce.Client, body *ReplaceSgV2Req) (*ReplaceSgV2Resp, error) {
+	req := &bce.BceRequest{}
+	req.SetMethod(http.PUT)
+	req.SetUri(getReplaceSecurityGroupUrl())
+
+	jsonBytes, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	jsonBody, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	req.SetBody(jsonBody)
+
+	resp := &bce.BceResponse{}
+	if err := cli.SendRequest(req, resp); err != nil {
+		return nil, err
+	}
+	if resp.IsFail() {
+		return nil, resp.ServiceError()
+	}
+	res := &ReplaceSgV2Resp{}
+	if err := resp.ParseJsonBody(res); err != nil {
+		return nil, err
+	}
+	return res, nil
 }

@@ -136,6 +136,7 @@ import (
 )
 
 var enableMultiAz = false
+
 func resourceBaiduCloudBosBucket() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceBaiduCloudBosBucketCreate,
@@ -219,8 +220,8 @@ func resourceBaiduCloudBosBucket() *schema.Resource {
 										Required:    true,
 									},
 									"storage_class": {
-										Type:         schema.TypeString,
-										Description:  "Destination storage class of the replication configuration, " +
+										Type: schema.TypeString,
+										Description: "Destination storage class of the replication configuration, " +
 											"the parameter does not need to be configured if it is consistent with the " +
 											"storage class of the source bucket, if you need to specify the storage " +
 											"class separately, it can be COLD, STANDARD, STANDARD_IA, " +
@@ -244,8 +245,8 @@ func resourceBaiduCloudBosBucket() *schema.Resource {
 										Required:    true,
 									},
 									"storage_class": {
-										Type:         schema.TypeString,
-										Description:  "Destination storage class of the replication configuration, the " +
+										Type: schema.TypeString,
+										Description: "Destination storage class of the replication configuration, the " +
 											"parameter does not need to be configured if it is consistent with the " +
 											"storage class of the source bucket, if you need to specify the storage " +
 											"class separately, it can be COLD, STANDARD, STANDARD_IA, MAZ_STANDARD, " +
@@ -520,7 +521,7 @@ func resourceBaiduCloudBosBucketCreate(d *schema.ResourceData, meta interface{})
 	action := "Create Bucket " + bucket
 
 	location, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
-		return bosClient.PutBucketWithArgs(bucket,args)
+		return bosClient.PutBucketWithArgs(bucket, args)
 	})
 	if err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_bucket", action, BCESDKGoERROR)
@@ -721,7 +722,7 @@ func resourceBaiduCloudBosBucketUpdate(d *schema.ResourceData, meta interface{})
 	}
 
 	// update bucket tags
-	if d.HasChange("tags"){
+	if d.HasChange("tags") {
 		if err := resourceBosBucketTagsUpdate(d, client); err != nil {
 			return err
 		}
@@ -729,7 +730,7 @@ func resourceBaiduCloudBosBucketUpdate(d *schema.ResourceData, meta interface{})
 	}
 
 	// update bucket resource group
-	if d.HasChange("resource_group"){
+	if d.HasChange("resource_group") {
 		if err := resourceBosBucketResourceGroupUpdate(d, client); err != nil {
 			return err
 		}
@@ -1196,9 +1197,9 @@ func resourceBosBucketTagsUpdate(d *schema.ResourceData, client *connectivity.Ba
 	action := "Update BOS Bucket tags"
 	tags := tranceTagMapToModel(d.Get("tags").(map[string]interface{}))
 	bosTags := make([]api.Tag, 0)
-	for _,item := range tags{
+	for _, item := range tags {
 		bosTags = append(bosTags, api.Tag{
-			TagKey: item.TagKey,
+			TagKey:   item.TagKey,
 			TagValue: item.TagValue,
 		})
 	}

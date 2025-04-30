@@ -170,6 +170,8 @@ type InstanceModel struct {
 	OsName                 string                 `json:"osName"`
 	ImageName              string                 `json:"imageName"`
 	ImageType              string                 `json:"imageType"`
+	CpuThreadConfig        string                 `json:"cpuThreadConfig"`
+	NumaConfig             string                 `json:"numaConfig"`
 }
 
 type DeploySetSimpleModel struct {
@@ -192,6 +194,13 @@ type BccStock struct {
 	RootOnLocal       bool   `json:"rootOnLocal"`
 	UpdatedTime       string `json:"updatedTime"`
 	CollectionTime    string `json:"collectionTime"`
+	ZoneName          string `json:"logicalZone"`
+}
+
+type BccOnlineStock struct {
+	Spec              string `json:"spec"`
+	InventoryQuantity int    `json:"inventoryQuantity"`
+	RootOnLocal       bool   `json:"rootOnLocal"`
 	ZoneName          string `json:"logicalZone"`
 }
 
@@ -269,12 +278,14 @@ type CreateCdsModel struct {
 	CdsSizeInGB int         `json:"cdsSizeInGB"`
 	StorageType StorageType `json:"storageType"`
 	SnapShotId  string      `json:"snapshotId,omitempty"`
+	EncryptKey  string      `json:"encryptKey,omitempty"`
 }
 
 type CreateCdsModelV3 struct {
 	CdsSizeInGB int           `json:"cdsSizeInGB"`
 	StorageType StorageTypeV3 `json:"storageType"`
 	SnapShotId  string        `json:"snapshotId,omitempty"`
+	EncryptKey  string        `json:"encryptKey,omitempty"`
 }
 
 type DiskInfo struct {
@@ -464,6 +475,24 @@ type GetAvailableStockWithSpecResults struct {
 	BccStocks []BccStock `json:"bccStocks"`
 }
 
+type GetInstOccupyStocksOfVmArgs struct {
+	Flavors []OccupyStockFlavor `json:"flavors"`
+}
+
+type OccupyStockFlavor struct {
+	Spec        string `json:"spec"`
+	RootOnLocal *bool  `json:"rootOnLocal,omitempty"`
+	ZoneName    string `json:"logicalZone"`
+}
+
+type GetInstOccupyStocksOfVmResults struct {
+	BccStocks []BccOnlineStock `json:"bccStocks"`
+}
+
+type GetSortedInstFlavorsResults struct {
+	ZoneResources []SortedZoneResource `json:"zoneResources"`
+}
+
 type GetStockWithSpecResults struct {
 	BccStocks []BccStock `json:"bccStocks"`
 }
@@ -553,6 +582,8 @@ type CreateInstanceBySpecArgs struct {
 	ResGroupId                 string           `json:"resGroupId,omitempty"`
 	EnableJumboFrame           bool             `json:"enableJumboFrame"`
 	EhcClusterId               string           `json:"ehcClusterId,omitempty"`
+	CpuThreadConfig            string           `json:"cpuThreadConfig"`
+	NumaConfig                 string           `json:"numaConfig"`
 }
 
 type CreateInstanceBySpecArgsV2 struct {
@@ -747,25 +778,26 @@ type CreateInstanceBySpecResult struct {
 }
 
 type ListInstanceArgs struct {
-	Marker           string
-	MaxKeys          int
-	InternalIp       string
-	DedicatedHostId  string
-	ZoneName         string
-	KeypairId        string
-	AutoRenew        bool
-	InstanceIds      string
-	InstanceNames    string
-	CdsIds           string
-	DeploySetIds     string
-	SecurityGroupIds string
-	PaymentTiming    string
-	Status           string
-	Tags             string
-	VpcId            string
-	PrivateIps       string
-	Ipv6Addresses    string
-	EhcClusterId     string
+	Marker            string
+	MaxKeys           int
+	InternalIp        string
+	DedicatedHostId   string
+	ZoneName          string
+	KeypairId         string
+	AutoRenew         bool
+	InstanceIds       string
+	InstanceNames     string
+	CdsIds            string
+	DeploySetIds      string
+	SecurityGroupIds  string
+	PaymentTiming     string
+	Status            string
+	Tags              string
+	VpcId             string
+	PrivateIps        string
+	Ipv6Addresses     string
+	EhcClusterId      string
+	FuzzyInstanceName string
 }
 
 type ListInstanceResult struct {
@@ -774,6 +806,11 @@ type ListInstanceResult struct {
 	NextMarker  string          `json:"nextMarker"`
 	MaxKeys     int             `json:"maxKeys"`
 	Instances   []InstanceModel `json:"instances"`
+}
+
+type InstanceUserDataAttrResult struct {
+	UserData   string `json:"userData"`
+	InstanceId string `json:"instanceId"`
 }
 
 type ListRecycleInstanceArgs struct {
@@ -929,6 +966,7 @@ type ResizeInstanceArgs struct {
 	EphemeralDisks     []EphemeralDisk `json:"ephemeralDisks,omitempty"`
 	Spec               string          `json:"spec"`
 	LiveResize         bool            `json:"liveResize"`
+	EnableJumboFrame   *bool           `json:"enableJumboFrame"`
 	ClientToken        string          `json:"-"`
 }
 
@@ -1017,6 +1055,22 @@ type Flavor struct {
 	MemoryCapacityInGB int    `json:"memoryCapacityInGB"`
 	ProductType        string `json:"productType"`
 	Spec               string `json:"spec"`
+}
+
+type SortedZoneResource struct {
+	ZoneName     string              `json:"logicalZone"`
+	BccResources []SortedBccResource `json:"bccResources"`
+}
+
+type SortedBccResource struct {
+	SpecId  string         `json:"specId"`
+	Flavors []SimpleFlavor `json:"flavors"`
+}
+
+type SimpleFlavor struct {
+	Spec               string `json:"spec"`
+	CpuCount           int    `json:"cpuCount"`
+	MemoryCapacityInGB int    `json:"memoryCapacityInGB"`
 }
 
 type PurchaseReservedArgs struct {
@@ -1463,6 +1517,12 @@ type GetAvailableDiskInfoResult struct {
 	DiskZoneResources  []DiskZoneResource `json:"diskZoneResources"`
 }
 
+type ListPurchasableDisksInfoResult struct {
+	CdsUsedCapacityGB  string     `json:"cdsUsedCapacityGB"`
+	CdsTotalCapacityGB string     `json:"cdsTotalCapacityGB"`
+	DiskInfos          []DiskInfo `json:"diskInfos"`
+}
+
 type AttachVolumeArgs struct {
 	InstanceId string `json:"instanceId"`
 }
@@ -1490,6 +1550,7 @@ type ListCDSVolumeArgs struct {
 	ChargeFilter string `json:"chargeFilter"`
 	UsageFilter  string `json:"usageFilter"`
 	Name         string `json:"name"`
+	VolumeIds    string `json:"volumeIds"`
 }
 
 type AutoRenewCDSVolumeArgs struct {
@@ -1580,10 +1641,11 @@ type CreateSecurityGroupArgs struct {
 }
 
 type ListSecurityGroupArgs struct {
-	Marker     string
-	MaxKeys    int
-	InstanceId string
-	VpcId      string
+	Marker          string
+	MaxKeys         int
+	InstanceId      string
+	VpcId           string
+	SecurityGroupId string
 }
 
 type CreateSecurityGroupResult struct {
@@ -1923,6 +1985,10 @@ type CreateDeploySetResp struct {
 
 type CreateDeploySetResult struct {
 	DeploySetId string `json:"deploySetIds"`
+}
+
+type ListDeploySetArgs struct {
+	DeploymentSetIdList string `json:"deploymentSetIds,omitempty"`
 }
 
 type ListDeploySetsResult struct {
@@ -2397,8 +2463,9 @@ type IdMapping struct {
 }
 
 type BatchResizeInstanceArgs struct {
-	Spec           string   `json:"spec"`
-	InstanceIdList []string `json:"instanceIdList"`
+	Spec             string   `json:"spec"`
+	InstanceIdList   []string `json:"instanceIdList"`
+	EnableJumboFrame *bool    `json:"enableJumboFrame"`
 }
 
 type BatchResizeInstanceResults struct {
@@ -2658,6 +2725,10 @@ type DescribeEhcClusterListArg struct {
 	SortDir          string   `json:"sortDir,omitempty"`
 }
 
+type DescribeInstanceUserDataArg struct {
+	InstanceId string `json:"instanceId"`
+}
+
 type ModifyReservedInstancesArgs struct {
 	ClientToken       string                   `json:"-"`
 	ReservedInstances []ModifyReservedInstance `json:"reservedInstances"`
@@ -2740,4 +2811,52 @@ type ModifySnapshotAttributeArgs struct {
 	SnapshotName    string `json:"snapshotName,omitempty"`
 	Desc            string `json:"desc,omitempty"`
 	RetentionInDays int    `json:"retentionInDays,omitempty"`
+}
+
+type EnterRescueModeReq struct {
+	InstanceId string `json:"instanceId"`
+	ForceStop  bool   `json:"forceStop"`
+	Password   string `json:"password"`
+}
+
+type EnterRescueModeResp struct {
+	RequestId *string `json:"requestId"`
+}
+
+type ExitRescueModeReq struct {
+	InstanceId string `json:"instanceId"`
+}
+
+type ExitRescueModeResp struct {
+	RequestId *string `json:"requestId"`
+}
+
+type BindSgV2Req struct {
+	InstanceIds       []string `json:"instanceIds"`
+	SecurityGroupIds  []string `json:"securityGroupIds"`
+	SecurityGroupType string   `json:"securityGroupType"`
+}
+
+type BindSgV2Resp struct {
+	RequestId *string `json:"requestId"`
+}
+
+type UnbindSgV2Req struct {
+	InstanceIds       []string `json:"instanceIds"`
+	SecurityGroupIds  []string `json:"securityGroupIds"`
+	SecurityGroupType string   `json:"securityGroupType"`
+}
+
+type UnbindSgV2Resp struct {
+	RequestId *string `json:"requestId"`
+}
+
+type ReplaceSgV2Req struct {
+	InstanceIds       []string `json:"instanceIds"`
+	SecurityGroupIds  []string `json:"securityGroupIds"`
+	SecurityGroupType string   `json:"securityGroupType"`
+}
+
+type ReplaceSgV2Resp struct {
+	RequestId *string `json:"requestId"`
 }

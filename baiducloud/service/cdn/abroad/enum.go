@@ -1,7 +1,7 @@
 package abroad
 
 const (
-	DomainStatusRunning           = "RUNNING"
-	DomainStatusOperating         = "OPERATING"
-	DomainStatusStopped        = "STOPPED"
+	DomainStatusRunning   = "RUNNING"
+	DomainStatusOperating = "OPERATING"
+	DomainStatusStopped   = "STOPPED"
 )

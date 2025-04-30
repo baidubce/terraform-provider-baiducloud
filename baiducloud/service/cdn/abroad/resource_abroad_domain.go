@@ -74,10 +74,10 @@ func ResourceAbroadDomain() *schema.Resource {
 				Optional:    true,
 			},
 			"cname": {
-				Type:        schema.TypeString,
+				Type: schema.TypeString,
 				Description: "The generated CNAME domain name, Users can enable acceleration for CDN domain" +
 					" by setting a CNAME record to point to this.",
-				Computed:    true,
+				Computed: true,
 			},
 			"status": {
 				Type:        schema.TypeString,

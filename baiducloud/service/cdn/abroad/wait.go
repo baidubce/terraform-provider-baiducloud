@@ -21,7 +21,7 @@ func waitAbroadCDNDomainAvailable(conn *connectivity.BaiduClient, domainName str
 	stateConf := &resource.StateChangeConf{
 		Delay:   0,
 		Pending: pendingStatus(),
-		Target:  []string{DomainStatusRunning,},
+		Target:  []string{DomainStatusRunning},
 		Refresh: statusAbroadCDNDomain(conn, domainName),
 		Timeout: CDNDomainAvailableTimeout,
 	}

@@ -82,19 +82,17 @@ func expandRefererACL(tfList []interface{}) *api.RefererACL {
 	tfMap := tfList[0].(map[string]interface{})
 	whiteList := flex.ExpandStringValueSet(tfMap["white_list"].(*schema.Set))
 	blackList := flex.ExpandStringValueSet(tfMap["black_list"].(*schema.Set))
-	if len(whiteList)> 0 {
+	if len(whiteList) > 0 {
 		refererACL.WhiteList = whiteList
 	}
-	if len(blackList)> 0 {
+	if len(blackList) > 0 {
 		refererACL.BlackList = blackList
 	}
 	return refererACL
 }
 
 func expandIpACL(tfList []interface{}) *api.IpACL {
-	ipACL := &api.IpACL{
-
-	}
+	ipACL := &api.IpACL{}
 	if len(tfList) == 0 || tfList[0] == nil {
 		ipACL.WhiteList = nil
 		return ipACL
@@ -102,10 +100,10 @@ func expandIpACL(tfList []interface{}) *api.IpACL {
 	tfMap := tfList[0].(map[string]interface{})
 	whiteList := flex.ExpandStringValueSet(tfMap["white_list"].(*schema.Set))
 	blackList := flex.ExpandStringValueSet(tfMap["black_list"].(*schema.Set))
-	if len(whiteList)> 0 {
+	if len(whiteList) > 0 {
 		ipACL.WhiteList = whiteList
 	}
-	if len(blackList)> 0 {
+	if len(blackList) > 0 {
 		ipACL.BlackList = blackList
 	}
 	return ipACL

@@ -58,17 +58,20 @@ const (
 	REQUEST_DELETEPREPAY         = "/volume/deletePrepay"
 
 	//
-	REQUEST_FLAVOR_SPEC_URI       = "/instance/flavorSpec"
-	REQUEST_PRICE_URI             = "/price"
-	REQUEST_AUTO_RENEW_URI        = "/autoRenew"
-	REQUEST_CANCEL_AUTO_RENEW_URI = "/cancelAutoRenew"
-	REQUEST_BID_PRICE_URI         = "/bidPrice"
-	REQUEST_BID_FLAVOR_URI        = "/bidFlavor"
+	REQUEST_FLAVOR_SPEC_URI                        = "/instance/flavorSpec"
+	REQUEST_STOCK_GET_SORTED_INST_FLAVORS_URI      = "/stock/getSortedInstFlavors"
+	REQUEST_STOCK_GET_INST_OCCUPY_STOCKS_OF_VM_URI = "/stock/getInstOccupyStocksOfVM"
+	REQUEST_PRICE_URI                              = "/price"
+	REQUEST_AUTO_RENEW_URI                         = "/autoRenew"
+	REQUEST_CANCEL_AUTO_RENEW_URI                  = "/cancelAutoRenew"
+	REQUEST_BID_PRICE_URI                          = "/bidPrice"
+	REQUEST_BID_FLAVOR_URI                         = "/bidFlavor"
 
 	//
 	REQUEST_INSTANCE_PRICE_URI               = "/instance/price"
 	REQUEST_INSTANCE_BY_SPEC_URI             = "/instanceBySpec"
 	REQUEST_VOLUME_DISK_URI                  = "/volume/disk"
+	REQUEST_VOLUME_DISK_QUOTA_URI            = "/volume/disk/quota"
 	REQUEST_TYPE_ZONE_URI                    = "/instance/flavorZones"
 	REQUEST_ENI_URI                          = "/eni"
 	REQUEST_KEYPAIR_URI                      = "/keypair"
@@ -91,15 +94,21 @@ const (
 	REQUEST_TRANSFER_ACCEPT_URI              = "/reserved/transfer/accept"
 	REQUEST_TRANSFER_IN_URI                  = "/reserved/transfer/in/list"
 	REQUEST_TRANSFER_OUT_URI                 = "/reserved/transfer/out/list"
-	REQUEST_RESERVED_LIST_URI				 = "/reserved/list"
+	REQUEST_RESERVED_LIST_URI                = "/reserved/list"
 	REQUEST_RELATED_DELETE_POLICY            = "/modifyRelatedDeletePolicy"
 	REQUEST_VOLUME_PRICE_URI                 = "/volume/getPrice"
 
-	REQUEST_DESCRIBE_REGIONS_URI   = "/describeRegions"
-	REQUEST_EHC_CLUSTER_CREATE_URI = "/ehc/cluster/create"
-	REQUEST_EHC_CLUSTER_LIST_URI   = "/ehc/cluster/list"
-	REQUEST_EHC_CLUSTER_MODIFY_URI = "/ehc/cluster/modify"
-	REQUEST_EHC_CLUSTER_DELETE_URI = "/ehc/cluster/delete"
+	REQUEST_DESCRIBE_REGIONS_URI       = "/describeRegions"
+	REQUEST_EHC_CLUSTER_CREATE_URI     = "/ehc/cluster/create"
+	REQUEST_EHC_CLUSTER_LIST_URI       = "/ehc/cluster/list"
+	REQUEST_EHC_CLUSTER_MODIFY_URI     = "/ehc/cluster/modify"
+	REQUEST_EHC_CLUSTER_DELETE_URI     = "/ehc/cluster/delete"
+	REQUEST_INSTANCE_USER_DATA_URI     = "/attribute/getUserdata"
+	REQUEST_ENTER_RESCUE_MODE_URI      = "/rescue/mode/enter"
+	REQUEST_EXIT_RESCUE_MODE_URI       = "/rescue/mode/exit"
+	REQUEST_BIND_SECURITY_GROUP__URI   = "/securitygroup/bind"
+	REQUEST_UNBIND_SECURITY_GROUP__URI = "/securitygroup/unbind"
+	REQUEST_REPLACE_SECURITY_GROUP_URI = "/securitygroup/replace"
 )
 
 func getInstanceUri() string {
@@ -211,6 +220,10 @@ func getAvailableDiskInfo() string {
 	return URI_PREFIXV2 + REQUEST_VOLUME_DISK_URI
 }
 
+func listPurchasableDisksInfo() string {
+	return URI_PREFIXV2 + REQUEST_VOLUME_DISK_QUOTA_URI
+}
+
 func getSecurityGroupUri() string {
 	return URI_PREFIXV2 + REQUEST_SECURITYGROUP_URI
 }
@@ -313,6 +326,14 @@ func getStockWithSpec() string {
 
 func getAvailableStockWithSpec() string {
 	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + REQUEST_GET_AVAILABLE_STOCK_WITH_SPEC
+}
+
+func getSortedInstFlavors() string {
+	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + REQUEST_STOCK_GET_SORTED_INST_FLAVORS_URI
+}
+
+func getInstOccupyStocksOfVm() string {
+	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + REQUEST_STOCK_GET_INST_OCCUPY_STOCKS_OF_VM_URI
 }
 
 func getCreateInstanceStock() string {
@@ -504,7 +525,7 @@ func getAvailableImagesBySpecUri() string {
 }
 
 func getListReservedInstancesUri() string {
-	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + REQUEST_RESERVED_LIST_URI;
+	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + REQUEST_RESERVED_LIST_URI
 }
 
 func getCreateTransferReservedInstanceOrderUri() string {
@@ -549,4 +570,28 @@ func getEhcClusterModifyUri() string {
 
 func getEhcClusterDeleteUri() string {
 	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + REQUEST_EHC_CLUSTER_DELETE_URI
+}
+
+func getInstanceUserDataUri() string {
+	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + REQUEST_INSTANCE_USER_DATA_URI
+}
+
+func getEnterRescueModeUri() string {
+	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + REQUEST_ENTER_RESCUE_MODE_URI
+}
+
+func getExitRescueModeUri() string {
+	return URI_PREFIXV2 + REQUEST_INSTANCE_URI + REQUEST_EXIT_RESCUE_MODE_URI
+}
+
+func getBindSecurityGroupUrl() string {
+	return URI_PREFIXV2 + REQUEST_BIND_SECURITY_GROUP__URI
+}
+
+func getUnbindSecurityGroupUrl() string {
+	return URI_PREFIXV2 + REQUEST_UNBIND_SECURITY_GROUP__URI
+}
+
+func getReplaceSecurityGroupUrl() string {
+	return URI_PREFIXV2 + REQUEST_REPLACE_SECURITY_GROUP_URI
 }

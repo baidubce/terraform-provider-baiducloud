@@ -170,7 +170,7 @@ func resourceBaiduCloudBLB() *schema.Resource {
 				Description:  "performance level, available values are small1, small2, medium1, medium2, large1, large2, large3",
 				Optional:     true,
 				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice([]string{"small1", "small2", "medium1", "medium2", "large1", "large2", "large3",}, false),
+				ValidateFunc: validation.StringInSlice([]string{"small1", "small2", "medium1", "medium2", "large1", "large2", "large3"}, false),
 			},
 			"vpc_name": {
 				Type:        schema.TypeString,
@@ -378,10 +378,10 @@ func getResourceGroup(d *schema.ResourceData, client *connectivity.BaiduClient, 
 		return client.GetResGroupBatch(args)
 	})
 	if err != nil {
-		return "",WrapErrorf(err, DefaultErrorMsg, product, action, BCESDKGoERROR)
+		return "", WrapErrorf(err, DefaultErrorMsg, product, action, BCESDKGoERROR)
 	}
 	resp := raw.(*resmanager.ResGroupDetailResponse)
-	if len(resp.ResourceGroupsDetailFull)>0 && len(resp.ResourceGroupsDetailFull[0].BindGroupInfo)> 0 {
+	if len(resp.ResourceGroupsDetailFull) > 0 && len(resp.ResourceGroupsDetailFull[0].BindGroupInfo) > 0 {
 		return resp.ResourceGroupsDetailFull[0].BindGroupInfo[0].GroupId, nil
 	}
 	return "", nil
@@ -562,7 +562,7 @@ func buildBaiduCloudCreateBlbArgs(d *schema.ResourceData) *blb.CreateLoadBalance
 		result.Billing = billingRequest
 	}
 
-	if v := d.Get("allow_delete"); true{
+	if v := d.Get("allow_delete"); true {
 		allowDelete := v.(bool)
 		result.AllowDelete = &allowDelete
 	}

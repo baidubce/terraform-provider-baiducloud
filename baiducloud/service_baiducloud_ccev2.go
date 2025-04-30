@@ -67,8 +67,8 @@ func resourceCCEv2ClusterSpec() *schema.Resource {
 				Optional:    true,
 			},
 			"k8s_version": {
-				Type:         schema.TypeString,
-				Description:  "Kubernetes Version. Available Value: [1.18.9, 1.20.8, 1.21.14, " +
+				Type: schema.TypeString,
+				Description: "Kubernetes Version. Available Value: [1.18.9, 1.20.8, 1.21.14, " +
 					"1.22.5, 1.24.4, 1.26.9, 1.28.8, 1.30.1].",
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice(K8SVersionPermitted, false),
@@ -2705,7 +2705,7 @@ func buildCCEv2CreateClusterArgs(d *schema.ResourceData) (*ccev2.CreateClusterAr
 
 	clusterSpecRaw := d.Get("cluster_spec.0").(map[string]interface{})
 	clusterSpec, err := buildCCEv2CreateClusterClusterSpec(clusterSpecRaw)
-	if v,ok := d.GetOk("tags"); ok{
+	if v, ok := d.GetOk("tags"); ok {
 		clusterSpec.Tags = tranceCCETagMapToModel(v.(map[string]interface{}))
 	}
 	if err != nil {

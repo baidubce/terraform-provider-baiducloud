@@ -214,4 +214,3 @@ func dataSourceBaiduCloudEtGatewayAssociationsRead(d *schema.ResourceData, meta 
 	}
 	return nil
 }
-

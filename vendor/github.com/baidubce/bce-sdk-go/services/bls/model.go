@@ -97,6 +97,8 @@ type ListLogStoreRequest struct {
 	PageNo int `json:"pageNo"`
 	// 每页大小 选填， 默认为10
 	PageSize int `json:"pageSize"`
+	// 根据绑定云产品过滤，多个绑定过滤条件是"或"关系，默认为空
+	BindingResources []BindingResource `json:"bindingResources"`
 }
 
 type ListLogStreamRequest struct {
@@ -114,6 +116,15 @@ type ListLogStreamRequest struct {
 	PageNo int `json:"pageNo"`
 	// 每页大小 选填， 默认为10
 	PageSize int `json:"pageSize"`
+}
+
+type BatchLogStoreRequest struct {
+	LogStores []BaseLogStore `json:"logStores"`
+}
+
+type BaseLogStore struct {
+	LogStoreName string `json:"logStoreName"`
+	Project      string `json:"project"`
 }
 
 type PushLogRecordRequest struct {
@@ -165,6 +176,10 @@ type QueryLogRecordRequest struct {
 	Marker string `json:"marker"`
 	// 排序字段，默认desc，按照时间倒序排序；asc，按照时间顺序排序
 	Sort string `json:"sort"`
+	// 检索时的采样百分比，选填，范围为1-100。注：该参数只对检索结果生效
+	SamplePercentage float64 `json:"samplePercentage"`
+	// 检索采样时的seed，相同seed多次查询产生相同的随机结果。注：该参数只对检索结果生效
+	SampleSeed int `json:"sampleSeed"`
 }
 
 type CreateFastQueryRequest struct {
@@ -421,4 +436,17 @@ type ListDownloadTaskRequest struct {
 	PageNo int `json:"pageNo"`
 	// 每页大小 选填， 默认为10
 	PageSize int `json:"pageSize"`
+}
+
+type BindResourceRequest struct {
+	Project      string `json:"project"`
+	UserID       string `json:"userID"`
+	LogStoreName string `json:"logStoreName"`
+	ID           string `json:"id"`
+	Scope        string `json:"scope"`
+	SubScope     string `json:"subScope"`
+}
+
+type BindingResource struct {
+	Scope string `json:"scope"`
 }

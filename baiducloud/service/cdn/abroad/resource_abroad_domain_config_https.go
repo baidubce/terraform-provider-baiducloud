@@ -179,4 +179,3 @@ func updateOriginProtocol(d *schema.ResourceData, conn *connectivity.BaiduClient
 	}
 	return nil
 }
-

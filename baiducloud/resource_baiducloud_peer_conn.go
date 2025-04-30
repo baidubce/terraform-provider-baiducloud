@@ -473,7 +473,7 @@ func setAttributeForPeerConn(d *schema.ResourceData, peerConn *vpc.PeerConn) {
 	d.Set("created_time", peerConn.CreatedTime)
 	d.Set("expired_time", peerConn.ExpiredTime)
 	d.Set("dns_status", peerConn.DnsStatus)
-	if peerConn.DnsStatus == vpc.DNS_STATUS_CLOSE || peerConn.DnsStatus == vpc.DNS_STATUS_CLOSING{
+	if peerConn.DnsStatus == vpc.DNS_STATUS_CLOSE || peerConn.DnsStatus == vpc.DNS_STATUS_CLOSING {
 		d.Set("dns_sync", false)
 	} else {
 		d.Set("dns_sync", true)

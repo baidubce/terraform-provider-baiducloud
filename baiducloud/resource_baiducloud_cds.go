@@ -486,7 +486,7 @@ func buildBaiduCloudCreateCDSArgs(d *schema.ResourceData, meta interface{}) (*ap
 }
 
 func checkResourceBind(d *schema.ResourceData, meta interface{}) error {
-	action := "Check CDS resource group bind, id is "+d.Id()
+	action := "Check CDS resource group bind, id is " + d.Id()
 	client := meta.(*connectivity.BaiduClient)
 	raw, err := client.WithBccClient(func(client *bcc.Client) (i interface{}, e error) {
 		return client.GetCDSVolumeDetail(d.Id())

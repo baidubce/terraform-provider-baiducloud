@@ -341,7 +341,7 @@ func resourceBaiduCloudBccInstanceCreate(d *schema.ResourceData, meta interface{
 	if len(securityGroups) > 0 {
 		createInstanceArgs.SecurityGroupId = securityGroups[0].(string)
 	}
-	jsonData,_ := json.Marshal(createInstanceArgs)
+	jsonData, _ := json.Marshal(createInstanceArgs)
 	log.Print("BBC args is ", string(jsonData))
 	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 		res, err := client.WithBbcClient(func(bbcClient *bbc.Client) (i interface{}, e error) {

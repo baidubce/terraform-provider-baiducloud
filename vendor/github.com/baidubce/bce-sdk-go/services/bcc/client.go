@@ -1553,6 +1553,15 @@ func (c *Client) ListDeploySets() (*api.ListDeploySetsResult, error) {
 	return api.ListDeploySets(c)
 }
 
+// ListDeploySetsWithId - list deploy sets with ids
+//
+// RETURNS:
+//   - *ListDeploySetsResult: the result of list all deploy sets
+//   - error: nil if success otherwise the specific error
+func (c *Client) ListDeploySetsWithId(args *api.ListDeploySetArgs) (*api.ListDeploySetsResult, error) {
+	return api.ListDeploySetsWithId(c, args)
+}
+
 // ModifyDeploySet - modify the deploy set
 //
 // PARAMS:
@@ -1783,7 +1792,6 @@ func (c *Client) UnBindInstanceToTags(instanceId string, args *api.UnBindTagsReq
 	return api.UnBindInstanceToTags(c, instanceId, body)
 }
 
-
 func (c *Client) ListReservedInstances(args *api.ListReservedInstanceArgs) (*api.ListReservedInstanceResult, error) {
 	return api.ListReservedInstances(c, args)
 }
@@ -1915,6 +1923,10 @@ func (c *Client) GetAvailableDiskInfo(zoneName string) (*api.GetAvailableDiskInf
 	return api.GetAvailableDiskInfo(c, zoneName)
 }
 
+func (c *Client) ListPurchasableDisksInfo(zoneName string) (*api.ListPurchasableDisksInfoResult, error) {
+	return api.ListPurchasableDisksInfo(c, zoneName)
+}
+
 // DeletePrepayVolume - delete the volumes for prepay
 //
 // PARAMS:
@@ -2017,6 +2029,24 @@ func (c *Client) GetStockWithSpec(args *api.GetStockWithSpecArgs) (*api.GetStock
 
 func (c *Client) GetAvailableStockWithSpec(args *api.GetAvailableStockWithSpecArgs) (*api.GetAvailableStockWithSpecResults, error) {
 	return api.GetAvailableStockWithSpec(c, args)
+}
+
+// GetSortedInstFlavors - get the sorted instance flavors
+//
+// RETURNS:
+//   - *GetSortedInstFlavorsResults: the result of the sorted instance flavors
+//   - error: nil if success otherwise the specific error
+func (c *Client) GetSortedInstFlavors() (*api.GetSortedInstFlavorsResults, error) {
+	return api.GetSortedInstFlavors(c)
+}
+
+// GetInstOccupyStocksOfVm - get the bcc's occupy stock with spec, logicalZone, rootOnLocal
+//
+// RETURNS:
+//   - *GetInstOccupyStocksOfVmResults: the result of the bcc's occupy stock
+//   - error: nil if success otherwise the specific error
+func (c *Client) GetInstOccupyStocksOfVm(args *api.GetInstOccupyStocksOfVmArgs) (*api.GetInstOccupyStocksOfVmResults, error) {
+	return api.GetInstOccupyStocksOfVm(c, args)
 }
 
 func (c *Client) GetInstanceCreateStock(args *api.CreateInstanceStockArgs) (*api.InstanceStockResult, error) {
@@ -2600,6 +2630,18 @@ func (c *Client) ListEhcCluster(args *api.DescribeEhcClusterListArg) (*api.Descr
 	return api.EhcClusterList(c, body)
 }
 
+func (c *Client) getInstanceUserData(args *api.DescribeInstanceUserDataArg) (*api.InstanceUserDataAttrResult, error) {
+	jsonBytes, jsonErr := json.Marshal(args)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+	body, err := bce.NewBodyFromBytes(jsonBytes)
+	if err != nil {
+		return nil, err
+	}
+	return api.GetInstanceUserDataAttr(c, body)
+}
+
 // ModifyEhcCluster - modify ehcCluster
 //
 // PARAMS:
@@ -2663,4 +2705,26 @@ func (c *Client) GetSecurityGroupDetail(securityGroupId string) (*api.GetSecurit
 //   - error: nil if success otherwise the specific error
 func (c *Client) ModifySnapshotAttribute(snapshotId string, args *api.ModifySnapshotAttributeArgs) error {
 	return api.ModifySnapshotAttribute(c, snapshotId, args)
+}
+
+func (c *Client) EnterRescueMode(body *api.EnterRescueModeReq) (
+	*api.EnterRescueModeResp, error) {
+	return api.EnterRescueMode(c, body)
+}
+
+func (c *Client) ExitRescueMode(body *api.ExitRescueModeReq) (
+	*api.ExitRescueModeResp, error) {
+	return api.ExitRescueMode(c, body)
+}
+
+func (c *Client) InstanceBindSecurityGroup(body *api.BindSgV2Req) (*api.BindSgV2Resp, error) {
+	return api.InstanceBindSecurityGroup(c, body)
+}
+
+func (c *Client) InstanceUnbindSecurityGroup(body *api.UnbindSgV2Req) (*api.UnbindSgV2Resp, error) {
+	return api.InstanceUnbindSecurityGroup(c, body)
+}
+
+func (c *Client) InstanceReplaceSecurityGroup(body *api.ReplaceSgV2Req) (*api.ReplaceSgV2Resp, error) {
+	return api.InstanceReplaceSecurityGroup(c, body)
 }

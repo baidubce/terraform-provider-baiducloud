@@ -102,13 +102,15 @@ type PushLogRecordBody struct {
 }
 
 type QueryLogRecordArgs struct {
-	LogStreamName string   `json:"logStreamName"`
-	Query         string   `json:"query"`
-	StartDateTime DateTime `json:"startDatetime"`
-	EndDateTime   DateTime `json:"endDateTime"`
-	Limit         int      `json:"limit"`
-	Marker        string   `json:"marker"`
-	Sort          string   `json:"sort"`
+	LogStreamName    string   `json:"logStreamName"`
+	Query            string   `json:"query"`
+	StartDateTime    DateTime `json:"startDatetime"`
+	EndDateTime      DateTime `json:"endDateTime"`
+	Limit            int      `json:"limit"`
+	Marker           string   `json:"marker"`
+	Sort             string   `json:"sort"`
+	SamplePercentage float64  `json:"samplePercentage"`
+	SampleSeed       int      `json:"sampleSeed"`
 }
 
 type PullLogRecordArgs struct {
@@ -177,6 +179,12 @@ type ListLogStoreResult struct {
 	PageSize   int        `json:"pageSize"`
 	TotalCount int        `json:"totalCount"`
 	Result     []LogStore `json:"result"`
+}
+
+type BatchLogStoreResult struct {
+	Result  []LogStore `json:"result"`
+	Code    string     `json:"code"`
+	Success bool       `json:"success"`
 }
 
 type FastQuery struct {

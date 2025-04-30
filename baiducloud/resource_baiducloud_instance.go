@@ -144,8 +144,8 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				DiffSuppressFunc: specDiffSuppressFunc,
 			},
 			"root_disk_size_in_gb": {
-				Type:         schema.TypeInt,
-				Description:  "System disk size(GB) of the instance to be created. The value range is [40,2048]GB," +
+				Type: schema.TypeInt,
+				Description: "System disk size(GB) of the instance to be created. The value range is [40,2048]GB," +
 					" Default to 40GB, and more than 40GB is charged according to the cloud disk price. " +
 					"Note that the specified system disk size needs to meet the minimum disk space limit of the mirror used.",
 				Optional:     true,
@@ -154,15 +154,15 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				ValidateFunc: validation.IntBetween(40, 2048),
 			},
 			"root_disk_storage_type": {
-				Type:         schema.TypeString,
-				Description:  "System disk storage type of the instance. " +
+				Type: schema.TypeString,
+				Description: "System disk storage type of the instance. " +
 					"Available values are " +
 					"enhanced_ssd_pl1, enhanced_ssd_pl2, cloud_hp1, premium_ssd, hp1, " +
 					"ssd, sata, hdd, local, sata, local-ssd, local-hdd, local-nvme. " +
 					"Default to cloud_hp1.",
-				Optional:     true,
-				ForceNew:     true,
-				Default:      api.StorageTypeCloudHP1,
+				Optional: true,
+				ForceNew: true,
+				Default:  api.StorageTypeCloudHP1,
 				//ValidateFunc: validateStorageType(),
 			},
 			"ephemeral_disks": {
@@ -407,12 +407,12 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Optional:    true,
 			},
 			"is_open_ipv6": {
-				Type:        schema.TypeBool,
+				Type: schema.TypeBool,
 				Description: "Whether to enable IPv6 for the instance to be created. " +
 					"It can be enabled only when both the image and the subnet support IPv6. " +
 					"True means enabled, false means disabled, " +
 					"undefined means automatically adapting to the IPv6 support of the image and subnet.",
-				Optional:    true,
+				Optional: true,
 			},
 			"tags": tagsSchema(),
 			"resource_group_id": {
