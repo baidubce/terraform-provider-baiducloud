@@ -69,13 +69,14 @@ The following arguments are supported:
 * `delete_cds_snapshot_flag` - (Optional, ForceNew) Whether to release the cds disk snapshots, default to false. It is effective only when the related_release_flag is true.
 * `deploy_set_ids` - (Optional) Deploy set ids the instance belong to
 * `description` - (Optional) Description of the instance.
+* `enterprise_security_groups` - (Optional) Enterprise security group ids of the instance.
 * `ephemeral_disks` - (Optional) Ephemeral disks of the instance.
 * `fpga_card` - (Optional, ForceNew) FPGA card of the instance.
 * `gpu_card` - (Optional, ForceNew) GPU card of the instance.
 * `hostname` - (Optional) Hostname of the instance.
 * `instance_spec` - (Optional) spec
 * `instance_type` - (Optional, ForceNew) Type of the instance to start. Available values are N1, N2, N3, N4, N5, C1, C2, S1, G1, F1. Default to N3.
-* `is_open_hostname_domain` - (Optional) Whether to automatically generate hostname domain
+* `is_open_hostname_domain` - (Optional) Whether to automatically generate hostname domain.
 * `is_open_ipv6` - (Optional) Whether to enable IPv6 for the instance to be created. It can be enabled only when both the image and the subnet support IPv6. True means enabled, false means disabled, undefined means automatically adapting to the IPv6 support of the image and subnet.
 * `keypair_id` - (Optional, ForceNew) Key pair id of the instance.
 * `memory_capacity_in_gb` - (Optional) Memory capacity(GB) of the instance to be created.
@@ -87,7 +88,7 @@ The following arguments are supported:
 * `resource_group_id` - (Optional) Resource group Id of the instance.
 * `root_disk_size_in_gb` - (Optional, ForceNew) System disk size(GB) of the instance to be created. The value range is [40,2048]GB, Default to 40GB, and more than 40GB is charged according to the cloud disk price. Note that the specified system disk size needs to meet the minimum disk space limit of the mirror used.
 * `root_disk_storage_type` - (Optional, ForceNew) System disk storage type of the instance. Available values are enhanced_ssd_pl1, enhanced_ssd_pl2, cloud_hp1, premium_ssd, hp1, ssd, sata, hdd, local, sata, local-ssd, local-hdd, local-nvme. Default to cloud_hp1.
-* `security_groups` - (Optional) Security groups of the instance.
+* `security_groups` - (Optional) Security group ids of the instance.
 * `stop_with_no_charge` - (Optional) Whether to enable stopping charging after shutdown for postpaid instance without local disks. Defaults to false.
 * `subnet_id` - (Optional) The subnet ID of VPC. The default subnet will be used when it is empty. The instance will restart after changing the subnet.
 * `tags` - (Optional, ForceNew) Tags, do not support modify

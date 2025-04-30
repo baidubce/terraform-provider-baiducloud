@@ -41,6 +41,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/rateLimit"
+
+	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/flex"
 )
 
 func resourceBaiduCloudInstance() *schema.Resource {
@@ -242,10 +244,22 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Computed:    true,
 			},
 			"security_groups": {
-				Type:        schema.TypeSet,
-				Description: "Security groups of the instance.",
-				Optional:    true,
-				Computed:    true,
+				Type:          schema.TypeSet,
+				Description:   "Security group ids of the instance.",
+				ConflictsWith: []string{"enterprise_security_groups"},
+				Optional:      true,
+				Computed:      true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"enterprise_security_groups": {
+				Type:          schema.TypeSet,
+				Description:   "Enterprise security group ids of the instance. ",
+				ConflictsWith: []string{"security_groups"},
+				Optional:      true,
+				Computed:      true,
+				MinItems:      1,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -443,13 +457,9 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 		createBySpec = true
 	}
 
-	securityGroups := make([]interface{}, 0)
-	groups, ok := d.GetOk("security_groups")
-	if ok {
-		securityGroups = groups.(*schema.Set).List()
-	}
+	securityGroups := expandStringSet(d.Get("security_groups").(*schema.Set))
+	enterpriseSecurityGroups := expandStringSet(d.Get("enterprise_security_groups").(*schema.Set))
 
-	//var err error
 	if createBySpec {
 		createInstanceArgs, err := buildBaiduCloudInstanceBySpecArgs(d, meta)
 		if err != nil {
@@ -457,8 +467,12 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 		}
 
 		if len(securityGroups) > 0 {
-			createInstanceArgs.SecurityGroupId = securityGroups[0].(string)
+			createInstanceArgs.SecurityGroupIds = securityGroups
 		}
+		if len(enterpriseSecurityGroups) > 0 {
+			createInstanceArgs.EnterpriseSecurityGroupIds = enterpriseSecurityGroups
+		}
+
 		createArgs = createInstanceArgs
 	} else {
 		createInstanceArgs, err := buildBaiduCloudInstanceArgs(d, meta)
@@ -467,8 +481,12 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 		}
 
 		if len(securityGroups) > 0 {
-			createInstanceArgs.SecurityGroupId = securityGroups[0].(string)
+			createInstanceArgs.SecurityGroupIds = securityGroups
 		}
+		if len(enterpriseSecurityGroups) > 0 {
+			createInstanceArgs.EnterpriseSecurityGroupIds = enterpriseSecurityGroups
+		}
+
 		createArgs = createInstanceArgs
 	}
 
@@ -514,21 +532,6 @@ func resourceBaiduCloudInstanceCreate(d *schema.ResourceData, meta interface{}) 
 	)
 	if _, err = stateConf.WaitForState(); err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
-	}
-
-	// bind security groups
-	for i, sg := range securityGroups {
-		// The first security group has been binded when creating the instance,
-		// so skip it directly.
-		if i == 0 {
-			continue
-		}
-		// bind security groups
-		if _, err := client.WithBccClient(func(bccClient *bcc.Client) (i interface{}, e error) {
-			return nil, bccClient.BindSecurityGroup(d.Id(), sg.(string))
-		}); err != nil {
-			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
-		}
 	}
 
 	// set instance description
@@ -638,29 +641,14 @@ func resourceBaiduCloudInstanceRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("auto_renew", response.Instance.AutoRenew)
 	d.Set("hostname", response.Instance.Hostname)
 
+	d.Set("security_groups", flex.FlattenStringValueSet(response.Instance.NicInfo.SecurityGroups))
+	d.Set("enterprise_security_groups", flex.FlattenStringValueSet(response.Instance.NicInfo.EnterpriseSecurityGroups))
+
 	deploysetIds := make([]string, 0)
 	for _, value := range response.Instance.DeploySetList {
 		deploysetIds = append(deploysetIds, value.DeploySetId)
 	}
 	d.Set("deploy_set_ids", deploysetIds)
-	raw, err = client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
-		args := &api.ListSecurityGroupArgs{
-			InstanceId: instanceID,
-		}
-		return bccClient.ListSecurityGroup(args)
-	})
-	addDebug(action, raw)
-	if err != nil {
-		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
-	}
-
-	securityGroups, _ := raw.(*api.ListSecurityGroupResult)
-	sgIDs := make([]string, len(securityGroups.SecurityGroups))
-	for i, sg := range securityGroups.SecurityGroups {
-		sgIDs[i] = sg.Id
-	}
-	addDebug(action, sgIDs)
-	d.Set("security_groups", sgIDs)
 
 	// read ephemeral disks
 	ephVolumes, err := bccService.ListAllEphemeralVolumes(instanceID)
@@ -725,6 +713,11 @@ func resourceBaiduCloudInstanceUpdate(d *schema.ResourceData, meta interface{}) 
 
 	// update instance security groups
 	if err := updateInstanceSecurityGroups(d, meta, instanceID); err != nil {
+		return err
+	}
+
+	// update instance enterprise security groups
+	if err := updateInstanceEnterpriseSecurityGroups(d, meta, instanceID); err != nil {
 		return err
 	}
 
@@ -1388,6 +1381,29 @@ func updateInstanceSecurityGroups(d *schema.ResourceData, meta interface{}, inst
 		}
 
 		d.SetPartial("security_groups")
+	}
+
+	return nil
+}
+
+func updateInstanceEnterpriseSecurityGroups(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	action := "Update instance enterprise security groups " + instanceID
+	client := meta.(*connectivity.BaiduClient)
+
+	if d.HasChange("enterprise_security_groups") {
+		newGroupIds := expandStringSet(d.Get("enterprise_security_groups").(*schema.Set))
+
+		request := &api.ReplaceSgV2Req{}
+		request.SecurityGroupType = "enterprise"
+		request.InstanceIds = []string{instanceID}
+		request.SecurityGroupIds = newGroupIds
+		if _, err := client.WithBccClient(func(bccClient *bcc.Client) (i interface{}, e error) {
+			return bccClient.InstanceReplaceSecurityGroup(request)
+		}); err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+		}
+
+		d.SetPartial("enterprise_security_groups")
 	}
 
 	return nil
