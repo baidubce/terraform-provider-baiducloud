@@ -1,4 +1,10 @@
-	## 1.21.13 (Unreleased)
+	## 1.21.14 (Unreleased)
+## 1.21.13 (April 30, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_instance: Add parameter `enterprise_security_groups`, support modification.
+- Support temporary AK/SK with optional `session_token`.
+- Update `baidubce/bce-sdk-go` to v0.9.225.
+
 ## 1.21.12 (January 23, 2025)
 NOTES:
 - custom endpoints support more products
