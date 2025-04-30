@@ -120,6 +120,13 @@ func (c *Config) Client() (*BaiduClient, error) {
 		}
 
 		client.Credentials = stsCredential
+	} else if c.SessionToken != "" {
+		credentials, err := auth.NewSessionBceCredentials(c.AccessKey, c.SecretKey, c.SessionToken)
+		if err != nil {
+			return nil, err
+		}
+
+		client.Credentials = credentials
 	} else {
 		credentials, err := auth.NewBceCredentials(c.AccessKey, c.SecretKey)
 		if err != nil {

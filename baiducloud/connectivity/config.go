@@ -10,9 +10,10 @@ type ConfigEndpoints map[ServiceCode]string
 
 // Config of BaiduCloud
 type Config struct {
-	AccessKey string
-	SecretKey string
-	Region    Region
+	AccessKey    string
+	SecretKey    string
+	SessionToken string
+	Region       Region
 
 	// assume role
 	AssumeRoleRoleName  string

@@ -165,6 +165,9 @@ The following arguments are supported:
 * `secret_key` - (Optional) This is the BaiduCloud secret key. It must be provided, but
   it can also be sourced from the `BAIDUCLOUD_SECRET_KEY` environment variable.
 
+* `session_token` - (Optional) This is the BaiduCloud session token. It must be provided when 
+   using a temporary access key, it can also be sourced from the `BAIDUCLOUD_SESSION_TOKEN` environment variable.
+
 * `region` - (Required) This is the BaiduCloud region. It must be provided, but
   it can also be sourced from the `BAIDUCLOUD_REGION` environment variables.
   The default input value is bj. Available value is [bj, bd, gz, su, fsh, fwh, hkg, sin]

@@ -155,9 +155,10 @@ import (
 )
 
 const (
-	PROVIDER_ACCESS_KEY = "BAIDUCLOUD_ACCESS_KEY"
-	PROVIDER_SECRET_KEY = "BAIDUCLOUD_SECRET_KEY"
-	PROVIDER_REGION     = "BAIDUCLOUD_REGION"
+	PROVIDER_ACCESS_KEY    = "BAIDUCLOUD_ACCESS_KEY"
+	PROVIDER_SECRET_KEY    = "BAIDUCLOUD_SECRET_KEY"
+	PROVIDER_SESSION_TOKEN = "BAIDUCLOUD_SESSION_TOKEN"
+	PROVIDER_REGION        = "BAIDUCLOUD_REGION"
 )
 
 func Provider() terraform.ResourceProvider {
@@ -175,6 +176,14 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc(PROVIDER_SECRET_KEY, nil),
 				Description: descriptions["secret_key"],
 				Sensitive:   true,
+			},
+			"session_token": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				DefaultFunc:   schema.EnvDefaultFunc(PROVIDER_SESSION_TOKEN, nil),
+				Description:   descriptions["session_token"],
+				ConflictsWith: []string{"assume_role"},
+				Sensitive:     true,
 			},
 			"region": {
 				Type:         schema.TypeString,
@@ -363,6 +372,8 @@ func init() {
 		"access_key": "The Access Key of BaiduCloud for API operations. You can retrieve this from the 'Security Management' section of the BaiduCloud console.",
 
 		"secret_key": "The Secret key of BaiduCloud for API operations. You can retrieve this from the 'Security Management' section of the BaiduCloud console.",
+
+		"session_token": "Must be set when using a temporary access key.",
 
 		"region": "The region where BaiduCloud operations will take place. Examples are bj, su, gz, etc.",
 
@@ -621,15 +632,20 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	if !ok {
 		secretKey = os.Getenv(PROVIDER_SECRET_KEY)
 	}
+	sessionToken, ok := d.GetOk("session_token")
+	if !ok {
+		sessionToken = os.Getenv(PROVIDER_SESSION_TOKEN)
+	}
 	region, ok := d.GetOk("region")
 	if !ok {
 		region = os.Getenv(PROVIDER_REGION)
 	}
 
 	config := connectivity.Config{
-		AccessKey: accessKey.(string),
-		SecretKey: secretKey.(string),
-		Region:    connectivity.Region(region.(string)),
+		AccessKey:    accessKey.(string),
+		SecretKey:    secretKey.(string),
+		SessionToken: sessionToken.(string),
+		Region:       connectivity.Region(region.(string)),
 	}
 
 	assumeRoleList, ok := d.GetOk("assume_role")
@@ -695,10 +711,11 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 
 func assumeRoleSchema() *schema.Schema {
 	return &schema.Schema{
-		Type:        schema.TypeList,
-		Optional:    true,
-		MaxItems:    1,
-		Description: "Assume role configurations, for more information, please refer to https://cloud.baidu.com/doc/IAM/s/Qjwvyc8ov",
+		Type:          schema.TypeList,
+		Optional:      true,
+		MaxItems:      1,
+		Description:   "Assume role configurations, for more information, please refer to https://cloud.baidu.com/doc/IAM/s/Qjwvyc8ov",
+		ConflictsWith: []string{"session_token"},
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"role_name": {
