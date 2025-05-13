@@ -30,6 +30,7 @@ $ terraform import baiducloud_instance.my-server id
 package baiducloud
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -82,8 +83,10 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Computed:    true,
 			},
 			"payment_timing": {
-				Type:         schema.TypeString,
-				Description:  "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid.",
+				Type: schema.TypeString,
+				Description: "Payment timing of billing, which can be Prepaid or Postpaid. The default is Postpaid. " +
+					"When switching to Prepaid, reservation length must be set. " +
+					"Switching to Postpaid takes effect immediately.",
 				Optional:     true,
 				Default:      api.PaymentTimingPostPaid,
 				ValidateFunc: validatePaymentTiming(),
@@ -288,14 +291,12 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Type:         schema.TypeString,
 				Description:  "Time unit of automatic renewal, the value can be month or year. The default value is empty, indicating no automatic renewal. It is valid only when the payment_timing is Prepaid.",
 				Optional:     true,
-				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{"month", "year"}, false),
 			},
 			"auto_renew_time_length": {
 				Type:         schema.TypeInt,
 				Description:  "The time length of automatic renewal. It is valid when payment_timing is Prepaid, and the value should be 1-9 when the auto_renew_time_unit is month and 1-3 when the auto_renew_time_unit is year. Default to 1.",
 				Optional:     true,
-				ForceNew:     true,
 				Default:      1,
 				ValidateFunc: validation.IntBetween(1, 9),
 			},
@@ -741,6 +742,11 @@ func resourceBaiduCloudInstanceUpdate(d *schema.ResourceData, meta interface{}) 
 		return err
 	}
 
+	// update payment timing
+	if err := updateInstancePaymentTiming(d, meta, instanceID); err != nil {
+		return err
+	}
+
 	d.Partial(false)
 
 	return resourceBaiduCloudInstanceRead(d, meta)
@@ -754,26 +760,58 @@ func resourceBaiduCloudInstanceDelete(d *schema.ResourceData, meta interface{}) 
 	action := "Delete BCC Instance " + instanceId
 
 	// delete instance
-	args := &api.DeleteInstanceWithRelateResourceArgs{}
-	if v, ok := d.GetOk("related_release_flag"); ok {
-		args.RelatedReleaseFlag = v.(bool)
-	}
-	if v, ok := d.GetOk("delete_cds_snapshot_flag"); ok {
-		args.DeleteCdsSnapshotFlag = v.(bool)
-	}
-	err := resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
-		raw, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
-			return instanceId, bccClient.DeleteInstanceWithRelateResource(instanceId, args)
-		})
-		if err != nil {
-			if IsExceptedErrors(err, []string{ReleaseWhileCreating, bce.EINTERNAL_ERROR}) {
-				return resource.RetryableError(err)
-			}
-			return resource.NonRetryableError(err)
+	paymentTiming := d.Get("payment_timing").(string)
+	var err error
+	if paymentTiming == "Postpaid" {
+		args := &api.DeleteInstanceWithRelateResourceArgs{}
+		if v, ok := d.GetOk("related_release_flag"); ok {
+			args.RelatedReleaseFlag = v.(bool)
 		}
-		addDebug(action, raw)
-		return nil
-	})
+		if v, ok := d.GetOk("delete_cds_snapshot_flag"); ok {
+			args.DeleteCdsSnapshotFlag = v.(bool)
+		}
+		err = resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+			raw, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
+				return instanceId, bccClient.DeleteInstanceWithRelateResource(instanceId, args)
+			})
+			if err != nil {
+				if IsExceptedErrors(err, []string{ReleaseWhileCreating, bce.EINTERNAL_ERROR}) {
+					return resource.RetryableError(err)
+				}
+				return resource.NonRetryableError(err)
+			}
+			addDebug(action, raw)
+			return nil
+		})
+	} else {
+		args := &api.DeletePrepaidInstanceWithRelateResourceArgs{
+			InstanceId: instanceId,
+		}
+		if v, ok := d.GetOk("related_release_flag"); ok {
+			args.RelatedReleaseFlag = v.(bool)
+		}
+		if v, ok := d.GetOk("delete_cds_snapshot_flag"); ok {
+			args.DeleteCdsSnapshotFlag = v.(bool)
+		}
+		err = resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+			raw, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
+				return bccClient.DeletePrepaidInstanceWithRelateResource(args)
+			})
+			if err != nil {
+				if IsExceptedErrors(err, []string{ReleaseWhileCreating, bce.EINTERNAL_ERROR}) {
+					return resource.RetryableError(err)
+				}
+				return resource.NonRetryableError(err)
+			}
+			addDebug(action, raw)
+			response := raw.(*api.ReleasePrepaidInstanceResponse)
+			if !response.InstanceRefundFlag {
+				return resource.NonRetryableError(fmt.Errorf("release prepaid instance failed: %+v", response))
+			}
+			return nil
+		})
+	}
+
 	if err != nil {
 		if IsExceptedErrors(err, BccNotFound) {
 			return nil
@@ -782,8 +820,8 @@ func resourceBaiduCloudInstanceDelete(d *schema.ResourceData, meta interface{}) 
 	}
 
 	stateConf := buildStateConf(
-		[]string{string(api.InstanceStatusStopping), string(api.InstanceStatusStopped)},
-		[]string{string(api.InstanceStatusDeleted)},
+		[]string{string(api.InstanceStatusRunning), string(api.InstanceStatusStopping), string(api.InstanceStatusStopped)},
+		[]string{string(api.InstanceStatusDeleted), string(api.InstanceStatusExpired), string(api.InstanceStatusRecycled)},
 		d.Timeout(schema.TimeoutDelete),
 		bccService.InstanceStateRefresh(instanceId),
 	)
@@ -1535,6 +1573,63 @@ func updateInstanceHostname(d *schema.ResourceData, meta interface{}, instanceID
 
 		d.SetPartial("hostname")
 		d.SetPartial("is_open_hostname_domain")
+	}
+	return nil
+
+}
+
+func updateInstancePaymentTiming(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	if d.HasChange("payment_timing") {
+		action := "Update instance payment timing " + instanceID
+		client := meta.(*connectivity.BaiduClient)
+		newValue := d.Get("payment_timing").(string)
+		if newValue == "Prepaid" {
+			if _, ok := d.GetOk("reservation.reservation_length"); !ok {
+				return fmt.Errorf("please set 'reservation.reservation_length' before changing payment_timing to 'Prepaid'")
+			}
+			reservationLength, _ := strconv.Atoi(d.Get("reservation.reservation_length").(string))
+			prepayConfig := api.PrepayConfig{
+				InstanceId: instanceID,
+				Duration:   reservationLength,
+			}
+			if v, ok := d.GetOk("auto_renew_time_unit"); ok {
+				prepayConfig.AutoRenew = true
+				autoRenewTimeLength := d.Get("auto_renew_time_length").(int)
+				autoRenewTimeUnit := v.(string)
+				if autoRenewTimeUnit == "year" {
+					autoRenewTimeLength *= 12
+				}
+				prepayConfig.AutoRenewPeriod = autoRenewTimeLength
+			}
+			args := &api.BatchChangeInstanceToPrepayArgs{
+				Config: []api.PrepayConfig{prepayConfig},
+			}
+			addDebug(action, args)
+			_, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
+				return bccClient.BatchChangeInstanceToPrepay(args)
+			})
+			if err != nil {
+				return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+			}
+
+		} else if newValue == "Postpaid" {
+			postpayConfig := api.PostpayConfig{
+				InstanceId:    instanceID,
+				EffectiveType: "AtOnce",
+			}
+			args := &api.BatchChangeInstanceToPostpayArgs{
+				Config: []api.PostpayConfig{postpayConfig},
+			}
+			addDebug(action, args)
+			_, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
+				return bccClient.BatchChangeInstanceToPostpay(args)
+			})
+			if err != nil {
+				return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
+			}
+		}
+
+		d.SetPartial("payment_timing")
 	}
 	return nil
 
