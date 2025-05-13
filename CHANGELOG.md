@@ -1,4 +1,11 @@
-	## 1.21.14 (Unreleased)
+	## 1.21.15 (Unreleased)
+## 1.21.14 (May 13, 2025)
+FEATURES:
+- **New Resource:** `baiducloud_ccev2_instance_group_attachment`.
+
+ENHANCEMENTS:
+- resource/baiducloud_instance: Support modifying parameter `payment_timing` and releasing prepaid instances.
+
 ## 1.21.13 (April 30, 2025)
 ENHANCEMENTS:
 - resource/baiducloud_instance: Add parameter `enterprise_security_groups`, support modification.
