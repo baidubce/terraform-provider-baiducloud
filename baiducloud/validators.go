@@ -159,3 +159,14 @@ func validateCFCMemorySize(v interface{}, k string) (ws []string, errors []error
 
 	return
 }
+
+func ValidateTrueOnly(val interface{}, key string) (warns []string, errs []error) {
+	if b, ok := val.(bool); ok {
+		if !b {
+			errs = append(errs, fmt.Errorf("%q must be true", key))
+		}
+	} else {
+		errs = append(errs, fmt.Errorf("%q must be a boolean", key))
+	}
+	return
+}
