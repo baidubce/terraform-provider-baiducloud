@@ -313,6 +313,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_ccev2_instance":                  resourceBaiduCloudCCEv2Instance(),
 			"baiducloud_ccev2_instance_group":            resourceBaiduCloudCCEv2InstanceGroup(),
 			"baiducloud_ccev2_instance_group_attachment": resourceBaiduCloudCCEv2InstanceGroupAttachment(),
+			"baiducloud_ccev2_instance_group_detachment": resourceBaiduCloudCCEv2InstanceGroupDetachment(),
 			"baiducloud_rds_instance":                    resourceBaiduCloudRdsInstance(),
 			"baiducloud_rds_readonly_instance":           resourceBaiduCloudRdsReadOnlyInstance(),
 			"baiducloud_rds_account":                     resourceBaiduCloudRdsAccount(),
