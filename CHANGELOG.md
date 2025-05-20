@@ -1,4 +1,9 @@
-	## 1.21.15 (Unreleased)
+	## 1.21.16 (Unreleased)
+
+## 1.21.15 (May 20, 2025)
+FEATURES:
+- **New Resource:** `baiducloud_ccev2_instance_group_detachment`.
+
 ## 1.21.14 (May 13, 2025)
 FEATURES:
 - **New Resource:** `baiducloud_ccev2_instance_group_attachment`.
