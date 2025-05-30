@@ -23,6 +23,7 @@ resource "baiducloud_ccev2_instance_group_attachment" "example" {
 package baiducloud
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"time"
@@ -39,10 +40,6 @@ func resourceBaiduCloudCCEv2InstanceGroupAttachment() *schema.Resource {
 		Read:   resourceBaiduCloudCCEv2InstanceGroupAttachmentRead,
 		Delete: resourceBaiduCloudCCEv2InstanceGroupAttachmentDelete,
 		Update: resourceBaiduCloudCCEv2InstanceGroupAttachmentUpdate,
-
-		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
-		},
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(20 * time.Minute),
@@ -92,10 +89,16 @@ func resourceBaiduCloudCCEv2InstanceGroupAttachment() *schema.Resource {
 						},
 						"use_instance_group_config": {
 							Type:         schema.TypeBool,
-							Description:  "Whether to apply the instance group’s config. Only 'true' is supported currently.",
+							Description:  "Whether to apply the instance group’s configuration. Only 'true' is supported currently.",
 							Optional:     true,
 							Default:      true,
 							ValidateFunc: ValidateTrueOnly,
+						},
+						"use_instance_group_config_with_disk_info": {
+							Type:        schema.TypeBool,
+							Description: "Whether to apply the instance group’s disk mount configuration. Defaults to `false`.",
+							Optional:    true,
+							Default:     false,
 						},
 						"image_id": {
 							Type:        schema.TypeString,
@@ -154,6 +157,9 @@ func resourceBaiduCloudCCEv2InstanceGroupAttachmentCreate(d *schema.ResourceData
 		return WrapError(err)
 	}
 
+	argsStr, _ := json.Marshal(args)
+	addDebug("BuildInstanceGroupAttachmentArgs", string(argsStr))
+
 	raw, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
 		return client.AttachInstancesToInstanceGroup(args)
 	})
@@ -190,21 +196,26 @@ func buildInstanceGroupAttachmentArgs(d *schema.ResourceData, meta interface{}) 
 		configRaw := d.Get("existed_instances_config")
 		config := configRaw.([]interface{})[0].(map[string]interface{})
 
+		instanceGroupConfig, err := getInstanceGroupConfig(d, meta)
+		if err != nil {
+			return nil, WrapErrorf(err, "GetInstanceGroupConfig Error")
+		}
+
 		imageId := ""
 		if v, ok := d.GetOk("existed_instances_config.image_id"); ok {
 			imageId = v.(string)
 		}
 		if imageId == "" {
-			instanceGroupImageId, err := getInstanceGroupImageId(d, meta)
-			if err != nil {
-				return nil, WrapErrorf(err, "GetInstanceGroupImageId Error")
-			}
-			imageId = instanceGroupImageId
+			imageId = instanceGroupConfig.Spec.InstanceTemplate.ImageID
 		}
 
+		useInstanceGroupConfigWithDiskInfo := config["use_instance_group_config_with_disk_info"].(bool)
 		var instances []*ccev2.InstanceSet
 		for _, instanceId := range instancesIds.(*schema.Set).List() {
 			instanceSpec := buildAttachmentInstanceSpec(config, instanceId.(string), imageId)
+			if useInstanceGroupConfigWithDiskInfo {
+				instanceSpec.InstanceResource = types.InstanceResource{CDSList: instanceGroupConfig.Spec.InstanceTemplate.InstanceResource.CDSList}
+			}
 			instance := &ccev2.InstanceSet{
 				InstanceSpec: *instanceSpec,
 			}
@@ -214,6 +225,7 @@ func buildInstanceGroupAttachmentArgs(d *schema.ResourceData, meta interface{}) 
 		request.Incluster = false
 		request.ExistedInstances = instances
 		request.UseInstanceGroupConfig = config["use_instance_group_config"].(bool)
+		request.UseInstanceGroupConfigWithDiskInfo = useInstanceGroupConfigWithDiskInfo
 	}
 
 	if instancesIds, ok := d.GetOk("existed_instances_in_cluster"); ok && instancesIds.(*schema.Set).Len() > 0 {
@@ -255,7 +267,7 @@ func buildAttachmentInstanceSpec(config map[string]interface{}, instanceId, imag
 	return spec
 }
 
-func getInstanceGroupImageId(d *schema.ResourceData, meta interface{}) (string, error) {
+func getInstanceGroupConfig(d *schema.ResourceData, meta interface{}) (*ccev2.InstanceGroup, error) {
 	client := meta.(*connectivity.BaiduClient)
 
 	args := &ccev2.GetInstanceGroupArgs{
@@ -266,8 +278,7 @@ func getInstanceGroupImageId(d *schema.ResourceData, meta interface{}) (string, 
 		return client.GetInstanceGroup(args)
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	resp := raw.(*ccev2.GetInstanceGroupResponse)
-	return resp.InstanceGroup.Spec.InstanceTemplate.ImageID, nil
+	return raw.(*ccev2.GetInstanceGroupResponse).InstanceGroup, nil
 }
