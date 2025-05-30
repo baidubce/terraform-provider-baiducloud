@@ -1,4 +1,8 @@
-	## 1.21.16 (Unreleased)
+	## 1.21.17 (Unreleased)
+
+## 1.21.16 (May 30, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_ccev2_instance_group_attachment: Add parameter `use_instance_group_config_with_disk_info` to support inheriting disk mount configuration from the instance group.
 
 ## 1.21.15 (May 20, 2025)
 FEATURES:
