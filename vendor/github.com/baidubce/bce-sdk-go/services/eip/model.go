@@ -31,6 +31,7 @@ type Billing struct {
 }
 
 type CreateEipArgs struct {
+	IpVersion         string           `json:"ipVersion,omitempty"`
 	Name              string           `json:"name,omitempty"`
 	BandWidthInMbps   int              `json:"bandwidthInMbps"`
 	Billing           *Billing         `json:"billing"`
@@ -78,12 +79,14 @@ type BindEipArgs struct {
 }
 
 type ListEipArgs struct {
+	IpVersion    string
 	Eip          string
 	InstanceType string
 	InstanceId   string
+	Status       string
+	EipIds       []string
 	Marker       string
 	MaxKeys      int
-	Status       string
 }
 
 type ListEipResult struct {
@@ -231,7 +234,8 @@ type EipTpDetail struct {
 
 type CreateEipGroupArgs struct {
 	Name            string           `json:"name,omitempty"`
-	EipCount        int              `json:"eipCount"`
+	EipCount        int              `json:"eipCount,omitempty"`
+	Eipv6Count      int              `json:"eipv6Count,omitempty"`
 	BandWidthInMbps int              `json:"bandwidthInMbps"`
 	Billing         *Billing         `json:"billing"`
 	Tags            []model.TagModel `json:"tags,omitempty"`
@@ -252,8 +256,9 @@ type ResizeEipGroupArgs struct {
 }
 
 type GroupAddEipCountArgs struct {
-	EipAddCount int    `json:"eipAddCount"`
-	ClientToken string `json:"-"`
+	EipAddCount   int    `json:"eipAddCount"`
+	Eipv6AddCount int    `json:"eipv6AddCount"`
+	ClientToken   string `json:"-"`
 }
 
 type ReleaseEipGroupIpsArgs struct {
@@ -299,6 +304,7 @@ type EipGroupModel struct {
 	Region                    string           `json:"region"`
 	RouteType                 string           `json:"routeType"`
 	Eips                      []EipModel       `json:"eips"`
+	Eipv6s                    []EipModel       `json:"eipv6s"`
 	Tags                      []model.TagModel `json:"tags"`
 }
 
@@ -397,4 +403,60 @@ type UpdateEipBpAutoReleaseTimeArgs struct {
 type UpdateEipBpNameArgs struct {
 	Name        string `json:"name"`
 	ClientToken string `json:"-"`
+}
+
+type DdosModel struct {
+	Ip               string `json:"ip,omitempty"`
+	Status           string `json:"status,omitempty"`
+	BindInstanceType string `json:"bindInstanceType,omitempty"`
+	BindInstanceId   string `json:"bindInstanceId,omitempty"`
+	IpCleanMbps      int64  `json:"ipCleanMbps,omitempty"`
+	IpCleanPps       int64  `json:"ipCleanPps,omitempty"`
+	ThresholdType    string `json:"thresholdType,omitempty"`
+	MaximumThreshold int64  `json:"maximumThreshold,omitempty"`
+}
+
+type ListDdosRequest struct {
+	Ips     string `json:"-"`
+	Type    string `json:"-"`
+	Marker  string `json:"-"`
+	MaxKeys int32  `json:"-"`
+}
+
+type ListDdosResponse struct {
+	DdosList    *[]DdosModel `json:"ddosList,omitempty"`
+	Marker      string       `json:"marker,omitempty"`
+	IsTruncated bool         `json:"isTruncated,omitempty"`
+	NextMarker  string       `json:"nextMarker,omitempty"`
+	MaxKeys     int32        `json:"maxKeys,omitempty"`
+}
+
+type DdosAttackRecordModel struct {
+	Ip             string   `json:"ip,omitempty"`
+	StartTime      string   `json:"startTime,omitempty"`
+	EndTime        string   `json:"endTime,omitempty"`
+	AttackType     []string `json:"attackType,omitempty"`
+	AttackPeakMbps int64    `json:"attackPeakMbps,omitempty"`
+	AttackPeakPps  int64    `json:"attackPeakPps,omitempty"`
+	AttackPeakQps  int64    `json:"attackPeakQps,omitempty"`
+	AttackStatus   string   `json:"attackStatus,omitempty"`
+}
+
+type ListDdosAttackRecordRequest struct {
+	Ip        string `json:"-"`
+	StartTime string `json:"-"`
+	Marker    string `json:"-"`
+	MaxKeys   int32  `json:"-"`
+}
+
+type ListDdosAttackRecordResponse struct {
+	AttackRecordList *[]DdosAttackRecordModel `json:"attackRecordList,omitempty"`
+}
+
+type ModifyDdosThresholdRequest struct {
+	Ip            string `json:"-"`
+	ClientToken   string `json:"-"`
+	ThresholdType string `json:"thresholdType"`
+	IpCleanMbps   int64  `json:"ipCleanMbps"`
+	IpCleanPps    int64  `json:"ipCleanPps"`
 }

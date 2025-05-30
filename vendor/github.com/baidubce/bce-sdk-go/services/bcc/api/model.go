@@ -172,6 +172,7 @@ type InstanceModel struct {
 	ImageType              string                 `json:"imageType"`
 	CpuThreadConfig        string                 `json:"cpuThreadConfig"`
 	NumaConfig             string                 `json:"numaConfig"`
+	Application            string                 `json:"application"`
 }
 
 type DeploySetSimpleModel struct {
@@ -556,6 +557,7 @@ type CreateInstanceBySpecArgs struct {
 	EnterpriseSecurityGroupId  string           `json:"enterpriseSecurityGroupId,omitempty"`
 	SecurityGroupIds           []string         `json:"securityGroupIds,omitempty"`
 	EnterpriseSecurityGroupIds []string         `json:"enterpriseSecurityGroupIds,omitempty"`
+	EniIds                     []string         `json:"eniIds,omitempty"`
 	RelationTag                bool             `json:"relationTag,omitempty"`
 	Tags                       []model.TagModel `json:"tags,omitempty"`
 	KeypairId                  string           `json:"keypairId"`
@@ -610,6 +612,7 @@ type CreateInstanceBySpecArgsV2 struct {
 	EnterpriseSecurityGroupId  string           `json:"enterpriseSecurityGroupId,omitempty"`
 	SecurityGroupIds           []string         `json:"securityGroupIds,omitempty"`
 	EnterpriseSecurityGroupIds []string         `json:"enterpriseSecurityGroupIds,omitempty"`
+	EniIds                     []string         `json:"eniIds,omitempty"`
 	RelationTag                *bool            `json:"relationTag"`
 	Tags                       []model.TagModel `json:"tags,omitempty"`
 	KeypairId                  string           `json:"keypairId"`
@@ -1073,10 +1076,16 @@ type SimpleFlavor struct {
 	MemoryCapacityInGB int    `json:"memoryCapacityInGB"`
 }
 
+type CdsCustomPeriod struct {
+	Period   int    `json:"period"`
+	VolumeId string `json:"volumeId"`
+}
+
 type PurchaseReservedArgs struct {
-	RelatedRenewFlag string  `json:"relatedRenewFlag"`
-	Billing          Billing `json:"billing"`
-	ClientToken      string  `json:"-"`
+	RelatedRenewFlag string            `json:"relatedRenewFlag"`
+	Billing          Billing           `json:"billing"`
+	CdsCustomPeriod  []CdsCustomPeriod `json:"cdsCustomPeriod"`
+	ClientToken      string            `json:"-"`
 }
 
 const (
@@ -1338,6 +1347,7 @@ type DetachVolumeArgs struct {
 
 type PurchaseReservedCSDVolumeArgs struct {
 	Billing     *Billing `json:"billing"`
+	InstanceId  string   `json:"instanceId"`
 	ClientToken string   `json:"-"`
 }
 
@@ -1402,6 +1412,8 @@ type VolumeModel struct {
 	EnableAutoRenew    bool                     `json:"enableAutoRenew"`
 	AutoRenewTime      int                      `json:"autoRenewTime"`
 	Encrypted          bool                     `json:"encrypted"`
+	EncryptKey         string                   `json:"encryptKey"`
+	EncryptKeySpec     string                   `json:"encryptKeySpec"`
 	ClusterId          string                   `json:"clusterId"`
 	RoleName           string                   `json:"roleName"`
 	CreatedFrom        string                   `json:"createdFrom"`
@@ -1621,6 +1633,7 @@ type SecurityGroupRuleVo struct {
 	Ethertype           string `json:"ethertype"`
 	PortRange           string `json:"portRange"`
 	SecurityGroupUuid   string `json:"securityGroupUuid"`
+	SourceGroupId       string `json:"sourceGroupId"`
 	SourceIp            string `json:"sourceIp"`
 	DestGroupId         string `json:"destGroupId"`
 	DestIp              string `json:"destIp"`
@@ -1641,11 +1654,12 @@ type CreateSecurityGroupArgs struct {
 }
 
 type ListSecurityGroupArgs struct {
-	Marker          string
-	MaxKeys         int
-	InstanceId      string
-	VpcId           string
-	SecurityGroupId string
+	Marker           string
+	MaxKeys          int
+	InstanceId       string
+	VpcId            string
+	SecurityGroupId  string
+	SecurityGroupIds string
 }
 
 type CreateSecurityGroupResult struct {
@@ -2166,6 +2180,7 @@ type BccFlavor struct {
 	NicIpv6Quota       int      `json:"nicIpv6Quota"`
 	EniQuota           int      `json:"eniQuota"`
 	EriQuota           int      `json:"eriQuota"`
+	VolumeCount        int      `json:"volumeCount"`
 	RdmaType           string   `json:"rdmaType"`
 	RdmaNetCardCount   int      `json:"rdmaNetCardCount"`
 	RdmaNetBandwidth   int      `json:"rdmaNetBandwidth"`
@@ -2204,6 +2219,7 @@ type EbcFlavor struct {
 	NicIpv6Quota       int      `json:"nicIpv6Quota"`
 	EniQuota           int      `json:"eniQuota"`
 	EriQuota           int      `json:"eriQuota"`
+	VolumeCount        int      `json:"volumeCount"`
 	RdmaType           string   `json:"rdmaType"`
 	RdmaNetCardCount   int      `json:"rdmaNetCardCount"`
 	RdmaNetBandwidth   int      `json:"rdmaNetBandwidth"`
