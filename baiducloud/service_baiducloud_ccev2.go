@@ -1,8 +1,12 @@
 package baiducloud
 
 import (
+	"fmt"
 	"log"
 	"reflect"
+	"strings"
+	"sync"
+	"time"
 
 	bccapi "github.com/baidubce/bce-sdk-go/services/bcc/api"
 	ccev2 "github.com/baidubce/bce-sdk-go/services/cce/v2"
@@ -45,6 +49,67 @@ func (s *Ccev2Service) ClusterStateRefreshCCEv2(clusterId string, failState []cc
 		addDebug(action, raw)
 		return result, string(result.Cluster.Status.ClusterPhase), nil
 	}
+}
+
+func (s *Ccev2Service) InstanceEventStepsStateRefresh(instanceId string) resource.StateRefreshFunc {
+	return func() (interface{}, string, error) {
+		action := "Query CCE Instance Event Steps: " + instanceId
+		raw, err := s.client.WithCCEv2Client(func(cceV2Client *ccev2.Client) (i interface{}, e error) {
+			return cceV2Client.GetInstanceEventSteps(instanceId)
+		})
+
+		addDebug(action, raw)
+		if err != nil {
+			return nil, "", WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2", action, BCESDKGoERROR)
+		}
+		if raw == nil {
+			return nil, "", nil
+		}
+		result, _ := raw.(*ccev2.GetEventStepsResponse)
+
+		return result, result.Status, nil
+	}
+}
+
+func (s *Ccev2Service) waitForInstancesOperation(pending []string, target []string, timeout time.Duration, instanceIds []string) error {
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	var errs []string
+
+	for _, instanceId := range instanceIds {
+		wg.Add(1)
+
+		go func(id string) {
+			defer wg.Done()
+
+			stateConf := buildStateConf(pending, target, timeout, s.InstanceEventStepsStateRefresh(id))
+			if result, err := stateConf.WaitForState(); err != nil {
+				eventStepsResp, _ := result.(*ccev2.GetEventStepsResponse)
+
+				var messages []string
+				for _, step := range eventStepsResp.Steps {
+					if step.StepStatus == "failed" {
+						errorInfo := step.StepInfo.ErrorInfo
+						message := fmt.Sprintf("[%s]%s [message]: %s [code]: %s [traceId]: %s", step.StepName, errorInfo.Suggestion, errorInfo.Message,
+							errorInfo.Code, errorInfo.TraceID)
+						messages = append(messages, message)
+					}
+				}
+
+				errWithMessage := WrapErrorf(err, "instance [%s] operation failed, reason: %s", id, strings.Join(messages, "; "))
+
+				mu.Lock()
+				errs = append(errs, errWithMessage.Error())
+				mu.Unlock()
+			}
+		}(instanceId)
+	}
+
+	wg.Wait()
+	if len(errs) > 0 {
+		return fmt.Errorf("%s", strings.Join(errs, "; "))
+	}
+	return nil
 }
 
 func resourceCCEv2ClusterSpec() *schema.Resource {

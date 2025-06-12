@@ -170,6 +170,16 @@ func resourceBaiduCloudCCEv2InstanceGroupAttachmentCreate(d *schema.ResourceData
 	resp := raw.(*ccev2.AttachInstancesToInstanceGroupResponse)
 	d.SetId(resp.TaskID)
 
+	if v, ok := d.GetOk("existed_instances"); ok && v.(*schema.Set).Len() > 0 {
+		ccev2Service := Ccev2Service{client}
+		instanceIds := expandStringSet(v.(*schema.Set))
+
+		err := ccev2Service.waitForInstancesOperation([]string{EventStatusCreating}, []string{EventStatusCreated}, d.Timeout(schema.TimeoutCreate), instanceIds)
+		if err != nil {
+			return err
+		}
+	}
+
 	return resourceBaiduCloudCCEv2InstanceGroupAttachmentRead(d, meta)
 }
 

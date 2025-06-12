@@ -137,6 +137,16 @@ func resourceBaiduCloudCCEv2InstanceGroupDetachmentCreate(d *schema.ResourceData
 	resp := raw.(*ccev2.CreateTaskResp)
 	d.SetId(resp.TaskID)
 
+	if v, ok := d.GetOk("instances_to_be_removed"); ok && v.(*schema.Set).Len() > 0 && args.CleanPolicy == ccev2.CleanPolicyDelete {
+		ccev2Service := Ccev2Service{client}
+		instanceIds := expandStringSet(v.(*schema.Set))
+
+		err := ccev2Service.waitForInstancesOperation([]string{EventStatusDeleting}, []string{EventStatusDeleted}, d.Timeout(schema.TimeoutCreate), instanceIds)
+		if err != nil {
+			return err
+		}
+	}
+
 	return resourceBaiduCloudCCEv2InstanceGroupDetachmentRead(d, meta)
 }
 
