@@ -1,4 +1,8 @@
-	## 1.21.17 (Unreleased)
+	## 1.21.18 (Unreleased)
+
+## 1.21.17 (June 12, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_ccev2_instance_group_attachment, resource/baiducloud_ccev2_instance_group_detachment: add task status check during creation.
 
 ## 1.21.16 (May 30, 2025)
 ENHANCEMENTS:
