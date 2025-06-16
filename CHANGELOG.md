@@ -1,4 +1,8 @@
-	## 1.21.18 (Unreleased)
+	## 1.21.19 (Unreleased)
+
+## 1.21.18 (June 16, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_bec_vm_instance: Add parameter `network_config`.
 
 ## 1.21.17 (June 12, 2025)
 ENHANCEMENTS:
