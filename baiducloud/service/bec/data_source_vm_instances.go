@@ -205,6 +205,54 @@ func DNSConfigReadSchema() *schema.Resource {
 	}
 }
 
+func NetworkConfigListReadSchema() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"node_type": {
+				Type: schema.TypeString,
+				Description: "Node type,  Valid values: `SINGLE` (single network) , `TRIPLE` (triple network)." +
+					" SINGLE, TRIPLE, representing single line and triple line nodes respectively",
+				Optional: true,
+				Computed: true,
+			},
+			"networks": {
+				Type: schema.TypeList,
+				Description: "Network card information, including Networks;" +
+					"Used to set the corresponding network card name." +
+					"Note: The classic network order is fixed as inside+outside and cannot be customized; " +
+					"VPC network can customize the order of network cards",
+				Optional: true,
+				Computed: true,
+				Elem:     NetworkListReadSchema(),
+			},
+		},
+	}
+}
+
+func NetworkListReadSchema() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"net_type": {
+				Type: schema.TypeString,
+				Description: "Network type. Network card type (INTERNAL_IP represents internal network;" +
+					" Single line nodes use PULIC_SP to represent single line public network cards; " +
+					"Three line nodes are represented by TRIPLE_CT, TRIPLE-UN, and TRIPLE_CM " +
+					"respectively for telecommunications, China Unicom, and China Mobile on the three line public network",
+				Optional: true,
+				Computed: true,
+			},
+			"net_name": {
+				Type: schema.TypeString,
+				Description: "Network name. Network card name, the names of internal and external network cards " +
+					"cannot be duplicated; Supports uppercase and lowercase letters, numbers," +
+					" \"- _\", must start with a letter, and have a length of 3-16 characters.",
+				Optional: true,
+				Computed: true,
+			},
+		},
+	}
+}
+
 func dataSourceVMInstancesRead(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*connectivity.BaiduClient)
 

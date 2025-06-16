@@ -76,6 +76,7 @@ resource "baiducloud_bec_vm_instance" "example" {
 - `image_type` (String) Valid values: `bec`(public image or bec custom image), `bcc`(bcc custom image)
 - `need_ipv6_public_ip` (Boolean) Whether to open IPv6 public network. Defaults to `false`.
 - `need_public_ip` (Boolean) Whether to open public network. Defaults to `false`.
+- `network_config` (Block List) Network config of the vm instance. If not set, system will use default network config. (see [below for nested schema](#nestedblock--network_config))
 - `spec` (String) Specification family.
 - `vm_name` (String) Name of the vm instance. If empty, system will assign one.
 
@@ -139,6 +140,23 @@ Required:
 Read-Only:
 
 - `pvc_name` (String) PVC name of the disk.
+
+
+<a id="nestedblock--network_config"></a>
+### Nested Schema for `network_config`
+
+Optional:
+
+- `networks` (Block List) Network card information, including Networks;Used to set the corresponding network card name.Note: The classic network order is fixed as inside+outside and cannot be customized; VPC network can customize the order of network cards (see [below for nested schema](#nestedblock--network_config--networks))
+- `node_type` (String) Node type,  Valid values: `SINGLE` (single network) , `TRIPLE` (triple network). SINGLE, TRIPLE, representing single line and triple line nodes respectively
+
+<a id="nestedblock--network_config--networks"></a>
+### Nested Schema for `network_config.networks`
+
+Optional:
+
+- `net_name` (String) Network name. Network card name, the names of internal and external network cards cannot be duplicated; Supports uppercase and lowercase letters, numbers, "- _", must start with a letter, and have a length of 3-16 characters.
+- `net_type` (String) Network type. Network card type (INTERNAL_IP represents internal network; Single line nodes use PULIC_SP to represent single line public network cards; Three line nodes are represented by TRIPLE_CT, TRIPLE-UN, and TRIPLE_CM respectively for telecommunications, China Unicom, and China Mobile on the three line public network
 
 ## Import
 

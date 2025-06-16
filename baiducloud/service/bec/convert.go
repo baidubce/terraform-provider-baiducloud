@@ -219,3 +219,33 @@ func expandKeyConfig(tfList []interface{}) *api.KeyConfig {
 		BccKeyPairIdList: flex.ExpandStringValueList(tfMap["bcc_key_pair_id_list"].([]interface{})),
 	}
 }
+
+func expandNetworkConfigList(tfList []interface{}) *[]api.NetworkConfig {
+	if len(tfList) == 0 || tfList[0] == nil {
+		return nil
+	}
+	list := []api.NetworkConfig{}
+	for _, v := range tfList {
+		tfMap := v.(map[string]interface{})
+		list = append(list, api.NetworkConfig{
+			NodeType:     tfMap["node_type"].(string),
+			NetworksList: expandNetworks(tfMap["networks"].([]interface{})),
+		})
+	}
+	return &list
+}
+
+func expandNetworks(tfList []interface{}) *[]api.Networks {
+	if len(tfList) == 0 || tfList[0] == nil {
+		return nil
+	}
+	list := []api.Networks{}
+	for _, v := range tfList {
+		tfMap := v.(map[string]interface{})
+		list = append(list, api.Networks{
+			NetType: tfMap["net_type"].(string),
+			NetName: tfMap["net_name"].(string),
+		})
+	}
+	return &list
+}

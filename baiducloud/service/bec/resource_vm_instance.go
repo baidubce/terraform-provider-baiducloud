@@ -120,6 +120,12 @@ func ResourceVMInstance() *schema.Resource {
 				MaxItems:    1,
 				Elem:        DNSConfigSchema(),
 			},
+			"network_config": {
+				Type:        schema.TypeList,
+				Description: "Network config of the vm instance. If not set, system will use default network config.",
+				Optional:    true,
+				Elem:        NetworkConfigListReadSchema(),
+			},
 			"key_config": {
 				Type:        schema.TypeList,
 				Description: "Password or keypair config of the vm instance.",
@@ -387,19 +393,20 @@ func resourceVMInstanceDelete(d *schema.ResourceData, meta interface{}) error {
 
 func buildCreationArgs(d *schema.ResourceData) *api.CreateVmServiceArgs {
 	args := &api.CreateVmServiceArgs{
-		VmName:          d.Get("vm_name").(string),
-		Hostname:        d.Get("host_name").(string),
-		DeployInstances: expandDeployInstances(d.Get("region_id").(string)),
-		Spec:            d.Get("spec").(string),
-		Cpu:             d.Get("cpu").(int),
-		Memory:          d.Get("memory").(int),
-		ImageType:       api.ImageType(d.Get("image_type").(string)),
-		ImageId:         d.Get("image_id").(string),
-		SystemVolume:    expandSystemVolume(d.Get("system_volume").([]interface{})),
-		DataVolumeList:  expandDataVolumes(d.Get("data_volume").([]interface{})),
-		NeedPublicIp:    d.Get("need_public_ip").(bool),
-		DnsConfig:       expandDNSConfig(d.Get("dns_config").([]interface{})),
-		KeyConfig:       expandKeyConfig(d.Get("key_config").([]interface{})),
+		VmName:            d.Get("vm_name").(string),
+		Hostname:          d.Get("host_name").(string),
+		DeployInstances:   expandDeployInstances(d.Get("region_id").(string)),
+		Spec:              d.Get("spec").(string),
+		Cpu:               d.Get("cpu").(int),
+		Memory:            d.Get("memory").(int),
+		ImageType:         api.ImageType(d.Get("image_type").(string)),
+		ImageId:           d.Get("image_id").(string),
+		SystemVolume:      expandSystemVolume(d.Get("system_volume").([]interface{})),
+		DataVolumeList:    expandDataVolumes(d.Get("data_volume").([]interface{})),
+		NeedPublicIp:      d.Get("need_public_ip").(bool),
+		DnsConfig:         expandDNSConfig(d.Get("dns_config").([]interface{})),
+		KeyConfig:         expandKeyConfig(d.Get("key_config").([]interface{})),
+		NetworkConfigList: expandNetworkConfigList(d.Get("network_config").([]interface{})),
 	}
 	if args.NeedPublicIp {
 		args.NeedIpv6PublicIp = d.Get("need_ipv6_public_ip").(bool)
