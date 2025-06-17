@@ -42,6 +42,7 @@ const (
 	ETCode              = ServiceCode("ET")
 	ResourceManagerCode = ServiceCode("ResourceManager")
 	MONGODBCode         = ServiceCode("MONGODB")
+	HPASCode            = ServiceCode("HPAS")
 )
 
 const (
@@ -63,6 +64,7 @@ const (
 	DefaultBJRegionBecEndPoint             = "bec.baidubce.com"
 	DefaultBJRegionResourceManagerEndPoint = "resourcemanager.baidubce.com"
 	DefaultBJRegionMongoDBEndPoint         = "mongodb.bj.baidubce.com"
+	DefaultBJRegionHpasEndPoint            = "hpas.bj.baidubce.com"
 
 	DefaultBDRegionBccEndPoint     = "bcc.bd.baidubce.com"
 	DefaultBDRegionBbcEndPoint     = "bbc.bd.baidubce.com"
@@ -101,6 +103,7 @@ const (
 	DefaultSURegionSmsEndPoint     = "smsv3.su.baidubce.com"
 	DefaultSURegionBlsEndPoint     = "bls-log.su.baidubce.com"
 	DefaultSURegionMongoDBEndPoint = "mongodb.su.baidubce.com"
+	DefaultSURegionHpasEndPoint    = "hpas.su.baidubce.com"
 
 	DefaultFSHRegionBccEndPoint = "bcc.fsh.baidubce.com"
 	DefaultFSHRegionVPNEndPoint = "bcc.fsh.baidubce.com"
@@ -187,6 +190,7 @@ var (
 		ESGCode:             DefaultBJRegionBccEndPoint,
 		ResourceManagerCode: DefaultBJRegionResourceManagerEndPoint,
 		MONGODBCode:         DefaultBJRegionMongoDBEndPoint,
+		HPASCode:            DefaultBJRegionHpasEndPoint,
 	}
 
 	// Region BD Service Endpoints
@@ -268,6 +272,7 @@ var (
 		ETCode:        DefaultBJRegionBccEndPoint,
 		ESGCode:       DefaultBJRegionBccEndPoint,
 		MONGODBCode:   DefaultSURegionMongoDBEndPoint,
+		HPASCode:      DefaultSURegionHpasEndPoint,
 	}
 
 	// Region FSH Service Endpoints

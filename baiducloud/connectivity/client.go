@@ -25,6 +25,7 @@ import (
 	"github.com/baidubce/bce-sdk-go/services/esg"
 	"github.com/baidubce/bce-sdk-go/services/et"
 	"github.com/baidubce/bce-sdk-go/services/etGateway"
+	"github.com/baidubce/bce-sdk-go/services/hpas"
 	"github.com/baidubce/bce-sdk-go/services/iam"
 	"github.com/baidubce/bce-sdk-go/services/localDns"
 	"github.com/baidubce/bce-sdk-go/services/mongodb"
@@ -79,6 +80,7 @@ type BaiduClient struct {
 	etConn              *et.Client
 	resourceManagerConn *resmanager.Client
 	mongodbConn         *mongodb.Client
+	hpasConn            *hpas.Client
 }
 
 type ApiVersion string
@@ -732,6 +734,24 @@ func (client *BaiduClient) WithMongoDBClient(do func(*mongodb.Client) (interface
 	}
 	goSdkMutex.Unlock()
 	return do(client.mongodbConn)
+}
+
+func (client *BaiduClient) WithHPASClient(do func(*hpas.Client) (interface{}, error)) (interface{}, error) {
+	goSdkMutex.Lock()
+	// Initialize the HPAS client if necessary
+	if client.hpasConn == nil {
+		client.WithCommonClient(HPASCode)
+		hpasClient, err := hpas.NewClient(client.Credentials.AccessKeyId, client.Credentials.SecretAccessKey, client.Endpoint)
+		if err != nil {
+			goSdkMutex.Unlock()
+			return nil, err
+		}
+		hpasClient.Config.Credentials = client.Credentials
+		hpasClient.Config.UserAgent = buildUserAgent()
+		client.hpasConn = hpasClient
+	}
+	goSdkMutex.Unlock()
+	return do(client.hpasConn)
 }
 
 func buildUserAgent() string {

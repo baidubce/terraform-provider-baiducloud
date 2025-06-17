@@ -1,6 +1,8 @@
 package flex
 
 import (
+	"encoding/json"
+
 	"github.com/baidubce/bce-sdk-go/model"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
@@ -51,6 +53,18 @@ func FlattenTagsToMap(tags []model.TagModel) map[string]string {
 	}
 
 	return tagMap
+}
+
+func FlattenInterfaceToTagMap(tags interface{}) map[string]string {
+	data, _ := json.Marshal(tags)
+	var items []map[string]string
+	_ = json.Unmarshal(data, &items)
+
+	result := make(map[string]string)
+	for _, item := range items {
+		result[item["tagKey"]] = item["tagValue"]
+	}
+	return result
 }
 
 func TranceTagMapToModel(tagMaps map[string]interface{}) []model.TagModel {

@@ -443,6 +443,8 @@ func init() {
 
 		"mongodb_endpoint": "Use this to override the default endpoint URL constructed from the `region`. " +
 			"It's typically used to connect to custom MONGODB endpoints.",
+
+		"hpas_endpoint": "Use this to override the default endpoint URL constructed from the `region`. It's typically used to connect to custom HPAS endpoints.",
 	}
 }
 
@@ -590,6 +592,12 @@ func endpointsSchema() *schema.Schema {
 					Default:     "",
 					Description: descriptions["mongodb_endpoint"],
 				},
+				"hpas": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					Default:     "",
+					Description: descriptions["hpas_endpoint"],
+				},
 			},
 		},
 		Set: endpointsToHash,
@@ -622,6 +630,7 @@ func endpointsToHash(v interface{}) int {
 	buf.WriteString(fmt.Sprintf("%s-", m["et_gateway"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["dns"].(string)))
 	buf.WriteString(fmt.Sprintf("%s-", m["mongodb"].(string)))
+	buf.WriteString(fmt.Sprintf("%s-", m["hpas"].(string)))
 	return hashcode.String(buf.String())
 }
 
