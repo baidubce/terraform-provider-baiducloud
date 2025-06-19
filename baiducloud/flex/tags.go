@@ -14,6 +14,15 @@ func SchemaTagsOnlySupportCreation() *schema.Schema {
 	}
 }
 
+func UpdatableTagsSchema() *schema.Schema {
+	return &schema.Schema{
+		Type:        schema.TypeMap,
+		Optional:    true,
+		Elem:        &schema.Schema{Type: schema.TypeString},
+		Description: "Tags of the resource.",
+	}
+}
+
 func ComputedSchemaTags() *schema.Schema {
 	return &schema.Schema{
 		Type:        schema.TypeMap,

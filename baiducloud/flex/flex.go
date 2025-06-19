@@ -55,7 +55,7 @@ func FlattenTagsToMap(tags []model.TagModel) map[string]string {
 	return tagMap
 }
 
-func FlattenInterfaceToTagMap(tags interface{}) map[string]string {
+func FlattenTagModelToMap(tags interface{}) map[string]string {
 	data, _ := json.Marshal(tags)
 	var items []map[string]string
 	_ = json.Unmarshal(data, &items)
@@ -77,6 +77,21 @@ func TranceTagMapToModel(tagMaps map[string]interface{}) []model.TagModel {
 	}
 
 	return tags
+}
+
+func ExpandMapToTagModel[T any](tagMap map[string]interface{}) []T {
+	var tempList []map[string]string
+	for k, v := range tagMap {
+		tempList = append(tempList, map[string]string{
+			"tagKey":   k,
+			"tagValue": v.(string),
+		})
+	}
+	jsonBytes, _ := json.Marshal(tempList)
+
+	var result []T
+	_ = json.Unmarshal(jsonBytes, &result)
+	return result
 }
 
 // 判断两个tag切片是否包含相同的元素
@@ -111,4 +126,29 @@ func MergeSchema(origin map[string]*schema.Schema, adding map[string]*schema.Sch
 	for k, v := range adding {
 		origin[k] = v
 	}
+}
+
+func DiffMaps(o, n map[string]interface{}) (added, removed map[string]interface{}) {
+	added = map[string]interface{}{}
+	removed = map[string]interface{}{}
+
+	if o == nil {
+		o = map[string]interface{}{}
+	}
+	if n == nil {
+		n = map[string]interface{}{}
+	}
+
+	for k, vA := range n {
+		if vB, ok := o[k]; !ok || vA != vB {
+			added[k] = vA
+		}
+	}
+	for k, vB := range o {
+		if vA, ok := n[k]; !ok || vA != vB {
+			removed[k] = vB
+		}
+	}
+
+	return
 }
