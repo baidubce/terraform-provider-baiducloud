@@ -141,6 +141,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/bec"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/cdn"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/cdn/abroad"
+	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/hpas"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/iam"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/mongodb"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/snic"
@@ -271,6 +272,8 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_et_gateways":                    dataSourceBaiduCloudEtGateways(),
 			"baiducloud_et_gateway_associations":        dataSourceBaiduCloudEtGatewayAssociations(),
 			"baiducloud_mongodb_instances":              mongodb.DataSourceInstances(),
+			"baiducloud_hpas_instances":                 hpas.DataSourceInstances(),
+			"baiducloud_hpas_images":                    hpas.DataSourceImages(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -361,6 +364,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_et_gateway_association":          resourceBaiduCloudEtGatewayAssociation(),
 			"baiducloud_mongodb_instance":                mongodb.ResourceInstance(),
 			"baiducloud_mongodb_sharding_instance":       mongodb.ResourceShardingInstance(),
+			"baiducloud_hpas_instance":                   hpas.ResourceInstance(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -710,6 +714,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		config.ConfigEndpoints[connectivity.ETGATEWAYCode] = strings.TrimSpace(endpoints["et_gateway"].(string))
 		config.ConfigEndpoints[connectivity.DNSCode] = strings.TrimSpace(endpoints["dns"].(string))
 		config.ConfigEndpoints[connectivity.MONGODBCode] = strings.TrimSpace(endpoints["mongodb"].(string))
+		config.ConfigEndpoints[connectivity.HPASCode] = strings.TrimSpace(endpoints["hpas"].(string))
 	}
 
 	client, err := config.Client()

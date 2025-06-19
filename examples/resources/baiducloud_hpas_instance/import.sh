@@ -1,0 +1,1 @@
+terraform import baiducloud_hpas_instance.example hpas-example
