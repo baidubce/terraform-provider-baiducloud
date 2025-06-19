@@ -1,4 +1,14 @@
-	## 1.21.19 (Unreleased)
+	## 1.22.1 (Unreleased)
+
+## 1.22.0 (June 19, 2025)
+FEATURES:
+- **New Resource:** `baiducloud_hpas_instance`
+- **New Data Source:** `baiducloud_hpas_instances`
+- **New Data Source:** `baiducloud_hpas_images`
+
+ENHANCEMENTS:
+- Update `baidubce/bce-sdk-go` to v0.9.231
+- Update `Go` to 1.18
 
 ## 1.21.18 (June 16, 2025)
 ENHANCEMENTS:
