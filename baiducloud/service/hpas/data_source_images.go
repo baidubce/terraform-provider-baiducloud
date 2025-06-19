@@ -31,7 +31,7 @@ func DataSourceImages() *schema.Resource {
 			},
 			"image_list": {
 				Type:        schema.TypeList,
-				Optional:    true,
+				Computed:    true,
 				Elem:        ImageSchema(),
 				Description: "Image list.",
 			},

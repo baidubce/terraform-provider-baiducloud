@@ -20,3 +20,36 @@ func flattenImageList(images []api.ImageResponse) interface{} {
 	}
 	return tfList
 }
+
+func flattenInstanceList(instances []api.HpasResponse) interface{} {
+	tfList := []map[string]interface{}{}
+	for _, v := range instances {
+		tfMap := map[string]interface{}{
+			"payment_timing":        v.ChargeType,
+			"tags":                  flex.FlattenTagModelToMap(v.Tags),
+			"hpas_id":               v.HpasId,
+			"app_type":              v.AppType,
+			"app_performance_level": v.AppPerformanceLevel,
+			"name":                  v.Name,
+			"zone_name":             v.ZoneName,
+			"image_id":              v.ImageId,
+			"image_name":            v.ImageName,
+			"internal_ip":           v.InternalIp,
+			"subnet_id":             v.SubnetId,
+			"subnet_name":           v.SubnetName,
+			"vpc_id":                v.VpcId,
+			"vpc_name":              v.VpcName,
+			"vpc_cidr":              v.VpcCidr,
+			"ehc_cluster_id":        v.EhcClusterId,
+			"ehc_cluster_name":      v.EhcClusterName,
+			"status":                v.Status,
+			"create_time":           v.CreateTime,
+		}
+		if len(v.NicInfo) > 0 {
+			tfMap["security_group_type"] = v.NicInfo[0].SecurityGroupType
+			tfMap["security_group_ids"] = flex.FlattenStringValueSet(v.NicInfo[0].SecurityGroupIds)
+		}
+		tfList = append(tfList, tfMap)
+	}
+	return tfList
+}
