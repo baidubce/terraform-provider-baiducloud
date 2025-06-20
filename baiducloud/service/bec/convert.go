@@ -81,13 +81,6 @@ func flattenVMInstances(vmInstances []api.VmInstanceDetailsVo) interface{} {
 	return tfList
 }
 
-func expandDeployInstances(regionID string) *[]api.DeploymentInstance {
-	return &[]api.DeploymentInstance{{
-		Replicas: 1,
-		RegionId: regionID,
-	}}
-}
-
 func flattenImageType(imageType string) string {
 	switch imageType {
 	case "becCommon", "becCustom":

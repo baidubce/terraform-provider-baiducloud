@@ -77,8 +77,11 @@ resource "baiducloud_bec_vm_instance" "example" {
 - `need_ipv6_public_ip` (Boolean) Whether to open IPv6 public network. Defaults to `false`.
 - `need_public_ip` (Boolean) Whether to open public network. Defaults to `false`.
 - `network_config` (Block List) Network config of the vm instance. If not set, system will use default network config. (see [below for nested schema](#nestedblock--network_config))
+- `network_type` (String) Network type of the instance. Valid values: `vpc`, `classic`. Default is `vpc`.
 - `spec` (String) Specification family.
+- `subnet_id` (String) ID of the subnet.
 - `vm_name` (String) Name of the vm instance. If empty, system will assign one.
+- `vpc_id` (String) ID of the vpc.
 
 ### Read-Only
 

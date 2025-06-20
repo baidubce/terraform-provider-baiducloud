@@ -50,6 +50,23 @@ func ResourceVMInstance() *schema.Resource {
 				Required:    true,
 				ForceNew:    true,
 			},
+			"network_type": {
+				Type:         schema.TypeString,
+				Description:  "Network type of the instance. Valid values: `vpc`, `classic`. Default is `vpc`.",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice([]string{"vpc", "classic"}, false),
+				Default:      "vpc",
+			},
+			"vpc_id": {
+				Type:        schema.TypeString,
+				Description: "ID of the vpc.",
+				Optional:    true,
+			},
+			"subnet_id": {
+				Type:        schema.TypeString,
+				Description: "ID of the subnet.",
+				Optional:    true,
+			},
 			"spec": {
 				Type:        schema.TypeString,
 				Description: "Specification family.",
@@ -395,7 +412,7 @@ func buildCreationArgs(d *schema.ResourceData) *api.CreateVmServiceArgs {
 	args := &api.CreateVmServiceArgs{
 		VmName:            d.Get("vm_name").(string),
 		Hostname:          d.Get("host_name").(string),
-		DeployInstances:   expandDeployInstances(d.Get("region_id").(string)),
+		DeployInstances:   expandDeployInstances(d),
 		Spec:              d.Get("spec").(string),
 		Cpu:               d.Get("cpu").(int),
 		Memory:            d.Get("memory").(int),
@@ -510,4 +527,14 @@ func updateVMInstanceAndWait(conn *connectivity.BaiduClient, vmID string, args *
 		return err
 	}
 	return nil
+}
+
+func expandDeployInstances(d *schema.ResourceData) *[]api.DeploymentInstance {
+	return &[]api.DeploymentInstance{{
+		Replicas:    1,
+		RegionId:    d.Get("region_id").(string),
+		NetworkType: d.Get("network_type").(string),
+		SubnetId:    d.Get("subnet_id").(string),
+		VpcId:       d.Get("vpc_id").(string),
+	}}
 }
