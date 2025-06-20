@@ -1,4 +1,8 @@
-	## 1.22.1 (Unreleased)
+	## 1.22.2 (Unreleased)
+
+## 1.22.1 (June 20, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_bec_vm_instance: Add parameters `network_type`, `vpc_id`, and `subnet_id`.
 
 ## 1.22.0 (June 19, 2025)
 FEATURES:
