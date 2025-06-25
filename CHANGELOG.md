@@ -1,4 +1,11 @@
-	## 1.22.2 (Unreleased)
+	## 1.22.3 (Unreleased)
+
+## 1.22.2 (June 25, 2025)
+FEATURES:
+- **New Resource:** `baiducloud_hpas_instance_operation`
+
+ENHANCEMENTS:
+- resource/baiducloud_hpas_instance: Support updating `name`, `application_name`, `image_id`, `internal_ip`, `subnet_id`, and `password`.
 
 ## 1.22.1 (June 20, 2025)
 ENHANCEMENTS:
