@@ -365,6 +365,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_mongodb_instance":                mongodb.ResourceInstance(),
 			"baiducloud_mongodb_sharding_instance":       mongodb.ResourceShardingInstance(),
 			"baiducloud_hpas_instance":                   hpas.ResourceInstance(),
+			"baiducloud_hpas_instance_operation":         hpas.ResourceInstanceOperation(),
 		},
 
 		ConfigureFunc: providerConfigure,

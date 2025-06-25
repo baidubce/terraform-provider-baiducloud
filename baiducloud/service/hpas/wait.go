@@ -28,3 +28,19 @@ func waitInstanceAvailable(conn *connectivity.BaiduClient, instanceID string) (*
 	}
 	return nil, err
 }
+
+func waitInstanceStopped(conn *connectivity.BaiduClient, instanceID string) (*api.HpasResponse, error) {
+	stateConf := &resource.StateChangeConf{
+		Delay:   0,
+		Pending: []string{InstanceStatusActive, InstanceStatusStopping, InstanceStatusStarting, InstanceStatusReboot, InstanceStatusRebuild},
+		Target:  []string{InstanceStatusStopped},
+		Refresh: StatusInstance(conn, instanceID),
+		Timeout: InstanceAvailableTimeout,
+	}
+
+	raw, err := stateConf.WaitForState()
+	if v, ok := raw.(*api.HpasResponse); ok {
+		return v, nil
+	}
+	return nil, err
+}
