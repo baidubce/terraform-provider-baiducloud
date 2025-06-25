@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	bcc "github.com/baidubce/bce-sdk-go/services/bcc/api"
 	"github.com/baidubce/bce-sdk-go/services/hpas"
 	"github.com/baidubce/bce-sdk-go/services/hpas/api"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/flex"
@@ -48,13 +47,13 @@ func ResourceInstance() *schema.Resource {
 			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Name of the instance. Currently does not support modification.",
+				Description: "Name of the instance.",
 			},
 			"application_name": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "Name of the application. Currently does not support modification.",
+				Description: "Name of the application.",
 			},
 			"auto_seq_suffix": {
 				Type:        schema.TypeBool,
@@ -82,25 +81,25 @@ func ResourceInstance() *schema.Resource {
 			"image_id": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Image ID used for the application. Currently does not support modification.",
+				Description: "Image ID used for the application. Changing this value triggers a reinstallation of the OS.",
 			},
 			"internal_ip": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "Internal IP addresses. Must match the CIDR block of the specified subnet. Currently does not support modification.",
+				Description: "Internal IP addresses. Must match the CIDR block of the specified subnet. Changing this value triggers a restart of the instance.",
 			},
 			"subnet_id": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Subnet ID. Currently does not support modification.",
+				Description: "Subnet ID. Changing this value triggers a restart of the instance.",
 			},
 			"password": {
 				Type:      schema.TypeString,
 				Required:  true,
 				Sensitive: true,
 				Description: "Password of the instance. This value should be 8-16 characters, and letters, numbers and symbols must exist at the same time. " +
-					"The symbols is limited to `!@#$%^*()`. Currently does not support modification.",
+					"The symbols is limited to `!@#$%^*()`. Changing this value triggers a restart of the instance.",
 			},
 			"ehc_cluster_id": {
 				Type:        schema.TypeString,
@@ -170,7 +169,7 @@ func resourceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*connectivity.BaiduClient)
 
 	raw, err := conn.WithHPASClient(func(client *hpas.Client) (interface{}, error) {
-		args := buildCreationArgs(d, client.Config.Credentials.SecretAccessKey)
+		args := buildCreationArgs(d, client)
 		return client.CreateHpas(args)
 	})
 	log.Printf("[DEBUG] Create HPAS Instance result: %+v", raw)
@@ -278,6 +277,18 @@ func resourceInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
 	if err := updateTags(d, conn); err != nil {
 		return fmt.Errorf("error updating HPAS Instance tags: %w", err)
 	}
+	if err := updateAttributes(d, conn); err != nil {
+		return fmt.Errorf("error updating HPAS Instance attributes: %w", err)
+	}
+
+	// need reboot or rebuild
+	if err := updateSubnetAndInternalIP(d, conn); err != nil {
+		return err
+	}
+
+	if err := updateImageAndPassword(d, conn); err != nil {
+		return err
+	}
 
 	return resourceInstanceRead(d, meta)
 }
@@ -300,7 +311,7 @@ func resourceInstanceDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func buildCreationArgs(d *schema.ResourceData, secretKey string) *api.CreateHpasReq {
+func buildCreationArgs(d *schema.ResourceData, client *hpas.Client) *api.CreateHpasReq {
 	billingModel := api.BillingModel{
 		ChargeType: d.Get("payment_timing").(string),
 		Period:     int32(d.Get("period").(int)),
@@ -313,8 +324,6 @@ func buildCreationArgs(d *schema.ResourceData, secretKey string) *api.CreateHpas
 		billingModel.AutoRenewPeriodUnit = d.Get("auto_renew_period_unit").(string)
 	}
 
-	password, _ := bcc.Aes128EncryptUseSecreteKey(secretKey, d.Get("password").(string))
-
 	args := &api.CreateHpasReq{
 		AppType:             d.Get("app_type").(string),
 		AppPerformanceLevel: d.Get("app_performance_level").(string),
@@ -325,7 +334,7 @@ func buildCreationArgs(d *schema.ResourceData, secretKey string) *api.CreateHpas
 		ZoneName:            d.Get("zone_name").(string),
 		ImageId:             d.Get("image_id").(string),
 		SubnetId:            d.Get("subnet_id").(string),
-		Password:            password,
+		Password:            encryptPassword(d, client),
 		EhcClusterId:        d.Get("ehc_cluster_id").(string),
 		SecurityGroupType:   d.Get("security_group_type").(string),
 		SecurityGroupIds:    flex.ExpandStringValueSet(d.Get("security_group_ids").(*schema.Set)),
@@ -391,6 +400,99 @@ func updateTags(d *schema.ResourceData, conn *connectivity.BaiduClient) error {
 			}
 		}
 
+	}
+	return nil
+}
+
+func updateAttributes(d *schema.ResourceData, conn *connectivity.BaiduClient) error {
+	if d.HasChanges("name", "application_name") {
+		_, err := conn.WithHPASClient(func(client *hpas.Client) (interface{}, error) {
+			args := &api.ModifyInstancesAttributeReq{
+				HpasIds:         []string{d.Id()},
+				Name:            d.Get("name").(string),
+				ApplicationName: d.Get("application_name").(string),
+			}
+			return nil, client.ModifyInstancesAttribute(args)
+		})
+
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func updateSubnetAndInternalIP(d *schema.ResourceData, conn *connectivity.BaiduClient) error {
+	if d.HasChanges("subnet_id", "internal_ip") {
+		_, err := conn.WithHPASClient(func(client *hpas.Client) (interface{}, error) {
+			args := &api.ModifyInstancesSubnetRequest{
+				HpasIds:   []string{d.Id()},
+				SubnetId:  d.Get("subnet_id").(string),
+				PrivateIp: d.Get("internal_ip").(string),
+			}
+			return client.ModifyInstancesSubnet(args)
+		})
+
+		if err != nil {
+			return fmt.Errorf("error updating HPAS Instance subnet and internal IP: %w", err)
+		}
+
+		_, err = waitInstanceAvailable(conn, d.Id())
+		if err != nil {
+			return fmt.Errorf("error waiting HPAS Instance (%s) becoming available: %w", d.Id(), err)
+		}
+	}
+	return nil
+}
+
+func updateImageAndPassword(d *schema.ResourceData, conn *connectivity.BaiduClient) error {
+	if d.HasChanges("image_id", "password") {
+		if d.HasChange("image_id") {
+			err := resetInstance(d, conn)
+			if err != nil {
+				return fmt.Errorf("error resetting HPAS instance (%s): %w", d.Id(), err)
+			}
+		} else if d.HasChange("password") {
+			err := modifyPassword(d, conn)
+			if err != nil {
+				return fmt.Errorf("error modifying password for HPAS instance (%s): %w", d.Id(), err)
+			}
+		}
+
+		_, err := waitInstanceAvailable(conn, d.Id())
+		if err != nil {
+			return fmt.Errorf("error waiting HPAS Instance (%s) becoming available: %w", d.Id(), err)
+		}
+	}
+
+	return nil
+}
+
+func resetInstance(d *schema.ResourceData, conn *connectivity.BaiduClient) error {
+	_, err := conn.WithHPASClient(func(client *hpas.Client) (interface{}, error) {
+		args := api.ResetHpasReq{
+			HpasIds:  []string{d.Id()},
+			ImageId:  d.Get("image_id").(string),
+			Password: encryptPassword(d, client),
+		}
+		return nil, client.ResetHpas(&args)
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func modifyPassword(d *schema.ResourceData, conn *connectivity.BaiduClient) error {
+	_, err := conn.WithHPASClient(func(client *hpas.Client) (interface{}, error) {
+		args := api.ModifyPasswordHpasReq{
+			HpasId:   d.Id(),
+			Password: encryptPassword(d, client),
+		}
+		return nil, client.ModifyPasswordHpas(&args)
+	})
+	if err != nil {
+		return err
 	}
 	return nil
 }

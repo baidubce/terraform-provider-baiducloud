@@ -1,7 +1,10 @@
 package hpas
 
 import (
+	bcc "github.com/baidubce/bce-sdk-go/services/bcc/api"
+	"github.com/baidubce/bce-sdk-go/services/hpas"
 	"github.com/baidubce/bce-sdk-go/services/hpas/api"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/flex"
 )
 
@@ -52,4 +55,12 @@ func flattenInstanceList(instances []api.HpasResponse) interface{} {
 		tfList = append(tfList, tfMap)
 	}
 	return tfList
+}
+
+func encryptPassword(d *schema.ResourceData, client *hpas.Client) string {
+	password := d.Get("password").(string)
+	secretKey := client.Config.Credentials.SecretAccessKey
+	encryptedPassword, _ := bcc.Aes128EncryptUseSecreteKey(secretKey, password)
+
+	return encryptedPassword
 }

@@ -15,8 +15,8 @@ const (
 
 func waitInstanceAvailable(conn *connectivity.BaiduClient, instanceID string) (*api.HpasResponse, error) {
 	stateConf := &resource.StateChangeConf{
-		Delay:   0,
-		Pending: []string{InstanceStatusCreating, InstanceStatusPassword, InstanceStatusStarting, InstanceStatusReboot, InstanceStatusRebuild},
+		Delay:   5 * time.Second,
+		Pending: []string{InstanceStatusCreating, InstanceStatusPassword, InstanceStatusStarting, InstanceStatusReboot, InstanceStatusRebuild, InstanceStatusChangeSubnet},
 		Target:  []string{InstanceStatusActive},
 		Refresh: StatusInstance(conn, instanceID),
 		Timeout: InstanceAvailableTimeout,
@@ -31,7 +31,7 @@ func waitInstanceAvailable(conn *connectivity.BaiduClient, instanceID string) (*
 
 func waitInstanceStopped(conn *connectivity.BaiduClient, instanceID string) (*api.HpasResponse, error) {
 	stateConf := &resource.StateChangeConf{
-		Delay:   0,
+		Delay:   5 * time.Second,
 		Pending: []string{InstanceStatusActive, InstanceStatusStopping, InstanceStatusStarting, InstanceStatusReboot, InstanceStatusRebuild},
 		Target:  []string{InstanceStatusStopped},
 		Refresh: StatusInstance(conn, instanceID),
