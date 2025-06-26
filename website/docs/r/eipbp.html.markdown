@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_eipbp"
+subcategory: "Elastic IP (EIP)"
 sidebar_current: "docs-baiducloud-resource-eipbp"
 description: |-
   Provide a resource to create an EIP BP.

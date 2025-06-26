@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_eipbps"
+subcategory: "Elastic IP (EIP)"
 sidebar_current: "docs-baiducloud-datasource-eipbps"
 description: |-
   Use this data source to query EIP bp list.

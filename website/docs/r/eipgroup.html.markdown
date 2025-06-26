@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_eipgroup"
+subcategory: "Elastic IP (EIP)"
 sidebar_current: "docs-baiducloud-resource-eipgroup"
 description: |-
   Provide a resource to create an EIP GROUP.

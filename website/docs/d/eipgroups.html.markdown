@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_eipgroups"
+subcategory: "Elastic IP (EIP)"
 sidebar_current: "docs-baiducloud-datasource-eipgroups"
 description: |-
   Use this data source to query EIP group list.

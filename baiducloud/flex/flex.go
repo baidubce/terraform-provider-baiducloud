@@ -152,3 +152,7 @@ func DiffMaps(o, n map[string]interface{}) (added, removed map[string]interface{
 
 	return
 }
+
+func DoNothing(d *schema.ResourceData, meta interface{}) error {
+	return nil
+}

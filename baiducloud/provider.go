@@ -141,6 +141,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/bec"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/cdn"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/cdn/abroad"
+	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/eip"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/hpas"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/iam"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/mongodb"
@@ -290,6 +291,8 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_eip":                             resourceBaiduCloudEip(),
 			"baiducloud_eipbp":                           resourceBaiduCloudEipbp(),
 			"baiducloud_eipgroup":                        resourceBaiduCloudEipgroup(),
+			"baiducloud_eipgroup_attachment":             eip.ResourceEipGroupAttachment(),
+			"baiducloud_eipgroup_detachment":             eip.ResourceEipGroupDetachment(),
 			"baiducloud_eip_association":                 resourceBaiduCloudEipAssociation(),
 			"baiducloud_acl":                             resourceBaiduCloudAcl(),
 			"baiducloud_nat_gateway":                     resourceBaiduCloudNatGateway(),
