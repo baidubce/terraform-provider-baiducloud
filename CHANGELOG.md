@@ -1,4 +1,12 @@
-	## 1.22.3 (Unreleased)
+	## 1.22.4 (Unreleased)
+
+## 1.22.3 (June 27, 2025)
+FEATURES:
+- **New Resource:** `baiducloud_eipgroup_attachment`.
+- **New Resource:** `baiducloud_eipgroup_detachment`.
+
+ENHANCEMENTS:
+- resource/baiducloud_eipgroup: Add `eipv6_count`, `eipv6s`, and support for adding EIP count.
 
 ## 1.22.2 (June 25, 2025)
 FEATURES:
