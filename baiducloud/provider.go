@@ -290,7 +290,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_security_group_rule":             resourceBaiduCloudSecurityGroupRule(),
 			"baiducloud_eip":                             resourceBaiduCloudEip(),
 			"baiducloud_eipbp":                           resourceBaiduCloudEipbp(),
-			"baiducloud_eipgroup":                        resourceBaiduCloudEipgroup(),
+			"baiducloud_eipgroup":                        eip.ResourceEipGroup(),
 			"baiducloud_eipgroup_attachment":             eip.ResourceEipGroupAttachment(),
 			"baiducloud_eipgroup_detachment":             eip.ResourceEipGroupDetachment(),
 			"baiducloud_eip_association":                 resourceBaiduCloudEipAssociation(),

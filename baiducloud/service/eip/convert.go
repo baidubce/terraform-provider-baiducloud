@@ -2,6 +2,8 @@ package eip
 
 import (
 	"github.com/baidubce/bce-sdk-go/services/eip"
+
+	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/flex"
 )
 
 func expandMoveOutEips(tfList []interface{}) []eip.MoveOutEip {
@@ -25,4 +27,28 @@ func expandMoveOutEips(tfList []interface{}) []eip.MoveOutEip {
 		moveOutEips = append(moveOutEips, moveOutEip)
 	}
 	return moveOutEips
+}
+
+func flattenEipList(eips []eip.EipModel) interface{} {
+	tfList := []map[string]interface{}{}
+	for _, v := range eips {
+		tfMap := map[string]interface{}{
+			"eip_id":            v.EipId,
+			"eip":               v.Eip,
+			"name":              v.Name,
+			"bandwidth_in_mbps": v.BandWidthInMbps,
+			"status":            v.Status,
+			"eip_instance_type": v.EipInstanceType,
+			"instance_type":     v.InstanceType,
+			"instance_id":       v.InstanceId,
+			"share_group_id":    v.ShareGroupId,
+			"payment_timing":    v.PaymentTiming,
+			"billing_method":    v.BillingMethod,
+			"create_time":       v.CreateTime,
+			"expire_time":       v.ExpireTime,
+			"tags":              flex.FlattenTagModelToMap(v.Tags),
+		}
+		tfList = append(tfList, tfMap)
+	}
+	return tfList
 }

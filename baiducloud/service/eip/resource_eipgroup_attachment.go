@@ -2,6 +2,7 @@ package eip
 
 import (
 	"fmt"
+
 	"github.com/baidubce/bce-sdk-go/services/eip"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/flex"

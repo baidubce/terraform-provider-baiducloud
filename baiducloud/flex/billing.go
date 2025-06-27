@@ -40,6 +40,17 @@ func SchemaReservationLength() *schema.Schema {
 	}
 }
 
+func SchemaReservationTimeUnit() *schema.Schema {
+	return &schema.Schema{
+		Type:             schema.TypeString,
+		Description:      "Time unit for billing. Effective when `payment_timing` is `Prepaid`. Valid value: `month`. Defaults to `month`.",
+		Optional:         true,
+		Default:          "month",
+		ValidateFunc:     validation.StringInSlice([]string{"month"}, false),
+		DiffSuppressFunc: PostPaidDiffSuppressFunc,
+	}
+}
+
 func SchemaAutoRenewLength() *schema.Schema {
 	return &schema.Schema{
 		Type: schema.TypeInt,

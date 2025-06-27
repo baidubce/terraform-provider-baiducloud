@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/baidubce/bce-sdk-go/model"
+	"github.com/baidubce/bce-sdk-go/util"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -155,4 +156,8 @@ func DiffMaps(o, n map[string]interface{}) (added, removed map[string]interface{
 
 func DoNothing(d *schema.ResourceData, meta interface{}) error {
 	return nil
+}
+
+func BuildClientToken() string {
+	return util.NewUUID()
 }
