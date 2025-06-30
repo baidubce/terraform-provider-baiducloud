@@ -1,4 +1,8 @@
-	## 1.22.4 (Unreleased)
+	## 1.22.5 (Unreleased)
+
+## 1.22.4 (June 30, 2025)
+ENHANCEMENTS:
+- provider: Support HTTP proxy via `HTTP_PROXY` environment variable.
 
 ## 1.22.3 (June 27, 2025)
 FEATURES:
