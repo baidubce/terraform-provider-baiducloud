@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_dns_customlines"
+subcategory: "DNS"
 sidebar_current: "docs-baiducloud-datasource-dns_customlines"
 description: |-
   Use this data source to query Dns customline list.

@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_dns_zones"
+subcategory: "DNS"
 sidebar_current: "docs-baiducloud-datasource-dns_zones"
 description: |-
   Use this data source to query Dns zone list.

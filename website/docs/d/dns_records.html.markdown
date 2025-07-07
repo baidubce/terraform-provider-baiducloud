@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_dns_records"
+subcategory: "DNS"
 sidebar_current: "docs-baiducloud-datasource-dns_records"
 description: |-
   Use this data source to query Dns record list.

@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_rds_security_ips"
+subcategory: "Relational Database Service (RDS)"
 sidebar_current: "docs-baiducloud-datasource-rds_security_ips"
 description: |-
   Use this data source to query RDS security ips.

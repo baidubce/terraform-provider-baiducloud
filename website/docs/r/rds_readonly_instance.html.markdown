@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_rds_readonly_instance"
+subcategory: "Relational Database Service (RDS)"
 sidebar_current: "docs-baiducloud-resource-rds_readonly_instance"
 description: |-
   Use this resource to get information about a RDS readonly instance.

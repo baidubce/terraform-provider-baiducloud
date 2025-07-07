@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_rds_security_ip"
+subcategory: "Relational Database Service (RDS)"
 sidebar_current: "docs-baiducloud-resource-rds_security_ip"
 description: |-
   Use this resource to get information about a RDS Security Ip.

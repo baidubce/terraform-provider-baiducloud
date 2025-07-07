@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_et_gateway_associations"
+subcategory: "Virtual private Cloud (VPC)"
 sidebar_current: "docs-baiducloud-datasource-et_gateway_associations"
 description: |-
   Use this data source to query et gateway associations.

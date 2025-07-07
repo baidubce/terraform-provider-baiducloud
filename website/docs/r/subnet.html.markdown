@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_subnet"
+subcategory: "Virtual private Cloud (VPC)"
 sidebar_current: "docs-baiducloud-resource-subnet"
 description: |-
   Provide a resource to create a VPC subnet.

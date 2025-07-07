@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_bls_log_stores"
+subcategory: "Baidu Log Service (BLS)"
 sidebar_current: "docs-baiducloud-datasource-bls_log_stores"
 description: |-
   Use this data source to query bls log stores .

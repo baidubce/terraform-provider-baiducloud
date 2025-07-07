@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_nat_gateway"
+subcategory: "Virtual private Cloud (VPC)"
 sidebar_current: "docs-baiducloud-resource-nat_gateway"
 description: |-
 Provide a resource to create a NAT Gateway.

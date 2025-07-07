@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_et_gateway"
+subcategory: "Virtual private Cloud (VPC)"
 sidebar_current: "docs-baiducloud-resource-et_gateway"
 description: |-
   Use this resource to get information about a ET Gateway.

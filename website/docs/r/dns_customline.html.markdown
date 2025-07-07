@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_dns_customline"
+subcategory: "DNS"
 sidebar_current: "docs-baiducloud-resource-dns_customline"
 description: |-
   Provide a resource to create an Dns customline.

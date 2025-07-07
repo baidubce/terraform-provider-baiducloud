@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_et_gateway_association"
+subcategory: "Virtual private Cloud (VPC)"
 sidebar_current: "docs-baiducloud-resource-et_gateway_association"
 description: |-
   Provide a resource to manage an et gateway association.

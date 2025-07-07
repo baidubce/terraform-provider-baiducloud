@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_dns_record"
+subcategory: "DNS"
 sidebar_current: "docs-baiducloud-resource-dns_record"
 description: |-
   Provide a resource to create an Dns record.

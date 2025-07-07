@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_nat_gateways"
+subcategory: "Virtual private Cloud (VPC)"
 sidebar_current: "docs-baiducloud-datasource-nat_gateways"
 description: |-
 Use this data source to query NAT gateway list.

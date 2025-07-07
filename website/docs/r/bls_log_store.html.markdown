@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_bls_log_store"
+subcategory: "Baidu Log Service (BLS)"
 sidebar_current: "docs-baiducloud-resource-bls_log_store"
 description: |-
   Provide a resource to create an BLS LogStore.

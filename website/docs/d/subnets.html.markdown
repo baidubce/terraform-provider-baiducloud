@@ -1,6 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_subnets"
+subcategory: "Virtual private Cloud (VPC)"
 sidebar_current: "docs-baiducloud-datasource-subnets"
 description: |-
   Use this data source to query subnet list.
