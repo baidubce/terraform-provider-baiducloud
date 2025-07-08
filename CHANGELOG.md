@@ -1,4 +1,8 @@
-	## 1.22.5 (Unreleased)
+	## 1.22.6 (Unreleased)
+
+## 1.22.5 (July 08, 2025)
+FEATURES:
+- **New Resource:** `baiducloud_eip_ddos_protection`.
 
 ## 1.22.4 (June 30, 2025)
 ENHANCEMENTS:
