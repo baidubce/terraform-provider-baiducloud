@@ -4,7 +4,7 @@ page_title: "BaiduCloud: baiducloud_route_rule"
 subcategory: "Virtual private Cloud (VPC)"
 sidebar_current: "docs-baiducloud-resource-route_rule"
 description: |-
-Provides a resource to create a VPC routing rule.
+  Provides a resource to create a VPC routing rule.
 ---
 
 # baiducloud_route_rule
