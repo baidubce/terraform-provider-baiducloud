@@ -140,7 +140,7 @@ func resourceCCEv2ClusterSpec() *schema.Resource {
 			},
 			"runtime_type": {
 				Type:         schema.TypeString,
-				Description:  "Container Runtime Type. Available Value: [docker].",
+				Description:  "Container Runtime Type. Available Values: [docker, containerd].",
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice(RuntimeTypePermitted, false),
 			},
@@ -326,14 +326,14 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 			},
 			"machine_type": {
 				Type:         schema.TypeString,
-				Description:  "Machine Type. Available Value: [BCC, BBC, Metal].",
+				Description:  "Machine Type. Available Values: [BCC, BBC, EBC, HPAS].",
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice(MachineTypePermitted, false),
 			},
 			"instance_type": {
 				Type:         schema.TypeString,
-				Description:  "Instance Type Available Value: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1].",
+				Description:  "Instance Type. Available Values: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1, HPAS].",
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice(BCCInstanceTypePermitted, false),
@@ -345,6 +345,14 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Computed:    true,
 				MaxItems:    1,
 				Elem:        resourceCCEv2BBCOption(),
+			},
+			"hpas_option": {
+				Type:        schema.TypeList,
+				Description: "HPAS Option",
+				Optional:    true,
+				Computed:    true,
+				MaxItems:    1,
+				Elem:        resourceCCEv2HPASOption(),
 			},
 			"vpc_config": {
 				Type:        schema.TypeList,
@@ -803,6 +811,23 @@ func resourceCCEv2BBCOption() *schema.Resource {
 	}
 }
 
+func resourceCCEv2HPASOption() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"app_type": {
+				Type:        schema.TypeString,
+				Description: "Application type of the HPAS instance. e.g., `llama2_7B_train`.",
+				Required:    true,
+			},
+			"app_performance_level": {
+				Type:        schema.TypeString,
+				Description: "Performance level of the application. e.g., `10k`.",
+				Required:    true,
+			},
+		},
+	}
+}
+
 func resourceCCEv2VPCConfig() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
@@ -823,6 +848,13 @@ func resourceCCEv2VPCConfig() *schema.Resource {
 				Description: "Security Group ID",
 				Optional:    true,
 				Computed:    true,
+			},
+			"security_group_type": {
+				Type:         schema.TypeString,
+				Description:  "Security Group type. Available Values: [normal, enterprise]. Default: `normal`",
+				Optional:     true,
+				Default:      "normal",
+				ValidateFunc: validation.StringInSlice([]string{"normal", "enterprise"}, false),
 			},
 			"vpc_subnet_type": {
 				Type:         schema.TypeString,
@@ -1425,6 +1457,9 @@ func convertInstanceSpecFromJsonToMap(spec *ccev2types.InstanceSpec) ([]interfac
 	if spec.ClusterID != "" {
 		specMap["cluster_id"] = spec.ClusterID
 	}
+	if spec.InstanceChargingType != "" {
+		specMap["instance_charging_type"] = spec.InstanceChargingType
+	}
 	if spec.ClusterRole != "" {
 		specMap["cluster_role"] = spec.ClusterRole
 	}
@@ -1457,6 +1492,14 @@ func convertInstanceSpecFromJsonToMap(spec *ccev2types.InstanceSpec) ([]interfac
 			return nil, err
 		}
 		specMap["bbc_option"] = option
+	}
+
+	if spec.HPASOption != nil {
+		option, err := convertHPASOptionFromJsonToMap(spec.HPASOption)
+		if err != nil {
+			return nil, err
+		}
+		specMap["hpas_option"] = option
 	}
 
 	if !reflect.DeepEqual(spec.VPCConfig, ccev2types.VPCConfig{}) {
@@ -1752,6 +1795,20 @@ func convertBBCOptionFromJsonToMap(option *ccev2types.BBCOption) ([]interface{},
 	return result, nil
 }
 
+func convertHPASOptionFromJsonToMap(option *ccev2types.HPASOption) ([]interface{}, error) {
+	result := make([]interface{}, 0)
+	if option == nil {
+		return result, nil
+	}
+
+	optionMap := make(map[string]interface{})
+	optionMap["app_type"] = option.AppType
+	optionMap["app_performance_level"] = option.AppPerformanceLevel
+
+	result = append(result, optionMap)
+	return result, nil
+}
+
 func convertVPCConfigFromJsonToMap(config *ccev2types.VPCConfig) ([]interface{}, error) {
 	result := make([]interface{}, 0)
 	if config == nil {
@@ -1767,6 +1824,9 @@ func convertVPCConfigFromJsonToMap(config *ccev2types.VPCConfig) ([]interface{},
 	}
 	if config.SecurityGroupID != "" {
 		configMap["security_group_id"] = config.SecurityGroupID
+	}
+	if config.SecurityGroupType != "" {
+		configMap["security_group_type"] = config.SecurityGroupType
 	}
 	if config.VPCSubnetCIDR != "" {
 		configMap["vpc_subnet_cidr"] = config.VPCSubnetCIDR
@@ -2208,6 +2268,20 @@ func buildInstanceSpec(instanceSpecRawMap map[string]interface{}) (*ccev2types.I
 		}
 		instanceSpec.BBCOption = bbcOption
 	}
+
+	if v, ok := instanceSpecRawMap["hpas_option"]; ok && len(v.([]interface{})) == 1 {
+		hpasOptionRaw := v.([]interface{})[0].(map[string]interface{})
+		hpasOption, err := buildHPASOption(hpasOptionRaw)
+		if err != nil {
+			log.Println("Build InstanceSpec HPASOption Error:" + err.Error())
+			return nil, err
+		}
+		instanceSpec.HPASOption = hpasOption
+		instanceSpec.InstanceResource = ccev2types.InstanceResource{
+			MachineSpec: hpasOption.AppType + "/" + hpasOption.AppPerformanceLevel,
+		}
+	}
+
 	if v, ok := instanceSpecRawMap["vpc_config"]; ok && len(v.([]interface{})) == 1 {
 		vpcConfigRaw := v.([]interface{})[0].(map[string]interface{})
 		vpcConfig, err := buildVPCConfig(vpcConfigRaw)
@@ -2622,6 +2696,18 @@ func buildBBCOption(d map[string]interface{}) (*ccev2types.BBCOption, error) {
 	return bbcOption, nil
 }
 
+func buildHPASOption(d map[string]interface{}) (*ccev2types.HPASOption, error) {
+	hpasOption := &ccev2types.HPASOption{}
+
+	if v, ok := d["app_type"]; ok && v.(string) != "" {
+		hpasOption.AppType = v.(string)
+	}
+	if v, ok := d["app_performance_level"]; ok && v.(string) != "" {
+		hpasOption.AppPerformanceLevel = v.(string)
+	}
+	return hpasOption, nil
+}
+
 func buildVPCConfig(vpcRawMap map[string]interface{}) (*ccev2types.VPCConfig, error) {
 	vpcConfig := &ccev2types.VPCConfig{}
 
@@ -2635,6 +2721,10 @@ func buildVPCConfig(vpcRawMap map[string]interface{}) (*ccev2types.VPCConfig, er
 
 	if v, ok := vpcRawMap["security_group_id"]; ok && v.(string) != "" {
 		vpcConfig.SecurityGroupID = v.(string)
+	}
+
+	if v, ok := vpcRawMap["security_group_type"]; ok && v.(string) != "" {
+		vpcConfig.SecurityGroupType = v.(string)
 	}
 
 	if v, ok := vpcRawMap["vpc_subnet_type"]; ok && v.(string) != "" {
@@ -2886,6 +2976,7 @@ var K8SVersionPermitted = []string{
 
 var RuntimeTypePermitted = []string{
 	string(ccev2types.RuntimeTypeDocker),
+	string(ccev2types.RuntimeTypeContainerd),
 }
 
 var MasterTypePermitted = []string{
@@ -2941,6 +3032,7 @@ var MachineTypePermitted = []string{
 	string(ccev2types.MachineTypeBBC),
 	string(ccev2types.MachineTypeBCC),
 	string(ccev2types.MachineTypeEBC),
+	string(ccev2types.MachineTypeHPAS),
 }
 
 var BCCInstanceTypePermitted = []string{
@@ -2954,6 +3046,7 @@ var BCCInstanceTypePermitted = []string{
 	string(bccapi.InstanceTypeS1),
 	string(bccapi.InstanceTypeG1),
 	string(bccapi.InstanceTypeF1),
+	string(ccev2types.MachineTypeHPAS),
 }
 
 var VPCSubnetTypePermitted = []string{

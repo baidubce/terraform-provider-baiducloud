@@ -68,7 +68,7 @@ The `spec` object supports the following:
 
 * `cluster_id` - (Required, ForceNew) Cluster ID of Instance Group
 * `instance_group_name` - (Required, ForceNew) Name of Instance Group
-* `instance_template` - (Required, ForceNew) Instance Spec of Instances in this Instance Group 
+* `instance_template` - (Required, ForceNew) Instance Spec of Instances in this Instance Group
 * `replicas` - (Required) Number of instances in this Instance Group
 
 The `instance_template` object supports the following:
@@ -83,6 +83,7 @@ The `instance_template` object supports the following:
 * `eip_option` - (Optional) EIP Option
 * `existed_option` - (Optional) Existed Instance Option
 * `existed` - (Optional) Is the instance existed
+* `hpas_option` - (Optional) HPAS Option
 * `image_id` - (Optional) Image ID
 * `instance_charging_type` - (Optional) Instance charging type. Available Value: [Prepaid, Postpaid, bidding].
 * `instance_group_id` - (Optional) Instance Group ID of this Instance
@@ -92,9 +93,9 @@ The `instance_template` object supports the following:
 * `instance_precharging_option` - (Optional) Instance Pre-charging Option
 * `instance_resource` - (Optional) Instance Resource Config
 * `instance_taints` - (Optional) Taint List
-* `instance_type` - (Optional) Instance Type Available Value: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1].
+* `instance_type` - (Optional) Instance Type. Available Values: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1, HPAS].
 * `labels` - (Optional) Labels List
-* `machine_type` - (Optional) Machine Type. Available Value: [BCC, BBC, Metal].
+* `machine_type` - (Optional) Machine Type. Available Values: [BCC, BBC, EBC, HPAS].
 * `master_type` - (Optional) Master Type. Available Value: [managed, custom, serverless].
 * `need_eip` - (Optional) Whether the instance need a EIP
 * `runtime_type` - (Optional) Container Runtime Type. Available Value: [docker].
@@ -145,6 +146,11 @@ The `existed_option` object supports the following:
 
 * `existed_instance_id` - (Optional) Existed Instance ID
 * `rebuild` - (Optional) Whether re-install OS
+
+The `hpas_option` object supports the following:
+
+* `app_performance_level` - (Required) Performance level of the application. e.g., `10k`.
+* `app_type` - (Required) Application type of the HPAS instance. e.g., `llama2_7B_train`.
 
 The `instance_os` object supports the following:
 
@@ -199,6 +205,7 @@ The `vpc_config` object supports the following:
 
 * `available_zone` - (Optional) Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF].
 * `security_group_id` - (Optional) Security Group ID
+* `security_group_type` - (Optional) Security Group type. Available Values: [normal, enterprise]. Default: `normal`
 * `vpc_id` - (Optional) VPC ID
 * `vpc_subnet_cidr_ipv6` - (Optional) VPC Sunbet CIDR IPv6
 * `vpc_subnet_cidr` - (Optional) VPC Subnet CIDR
@@ -247,6 +254,7 @@ In addition to all arguments above, the following attributes are exported:
       * `existed_instance_id` - Existed Instance ID
       * `rebuild` - Whether re-install OS
     * `existed` - Is the instance existed
+    * `hpas_option` - HPAS Option
     * `image_id` - Image ID
     * `instance_charging_type` - Instance charging type. Available Value: [Prepaid, Postpaid, bidding].
     * `instance_group_id` - Instance Group ID of this Instance
@@ -285,9 +293,9 @@ In addition to all arguments above, the following attributes are exported:
       * `key` - Taint Key
       * `time_added` - Taint Added Time. Format RFC3339
       * `value` - Taint Value
-    * `instance_type` - Instance Type Available Value: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1].
+    * `instance_type` - Instance Type. Available Values: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1, HPAS].
     * `labels` - Labels List
-    * `machine_type` - Machine Type. Available Value: [BCC, BBC, Metal].
+    * `machine_type` - Machine Type. Available Values: [BCC, BBC, EBC, HPAS].
     * `master_type` - Master Type. Available Value: [managed, custom, serverless].
     * `need_eip` - Whether the instance need a EIP
     * `runtime_type` - Container Runtime Type. Available Value: [docker].
