@@ -101,6 +101,11 @@ func ResourceInstance() *schema.Resource {
 				Description: "Password of the instance. This value should be 8-16 characters, and letters, numbers and symbols must exist at the same time. " +
 					"The symbols is limited to `!@#$%^*()`. Changing this value triggers a restart of the instance.",
 			},
+			"keypair_id": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The ID of the keypair to bind to the instance.",
+			},
 			"ehc_cluster_id": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -155,6 +160,11 @@ func ResourceInstance() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Name of the image.",
+			},
+			"keypair_name": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Name of the keypair.",
 			},
 			"create_time": {
 				Type:        schema.TypeString,
@@ -230,6 +240,9 @@ func resourceInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	if err := d.Set("ehc_cluster_id", detail.EhcClusterId); err != nil {
 		return fmt.Errorf("error setting ehc_cluster_id: %w", err)
 	}
+	if err := d.Set("keypair_id", detail.KeypairId); err != nil {
+		return fmt.Errorf("error setting keypair_id: %w", err)
+	}
 	if len(detail.NicInfo) > 0 {
 		if err := d.Set("security_group_type", detail.NicInfo[0].SecurityGroupType); err != nil {
 			return fmt.Errorf("error setting security_group_type: %w", err)
@@ -260,6 +273,9 @@ func resourceInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	if err := d.Set("image_name", detail.ImageName); err != nil {
 		return fmt.Errorf("error setting image_name: %w", err)
+	}
+	if err := d.Set("keypair_name", detail.KeypairName); err != nil {
+		return fmt.Errorf("error setting keypair_name: %w", err)
 	}
 	if err := d.Set("create_time", detail.CreateTime); err != nil {
 		return fmt.Errorf("error setting create_time: %w", err)
@@ -335,6 +351,7 @@ func buildCreationArgs(d *schema.ResourceData, client *hpas.Client) *api.CreateH
 		ImageId:             d.Get("image_id").(string),
 		SubnetId:            d.Get("subnet_id").(string),
 		Password:            encryptPassword(d, client),
+		KeypairId:           d.Get("keypair_id").(string),
 		EhcClusterId:        d.Get("ehc_cluster_id").(string),
 		SecurityGroupType:   d.Get("security_group_type").(string),
 		SecurityGroupIds:    flex.ExpandStringValueSet(d.Get("security_group_ids").(*schema.Set)),
@@ -471,9 +488,10 @@ func updateImageAndPassword(d *schema.ResourceData, conn *connectivity.BaiduClie
 func resetInstance(d *schema.ResourceData, conn *connectivity.BaiduClient) error {
 	_, err := conn.WithHPASClient(func(client *hpas.Client) (interface{}, error) {
 		args := api.ResetHpasReq{
-			HpasIds:  []string{d.Id()},
-			ImageId:  d.Get("image_id").(string),
-			Password: encryptPassword(d, client),
+			HpasIds:   []string{d.Id()},
+			ImageId:   d.Get("image_id").(string),
+			Password:  encryptPassword(d, client),
+			KeypairId: d.Get("keypair_id").(string),
 		}
 		return nil, client.ResetHpas(&args)
 	})

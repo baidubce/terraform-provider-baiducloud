@@ -56,6 +56,7 @@ resource "baiducloud_hpas_instance" "example" {
 - `auto_seq_suffix` (Boolean) Whether to automatically append a suffix to the application name. Defaults to `false`.
 - `ehc_cluster_id` (String) EHC cluster ID. If not specified, the system will automatically select default EHC cluster.
 - `internal_ip` (String) Internal IP addresses. Must match the CIDR block of the specified subnet. Changing this value triggers a restart of the instance.
+- `keypair_id` (String) The ID of the keypair to bind to the instance.
 - `payment_timing` (String) Payment timing of billing. Valid values: `Prepaid`, `Postpaid`. Defaults to `Postpaid`.
 - `period` (Number) The reservation length (month) will pay. Effective when `payment_timing` is `Prepaid`. Valid values: `1`~`9`, `12`, `24`, `36`. Defaults to `1`.
 - `security_group_type` (String) Security group type. Valid values: `normal`, `enterprise`. Defaults to `normal`.
@@ -67,6 +68,7 @@ resource "baiducloud_hpas_instance" "example" {
 - `ehc_cluster_name` (String) Name of the EHC cluster.
 - `id` (String) The ID of this resource.
 - `image_name` (String) Name of the image.
+- `keypair_name` (String) Name of the keypair.
 - `status` (String) Status of the instance. Possible values: `Creating`, `Active`, `Expired`, `Error`, `Stopping`, `Starting`, `Stopped`, `Reboot`, `Rebuild`, `Password`, `ChangeVpc`, `ChangeSubnet`, `Template`.
 - `subnet_name` (String) Name of the subnet.
 - `vpc_cidr` (String) CIDR block of the VPC.
