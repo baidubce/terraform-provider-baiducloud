@@ -1,4 +1,10 @@
-	## 1.22.6 (Unreleased)
+	## 1.22.7 (Unreleased)
+
+## 1.22.6 (July 11, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_hpas_instance: Add parameters `keypair_id`, `keypair_name`.
+- resource/baiducloud_ccev2_instance_group: Add parameters `spec.hpas_option`, `spec.security_group_type`.
+- resource/baiducloud_ccev2_instance_group_attachment: Add parameter `existed_instances_config.machine_type`.
 
 ## 1.22.5 (July 08, 2025)
 FEATURES:
