@@ -44,6 +44,7 @@ The `existed_instances_config` object supports the following:
 
 * `admin_password` - (Optional) Admin password for login.
 * `image_id` - (Optional) Image ID used for rebuild.
+* `machine_type` - (Optional) Machine type. Valid values: `BCC`, `BBC`, `EBC`, `HPAS`. Defaults to `BCC`.
 * `rebuild` - (Optional) Whether to reinstall the operating system. This will reinstall the OS on the selected instances, clearing all data on the system disk (irrecoverable). Data on cloud disks will not be affected. Only 'true' is supported currently.
 * `ssh_key_id` - (Optional) Key pair ID for login.
 * `use_instance_group_config_with_disk_info` - (Optional) Whether to apply the instance group’s disk mount configuration. Defaults to `false`.

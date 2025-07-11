@@ -31,6 +31,7 @@ import (
 	ccev2 "github.com/baidubce/bce-sdk-go/services/cce/v2"
 	"github.com/baidubce/bce-sdk-go/services/cce/v2/types"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 )
 
@@ -78,6 +79,13 @@ func resourceBaiduCloudCCEv2InstanceGroupAttachment() *schema.Resource {
 				MaxItems:    1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
+						"machine_type": {
+							Type:         schema.TypeString,
+							Description:  "Machine type. Valid values: `BCC`, `BBC`, `EBC`, `HPAS`. Defaults to `BCC`.",
+							Optional:     true,
+							Default:      "BCC",
+							ValidateFunc: validation.StringInSlice([]string{"BCC", "BBC", "EBC", "HPAS"}, false),
+						},
 						"rebuild": {
 							Type: schema.TypeBool,
 							Description: "Whether to reinstall the operating system. This will reinstall the OS on the selected instances, " +
@@ -260,7 +268,7 @@ func buildAttachmentInstanceSpec(config map[string]interface{}, instanceId, imag
 
 	spec := &types.InstanceSpec{
 		Existed:     true,
-		MachineType: types.MachineTypeBCC,
+		MachineType: types.MachineType(config["machine_type"].(string)),
 		ClusterRole: types.ClusterRoleNode,
 		ExistedOption: types.ExistedOption{
 			ExistedInstanceID: instanceId,
