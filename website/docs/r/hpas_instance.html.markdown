@@ -43,7 +43,6 @@ resource "baiducloud_hpas_instance" "example" {
 - `app_type` (String) Application type. e.g., `llama2_7B_train`.
 - `image_id` (String) Image ID used for the application. Changing this value triggers a reinstallation of the OS.
 - `name` (String) Name of the instance.
-- `password` (String, Sensitive) Password of the instance. This value should be 8-16 characters, and letters, numbers and symbols must exist at the same time. The symbols is limited to `!@#$%^*()`. Changing this value triggers a restart of the instance.
 - `security_group_ids` (Set of String) List of security group IDs, must be in the same VPC as the subnet
 - `subnet_id` (String) Subnet ID. Changing this value triggers a restart of the instance.
 - `zone_name` (String) Zone information, e.g., `cn-bj-a`.
@@ -57,6 +56,7 @@ resource "baiducloud_hpas_instance" "example" {
 - `ehc_cluster_id` (String) EHC cluster ID. If not specified, the system will automatically select default EHC cluster.
 - `internal_ip` (String) Internal IP addresses. Must match the CIDR block of the specified subnet. Changing this value triggers a restart of the instance.
 - `keypair_id` (String) The ID of the keypair to bind to the instance.
+- `password` (String, Sensitive) Password of the instance. This value should be 8-16 characters, and letters, numbers and symbols must exist at the same time. The symbols is limited to `!@#$%^*()`. Changing this value triggers a restart of the instance.
 - `payment_timing` (String) Payment timing of billing. Valid values: `Prepaid`, `Postpaid`. Defaults to `Postpaid`.
 - `period` (Number) The reservation length (month) will pay. Effective when `payment_timing` is `Prepaid`. Valid values: `1`~`9`, `12`, `24`, `36`. Defaults to `1`.
 - `security_group_type` (String) Security group type. Valid values: `normal`, `enterprise`. Defaults to `normal`.

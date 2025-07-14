@@ -96,7 +96,7 @@ func ResourceInstance() *schema.Resource {
 			},
 			"password": {
 				Type:      schema.TypeString,
-				Required:  true,
+				Optional:  true,
 				Sensitive: true,
 				Description: "Password of the instance. This value should be 8-16 characters, and letters, numbers and symbols must exist at the same time. " +
 					"The symbols is limited to `!@#$%^*()`. Changing this value triggers a restart of the instance.",
@@ -171,6 +171,15 @@ func ResourceInstance() *schema.Resource {
 				Computed:    true,
 				Description: "Creation time of the instance in ISO8601 format.",
 			},
+		},
+
+		CustomizeDiff: func(diff *schema.ResourceDiff, v interface{}) error {
+			_, passSet := diff.GetOk("password")
+			_, keyPairSet := diff.GetOk("keypair_id")
+			if !passSet && !keyPairSet {
+				return fmt.Errorf("at least one of password or keypair_id must be set")
+			}
+			return nil
 		},
 	}
 }
@@ -350,13 +359,16 @@ func buildCreationArgs(d *schema.ResourceData, client *hpas.Client) *api.CreateH
 		ZoneName:            d.Get("zone_name").(string),
 		ImageId:             d.Get("image_id").(string),
 		SubnetId:            d.Get("subnet_id").(string),
-		Password:            encryptPassword(d, client),
 		KeypairId:           d.Get("keypair_id").(string),
 		EhcClusterId:        d.Get("ehc_cluster_id").(string),
 		SecurityGroupType:   d.Get("security_group_type").(string),
 		SecurityGroupIds:    flex.ExpandStringValueSet(d.Get("security_group_ids").(*schema.Set)),
 		BillingModel:        billingModel,
 		Tags:                flex.ExpandMapToTagModel[api.TagModel](d.Get("tags").(map[string]interface{})),
+	}
+
+	if _, ok := d.GetOk("password"); ok {
+		args.Password = encryptPassword(d, client)
 	}
 
 	if v, ok := d.GetOk("internal_ip"); ok {
@@ -490,8 +502,11 @@ func resetInstance(d *schema.ResourceData, conn *connectivity.BaiduClient) error
 		args := api.ResetHpasReq{
 			HpasIds:   []string{d.Id()},
 			ImageId:   d.Get("image_id").(string),
-			Password:  encryptPassword(d, client),
 			KeypairId: d.Get("keypair_id").(string),
+		}
+
+		if _, ok := d.GetOk("password"); ok {
+			args.Password = encryptPassword(d, client)
 		}
 		return nil, client.ResetHpas(&args)
 	})
