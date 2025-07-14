@@ -1,4 +1,8 @@
-	## 1.22.7 (Unreleased)
+	## 1.22.8 (Unreleased)
+
+## 1.22.7 (July 14, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_hpas_instance: Change `password` from required to optional.
 
 ## 1.22.6 (July 11, 2025)
 ENHANCEMENTS:
