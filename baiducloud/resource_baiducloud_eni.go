@@ -66,13 +66,16 @@ $ terraform import baiducloud_eni.default eni_id
 package baiducloud
 
 import (
+	"fmt"
+	"log"
+	"time"
+
 	"github.com/baidubce/bce-sdk-go/bce"
 	"github.com/baidubce/bce-sdk-go/services/eni"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
-	"log"
-	"time"
 )
 
 const EniAvailable = "available"
@@ -113,17 +116,19 @@ func resourceBaiduCloudEni() *schema.Resource {
 				Computed:    true,
 			},
 			"security_group_ids": {
-				Type:        schema.TypeList,
-				Description: "Specifies the set of bound security group IDs",
-				Required:    true,
+				Type:          schema.TypeList,
+				Description:   "Specifies the set of bound security group IDs",
+				Optional:      true,
+				ConflictsWith: []string{"enterprise_security_group_ids"},
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"enterprise_security_group_ids": {
-				Type:        schema.TypeList,
-				Description: "Specifies the set of bound enterprise security group IDs",
-				Optional:    true,
+				Type:          schema.TypeList,
+				Description:   "Specifies the set of bound enterprise security group IDs",
+				Optional:      true,
+				ConflictsWith: []string{"security_group_ids"},
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -132,22 +137,25 @@ func resourceBaiduCloudEni() *schema.Resource {
 				Type:        schema.TypeList,
 				Description: "Specified intranet IP information",
 				Required:    true,
+				MinItems:    1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"public_ip_address": {
-							Type:        schema.TypeString,
-							Description: "The public IP address of the ENI, that is, the eip address",
-							Optional:    true,
+							Type: schema.TypeString,
+							Description: "The public IP address (EIP) of the ENI. Cannot be assigned during creation, or before a private IP is assigned; " +
+								"assign it after the ENI has been created and a private IP is available.",
+							Optional: true,
 						},
 						"primary": {
 							Type:        schema.TypeBool,
-							Description: "True or false, true mean it is primary IP, it's private IP address can not modify, only one primary IP in a ENI",
+							Description: "Whether this is the primary private IP address. If true, the IP address cannot be modified. Only one primary IP is allowed per ENI.",
 							Required:    true,
 						},
 						"private_ip_address": {
 							Type:        schema.TypeString,
-							Description: "Intranet IP address of the ENI",
-							Required:    true,
+							Description: "The private IP address to assign to the ENI. If empty, one will be assigned automatically.",
+							Optional:    true,
+							Computed:    true,
 						},
 					},
 				},
@@ -183,6 +191,15 @@ func resourceBaiduCloudEni() *schema.Resource {
 				Computed:    true,
 			},
 		},
+
+		CustomizeDiff: func(diff *schema.ResourceDiff, i interface{}) error {
+			_, securityGroupIdsSet := diff.GetOk("security_group_ids")
+			_, enterpriseSecurityGroupIdsSet := diff.GetOk("enterprise_security_group_ids")
+			if !securityGroupIdsSet && !enterpriseSecurityGroupIdsSet {
+				return fmt.Errorf("one of 'security_group_ids' or 'enterprise_security_group_ids' must be specified")
+			}
+			return nil
+		},
 	}
 }
 
@@ -190,6 +207,12 @@ func resourceBaiduCloudEniCreate(d *schema.ResourceData, meta interface{}) error
 	action := "Create Eni"
 	client := meta.(*connectivity.BaiduClient)
 	args := buildEniCreateArgs(d)
+	for _, v := range args.PrivateIpSet {
+		if v.PublicIpAddress != "" {
+			return fmt.Errorf("'public_ip_address' cannot be set during ENI creation. Please associate a public IP after the ENI has been created")
+		}
+	}
+
 	err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 		raw, err := client.WithEniClient(func(eniClient *eni.Client) (interface{}, error) {
 			return eniClient.CreateEni(args)
@@ -203,13 +226,6 @@ func resourceBaiduCloudEniCreate(d *schema.ResourceData, meta interface{}) error
 		addDebug(action, raw)
 		res := raw.(*eni.CreateEniResult)
 		d.SetId(res.EniId)
-		err = updateEniPrivateIP(d, meta)
-		if err != nil {
-			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
-				return resource.RetryableError(err)
-			}
-			return resource.NonRetryableError(err)
-		}
 		return nil
 	})
 	if err != nil {
@@ -320,7 +336,7 @@ func buildEniCreateArgs(d *schema.ResourceData) *eni.CreateEniArgs {
 		res.SecurityGroupIds = interfaceSlice2StringSlice(v.([]interface{}))
 	}
 	if v, ok := d.GetOk("enterprise_security_group_ids"); ok {
-		res.EnterpriseSecurityGroupIds = v.([]string)
+		res.EnterpriseSecurityGroupIds = interfaceSlice2StringSlice(v.([]interface{}))
 	}
 	if v, ok := d.GetOk("private_ip"); ok {
 		res.PrivateIpSet = interfaceSlice2PrivateIpSlice(v.([]interface{}))
@@ -408,6 +424,14 @@ func updateEniPrivateIP(d *schema.ResourceData, meta interface{}) error {
 		ns := n.([]interface{})
 		osSlice := getIPAddress("private_ip_address", os)
 		nsSlice := getIPAddress("private_ip_address", ns)
+
+		for _, item := range ns {
+			temp := item.(map[string]interface{})
+			if temp["private_ip_address"].(string) == "" && temp["public_ip_address"].(string) != "" {
+				return fmt.Errorf("'public_ip_address' cannot be set before a private IP is assigned. Assign it after the private IP is available")
+			}
+		}
+
 		// 1.unbind EIP
 		for _, item := range os {
 			temp := item.(map[string]interface{})
@@ -516,17 +540,22 @@ func updateEniPrivateIP(d *schema.ResourceData, meta interface{}) error {
 func updateEniSecurityGroup(d *schema.ResourceData, meta interface{}) error {
 	action := "Update Eni Security Group"
 	client := meta.(*connectivity.BaiduClient)
-	if d.HasChange("security_group_ids") {
+	if d.HasChanges("security_group_ids", "enterprise_security_group_ids") {
 		sgs := interfaceSlice2StringSlice(d.Get("security_group_ids").([]interface{}))
-		if len(sgs) == 0 {
-			return WrapErrorf(Error("security group ids can not be nil"), DefaultErrorMsg, "baiducloud_eni", action, BCESDKGoERROR)
-		}
+		esgs := interfaceSlice2StringSlice(d.Get("enterprise_security_group_ids").([]interface{}))
 		err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 			raw, err := client.WithEniClient(func(eniClient *eni.Client) (interface{}, error) {
-				return nil, eniClient.UpdateEniSecurityGroup(&eni.UpdateEniSecurityGroupArgs{
-					EniId:            d.Id(),
-					ClientToken:      buildClientToken(),
-					SecurityGroupIds: sgs,
+				if len(sgs) > 0 {
+					return nil, eniClient.UpdateEniSecurityGroup(&eni.UpdateEniSecurityGroupArgs{
+						EniId:            d.Id(),
+						ClientToken:      buildClientToken(),
+						SecurityGroupIds: sgs,
+					})
+				}
+				return nil, eniClient.UpdateEniEnterpriseSecurityGroup(&eni.UpdateEniEnterpriseSecurityGroupArgs{
+					EniId:                      d.Id(),
+					ClientToken:                buildClientToken(),
+					EnterpriseSecurityGroupIds: esgs,
 				})
 			})
 			if err != nil {

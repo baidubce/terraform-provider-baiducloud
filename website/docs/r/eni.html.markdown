@@ -71,16 +71,16 @@ The following arguments are supported:
 
 * `name` - (Required) Name of the ENI. Support for uppercase and lowercase letters, numbers, Chinese and special characters, such as "-","_","/",".", the value must start with a letter, length 1-65.
 * `private_ip` - (Required) Specified intranet IP information
-* `security_group_ids` - (Required) Specifies the set of bound security group IDs
 * `subnet_id` - (Required) Subnet ID which ENI belong to
 * `description` - (Optional) Description of the ENI
 * `enterprise_security_group_ids` - (Optional) Specifies the set of bound enterprise security group IDs
+* `security_group_ids` - (Optional) Specifies the set of bound security group IDs
 
 The `private_ip` object supports the following:
 
-* `primary` - (Required) True or false, true mean it is primary IP, it's private IP address can not modify, only one primary IP in a ENI
-* `private_ip_address` - (Required) Intranet IP address of the ENI
-* `public_ip_address` - (Optional) The public IP address of the ENI, that is, the eip address
+* `primary` - (Required) Whether this is the primary private IP address. If true, the IP address cannot be modified. Only one primary IP is allowed per ENI.
+* `private_ip_address` - (Optional) The private IP address to assign to the ENI. If empty, one will be assigned automatically.
+* `public_ip_address` - (Optional) The public IP address (EIP) of the ENI. Cannot be assigned during creation, or before a private IP is assigned; assign it after the ENI has been created and a private IP is available.
 
 ## Attributes Reference
 
