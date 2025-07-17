@@ -288,24 +288,41 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Default:     0,
 			},
 			"auto_renew_time_unit": {
-				Type:         schema.TypeString,
-				Description:  "Time unit of automatic renewal, the value can be month or year. The default value is empty, indicating no automatic renewal. It is valid only when the payment_timing is Prepaid.",
-				Optional:     true,
-				ValidateFunc: validation.StringInSlice([]string{"month", "year"}, false),
+				Type:             schema.TypeString,
+				Description:      "Time unit of automatic renewal, the value can be month or year. The default value is empty, indicating no automatic renewal. It is valid only when the payment_timing is Prepaid.",
+				Optional:         true,
+				ValidateFunc:     validation.StringInSlice([]string{"month", "year"}, false),
+				DiffSuppressFunc: postPaidDiffSuppressFunc,
 			},
 			"auto_renew_time_length": {
-				Type:         schema.TypeInt,
-				Description:  "The time length of automatic renewal. It is valid when payment_timing is Prepaid, and the value should be 1-9 when the auto_renew_time_unit is month and 1-3 when the auto_renew_time_unit is year. Default to 1.",
-				Optional:     true,
-				Default:      1,
-				ValidateFunc: validation.IntBetween(1, 9),
+				Type: schema.TypeInt,
+				Description: "The time length of automatic renewal. Effective only when `payment_timing` is `Prepaid`. " +
+					"Valid values are `1–9` when `auto_renew_time_unit` is `month` and `1–3` when it is `year`. " +
+					"Defaults to `1`. Due to API limitations, modifying this parameter after the auto-renewal rule is created " +
+					"will first delete the existing rule and then recreate it.",
+				Optional:         true,
+				Default:          1,
+				ValidateFunc:     validation.IntBetween(1, 9),
+				DiffSuppressFunc: autoRenewDiffSuppressFunc,
 			},
 			"cds_auto_renew": {
-				Type:        schema.TypeBool,
-				Description: "Whether the cds is automatically renewed. It is valid when payment_timing is Prepaid. Default to false.",
-				Optional:    true,
-				Default:     false,
-				ForceNew:    true,
+				Type: schema.TypeBool,
+				Description: "[This parameter is deprecated as CDS auto-renewal now aligns with the BCC instance.] " +
+					"Whether the cds is automatically renewed. It is valid when payment_timing is Prepaid. Default to false.",
+				Deprecated:       "This parameter is deprecated as CDS auto-renewal now aligns with the BCC instance.",
+				Optional:         true,
+				Default:          false,
+				DiffSuppressFunc: postPaidDiffSuppressFunc,
+			},
+			"sync_eip_auto_renew_rule": {
+				Type: schema.TypeBool,
+				Description: "Whether to synchronize the EIP's auto-renewal rule with that of the associated BCC instance. " +
+					"This setting applies during both the creation and deletion of the BCC's auto-renewal rule. " +
+					"Modifying this parameter alone does not trigger any change to the EIP's auto-renewal rule. " +
+					"Effective only when `payment_timing` is `Prepaid`. Defaults to `true`.",
+				Optional:         true,
+				Default:          true,
+				DiffSuppressFunc: postPaidDiffSuppressFunc,
 			},
 			"related_release_flag": {
 				Type:        schema.TypeBool,
@@ -626,6 +643,8 @@ func resourceBaiduCloudInstanceRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("instance_spec", response.Instance.Spec)
 
 	d.Set("payment_timing", response.Instance.PaymentTiming)
+	d.Set("auto_renew_time_unit", response.Instance.AutoRenewPeriodUnit)
+	d.Set("auto_renew_time_length", response.Instance.AutoRenewPeriod)
 
 	// Computed
 	d.Set("description", response.Instance.Description)
@@ -742,9 +761,16 @@ func resourceBaiduCloudInstanceUpdate(d *schema.ResourceData, meta interface{}) 
 		return err
 	}
 
-	// update payment timing
-	if err := updateInstancePaymentTiming(d, meta, instanceID); err != nil {
-		return err
+	if d.HasChange("payment_timing") {
+		// update payment timing
+		if err := updateInstancePaymentTiming(d, meta, instanceID); err != nil {
+			return err
+		}
+	} else if d.HasChanges("auto_renew_time_unit", "auto_renew_time_length") {
+		// update auto renew rules
+		if err := updateInstanceAutoRenew(d, meta, instanceID); err != nil {
+			return err
+		}
 	}
 
 	d.Partial(false)
@@ -1633,4 +1659,60 @@ func updateInstancePaymentTiming(d *schema.ResourceData, meta interface{}, insta
 	}
 	return nil
 
+}
+
+func updateInstanceAutoRenew(d *schema.ResourceData, meta interface{}, instanceID string) error {
+	if d.HasChanges("auto_renew_time_unit", "auto_renew_time_length") {
+		client := meta.(*connectivity.BaiduClient)
+
+		deleteRule := func() error {
+			_, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
+				args := &api.BccDeleteAutoRenewArgs{
+					InstanceId: instanceID,
+					RenewEip:   d.Get("sync_eip_auto_renew_rule").(bool),
+				}
+				return nil, bccClient.BatchDeleteAutoRenewRules(args)
+			})
+			return err
+
+		}
+
+		createRule := func() error {
+			args := &api.BccCreateAutoRenewArgs{
+				InstanceId:    instanceID,
+				RenewTimeUnit: d.Get("auto_renew_time_unit").(string),
+				RenewTime:     d.Get("auto_renew_time_length").(int),
+				RenewEip:      d.Get("sync_eip_auto_renew_rule").(bool),
+			}
+			_, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
+				return nil, bccClient.BatchCreateAutoRenewRules(args)
+			})
+			return err
+		}
+
+		_, timeUnitSet := d.GetOk("auto_renew_time_unit")
+		if timeUnitSet {
+			autoRenewEnabled := d.Get("auto_renew").(bool)
+			if autoRenewEnabled {
+				err := deleteRule()
+				if err != nil {
+					return fmt.Errorf("delete auto renew rule failed: %s", err)
+				}
+				err = createRule()
+				if err != nil {
+					return fmt.Errorf("create auto renew rule failed: %s", err)
+				}
+			}
+		} else {
+			err := deleteRule()
+			if err != nil {
+				return fmt.Errorf("delete auto renew rule failed: %s", err)
+			}
+		}
+
+		d.SetPartial("auto_renew_time_unit")
+		d.SetPartial("auto_renew_time_length")
+		d.SetPartial("sync_eip_auto_renew_rule")
+	}
+	return nil
 }

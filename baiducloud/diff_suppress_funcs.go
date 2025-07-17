@@ -13,6 +13,10 @@ func postPaidBillingDiffSuppressFunc(k, old, new string, d *schema.ResourceData)
 	return d.Get("billing").(map[string]interface{})["payment_timing"].(string) == PaymentTimingPostpaid
 }
 
+func autoRenewDiffSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
+	return d.Get("payment_timing").(string) == PaymentTimingPostpaid || d.Get("auto_renew_time_unit").(string) == ""
+}
+
 func specDiffSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
 	return d.Get("instance_spec").(string) != ""
 }

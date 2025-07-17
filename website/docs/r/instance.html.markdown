@@ -58,11 +58,11 @@ The following arguments are supported:
 * `image_id` - (Required) ID of the image to be used for the instance.
 * `action` - (Optional) Start or stop the instance, which can only be start or stop, default start.
 * `admin_pass` - (Optional, Sensitive) Password of the instance to be started. This value should be 8-16 characters, and English, numbers and symbols must exist at the same time. The symbols is limited to "!@#$%^*()".
-* `auto_renew_time_length` - (Optional) The time length of automatic renewal. It is valid when payment_timing is Prepaid, and the value should be 1-9 when the auto_renew_time_unit is month and 1-3 when the auto_renew_time_unit is year. Default to 1.
+* `auto_renew_time_length` - (Optional) The time length of automatic renewal. Effective only when `payment_timing` is `Prepaid`. Valid values are `1–9` when `auto_renew_time_unit` is `month` and `1–3` when it is `year`. Defaults to `1`. Due to API limitations, modifying this parameter after the auto-renewal rule is created will first delete the existing rule and then recreate it.
 * `auto_renew_time_unit` - (Optional) Time unit of automatic renewal, the value can be month or year. The default value is empty, indicating no automatic renewal. It is valid only when the payment_timing is Prepaid.
 * `availability_zone` - (Optional, ForceNew) Availability zone to start the instance in.
 * `card_count` - (Optional) Count of the GPU cards or FPGA cards to be carried for the instance to be created, it is valid only when the gpu_card or fpga_card field is not empty.
-* `cds_auto_renew` - (Optional, ForceNew) Whether the cds is automatically renewed. It is valid when payment_timing is Prepaid. Default to false.
+* `cds_auto_renew` - (Optional) **This parameter is deprecated as CDS auto-renewal now aligns with the BCC instance.** Whether the cds is automatically renewed. It is valid when payment_timing is Prepaid. Default to false.
 * `cds_disks` - (Optional) CDS disks of the instance.
 * `cpu_count` - (Optional) Number of CPU cores to be created for the instance.
 * `dedicate_host_id` - (Optional, ForceNew) The ID of dedicated host.
@@ -91,6 +91,7 @@ The following arguments are supported:
 * `security_groups` - (Optional) Security group ids of the instance.
 * `stop_with_no_charge` - (Optional) Whether to enable stopping charging after shutdown for postpaid instance without local disks. Defaults to false.
 * `subnet_id` - (Optional) The subnet ID of VPC. The default subnet will be used when it is empty. The instance will restart after changing the subnet.
+* `sync_eip_auto_renew_rule` - (Optional) Whether to synchronize the EIP's auto-renewal rule with that of the associated BCC instance. This setting applies during both the creation and deletion of the BCC's auto-renewal rule. Modifying this parameter alone does not trigger any change to the EIP's auto-renewal rule. Effective only when `payment_timing` is `Prepaid`. Defaults to `true`.
 * `tags` - (Optional, ForceNew) Tags, do not support modify
 * `user_data` - (Optional) User Data
 
