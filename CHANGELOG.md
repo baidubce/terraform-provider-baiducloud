@@ -1,4 +1,11 @@
-	## 1.22.8 (Unreleased)
+	## 1.22.9 (Unreleased)
+
+## 1.22.8 (July 17, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_instance: Support modifying `auto_renew_time_unit` and `auto_renew_time_length`.
+
+BUG FIXES:
+- resource_baiducloud_eni: fix issues during resource creation and update.
 
 ## 1.22.7 (July 14, 2025)
 ENHANCEMENTS:
