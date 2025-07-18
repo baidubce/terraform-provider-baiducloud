@@ -1,4 +1,8 @@
-	## 1.22.9 (Unreleased)
+	## 1.22.10 (Unreleased)
+
+## 1.22.9 (July 18, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_bec_vm_instance: Add parameters `payment_method`, `reservation` and `auto_renew`.
 
 ## 1.22.8 (July 17, 2025)
 ENHANCEMENTS:
