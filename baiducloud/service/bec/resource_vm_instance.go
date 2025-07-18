@@ -150,6 +150,33 @@ func ResourceVMInstance() *schema.Resource {
 				MaxItems:    1,
 				Elem:        KeyConfigSchema(),
 			},
+			"payment_method": {
+				Type:         schema.TypeString,
+				Description:  "Payment method of the vm instance. Valid values: `prepay`, `postpay`.",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice([]string{"prepay", "postpay"}, false),
+				Default:      "postpay",
+			},
+			"auto_renew": {
+				Type: schema.TypeList,
+				Description: "Automatic renewal cycle: the system will automatically deduct and renew the resource 7/3/1/0 days " +
+					"before the resource expires. If the balance is insufficient during the automatic deduction, " +
+					"it will be postponed to the next scheduled deduction. The deduction period is equal to the automatic renewal cycle." +
+					"If it is not transmitted, it will not be automatically renewed.",
+				Optional:         true,
+				MaxItems:         1,
+				Elem:             TimeLengthSchema("AutoRenew"),
+				DiffSuppressFunc: needPrepayDiffSuppress,
+			},
+			"reservation": {
+				Type: schema.TypeList,
+				Description: "Reservation config of the vm instance. " +
+					"Prepaid plan purchase duration",
+				Optional:         true,
+				MaxItems:         1,
+				Elem:             TimeLengthSchema("Reservation"),
+				DiffSuppressFunc: needPrepayDiffSuppress,
+			},
 			// computed
 			"status": {
 				Type: schema.TypeString,
@@ -256,6 +283,24 @@ func KeyConfigSchema() *schema.Resource {
 				Optional:      true,
 				Sensitive:     true,
 				ConflictsWith: []string{"key_config.0.bcc_key_pair_id_list"},
+			},
+		},
+	}
+}
+
+func TimeLengthSchema(schemaType string) *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"length": {
+				Type:        schema.TypeInt,
+				Description: fmt.Sprintf("%s length.", schemaType),
+				Required:    true,
+			},
+			"time_unit": {
+				Type:         schema.TypeString,
+				Description:  fmt.Sprintf("%s time unit. Valid values: `month`, `year`", schemaType),
+				Required:     true,
+				ValidateFunc: validation.StringInSlice([]string{"month", "year"}, false),
 			},
 		},
 	}
@@ -424,6 +469,13 @@ func buildCreationArgs(d *schema.ResourceData) *api.CreateVmServiceArgs {
 		DnsConfig:         expandDNSConfig(d.Get("dns_config").([]interface{})),
 		KeyConfig:         expandKeyConfig(d.Get("key_config").([]interface{})),
 		NetworkConfigList: expandNetworkConfigList(d.Get("network_config").([]interface{})),
+		PaymentMethod:     d.Get("payment_method").(string),
+		AutoRenew:         expandAutoRenew(d.Get("auto_renew").([]interface{})),
+		Reservation:       expandReservation(d.Get("reservation").([]interface{})),
+	}
+	// Note: DirectPay: Prepay direct deduction, prepay payment business defaults to true
+	if args.PaymentMethod == "prepay" {
+		args.DirectPay = true
 	}
 	if args.NeedPublicIp {
 		args.NeedIpv6PublicIp = d.Get("need_ipv6_public_ip").(bool)

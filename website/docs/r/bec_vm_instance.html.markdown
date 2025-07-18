@@ -70,6 +70,7 @@ resource "baiducloud_bec_vm_instance" "example" {
 
 ### Optional
 
+- `auto_renew` (Block List, Max: 1) Automatic renewal cycle: the system will automatically deduct and renew the resource 7/3/1/0 days before the resource expires. If the balance is insufficient during the automatic deduction, it will be postponed to the next scheduled deduction. The deduction period is equal to the automatic renewal cycle.If it is not transmitted, it will not be automatically renewed. (see [below for nested schema](#nestedblock--auto_renew))
 - `bandwidth` (Number) Public network bandwidth size (Mbps).
 - `data_volume` (Block List) Data volume config of the vm instance. (see [below for nested schema](#nestedblock--data_volume))
 - `host_name` (String) Host name of the vm instance. If empty, system will assign one.
@@ -78,6 +79,8 @@ resource "baiducloud_bec_vm_instance" "example" {
 - `need_public_ip` (Boolean) Whether to open public network. Defaults to `false`.
 - `network_config` (Block List) Network config of the vm instance. If not set, system will use default network config. (see [below for nested schema](#nestedblock--network_config))
 - `network_type` (String) Network type of the instance. Valid values: `vpc`, `classic`. Default is `vpc`.
+- `payment_method` (String) Payment method of the vm instance. Valid values: `prepay`, `postpay`.
+- `reservation` (Block List, Max: 1) Reservation config of the vm instance. Prepaid plan purchase duration (see [below for nested schema](#nestedblock--reservation))
 - `spec` (String) Specification family.
 - `subnet_id` (String) ID of the subnet.
 - `vm_name` (String) Name of the vm instance. If empty, system will assign one.
@@ -131,6 +134,15 @@ Read-Only:
 - `pvc_name` (String) PVC name of the disk.
 
 
+<a id="nestedblock--auto_renew"></a>
+### Nested Schema for `auto_renew`
+
+Required:
+
+- `length` (Number) AutoRenew length.
+- `time_unit` (String) AutoRenew time unit. Valid values: `month`, `year`
+
+
 <a id="nestedblock--data_volume"></a>
 ### Nested Schema for `data_volume`
 
@@ -160,6 +172,16 @@ Optional:
 
 - `net_name` (String) Network name. Network card name, the names of internal and external network cards cannot be duplicated; Supports uppercase and lowercase letters, numbers, "- _", must start with a letter, and have a length of 3-16 characters.
 - `net_type` (String) Network type. Network card type (INTERNAL_IP represents internal network; Single line nodes use PULIC_SP to represent single line public network cards; Three line nodes are represented by TRIPLE_CT, TRIPLE-UN, and TRIPLE_CM respectively for telecommunications, China Unicom, and China Mobile on the three line public network
+
+
+
+<a id="nestedblock--reservation"></a>
+### Nested Schema for `reservation`
+
+Required:
+
+- `length` (Number) Reservation length.
+- `time_unit` (String) Reservation time unit. Valid values: `month`, `year`
 
 ## Import
 

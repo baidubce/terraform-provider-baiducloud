@@ -10,6 +10,11 @@ func needPublicIPDiffSuppress(k, old, new string, d *schema.ResourceData) bool {
 	return !d.Get("need_public_ip").(bool)
 }
 
+func needPrepayDiffSuppress(k, old, new string, d *schema.ResourceData) bool {
+	v, _ := d.Get("payment_method").(string)
+	return v != "prepay"
+}
+
 func volumeConfigCustomizeDiff(diff *schema.ResourceDiff, meta interface{}) error {
 	if diff.HasChange("system_volume") {
 		if err := forceNewIf("system_volume.0.name", diff); err != nil {

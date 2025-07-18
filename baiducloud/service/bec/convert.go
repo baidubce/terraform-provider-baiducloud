@@ -242,3 +242,25 @@ func expandNetworks(tfList []interface{}) *[]api.Networks {
 	}
 	return &list
 }
+
+func expandAutoRenew(tfList []interface{}) *api.AutoRenew {
+	if len(tfList) == 0 || tfList[0] == nil {
+		return nil
+	}
+	tfMap := tfList[0].(map[string]interface{})
+	return &api.AutoRenew{
+		Length:   tfMap["length"].(int),
+		TimeUnit: tfMap["time_unit"].(string),
+	}
+}
+
+func expandReservation(tfList []interface{}) *api.Reservation {
+	if len(tfList) == 0 || tfList[0] == nil {
+		return nil
+	}
+	tfMap := tfList[0].(map[string]interface{})
+	return &api.Reservation{
+		Length:   tfMap["length"].(int),
+		TimeUnit: tfMap["time_unit"].(string),
+	}
+}
