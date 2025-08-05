@@ -79,6 +79,7 @@ In addition to all arguments above, the following attributes are exported:
     * `status` - Status of the replication configuration.
   * `server_side_encryption_rule` - Encryption of the bucket.
   * `storage_class` - Storage class of the bucket.
+  * `versioning_status` - Versioning status of the bucket.
   * `website` - Website of the BOS bucket.
     * `error_document` - An absolute path to the document to return in case of a 404 error.
     * `index_document` - Baiducloud BOS returns this index document when requests are made to the root domain or any of the subfolders.

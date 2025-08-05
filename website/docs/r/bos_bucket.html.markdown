@@ -14,6 +14,14 @@ Provide a resource to create a BOS Bucket.
 ## Example Usage
 
 ```hcl
+Versioning bucket
+resource "baiducloud_bos_bucket" "default" {
+  bucket = "${var.bucket}"
+  versioning_status = "enabled"
+}
+```
+
+```hcl
 Private bucket
 resource "baiducloud_bos_bucket" "default" {
   bucket = "${var.bucket}"
@@ -128,15 +136,16 @@ The following arguments are supported:
 * `acl` - (Optional) Canned ACL to apply, available values are private, public-read and public-read-write. Default to private.
 * `copyright_protection` - (Optional) Configuration of the copyright protection.
 * `cors_rule` - (Optional) Configuration of the Cross-Origin Resource Sharing. Up to 100 rules are allowed per bucket, if there are multiple configurations, the execution order is from top to bottom.
+* `enable_multi_az` - (Optional, ForceNew) Whether to enable multi-az replication for the bucket. Default to false.
 * `force_destroy` - (Optional) Whether to force delete the bucket and related objects when the bucket is not empty. Default to false.
 * `lifecycle_rule` - (Optional) Configuration of object lifecycle management.
-* `enable_multi_az` (Optional) Whether to enable multi-az replication for the bucket. Default to false.
 * `logging` - (Optional) Settings of the bucket logging.
 * `replication_configuration` - (Optional) Replication configuration of the BOS bucket.
 * `resource_group` - (Optional, ForceNew) resource group of bucket.
 * `server_side_encryption_rule` - (Optional) Encryption rule for the server side, which can only be AES256 currently.
 * `storage_class` - (Optional) Storage class of the BOS bucket, available values are STANDARD, STANDARD_IA, MAZ_STANDARD, MAZ_STANDARD_IA, COLD or ARCHIVE.
 * `tags` - (Optional, ForceNew) Tags, do not support modify
+* `versioning_status` - (Optional) Versioning status of the BOS bucket.
 * `website` - (Optional) Website of the BOS bucket.
 
 The `copyright_protection` object supports the following:
@@ -189,7 +198,7 @@ The `replication_configuration` object supports the following:
 The `destination` object supports the following:
 
 * `bucket` - (Required) Destination bucket name of the replication configuration.
-* `storage_class` - (Optional) Destination storage class of the replication configuration, the parameter does not need to be configured if it is consistent with the storage class of the source bucket, if you need to specify the storage class separately, it can be COLD, STANDARD, STANDARD_IA.
+* `storage_class` - (Optional) Destination storage class of the replication configuration, the parameter does not need to be configured if it is consistent with the storage class of the source bucket, if you need to specify the storage class separately, it can be COLD, STANDARD, STANDARD_IA, MAZ_STANDARD, MAZ_STANDARD_IA.
 
 The `replicate_history` object supports the following:
 

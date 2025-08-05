@@ -21,6 +21,10 @@ const (
 
 	BOS_BUCKET_OBJECT_CONTENT_DISPOSITION_INLINE     = "inline"
 	BOS_BUCKET_OBJECT_CONTENT_DISPOSITION_ATTACHMENT = "attachment"
+
+	BOS_BUCKET_VERSIONING_NOT_ENABLED = "notEnabled"
+	BOS_BUCKET_VERSIONING_ENABLED     = "enabled"
+	BOS_BUCKET_VERSIONING_SUSPENDED   = "suspended"
 )
 
 type BosService struct {
@@ -51,6 +55,21 @@ func (s *BosService) ListAllObjects(bucket, prefix string) ([]api.ObjectSummaryT
 	}
 
 	return objects, nil
+}
+
+func (s *BosService) resourceBaiduCloudBosBucketReadVersioningStatus(bucket string) (string, error) {
+	action := "read bos bucket versioning status " + bucket
+
+	raw, err := s.client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
+		return bosClient.GetBucketVersioning(bucket)
+	})
+	addDebug(action, raw)
+	if err != nil {
+		return "", err
+	}
+
+	result, _ := raw.(*api.BucketVersioningArgs)
+	return result.Status, nil
 }
 
 func (s *BosService) resourceBaiduCloudBosBucketReadAcl(bucket string) (string, error) {

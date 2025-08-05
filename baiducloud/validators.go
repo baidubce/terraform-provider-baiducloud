@@ -89,6 +89,14 @@ func validateBOSBucketStorageClass() schema.SchemaValidateFunc {
 	}, false)
 }
 
+func validateBOSBucketVersioningStatus() schema.SchemaValidateFunc {
+	return validation.StringInSlice([]string{
+		BOS_BUCKET_VERSIONING_NOT_ENABLED,
+		BOS_BUCKET_VERSIONING_ENABLED,
+		BOS_BUCKET_VERSIONING_SUSPENDED,
+	}, false)
+}
+
 func validateBOSBucketEnableMultiAZ(v interface{}, k string) (ws []string, errors []error) {
 	value := v.(bool)
 	if value {

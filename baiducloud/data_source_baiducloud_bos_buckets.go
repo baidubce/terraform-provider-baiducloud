@@ -73,7 +73,11 @@ func dataSourceBaiduCloudBosBuckets() *schema.Resource {
 							Description: "Owner name of the bucket.",
 							Computed:    true,
 						},
-
+						"versioning_status": {
+							Type:        schema.TypeString,
+							Description: "Versioning status of the bucket.",
+							Computed:    true,
+						},
 						"acl": {
 							Type:        schema.TypeString,
 							Description: "Acl of the bucket.",
@@ -402,6 +406,13 @@ func dataSourceBaiduCloudBosBucketsReadBucketData(meta interface{}, bucket strin
 
 	// read basic
 	bucMap := make(map[string]interface{})
+
+	// read versioning status
+	versioningStatus, err := bosService.resourceBaiduCloudBosBucketReadVersioningStatus(bucket)
+	if err != nil {
+		return nil, WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_buckets", action, BCESDKGoERROR)
+	}
+	bucMap["versioning_status"] = versioningStatus
 
 	// read bucket acl
 	acl, err := bosService.resourceBaiduCloudBosBucketReadAcl(bucket)

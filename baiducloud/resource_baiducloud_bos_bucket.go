@@ -4,6 +4,14 @@ Provide a resource to create a BOS Bucket.
 Example Usage
 
 ```hcl
+Versioning bucket
+resource "baiducloud_bos_bucket" "default" {
+  bucket = "${var.bucket}"
+  versioning_status = "enabled"
+}
+```
+
+```hcl
 Private bucket
 resource "baiducloud_bos_bucket" "default" {
   bucket = "${var.bucket}"
@@ -122,8 +130,10 @@ package baiducloud
 
 import (
 	"encoding/json"
-	"github.com/baidubce/bce-sdk-go/services/resmanager"
+	"fmt"
 	"time"
+
+	"github.com/baidubce/bce-sdk-go/services/resmanager"
 
 	"github.com/baidubce/bce-sdk-go/services/bos"
 	"github.com/baidubce/bce-sdk-go/services/bos/api"
@@ -160,6 +170,13 @@ func resourceBaiduCloudBosBucket() *schema.Resource {
 				Description: "Name of the bucket.",
 				Required:    true,
 				ForceNew:    true,
+			},
+			"versioning_status": {
+				Type:         schema.TypeString,
+				Description:  "Versioning status of the BOS bucket.",
+				Optional:     true,
+				Default:      BOS_BUCKET_VERSIONING_NOT_ENABLED,
+				ValidateFunc: validateBOSBucketVersioningStatus(),
 			},
 			"enable_multi_az": {
 				Type:         schema.TypeBool,
@@ -518,10 +535,28 @@ func resourceBaiduCloudBosBucketCreate(d *schema.ResourceData, meta interface{})
 	args := &api.PutBucketArgs{
 		EnableMultiAz: d.Get("enable_multi_az").(bool),
 	}
+	versioningStatus := d.Get("versioning_status").(string)
 	action := "Create Bucket " + bucket
 
 	location, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
-		return bosClient.PutBucketWithArgs(bucket, args)
+		location, err := bosClient.PutBucketWithArgs(bucket, args)
+		if err != nil {
+			return location, err
+		}
+		if versioningStatus != BOS_BUCKET_VERSIONING_NOT_ENABLED {
+			versioningArgs := &api.BucketVersioningArgs{
+				Status: versioningStatus,
+			}
+			err = bosClient.PutBucketVersioning(bucket, versioningArgs)
+			if err != nil {
+				delErr := bosClient.DeleteBucket(bucket)
+				if delErr != nil {
+					err = fmt.Errorf("%w, %s", err, delErr.Error())
+				}
+				return "", err
+			}
+		}
+		return location, nil
 	})
 	if err != nil {
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_bucket", action, BCESDKGoERROR)
@@ -561,6 +596,13 @@ func resourceBaiduCloudBosBucketRead(d *schema.ResourceData, meta interface{}) e
 			break
 		}
 	}
+
+	// read versioning status
+	versioningStatus, err := bosService.resourceBaiduCloudBosBucketReadVersioningStatus(bucket)
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_bucket", action, BCESDKGoERROR)
+	}
+	d.Set("versioning_status", versioningStatus)
 
 	// read bucket acl
 	acl, err := bosService.resourceBaiduCloudBosBucketReadAcl(bucket)
@@ -640,6 +682,14 @@ func resourceBaiduCloudBosBucketUpdate(d *schema.ResourceData, meta interface{})
 	addDebug(action, bucket)
 
 	d.Partial(true)
+
+	// update versioning status
+	if d.HasChange("versioning_status") {
+		if err := resourceBaiduCloudBosBucketVersioningStatusUpdate(d, client); err != nil {
+			return err
+		}
+		d.SetPartial("versioning_status")
+	}
 
 	// update acl
 	if d.HasChange("acl") {
@@ -842,6 +892,27 @@ func flattenBaiduCloudBucketReplicationConfiguration(getBucketReplicationResult 
 
 func resourceHash(v interface{}) int {
 	return hashcode.String(v.(string))
+}
+
+func resourceBaiduCloudBosBucketVersioningStatusUpdate(d *schema.ResourceData, client *connectivity.BaiduClient) error {
+	action := "Update BOS Bucket versioning status"
+	bucket := d.Get("bucket").(string)
+	args := &api.BucketVersioningArgs{
+		Status: d.Get("versioning_status").(string),
+	}
+	if args.Status == BOS_BUCKET_VERSIONING_NOT_ENABLED {
+		err := fmt.Errorf("versioning status should be updated to '%s' or '%s'",
+			BOS_BUCKET_VERSIONING_ENABLED, BOS_BUCKET_VERSIONING_SUSPENDED)
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_bucket", action, BCESDKGoERROR)
+	}
+
+	if _, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
+		return nil, bosClient.PutBucketVersioning(bucket, args)
+	}); err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_bucket", action, BCESDKGoERROR)
+	}
+
+	return nil
 }
 
 func resourceBaiduCloudBosBucketAclUpdate(d *schema.ResourceData, client *connectivity.BaiduClient) error {
