@@ -15,7 +15,7 @@ const (
 
 func waitVMInstanceAvailable(conn *connectivity.BaiduClient, vmID string) (*api.VmInstanceDetailsVo, error) {
 	stateConf := &resource.StateChangeConf{
-		Delay:   0,
+		Delay:   10 * time.Second,
 		Pending: []string{VMInstanceStatusCreating, VMInstanceStatusRestarting},
 		Target:  []string{VMInstanceStatusRunning},
 		Refresh: StatusVMInstance(conn, vmID),

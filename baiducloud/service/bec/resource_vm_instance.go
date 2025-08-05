@@ -152,7 +152,7 @@ func ResourceVMInstance() *schema.Resource {
 			},
 			"payment_method": {
 				Type:         schema.TypeString,
-				Description:  "Payment method of the vm instance. Valid values: `prepay`, `postpay`.",
+				Description:  "Payment method of the vm instance. Valid values: `prepay`, `postpay`. The payment method cannot be modified after the instance was created.",
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice([]string{"prepay", "postpay"}, false),
 				Default:      "postpay",

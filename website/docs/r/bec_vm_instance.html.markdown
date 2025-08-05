@@ -79,7 +79,7 @@ resource "baiducloud_bec_vm_instance" "example" {
 - `need_public_ip` (Boolean) Whether to open public network. Defaults to `false`.
 - `network_config` (Block List) Network config of the vm instance. If not set, system will use default network config. (see [below for nested schema](#nestedblock--network_config))
 - `network_type` (String) Network type of the instance. Valid values: `vpc`, `classic`. Default is `vpc`.
-- `payment_method` (String) Payment method of the vm instance. Valid values: `prepay`, `postpay`.
+- `payment_method` (String) Payment method of the vm instance. Valid values: `prepay`, `postpay`. The payment method cannot be modified after the instance was created.
 - `reservation` (Block List, Max: 1) Reservation config of the vm instance. Prepaid plan purchase duration (see [below for nested schema](#nestedblock--reservation))
 - `spec` (String) Specification family.
 - `subnet_id` (String) ID of the subnet.
