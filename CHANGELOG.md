@@ -1,4 +1,9 @@
-	## 1.22.10 (Unreleased)
+	## 1.22.11 (Unreleased)
+
+## 1.22.10 (August 05, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_bec_vm_instance: Optimize instance availability wait delay.
+- resource/baiducloud_bos_bucket: Add parameter `versioning_status`.
 
 ## 1.22.9 (July 18, 2025)
 ENHANCEMENTS:
