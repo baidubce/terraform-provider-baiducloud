@@ -1,5 +1,10 @@
 	## 1.22.11 (Unreleased)
 
+## 1.22.11 (August 18, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_security_group_rule, resource/baiducloud_route_rule: Update handling of duplicate rules.
+  (Modify provider logic to update existing rules when a duplicate is detected)
+
 ## 1.22.10 (August 05, 2025)
 ENHANCEMENTS:
 - resource/baiducloud_bec_vm_instance: Optimize instance availability wait delay.
