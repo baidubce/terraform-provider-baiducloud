@@ -22,6 +22,8 @@ package baiducloud
 
 import (
 	"fmt"
+	"log"
+	"strings"
 	"time"
 
 	"github.com/baidubce/bce-sdk-go/bce"
@@ -108,6 +110,7 @@ func resourceBaiduCloudSecurityGroupRule() *schema.Resource {
 				Computed:      true,
 				ForceNew:      true,
 				ConflictsWith: []string{"source_group_id"},
+				DiffSuppressFunc: diffSuppressIpSuffix,
 			},
 			"dest_group_id": {
 				Type:          schema.TypeString,
@@ -124,9 +127,14 @@ func resourceBaiduCloudSecurityGroupRule() *schema.Resource {
 				Computed:      true,
 				ForceNew:      true,
 				ConflictsWith: []string{"dest_group_id"},
+				DiffSuppressFunc: diffSuppressIpSuffix,
 			},
 		},
 	}
+}
+
+func diffSuppressIpSuffix(k, old, new string, d *schema.ResourceData) bool {
+	return strings.TrimSuffix(old, "/32") == strings.TrimSuffix(new, "/32")
 }
 
 func resourceBaiduCloudSecurityGroupRuleCreate(d *schema.ResourceData, meta interface{}) error {
@@ -143,30 +151,77 @@ func resourceBaiduCloudSecurityGroupRuleCreate(d *schema.ResourceData, meta inte
 		return WrapError(err)
 	}
 
-	args := &api.AuthorizeSecurityGroupArgs{
-		Rule:        singleRule,
-		ClientToken: buildClientToken(),
+	sgRule, err := bccService.GetSecurityGroupRule(ruleId)
+	if err != nil {
+		if !NotFoundError(err) {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_security_group_rule", "Get SecurityGroup Rule", BCESDKGoERROR)
+		}
 	}
-	action := "Authorize SecurityGroup Rules " + singleRule.SecurityGroupId
 
-	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
-		_, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
-			return nil, bccClient.AuthorizeSecurityGroupRule(singleRule.SecurityGroupId, args)
+	if sgRule == nil {
+		log.Printf("[DEBUG] SecurityGroup Rule %s not found, will create a new one", ruleId)
+
+		// create rule
+		args := &api.AuthorizeSecurityGroupArgs{
+			Rule:        singleRule,
+			ClientToken: buildClientToken(),
+		}
+		action := "Authorize SecurityGroup Rules " + singleRule.SecurityGroupId
+
+		err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+			_, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
+				return nil, bccClient.AuthorizeSecurityGroupRule(singleRule.SecurityGroupId, args)
+			})
+
+			if err != nil {
+				if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
+					return resource.RetryableError(err)
+				}
+				return resource.NonRetryableError(err)
+			}
+			addDebug(action, args)
+
+			return nil
 		})
 
 		if err != nil {
-			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
-				return resource.RetryableError(err)
-			}
-			return resource.NonRetryableError(err)
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_security_group_rule", action, BCESDKGoERROR)
 		}
-		addDebug(action, args)
+	} else {
+		log.Printf("[DEBUG] SecurityGroup Rule %s found, will update it", sgRule.SecurityGroupRuleId)
+		// update rule
+		args := &api.UpdateSecurityGroupRuleArgs{
+			SecurityGroupRuleId: sgRule.SecurityGroupRuleId,
+			Remark:              &singleRule.Remark,
+			PortRange:           &singleRule.PortRange,
+			SourceIp:            &singleRule.SourceIp,
+			SourceGroupId:       &singleRule.SourceGroupId,
+			DestIp:              &singleRule.DestIp,
+			DestGroupId:         &singleRule.DestGroupId,
+			Protocol:            &singleRule.Protocol,
+		}
+		action := "Update SecurityGroup Rule " + singleRule.SecurityGroupId
 
-		return nil
-	})
+		err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+			_, err := client.WithBccClient(func(bccClient *bcc.Client) (interface{}, error) {
+				return nil, bccClient.UpdateSecurityGroupRule(args)
+			})
 
-	if err != nil {
-		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_security_group_rule", action, BCESDKGoERROR)
+			if err != nil {
+				if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
+					return resource.RetryableError(err)
+				}
+				return resource.NonRetryableError(err)
+			}
+			addDebug(action, args)
+
+			return nil
+		})
+
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_security_group_rule", action, BCESDKGoERROR)
+		}
+
 	}
 
 	d.SetId(ruleId)
@@ -207,7 +262,7 @@ func resourceBaiduCloudSecurityGroupRuleRead(d *schema.ResourceData, meta interf
 func resourceBaiduCloudSecurityGroupRuleDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
 
-	action := "Delete Securitt Group Rule " + d.Id()
+	action := "Delete Security Group Rule " + d.Id()
 	singleRule, err := buildSingleSecurityGroupRuleModel(d)
 	if err != nil {
 		return WrapError(err)

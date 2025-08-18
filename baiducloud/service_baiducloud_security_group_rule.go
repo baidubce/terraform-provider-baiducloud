@@ -3,6 +3,7 @@ package baiducloud
 import (
 	"encoding/base64"
 	"encoding/json"
+	"strings"
 
 	"github.com/baidubce/bce-sdk-go/services/bcc/api"
 )
@@ -111,7 +112,7 @@ func compareSecurityGroupRule(r1, r2 *api.SecurityGroupRuleModel) bool {
 	}
 
 	if r1.Direction == "ingress" {
-		if !stringEqualWithDefault(r1.SourceIp, r2.SourceIp, []string{"", "all"}) {
+		if !stringEqualWithDefault(strings.TrimSuffix(r1.SourceIp, "/32"), strings.TrimSuffix(r2.SourceIp, "/32"), []string{"", "all"}) {
 			return false
 		}
 
@@ -120,8 +121,8 @@ func compareSecurityGroupRule(r1, r2 *api.SecurityGroupRuleModel) bool {
 		}
 	}
 
-	if r1.Direction == "engress" {
-		if !stringEqualWithDefault(r1.DestIp, r2.DestIp, []string{"", "all"}) {
+	if r1.Direction == "egress" {
+		if !stringEqualWithDefault(strings.TrimSuffix(r1.DestIp, "/32"), strings.TrimSuffix(r2.DestIp, "/32"), []string{"", "all"}) {
 			return false
 		}
 

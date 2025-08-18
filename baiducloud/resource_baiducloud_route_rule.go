@@ -17,6 +17,7 @@ resource "baiducloud_route_rule" "default" {
 package baiducloud
 
 import (
+	"log"
 	"strings"
 	"time"
 
@@ -111,7 +112,7 @@ func resourceBaiduCloudRouteRule() *schema.Resource {
 				Description:  "Type of the next hop, available values are custom, vpn, nat and dcGateway.",
 				Optional:     true,
 				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice([]string{"custom", "vpn", "nat", "dcGateway", "peerConn", "ipv6gateway"}, false),
+				ValidateFunc: validation.StringInSlice([]string{"custom", "vpn", "nat", "dcGateway", "peerConn", "ipv6gateway", "enic"}, false),
 			},
 			"description": {
 				Type:        schema.TypeString,
@@ -125,27 +126,55 @@ func resourceBaiduCloudRouteRule() *schema.Resource {
 
 func resourceBaiduCloudRouteRuleCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
+	routeTableID := d.Get("route_table_id").(string)
+	action := "Create Route Rule for Route Table " + routeTableID
 
-	createRouteRuleArgs := buildBaiduCloudRouteRuleArgs(d, meta)
-	action := "Create Route Rule for Route Table " + createRouteRuleArgs.RouteTableId
-
-	err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
-		raw, err := client.WithVpcClient(func(vpcClient *vpc.Client) (i interface{}, e error) {
-			return vpcClient.CreateRouteRule(createRouteRuleArgs)
+	rule, err := findRouteRule(client, routeTableID, d.Get("source_address").(string), d.Get("destination_address").(string))
+	if err != nil {
+		return err
+	}
+	if rule == nil {
+		// create route rule
+		createRouteRuleArgs := buildCreateRouteRuleArgs(d)
+		err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+			raw, err := client.WithVpcClient(func(vpcClient *vpc.Client) (i interface{}, e error) {
+				return vpcClient.CreateRouteRule(createRouteRuleArgs)
+			})
+			if err != nil {
+				if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
+					return resource.RetryableError(err)
+				}
+				return resource.NonRetryableError(err)
+			}
+			addDebug(action, raw)
+			result, _ := raw.(*vpc.CreateRouteRuleResult)
+			d.SetId(result.RouteRuleId)
+			return nil
 		})
 		if err != nil {
-			if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
-				return resource.RetryableError(err)
-			}
-			return resource.NonRetryableError(err)
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_route_rule", action, BCESDKGoERROR)
 		}
-		addDebug(action, raw)
-		result, _ := raw.(*vpc.CreateRouteRuleResult)
-		d.SetId(result.RouteRuleId)
-		return nil
-	})
-	if err != nil {
-		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_route_rule", action, BCESDKGoERROR)
+	} else {
+		log.Printf("[DEBUG] Route Rule %s already exists. Updating...", rule.RouteRuleId)
+		// update route rule
+
+		updateArgs := buildUpdateRouteRuleArgs(d, rule.RouteRuleId)
+		err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+			_, err := client.WithVpcClient(func(vpcClient *vpc.Client) (i interface{}, e error) {
+				return nil, vpcClient.UpdateRouteRule(updateArgs)
+			})
+			if err != nil {
+				if IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
+					return resource.RetryableError(err)
+				}
+				return resource.NonRetryableError(err)
+			}
+			d.SetId(rule.RouteRuleId)
+			return nil
+		})
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_route_rule", action, BCESDKGoERROR)
+		}
 	}
 
 	return resourceBaiduCloudRouteRuleRead(d, meta)
@@ -224,7 +253,7 @@ func resourceBaiduCloudRouteRuleDelete(d *schema.ResourceData, meta interface{})
 	return nil
 }
 
-func buildBaiduCloudRouteRuleArgs(d *schema.ResourceData, meta interface{}) *vpc.CreateRouteRuleArgs {
+func buildCreateRouteRuleArgs(d *schema.ResourceData) *vpc.CreateRouteRuleArgs {
 	request := &vpc.CreateRouteRuleArgs{
 		ClientToken: buildClientToken(),
 	}
@@ -249,4 +278,50 @@ func buildBaiduCloudRouteRuleArgs(d *schema.ResourceData, meta interface{}) *vpc
 	}
 
 	return request
+}
+
+func buildUpdateRouteRuleArgs(d *schema.ResourceData, routeRuleId string) *vpc.UpdateRouteRuleArgs {
+	request := &vpc.UpdateRouteRuleArgs{
+		RouteRuleId: routeRuleId,
+		ClientToken: buildClientToken(),
+	}
+
+	if v := d.Get("source_address").(string); v != "" {
+		request.SourceAddress = v
+	}
+	if v := d.Get("destination_address").(string); v != "" {
+		request.DestinationAddress = v
+	}
+	if v := d.Get("next_hop_id").(string); v != "" {
+		request.NexthopId = v
+	}
+
+	if v := d.Get("description").(string); v != "" {
+		request.Description = v
+	}
+	return request
+}
+
+func findRouteRule(client *connectivity.BaiduClient, routeRuleId, sourceAddress, destinationAddress string) (*vpc.RouteRule, error) {
+	raw, err := client.WithVpcClient(func(vpcClient *vpc.Client) (i interface{}, e error) {
+		return vpcClient.GetRouteTableDetail(routeRuleId, "")
+	})
+
+	action := "Read Route Table " + routeRuleId
+	addDebug(action, raw)
+
+	if err != nil {
+		if !NotFoundError(err) {
+			return nil, WrapErrorf(err, DefaultErrorMsg, "baiducloud_route_rule", action, BCESDKGoERROR)
+		}
+		return nil, nil
+	}
+
+	result, _ := raw.(*vpc.GetRouteTableResult)
+	for _, rule := range result.RouteRules {
+		if rule.SourceAddress == sourceAddress && rule.DestinationAddress == destinationAddress {
+			return &rule, nil
+		}
+	}
+	return nil, nil
 }

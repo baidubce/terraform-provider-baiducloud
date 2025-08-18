@@ -11,6 +11,11 @@ description: |-
 
 Provide a resource to create a security group rule.
 
+~> **NOTE:** When a rule with the same combination of protocol, direction, port range, and either source/destination IP or source/destination group ID already exists in the security group, 
+creating such a rule will update the existing one instead of adding a new entry.
+This behavior is specific to the Terraform provider and ensures resource uniqueness. 
+It may differ from how rules appear or behave when managed directly in the cloud provider’s console.
+
 ## Example Usage
 
 ```hcl

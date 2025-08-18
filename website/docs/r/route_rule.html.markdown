@@ -11,6 +11,9 @@ description: |-
 
 Provides a resource to create a VPC routing rule.
 
+~> **NOTE:** When a rule with the same source CIDR and destination CIDR already exists in the route table, creating such a rule will update the existing one instead of adding a new entry.
+This behavior is specific to the Terraform provider and ensures resource uniqueness. It may differ from how rules appear or behave when managed directly in the cloud provider’s console.
+
 ## Example Usage
 
 ```hcl
