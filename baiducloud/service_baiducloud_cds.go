@@ -165,11 +165,17 @@ func (s *BccService) ModifyChargeTypeCDSVolume(volumeId string, args *api.Modify
 	return nil
 }
 
-func (s *BccService) ResizeCDSVolume(volumeId string, newSize int) error {
+func (s *BccService) ResizeCDSVolume(volumeId string, newSize int, newStorageType string) error {
 	args := &api.ResizeCSDVolumeArgs{
-		NewCdsSizeInGB: newSize,
 		ClientToken:    buildClientToken(),
 	}
+	if newSize > 0 {
+		args.NewCdsSizeInGB = newSize
+	}
+	if newStorageType != "" {
+		args.NewVolumeType = api.StorageType(newStorageType)
+	}
+
 	action := "Resize CDS volume " + volumeId
 
 	_, err := s.client.WithBccClient(func(client *bcc.Client) (i interface{}, e error) {
@@ -178,18 +184,16 @@ func (s *BccService) ResizeCDSVolume(volumeId string, newSize int) error {
 	addDebug(action, nil)
 
 	if err != nil {
-		if err != nil {
-			if !IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
-				return WrapErrorf(err, DefaultErrorMsg, "baiducloud_cds", action, BCESDKGoERROR)
-			}
+		if !IsExceptedErrors(err, []string{bce.EINTERNAL_ERROR}) {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_cds", action, BCESDKGoERROR)
 		}
 	}
 
 	stateConf := buildStateConf(
 		CDSProcessingStatus,
-		[]string{string(api.VolumeStatusAVAILABLE)},
+		[]string{string(api.VolumeStatusAVAILABLE), string(api.VolumeStatusINUSE)},
 		DefaultTimeout,
-		s.CDSVolumeStateRefreshFunc(volumeId, append(CDSFailedStatus, string(api.VolumeStatusINUSE))))
+		s.CDSVolumeStateRefreshFunc(volumeId, CDSFailedStatus))
 	if _, err := stateConf.WaitForState(); err != nil {
 		return WrapError(err)
 	}

@@ -338,19 +338,30 @@ func resourceBaiduCloudCDSUpdate(d *schema.ResourceData, meta interface{}) error
 		d.SetPartial("payment_timing")
 	}
 
-	if d.HasChange("disk_size_in_gb") {
-		o, n := d.GetChange("disk_size_in_gb")
-		oldSize := o.(int)
-		newSize := n.(int)
-		if oldSize > newSize {
-			return Error("Cds only support scaling size, old size should bigger than new size")
+	if d.HasChanges("disk_size_in_gb", "storage_type") {
+		var newVolumeSize = 0
+		var newStorageType = ""
+
+		if d.HasChange("disk_size_in_gb") {
+			o, n := d.GetChange("disk_size_in_gb")
+			oldSize := o.(int)
+			newSize := n.(int)
+			if oldSize > newSize {
+				return Error("Cds only support scaling size, new size should bigger than old size")
+			}
+			newVolumeSize = newSize
 		}
 
-		if err := bccService.ResizeCDSVolume(id, newSize); err != nil {
+		if d.HasChange("storage_type") {
+			newStorageType = d.Get("storage_type").(string)
+		}
+
+		if err := bccService.ResizeCDSVolume(id, newVolumeSize, newStorageType); err != nil {
 			return WrapError(err)
 		}
 
 		d.SetPartial("disk_size_in_gb")
+		d.SetPartial("storage_type")
 	}
 
 	d.Partial(false)
