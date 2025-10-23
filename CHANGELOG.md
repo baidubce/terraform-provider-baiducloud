@@ -1,4 +1,8 @@
-	## 1.22.11 (Unreleased)
+	## 1.22.13 (Unreleased)
+
+## 1.22.12 (October 23, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_cds: Support modifying `storage_type`.
 
 ## 1.22.11 (August 18, 2025)
 ENHANCEMENTS:
