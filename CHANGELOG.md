@@ -1,4 +1,8 @@
-	## 1.22.13 (Unreleased)
+	## 1.22.14 (Unreleased)
+
+## 1.22.13 (October 29, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_cds: Add support for `SSD_Enhanced`, `premium_ssd`, and `ssd` storage types
 
 ## 1.22.12 (October 23, 2025)
 ENHANCEMENTS:
