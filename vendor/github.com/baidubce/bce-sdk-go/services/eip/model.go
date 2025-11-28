@@ -75,6 +75,7 @@ type ResizeEipArgs struct {
 type BindEipArgs struct {
 	InstanceType string `json:"instanceType"`
 	InstanceId   string `json:"instanceId"`
+	InstanceIp   string `json:"instanceIp,omitempty"`
 	ClientToken  string `json:"-"`
 }
 
@@ -116,6 +117,7 @@ type EipModel struct {
 	RouteType       string           `json:"routeType"`
 	Tags            []model.TagModel `json:"tags"`
 	DeleteProtect   bool             `json:"deleteProtect"`
+	BwShortId       string           `json:"bwShortId"`
 }
 
 type ListRecycleEipArgs struct {
@@ -462,4 +464,10 @@ type ModifyDdosThresholdRequest struct {
 	ThresholdType string `json:"thresholdType"`
 	IpCleanMbps   int64  `json:"ipCleanMbps"`
 	IpCleanPps    int64  `json:"ipCleanPps"`
+}
+
+type EipToPrepayRequest struct {
+	BandWidth      int32  `json:"bandWidth"`
+	PurchaseLength int32  `json:"purchaseLength"`
+	ClientToken    string `json:"-"`
 }

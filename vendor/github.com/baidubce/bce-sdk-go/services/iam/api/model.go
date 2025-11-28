@@ -22,6 +22,7 @@ type UserModel struct {
 	CreateTime  time.Time `json:"createTime"`
 	Description string    `json:"description"`
 	Enabled     bool      `json:"enabled"`
+	Contact     string    `json:"contact"`
 }
 
 type CreateUserArgs struct {
@@ -31,11 +32,16 @@ type CreateUserArgs struct {
 
 type CreateUserResult UserModel
 
-type GetUserResult UserModel
+type GetUserResult struct {
+	UserModel
+	LastLoginTime time.Time `json:"lastLoginTime,omitempty"`
+}
 
 type UpdateUserArgs struct {
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
+	Contact     string `json:"contact,omitempty"`
+	Enabled     bool   `json:"enabled,omitempty"`
 }
 
 type UpdateUserResult UserModel
@@ -67,15 +73,18 @@ type LoginProfileModel struct {
 	EnabledLogin      bool   `json:"enabledLogin"`
 	EnabledLoginMfa   bool   `json:"enabledLoginMfa"`
 	LoginMfaType      string `json:"loginMfaType,omitempty"`
-	ThirdPartyType    bool   `json:"thirdPartyType,omitempty"`
-	ThirdPartyAccount bool   `json:"thirdPartyAccount,omitempty"`
+	ThirdPartyType    string `json:"thirdPartyType,omitempty"`
+	ThirdPartyAccount string `json:"thirdPartyAccount,omitempty"`
 }
 
 type UpdateUserLoginProfileArgs LoginProfileModel
 
 type UpdateUserLoginProfileResult LoginProfileModel
 
-type GetUserLoginProfileResult LoginProfileModel
+type GetUserLoginProfileResult struct {
+	LoginProfileModel
+	PasswordExpireDate time.Time `json:"passwordExpireDate,omitempty"`
+}
 
 type GroupModel struct {
 	Id          string    `json:"id"`

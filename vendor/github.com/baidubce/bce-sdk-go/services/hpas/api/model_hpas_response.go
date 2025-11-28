@@ -41,12 +41,26 @@ type HpasResponse struct {
 	RdmaPodName         string        `json:"rdmaPodName"`
 	KeypairId           string        `json:"keypairId"`
 	KeypairName         string        `json:"keypairName"`
+	UserData            string        `json:"userData"`
+	VolumeInfo          []VolumeInfo  `json:"volumeInfo"`
 }
 
 type RdmaNicTopo struct {
 	RdmaIp     string `json:"rdmaIp"`
 	SwitchName string `json:"switchName"`
 	SwitchPort string `json:"switchPort"`
+}
+
+type VolumeInfo struct {
+	VolumeId        string `json:"volumeId"`
+	VolumeName      string `json:"volumeName"`
+	VolumeSizeInGiB int    `json:"volumeSizeInGiB"`
+	CreateTime      string `json:"createTime"`
+	ExpiredTime     string `json:"expiredTime"`
+	VolumeStatus    string `json:"volumeStatus"`
+	VolumeType      string `json:"volumeType"`
+	VolumeCategory  string `json:"volumeCategory"`
+	Source          string `json:"source"`
 }
 
 type NicInfo struct {

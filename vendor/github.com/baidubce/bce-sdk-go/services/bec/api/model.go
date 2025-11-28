@@ -707,7 +707,7 @@ type UpdateVmServiceArgs struct {
 	UpdateBecVmForm
 	ServiceName     string                `json:"serviceName,omitempty"`
 	DeployInstances *[]DeploymentInstance `json:"deployInstances,omitempty"`
-	ReplicaTemplate ReplicaTemplate       `json:"replicaTemplate,omitempty"`
+	ReplicaTemplate *ReplicaTemplate      `json:"replicaTemplate,omitempty"`
 }
 type ReplicaTemplate struct {
 	Type       string `json:"type,omitempty"`
@@ -1104,6 +1104,7 @@ type VmInstanceDetailsVo struct {
 	DataStorage    int                `json:"dataStorage"`
 	DataVolumeList []VolumeConfig     `json:"dataVolumeList"`
 	SystemVolume   SystemVolumeConfig `json:"systemVolume"`
+	NetworkConfig  NetworkConfig      `json:"networkConfig"`
 	BccKeyPairList []KeyPair          `json:"bccKeyPairList"`
 	RackId         string             `json:"rackId,omitempty"`
 	HostId         string             `json:"hostId,omitempty"`
@@ -1228,6 +1229,7 @@ type VmInstanceBriefVo struct {
 	DeploysetList    []DeploySetVo   `json:"deploysetList"`
 	Hostname         string          `json:"hostname"`
 	Dns              string          `json:"dns"`
+	UserData         string          `json:"userData"`
 	Tags             *[]Tag          `json:"tags,omitempty"`
 }
 
@@ -1247,7 +1249,7 @@ type Vpc struct {
 	Name        string `json:"name"`
 	Cidr        string `json:"cidr"`
 	Description string `json:"description"`
-	subnet      Subnet `json:"subnet"`
+	Subnet      Subnet `json:"subnet"`
 }
 
 type Subnet struct {

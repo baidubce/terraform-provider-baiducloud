@@ -185,6 +185,30 @@ func (c *Client) ModifyInstanceVpc(body *api.ModifyInstanceVpcRequest) (*api.Bas
 	return api.ModifyInstanceVpc(c, body)
 }
 
+// ModifyReservedHpasName - 修改hpas预留实力券名称
+//
+// PARAMS:
+//   - body: body参数
+//
+// RETURNS:
+//   - *api.BaseV3Resp:
+//   - error: the return error if any occurs
+func (c *Client) ModifyReservedHpasName(body *api.ModifyReservedHpasNameReq) (*api.BaseV3Resp, error) {
+	return api.ModifyReservedHpasName(c, body)
+}
+
+// ModifyReservedHpas - 修改hpas预留实力券可用区，EHC集群
+//
+// PARAMS:
+//   - body: body参数
+//
+// RETURNS:
+//   - *api.ModifyReservedHpasResp:
+//   - error: the return error if any occurs
+func (c *Client) ModifyReservedHpas(body *api.ModifyReservedHpasReq) (*api.ModifyReservedHpasResp, error) {
+	return api.ModifyReservedHpas(c, body)
+}
+
 // CreateReservedHpas -
 //
 // PARAMS:
@@ -412,6 +436,30 @@ func (c *Client) ReplaceSecurityGroups(body *api.SecurityGroupsReq) (*api.BaseV3
 //   - error: the return error if any occurs
 func (c *Client) DetachSecurityGroups(body *api.SecurityGroupsReq) (*api.BaseV3Resp, error) {
 	return api.DetachSecurityGroups(c, body)
+}
+
+// RenewHPASInstances -
+//
+// PARAMS:
+//   - body: body参数
+//
+// RETURNS:
+//   - *api.RenewHpasResp:
+//   - error: the return error if any occurs
+func (c *Client) RenewHpasInstances(body *api.RenewHpasReq) (*api.RenewHpasResp, error) {
+	return api.RenewHpasInstances(c, body)
+}
+
+// DescribeHpasSpecs -
+//
+// PARAMS:
+//   - body: body参数
+//
+// RETURNS:
+//   - *api.DescribeHpasSpecsResp:
+//   - error: the return error if any occurs
+func (c *Client) DescribeHpasSpecs(body *api.DescribeHpasSpecsReq) (*api.DescribeHpasSpecsResp, error) {
+	return api.DescribeHpasSpecs(c, body)
 }
 
 func (c *Client) DescribeInstanceInventoryQuantity(body *api.DescribeInstanceInventoryQuantityReq) (*api.DescribeInstanceInventoryQuantityResp, error) {

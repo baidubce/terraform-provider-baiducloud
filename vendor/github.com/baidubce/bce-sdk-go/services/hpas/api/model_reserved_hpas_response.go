@@ -26,4 +26,9 @@ type HpasReservedResponse struct {
 	CreateTime          string        `json:"createTime"`
 	ExpireTime          string        `json:"expireTime"`
 	Tags                []TagResponse `json:"tags"`
+	HpasId              string        `json:"hpasId"`
+	HpasName            string        `json:"hpasName"`
+	DeductInstance      bool          `json:"deductInstance,omitempty"`
+	EhcClusterId        string        `json:"ehcClusterId"`
+	EhcClusterName      string        `json:"ehcClusterName"`
 }

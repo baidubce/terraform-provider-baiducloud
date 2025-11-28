@@ -14,13 +14,9 @@
 
 package api
 
-type ListReservedHpasByMakerReq struct {
-	ReservedHpasIds    []string `json:"reservedHpasIds,omitempty"`
-	Name               string   `json:"name,omitempty"`
-	ZoneName           string   `json:"zoneName,omitempty"`
-	ReservedHpasStatus string   `json:"reservedHpasStatus,omitempty"`
-	AppType            string   `json:"appType,omitempty"`
-	HpasId             string   `json:"hpasId,omitempty"`
-	Marker             string   `json:"marker,omitempty"`
-	MaxKeys            int      `json:"maxKeys,omitempty"`
+type DescribeHpasSpecsReq struct {
+	ZoneName            string `json:"zoneName,omitempty"`
+	AppType             string `json:"appType,omitempty"`
+	AppPerformanceLevel string `json:"appPerformanceLevel,omitempty"`
+	IsCoupon            bool   `json:"isCoupon,omitempty"`
 }

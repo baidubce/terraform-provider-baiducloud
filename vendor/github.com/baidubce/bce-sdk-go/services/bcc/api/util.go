@@ -56,6 +56,7 @@ const (
 	REQUEST_ZONE_URI             = "/zone"
 	REQUEST_RECYCLE              = "/recycle"
 	REQUEST_DELETEPREPAY         = "/volume/deletePrepay"
+	REQUEST_PROGRESS             = "/volume/progress"
 
 	//
 	REQUEST_FLAVOR_SPEC_URI                        = "/instance/flavorSpec"
@@ -202,6 +203,10 @@ func getVolumeUriWithId(id string) string {
 
 func getDeletePrepayVolumeUri() string {
 	return URI_PREFIXV2 + REQUEST_DELETEPREPAY
+}
+
+func getVolumeProgressUri(volumeId string) string {
+	return URI_PREFIXV2 + REQUEST_PROGRESS + "/" + volumeId
 }
 
 func getVolumeV3UriWithId(id string) string {
@@ -606,4 +611,12 @@ func getSnapshotUnShareUrl() string {
 
 func getSnapshotShareListUrl() string {
 	return URI_PREFIXV2 + "/snapshot/snapshotShare/list"
+}
+
+func getTaskDetailUrl() string {
+	return URI_PREFIXV2 + "/task/detail"
+}
+
+func listTasklUrl() string {
+	return URI_PREFIXV2 + "/task/list"
 }

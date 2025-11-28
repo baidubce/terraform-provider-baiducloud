@@ -42,7 +42,7 @@ type AppRsPortModel struct {
 
 type AppBackendServer struct {
 	InstanceId string           `json:"instanceId,omitempty"`
-	Weight     int              `json:"weight,omitempty"`
+	Weight     *int             `json:"weight"`
 	PrivateIp  string           `json:"privateIp,omitempty"`
 	PortList   []AppRsPortModel `json:"portList,omitempty"`
 }
@@ -643,7 +643,7 @@ type CreateAppIpGroupArgs struct {
 type AppIpGroupMember struct {
 	Ip       string                      `json:"ip,omitempty"`
 	Port     int                         `json:"port,omitempty"`
-	Weight   int                         `json:"weight,omitempty"`
+	Weight   *int                        `json:"weight"`
 	MemberId string                      `json:"memberId,omitempty"`
 	PortList []AppIpGroupMemberPortModel `json:"portList,omitempty"`
 }
