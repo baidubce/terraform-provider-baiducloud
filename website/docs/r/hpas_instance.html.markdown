@@ -59,8 +59,11 @@ resource "baiducloud_hpas_instance" "example" {
 - `password` (String, Sensitive) Password of the instance. This value should be 8-16 characters, and letters, numbers and symbols must exist at the same time. The symbols is limited to `!@#$%^*()`. Changing this value triggers a restart of the instance.
 - `payment_timing` (String) Payment timing of billing. Valid values: `Prepaid`, `Postpaid`. Defaults to `Postpaid`.
 - `period` (Number) The reservation length (month) will pay. Effective when `payment_timing` is `Prepaid`. Valid values: `1`~`9`, `12`, `24`, `36`. Defaults to `1`.
+- `root_disk_size_in_gb` (Number) System disk size in GiB. Range 40–2048 GiB and must meet the image minimum.
+- `root_disk_storage_type` (String) System disk storage type when using CDS root disks. Valid values: `enhanced_ssd_pl3`, `enhanced_ssd_pl2`, `enhanced_ssd_pl1`, `premium_ssd`, `enhanced_ssd_pl0`, `hp1`.
 - `security_group_type` (String) Security group type. Valid values: `normal`, `enterprise`. Defaults to `normal`.
 - `tags` (Map of String) Tags of the resource.
+- `user_data` (String) If the instance supports custom user data, you may set `user_data`.User data is transmitted unencrypted. Do not include plaintext secrets (passwords, private keys). If sensitive data is required, encrypt it, Base64-encode it, and have the instance decode and decrypt it after launch.
 
 ### Read-Only
 

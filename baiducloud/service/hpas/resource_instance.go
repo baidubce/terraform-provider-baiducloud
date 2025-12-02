@@ -10,6 +10,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/flex"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 )
 
@@ -83,11 +84,29 @@ func ResourceInstance() *schema.Resource {
 				Required:    true,
 				Description: "Image ID used for the application. Changing this value triggers a reinstallation of the OS.",
 			},
+			"root_disk_size_in_gb": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "System disk size in GiB. Range 40–2048 GiB and must meet the image minimum.",
+				ValidateFunc: validation.IntBetween(40, 2048),
+			},
+			"root_disk_storage_type": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "System disk storage type when using CDS root disks. Valid values: `enhanced_ssd_pl3`, `enhanced_ssd_pl2`, `enhanced_ssd_pl1`, `premium_ssd`, `enhanced_ssd_pl0`, `hp1`.",
+			},
 			"internal_ip": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				Description: "Internal IP addresses. Must match the CIDR block of the specified subnet. Changing this value triggers a restart of the instance.",
+			},
+			"user_data": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "If the instance supports custom user data, you may set `user_data`.User data is transmitted unencrypted. " +
+					"Do not include plaintext secrets (passwords, private keys). If sensitive data is required, encrypt it, Base64-encode it, " +
+					"and have the instance decode and decrypt it after launch.",
 			},
 			"subnet_id": {
 				Type:        schema.TypeString,
@@ -371,8 +390,20 @@ func buildCreationArgs(d *schema.ResourceData, client *hpas.Client) *api.CreateH
 		args.Password = encryptPassword(d, client)
 	}
 
+	if v, ok := d.GetOk("root_disk_size_in_gb"); ok {
+		args.RootDiskSizeInGb = v.(int)
+	}
+
+	if v, ok := d.GetOk("root_disk_storage_type"); ok {
+		args.RootDiskStorageType = v.(string)
+	}
+
 	if v, ok := d.GetOk("internal_ip"); ok {
 		args.InternalIps = []string{v.(string)}
+	}
+
+	if v, ok := d.GetOk("user_data"); ok {
+		args.UserData = v.(string)
 	}
 
 	return args
