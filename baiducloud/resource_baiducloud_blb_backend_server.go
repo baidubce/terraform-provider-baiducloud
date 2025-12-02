@@ -17,10 +17,10 @@ resource "baiducloud_blb_backend_server" "default" {
 package baiducloud
 
 import (
-	"github.com/baidubce/bce-sdk-go/services/blb"
 	"time"
 
 	"github.com/baidubce/bce-sdk-go/bce"
+	"github.com/baidubce/bce-sdk-go/services/blb"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -186,9 +186,10 @@ func buildBaiduCloudCreateBlbServerGroupArgs(d *schema.ResourceData) *blb.AddBac
 		for _, value := range v {
 			m := value.(map[string]interface{})
 
+			weight := m["weight"].(int)
 			result.BackendServerList = append(result.BackendServerList, blb.BackendServerModel{
 				InstanceId: m["instance_id"].(string),
-				Weight:     m["weight"].(int),
+				Weight:     &weight,
 			})
 		}
 	}
@@ -208,9 +209,10 @@ func updateBackendServer(d *schema.ResourceData, meta interface{}) error {
 		for _, value := range v {
 			m := value.(map[string]interface{})
 
+			weight := m["weight"].(int)
 			updateArgs.BackendServerList = append(updateArgs.BackendServerList, blb.BackendServerModel{
 				InstanceId: m["instance_id"].(string),
-				Weight:     m["weight"].(int),
+				Weight:     &weight,
 			})
 		}
 	}

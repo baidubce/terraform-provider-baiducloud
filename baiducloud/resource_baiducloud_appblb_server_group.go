@@ -399,9 +399,10 @@ func buildBaiduCloudCreateAppBlbAppServerGroupArgs(d *schema.ResourceData) *appb
 		for _, value := range v {
 			m := value.(map[string]interface{})
 
+			weight := m["weight"].(int)
 			result.BackendServerList = append(result.BackendServerList, appblb.AppBackendServer{
 				InstanceId: m["instance_id"].(string),
-				Weight:     m["weight"].(int),
+				Weight:     &weight,
 			})
 		}
 	}
@@ -547,9 +548,10 @@ func buildRsWriteOpArgs(list []interface{}) *appblb.BlbRsWriteOpArgs {
 	for _, v := range list {
 		writeOpValue := v.(map[string]interface{})
 
+		weight := writeOpValue["weight"].(int)
 		result.BackendServerList = append(result.BackendServerList, appblb.AppBackendServer{
 			InstanceId: writeOpValue["instance_id"].(string),
-			Weight:     writeOpValue["weight"].(int),
+			Weight:     &weight,
 		})
 	}
 
