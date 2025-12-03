@@ -429,3 +429,44 @@ func (s *VpcService) ClosePeerConnDNSSync(d *schema.ResourceData, peerConnId str
 		return nil
 	})
 }
+
+func (s *VpcService) EnableVpcRelay(vpcId string) error {
+	action := "Enable VPC Relay for " + vpcId
+
+	args := &vpc.UpdateVpcRelayArgs{
+		VpcId:       vpcId,
+		ClientToken: buildClientToken(),
+	}
+
+	raw, err := s.client.WithVpcClient(func(vpcClient *vpc.Client) (i interface{}, e error) {
+		return nil, vpcClient.OpenRelay(args)
+	})
+
+	addDebug(action, raw)
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_vpc", action, BCESDKGoERROR)
+	}
+
+	return nil
+}
+
+func (s *VpcService) DisableVpcRelay(vpcId string) error {
+	action := "Disable VPC Relay for " + vpcId
+
+	args := &vpc.UpdateVpcRelayArgs{
+		VpcId:       vpcId,
+		ClientToken: buildClientToken(),
+	}
+
+	raw, err := s.client.WithVpcClient(func(vpcClient *vpc.Client) (i interface{}, e error) {
+		return nil, vpcClient.ShutdownRelay(args)
+	})
+
+	addDebug(action, raw)
+	if err != nil {
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_vpc", action, BCESDKGoERROR)
+	}
+
+	return nil
+}
+

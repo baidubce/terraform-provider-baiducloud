@@ -85,6 +85,14 @@ func resourceBaiduCloudVpc() *schema.Resource {
 				Optional:    true,
 				Default:     false,
 			},
+			"enable_relay": {
+				Type: schema.TypeBool,
+				Description: "Whether to enable route relay to allow the route table to forward traffic not originated from this VPC. When disabled, " +
+					"only traffic originated from this VPC will be forwarded. Default is false.",
+				Optional: true,
+				Computed: true,
+				Default:  false,
+			},
 			"tags": tagsSchema(),
 		},
 	}
@@ -146,6 +154,7 @@ func resourceBaiduCloudVpcRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("cidr", result.VPC.Cidr)
 	d.Set("tags", flattenTagsToMap(result.VPC.Tags))
 	d.Set("secondary_cidrs", result.VPC.SecondaryCidr)
+	d.Set("enable_relay", result.VPC.Relay)
 
 	//computed attribute
 	res, err := vpcService.GetRouteTableDetail("", vpcId)
@@ -185,6 +194,24 @@ func resourceBaiduCloudVpcUpdate(d *schema.ResourceData, meta interface{}) error
 			return nil
 		}
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_vpc", action, BCESDKGoERROR)
+	}
+
+	// Handle enable_relay update after UpdateVPC
+	// For new VPC creation or when enable_relay changes
+	if d.HasChange("enable_relay") || d.IsNewResource() {
+		enableRelay := d.Get("enable_relay").(bool)
+		vpcService := &VpcService{client}
+
+		if enableRelay {
+			if err := vpcService.EnableVpcRelay(vpcId); err != nil {
+				return WrapErrorf(err, DefaultErrorMsg, "baiducloud_vpc", action, BCESDKGoERROR)
+			}
+		} else if d.HasChange("enable_relay") {
+			// Only disable relay if it's an actual change, not a new resource with false value
+			if err := vpcService.DisableVpcRelay(vpcId); err != nil {
+				return WrapErrorf(err, DefaultErrorMsg, "baiducloud_vpc", action, BCESDKGoERROR)
+			}
+		}
 	}
 
 	return resourceBaiduCloudVpcRead(d, meta)
