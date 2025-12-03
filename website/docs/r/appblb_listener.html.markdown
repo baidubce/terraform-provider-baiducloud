@@ -96,8 +96,8 @@ The `policies` object supports the following:
 * `app_server_group_id` - (Required) Policy bind server group id
 * `backend_port` - (Required) Backend port
 * `priority` - (Required) Policy priority, support in [1, 32768]
+* `rule_list` - (Required) Policy rule list
 * `description` - (Optional) Policy's description
-* `rule_list` - (Optional) Policy rule list
 * `app_server_group_name` - Policy bind server group name
 * `frontend_port` - Frontend port
 * `id` - Policy's id

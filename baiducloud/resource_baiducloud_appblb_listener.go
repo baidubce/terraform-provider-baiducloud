@@ -318,8 +318,7 @@ func resourceBaiduCloudAppBlbListener() *schema.Resource {
 						"rule_list": {
 							Type:        schema.TypeSet,
 							Description: "Policy rule list",
-							Optional:    true,
-							Computed:    true,
+							Required:    true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"key": {
