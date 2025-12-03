@@ -1,4 +1,10 @@
-	## 1.22.14 (Unreleased)
+	## 1.22.15 (Unreleased)
+
+## 1.22.14 (December 03, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_hpas_instance: Add parameters `root_disk_size_in_gb`, `root_disk_storage_type` and `user_data`.
+- resource/baiducloud_vpc: Add parameter `enable_relay`.
+- resource/baiducloud_appblb_listener: Make `policies.rule_list` required to align with API behavior.
 
 ## 1.22.13 (October 29, 2025)
 ENHANCEMENTS:
