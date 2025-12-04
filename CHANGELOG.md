@@ -1,4 +1,8 @@
-	## 1.22.15 (Unreleased)
+	## 1.22.16 (Unreleased)
+
+## 1.22.15 (December 04, 2025)
+BUG FIXES:
+- resource/baiducloud_vpc: Fix `enable_relay` schema by removing computed.
 
 ## 1.22.14 (December 03, 2025)
 ENHANCEMENTS:
