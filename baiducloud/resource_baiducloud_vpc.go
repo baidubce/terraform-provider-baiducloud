@@ -90,7 +90,6 @@ func resourceBaiduCloudVpc() *schema.Resource {
 				Description: "Whether to enable route relay to allow the route table to forward traffic not originated from this VPC. When disabled, " +
 					"only traffic originated from this VPC will be forwarded. Default is false.",
 				Optional: true,
-				Computed: true,
 				Default:  false,
 			},
 			"tags": tagsSchema(),
