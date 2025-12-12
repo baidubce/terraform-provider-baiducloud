@@ -402,7 +402,10 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Admin Password",
 				Optional:    true,
-				Computed:    true,
+				Sensitive:   true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return true
+				},
 			},
 			"ssh_key_id": {
 				Type:        schema.TypeString,
@@ -452,7 +455,6 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Type:        schema.TypeMap,
 				Description: "Labels List",
 				Optional:    true,
-				Computed:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -461,7 +463,6 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				Type:        schema.TypeList,
 				Description: "Taint List",
 				Optional:    true,
-				Computed:    true,
 				Elem:        resourceCCEv2Taint(),
 			},
 			"cce_instance_priority": {
@@ -945,11 +946,10 @@ func resourceCCEv2InstanceResource() *schema.Resource {
 				Computed:    true,
 			},
 			"root_disk_type": {
-				Type:         schema.TypeString,
-				Description:  "Root disk type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].",
-				Optional:     true,
-				Computed:     true,
-				ValidateFunc: validation.StringInSlice(StorageTypePermitted, false),
+				Type:        schema.TypeString,
+				Description: "Root disk type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].",
+				Optional:    true,
+				Computed:    true,
 			},
 			"root_disk_size": {
 				Type:        schema.TypeInt,
@@ -977,11 +977,10 @@ func resourceCCEv2InstanceResource() *schema.Resource {
 							Computed:    true,
 						},
 						"storage_type": {
-							Type:         schema.TypeString,
-							Description:  "Storage Type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].",
-							Optional:     true,
-							Computed:     true,
-							ValidateFunc: validation.StringInSlice(StorageTypePermitted, false),
+							Type:        schema.TypeString,
+							Description: "Storage Type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].",
+							Optional:    true,
+							Computed:    true,
 						},
 						"cds_size": {
 							Type:        schema.TypeInt,
@@ -1389,6 +1388,71 @@ func buildGetInstancesOfInstanceGroupArgs(d *schema.ResourceData) (*ccev2.ListIn
 	return args, nil
 }
 
+func buildUpdateInstanceGroupConfigureArgs(d *schema.ResourceData, spec *ccev2.InstanceGroupSpec) (*ccev2.UpdateInstanceGroupConfigure, error) {
+	if spec == nil {
+		return nil, fmt.Errorf("instance group spec is nil")
+	}
+
+	instanceSpec := spec.InstanceTemplate.InstanceSpec
+
+	if d.HasChange("spec.0.instance_template.0.labels") {
+		labels := make(map[string]string)
+		if labelsRaw, ok := d.Get("spec.0.instance_template.0.labels").(map[string]interface{}); ok {
+			for key, value := range labelsRaw {
+				labels[key] = value.(string)
+			}
+		}
+		instanceSpec.Labels = labels
+	}
+
+	if d.HasChange("spec.0.instance_template.0.instance_taints") {
+		taintsRaw, _ := d.Get("spec.0.instance_template.0.instance_taints").([]interface{})
+		taints, err := buildTaints(taintsRaw)
+		if err != nil {
+			return nil, err
+		}
+		instanceSpec.Taints = taints
+	}
+
+	if d.HasChange("spec.0.instance_template.0.image_id") {
+		imageID, _ := d.Get("spec.0.instance_template.0.image_id").(string)
+		instanceSpec.ImageID = imageID
+	}
+
+	var securityGroups []ccev2types.SecurityGroupV2
+	for _, sg := range spec.DefaultSecurityGroups {
+		securityGroups = append(securityGroups, ccev2types.SecurityGroupV2{
+			Name: sg.Name,
+			Type: ccev2types.SecurityGroupType(sg.Type),
+			ID:   sg.ID,
+		})
+	}
+
+	instanceTemplate := ccev2types.InstanceTemplate{
+		InstanceSpec: instanceSpec,
+	}
+
+	updateSpec := ccev2types.InstanceGroupSpec{
+		CCEInstanceGroupID: spec.CCEInstanceGroupID,
+		InstanceGroupName:  spec.InstanceGroupName,
+		ClusterID:          spec.ClusterID,
+		ClusterRole:        spec.ClusterRole,
+		ShrinkPolicy:       ccev2types.ShrinkPolicy(spec.ShrinkPolicy),
+		UpdatePolicy:       ccev2types.UpdatePolicy(spec.UpdatePolicy),
+		CleanPolicy:        ccev2types.CleanPolicy(spec.CleanPolicy),
+		InstanceTemplate:   instanceTemplate,
+		InstanceTemplates:  []ccev2types.InstanceTemplate{instanceTemplate},
+		Replicas:           spec.Replicas,
+		SecurityGroups:     securityGroups,
+	}
+
+	return &ccev2.UpdateInstanceGroupConfigure{
+		PasswordNeedUpdate: false,
+		SyncMeta:           false,
+		InstanceGroupSpec:  updateSpec,
+	}, nil
+}
+
 //===================Convert系函数用于将SDK返回值转换成.tfstate参数===================
 //Tips: 对于.tfstate中存在的字段，但是sdk返回数据中不包含的字段，将不会在传递给.tfstate的map中设置此值，进而terrafrom会跳过更新此字段的状态，使其维持原样不变
 
@@ -1569,6 +1633,27 @@ func convertInstanceSpecFromJsonToMap(spec *ccev2types.InstanceSpec) ([]interfac
 	resultSpec = append(resultSpec, specMap)
 
 	return resultSpec, nil
+}
+
+func convertInstanceGroupSpecFromJsonToMap(spec *ccev2.InstanceGroupSpec) ([]interface{}, error) {
+	result := make([]interface{}, 0, 1)
+	if spec == nil {
+		return result, nil
+	}
+
+	specMap := make(map[string]interface{})
+	specMap["cluster_id"] = spec.ClusterID
+	specMap["instance_group_name"] = spec.InstanceGroupName
+	specMap["replicas"] = spec.Replicas
+
+	instanceTemplate, err := convertInstanceSpecFromJsonToMap(&spec.InstanceTemplate.InstanceSpec)
+	if err != nil {
+		return nil, err
+	}
+	specMap["instance_template"] = instanceTemplate
+
+	result = append(result, specMap)
+	return result, nil
 }
 
 func convertDeployCustomConfigFromJsonToMap(config *ccev2types.DeployCustomConfig) ([]interface{}, error) {

@@ -103,7 +103,6 @@ func resourceBaiduCloudCCEv2InstanceGroup() *schema.Resource {
 						"instance_template": {
 							Type:        schema.TypeList,
 							Description: "Instance Spec of Instances in this Instance Group ",
-							ForceNew:    true,
 							Required:    true,
 							MaxItems:    1,
 							Elem:        resourceCCEv2InstanceSpec(),
@@ -244,6 +243,16 @@ func resourceBaiduCloudCCEv2InstanceGroupRead(d *schema.ResourceData, meta inter
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", action, BCESDKGoERROR)
 	}
 
+	specList, err := convertInstanceGroupSpecFromJsonToMap(getInstanceGroupResp.InstanceGroup.Spec)
+	if err != nil {
+		log.Printf("Convert InstanceGroup Spec Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", action, BCESDKGoERROR)
+	}
+	if err := d.Set("spec", specList); err != nil {
+		log.Printf("Set spec Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", action, BCESDKGoERROR)
+	}
+
 	argsGetInstanceOfInstanceGroup, err := buildGetInstancesOfInstanceGroupArgs(d)
 	if err != nil {
 		log.Printf("Build ListInstanceByInstanceGroupIDArgs Error:" + err.Error())
@@ -275,46 +284,94 @@ func resourceBaiduCloudCCEv2InstanceGroupRead(d *schema.ResourceData, meta inter
 func resourceBaiduCloudCCEv2InstanceGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
 
+	instanceTemplateChanged := d.HasChange("spec.0.instance_template")
+	hasConfigureChange := d.HasChange("spec.0.instance_template.0.image_id") ||
+		d.HasChange("spec.0.instance_template.0.labels") ||
+		d.HasChange("spec.0.instance_template.0.instance_taints")
+
+	if instanceTemplateChanged && !hasConfigureChange {
+		return errors.New("updating instance_template is only supported for image_id, labels and instance_taints changes")
+	}
+
+	if hasConfigureChange {
+		if err := updateInstanceGroupConfigure(d, client); err != nil {
+			return err
+		}
+	}
+
+	if d.HasChange("spec.0.replicas") {
+		if err := updateInstanceGroupReplicas(d, client); err != nil {
+			return err
+		}
+	}
+
+	return resourceBaiduCloudCCEv2InstanceGroupRead(d, meta)
+}
+
+func updateInstanceGroupConfigure(d *schema.ResourceData, client *connectivity.BaiduClient) error {
+	argsGetInstanceGroup, _ := buildGetInstanceGroupArgs(d)
+
+	getAction := "Get CCEv2 Instance Group. ClusterID:" + argsGetInstanceGroup.ClusterID + " InstanceGroupID:" + argsGetInstanceGroup.InstanceGroupID
+	rawInstanceGroupResp, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
+		return client.GetInstanceGroup(argsGetInstanceGroup)
+	})
+	if err != nil {
+		log.Printf("Get InstanceGroup Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", getAction, BCESDKGoERROR)
+	}
+	instanceGroupResp := rawInstanceGroupResp.(*ccev2.GetInstanceGroupResponse)
+	if instanceGroupResp.InstanceGroup == nil || instanceGroupResp.InstanceGroup.Spec == nil {
+		err := errors.New("GetInstanceGroupResponse.InstanceGroup or  GetInstanceGroupResponse.InstanceGroup.Spec is nil")
+		log.Printf("Get InstanceGroup Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", getAction, BCESDKGoERROR)
+	}
+
+	updateArgs, err := buildUpdateInstanceGroupConfigureArgs(d, instanceGroupResp.InstanceGroup.Spec)
+	if err != nil {
+		log.Printf("Build UpdateInstanceGroupConfigureArgs Error:" + err.Error())
+		return WrapError(err)
+	}
+
+	updateAction := "Update CCE Instance Group Configure: " + updateArgs.InstanceGroupName
+	err = resource.Retry(d.Timeout(schema.TimeoutUpdate), func() *resource.RetryError {
+		raw, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
+			return client.UpdateInstanceGroupConfigure(updateArgs)
+		})
+		if err != nil {
+			return resource.NonRetryableError(err)
+		}
+		addDebug(updateAction, raw)
+		if _, ok := raw.(*ccev2.UpdateInstanceGroupConfigureResponse); !ok {
+			return resource.NonRetryableError(errors.New("response format illegal"))
+		}
+		return nil
+	})
+	if err != nil {
+		log.Printf("Update InstanceGroup Configure Error:" + err.Error())
+		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", updateAction, BCESDKGoERROR)
+	}
+	return nil
+}
+
+func updateInstanceGroupReplicas(d *schema.ResourceData, client *connectivity.BaiduClient) error {
 	args, err := buildUpdateInstanceGroupReplicaArgs(d)
 	if err != nil {
 		log.Printf("Build UpdateInstanceGroupReplicasArgs Error:" + err.Error())
 		return WrapError(err)
 	}
 	action := "Update CCE Instance Group: " + args.InstanceGroupID
-	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+	err = resource.Retry(d.Timeout(schema.TimeoutUpdate), func() *resource.RetryError {
 		raw, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
 			return client.UpdateInstanceGroupReplicas(args)
 		})
 		if err != nil {
 			return resource.NonRetryableError(err)
 		}
-		//waiting all instance in instance group are ready
-		createTimeOutTime := d.Timeout(schema.TimeoutCreate)
-		loopsCount := createTimeOutTime.Microseconds() / ((5 * time.Second).Microseconds())
-		var i int64
-		for i = 1; i <= loopsCount; i++ {
-			time.Sleep(5 * time.Second)
-			argsGetInstanceGroup := &ccev2.GetInstanceGroupArgs{
-				ClusterID:       args.ClusterID,
-				InstanceGroupID: args.InstanceGroupID,
-			}
-			rawInstanceGroupResp, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
-				return client.GetInstanceGroup(argsGetInstanceGroup)
-			})
-			if err != nil {
-				return resource.NonRetryableError(err)
-			}
-			instanceGroupResp := rawInstanceGroupResp.(*ccev2.GetInstanceGroupResponse)
-			if instanceGroupResp.InstanceGroup.Status.ReadyReplicas == instanceGroupResp.InstanceGroup.Spec.Replicas {
-				break
-			}
-			if i == loopsCount {
-				return resource.NonRetryableError(errors.New("create instance group time out"))
-			}
+		if err := waitInstanceGroupReady(client, args.ClusterID, args.InstanceGroupID, d.Timeout(schema.TimeoutUpdate)); err != nil {
+			return resource.NonRetryableError(err)
 		}
 		addDebug(action, raw)
-		_, ok := raw.(*ccev2.UpdateInstanceGroupReplicasResponse)
-		if !ok {
+		if _, ok := raw.(*ccev2.UpdateInstanceGroupReplicasResponse); !ok {
 			err = errors.New("response format illegal")
 			return resource.NonRetryableError(err)
 		}
@@ -324,7 +381,37 @@ func resourceBaiduCloudCCEv2InstanceGroupUpdate(d *schema.ResourceData, meta int
 		log.Printf("Update InstanceGroup Error:" + err.Error())
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_instance_group", action, BCESDKGoERROR)
 	}
-	return resourceBaiduCloudCCEv2InstanceGroupRead(d, meta)
+	return nil
+}
+
+func waitInstanceGroupReady(client *connectivity.BaiduClient, clusterID, instanceGroupID string, timeout time.Duration) error {
+	waitInterval := 5 * time.Second
+	loopsCount := int64(timeout / waitInterval)
+	if loopsCount <= 0 {
+		loopsCount = 1
+	}
+
+	for i := int64(0); i < loopsCount; i++ {
+		time.Sleep(waitInterval)
+		argsGetInstanceGroup := &ccev2.GetInstanceGroupArgs{
+			ClusterID:       clusterID,
+			InstanceGroupID: instanceGroupID,
+		}
+		rawInstanceGroupResp, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
+			return client.GetInstanceGroup(argsGetInstanceGroup)
+		})
+		if err != nil {
+			return err
+		}
+		instanceGroupResp := rawInstanceGroupResp.(*ccev2.GetInstanceGroupResponse)
+		if instanceGroupResp.InstanceGroup == nil || instanceGroupResp.InstanceGroup.Status == nil || instanceGroupResp.InstanceGroup.Spec == nil {
+			return errors.New("GetInstanceGroupResponse.InstanceGroup or  GetInstanceGroupResponse.InstanceGroup.Status is nil")
+		}
+		if instanceGroupResp.InstanceGroup.Status.ReadyReplicas == instanceGroupResp.InstanceGroup.Spec.Replicas {
+			return nil
+		}
+	}
+	return errors.New("wait instance group ready time out")
 }
 
 func resourceBaiduCloudCCEv2InstanceGroupDelete(d *schema.ResourceData, meta interface{}) error {
