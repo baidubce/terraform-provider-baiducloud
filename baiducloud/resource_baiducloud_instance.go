@@ -1303,7 +1303,7 @@ func updateInstanceAdminPass(d *schema.ResourceData, meta interface{}, instanceI
 		}
 
 		if _, err := client.WithBccClient(func(bccClient *bcc.Client) (i interface{}, e error) {
-			return nil, bccClient.ChangeInstancePass(instanceID, args)
+			return bccClient.ChangeInstancePass(instanceID, args)
 		}); err != nil {
 			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_instance", action, BCESDKGoERROR)
 		}
