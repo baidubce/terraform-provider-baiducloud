@@ -1,4 +1,8 @@
-	## 1.22.16 (Unreleased)
+	## 1.22.17 (Unreleased)
+
+## 1.22.16 (December 12, 2025)
+ENHANCEMENTS:
+- resource/baiducloud_ccev2_instance_group: Allow updating `image_id`, `labels`, and `instance_taints` in `instance_template`.
 
 ## 1.22.15 (December 04, 2025)
 BUG FIXES:
