@@ -72,6 +72,7 @@ APPBLB Resources
 	baiducloud_appblb
 	baiducloud_appblb_server_group
 	baiducloud_appblb_listener
+	baiducloud_appblb_ip_group
 
 BCC Resources
 
@@ -139,6 +140,7 @@ import (
 	"fmt"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/bcc"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/bec"
+	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/appblb"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/cdn"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/cdn/abroad"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/service/eip"
@@ -307,6 +309,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_peer_conn_acceptor":              resourceBaiduCloudPeerConnAcceptor(),
 			"baiducloud_appblb_server_group":             resourceBaiduCloudAppBlbServerGroup(),
 			"baiducloud_appblb_listener":                 resourceBaiduCloudAppBlbListener(),
+			"baiducloud_appblb_ip_group":                 appblb.ResourceIpGroup(),
 			"baiducloud_bos_bucket":                      resourceBaiduCloudBosBucket(),
 			"baiducloud_bos_bucket_object":               resourceBaiduCloudBucketObject(),
 			"baiducloud_cert":                            resourceBaiduCloudCert(),

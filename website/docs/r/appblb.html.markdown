@@ -1,7 +1,7 @@
 ---
 layout: "baiducloud"
 page_title: "BaiduCloud: baiducloud_appblb"
-subcategory: "Application Load Balance (APPBLB)"
+subcategory: "Application Load Balancer (APPBLB)"
 description: |-
   Provide a resource to create an APPBLB.
 ---
