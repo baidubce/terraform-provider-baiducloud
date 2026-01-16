@@ -1,4 +1,11 @@
-	## 1.22.17 (Unreleased)
+	## 1.22.18 (Unreleased)
+
+## 1.22.17 (January 16, 2026)
+FEATURES:
+- **New Resource:** `baiducloud_appblb_ip_group`.
+
+ENHANCEMENTS:
+- resource/baiducloud_ccev2_instance_group: Add `ehc_cluster_id` to instance_template, and `ephemeral_disk_list`/`machine_spec` to instance_template.instance_resource.
 
 ## 1.22.16 (December 12, 2025)
 ENHANCEMENTS:
