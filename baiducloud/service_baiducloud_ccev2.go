@@ -354,6 +354,12 @@ func resourceCCEv2InstanceSpec() *schema.Resource {
 				MaxItems:    1,
 				Elem:        resourceCCEv2HPASOption(),
 			},
+			"ehc_cluster_id": {
+				Type:        schema.TypeString,
+				Description: "EHC Cluster ID for instances",
+				Optional:    true,
+				Computed:    true,
+			},
 			"vpc_config": {
 				Type:        schema.TypeList,
 				Description: "VPC Config",
@@ -921,6 +927,12 @@ func resourceCCEv2Instance() *schema.Resource {
 func resourceCCEv2InstanceResource() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
+			"machine_spec": {
+				Type:        schema.TypeString,
+				Description: "Machine specification for instances, e.g., 'llama_7B_train/10k'",
+				Optional:    true,
+				Computed:    true,
+			},
 			"cpu": {
 				Type:        schema.TypeInt,
 				Description: "CPU cores",
@@ -991,6 +1003,32 @@ func resourceCCEv2InstanceResource() *schema.Resource {
 						"snapshot_id": {
 							Type:        schema.TypeString,
 							Description: "Snap shot ID",
+							Optional:    true,
+							Computed:    true,
+						},
+					},
+				},
+			},
+			"ephemeral_disk_list": {
+				Type:        schema.TypeList,
+				Description: "Ephemeral Disk List for instances",
+				Optional:    true,
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"storage_type": {
+							Type:        schema.TypeString,
+							Description: "Storage Type. Available Value: [local_nvme, local_ssd].",
+							Required:    true,
+						},
+						"size_in_gb": {
+							Type:        schema.TypeInt,
+							Description: "Disk size in GB",
+							Required:    true,
+						},
+						"disk_path": {
+							Type:        schema.TypeString,
+							Description: "Custom disk mount path for local disks",
 							Optional:    true,
 							Computed:    true,
 						},
@@ -1566,6 +1604,10 @@ func convertInstanceSpecFromJsonToMap(spec *ccev2types.InstanceSpec) ([]interfac
 		specMap["hpas_option"] = option
 	}
 
+	if spec.EhcClusterID != "" {
+		specMap["ehc_cluster_id"] = spec.EhcClusterID
+	}
+
 	if !reflect.DeepEqual(spec.VPCConfig, ccev2types.VPCConfig{}) {
 		config, err := convertVPCConfigFromJsonToMap(&spec.VPCConfig)
 		if err != nil {
@@ -1770,6 +1812,9 @@ func convertInstanceResourceFromJsonToMap(config *ccev2types.InstanceResource) (
 	}
 	configMap := make(map[string]interface{})
 
+	if config.MachineSpec != "" {
+		configMap["machine_spec"] = config.MachineSpec
+	}
 	configMap["gpu_count"] = config.GPUCount
 	configMap["node_cpu_quota"] = config.NodeCPUQuota
 	configMap["node_mem_quota"] = config.NodeMEMQuota
@@ -1789,6 +1834,14 @@ func convertInstanceResourceFromJsonToMap(config *ccev2types.InstanceResource) (
 			return nil, err
 		}
 		configMap["cds_list"] = cdsListMap
+	}
+
+	if config.EphemeralDiskList != nil {
+		ephemeralDiskListMap, err := convertEphemeralDiskListFromJsonToMap(config.EphemeralDiskList)
+		if err != nil {
+			return nil, err
+		}
+		configMap["ephemeral_disk_list"] = ephemeralDiskListMap
 	}
 
 	result = append(result, configMap)
@@ -1812,6 +1865,24 @@ func convertCDSListFromJsonToMap(cdsList []ccev2types.CDSConfig) ([]interface{},
 		cdsMap["cds_size"] = cds.CDSSize
 
 		result = append(result, cdsMap)
+	}
+	return result, nil
+}
+
+func convertEphemeralDiskListFromJsonToMap(ephemeralDiskList []ccev2types.EphemeralDiskConfig) ([]interface{}, error) {
+	result := make([]interface{}, 0, len(ephemeralDiskList))
+	for _, disk := range ephemeralDiskList {
+		diskMap := make(map[string]interface{})
+
+		if disk.StorageType != "" {
+			diskMap["storage_type"] = disk.StorageType
+		}
+		diskMap["size_in_gb"] = disk.SizeInGB
+		if disk.Path != "" {
+			diskMap["disk_path"] = disk.Path
+		}
+
+		result = append(result, diskMap)
 	}
 	return result, nil
 }
@@ -2367,6 +2438,10 @@ func buildInstanceSpec(instanceSpecRawMap map[string]interface{}) (*ccev2types.I
 		}
 	}
 
+	if v, ok := instanceSpecRawMap["ehc_cluster_id"]; ok && v.(string) != "" {
+		instanceSpec.EhcClusterID = v.(string)
+	}
+
 	if v, ok := instanceSpecRawMap["vpc_config"]; ok && len(v.([]interface{})) == 1 {
 		vpcConfigRaw := v.([]interface{})[0].(map[string]interface{})
 		vpcConfig, err := buildVPCConfig(vpcConfigRaw)
@@ -2834,6 +2909,10 @@ func buildVPCConfig(vpcRawMap map[string]interface{}) (*ccev2types.VPCConfig, er
 func buildInstanceResource(d map[string]interface{}) (*ccev2types.InstanceResource, error) {
 	instanceResource := &ccev2types.InstanceResource{}
 
+	if v, ok := d["machine_spec"]; ok && v.(string) != "" {
+		instanceResource.MachineSpec = v.(string)
+	}
+
 	if v, ok := d["cpu"]; ok {
 		instanceResource.CPU = v.(int)
 	}
@@ -2870,6 +2949,14 @@ func buildInstanceResource(d map[string]interface{}) (*ccev2types.InstanceResour
 		instanceResource.CDSList = cdsList
 	}
 
+	if v, ok := d["ephemeral_disk_list"]; ok {
+		ephemeralDiskList, err := buildEphemeralDiskList(v.([]interface{}))
+		if err != nil {
+			return nil, err
+		}
+		instanceResource.EphemeralDiskList = ephemeralDiskList
+	}
+
 	if v, ok := d["gpu_type"]; ok && v.(string) != "" {
 		instanceResource.GPUType = ccev2types.GPUType(v.(string))
 	}
@@ -2904,6 +2991,28 @@ func buildCDSList(cdsRawList []interface{}) ([]ccev2types.CDSConfig, error) {
 		cdsList = append(cdsList, config)
 	}
 	return cdsList, nil
+}
+
+func buildEphemeralDiskList(ephemeralDiskRawList []interface{}) ([]ccev2types.EphemeralDiskConfig, error) {
+	ephemeralDiskList := make([]ccev2types.EphemeralDiskConfig, 0)
+
+	for _, ephemeralDiskRaw := range ephemeralDiskRawList {
+		ephemeralDiskRawMap := ephemeralDiskRaw.(map[string]interface{})
+
+		disk := ccev2types.EphemeralDiskConfig{}
+		if v, ok := ephemeralDiskRawMap["storage_type"]; ok && v.(string) != "" {
+			disk.StorageType = ccev2types.StorageType(v.(string))
+		}
+		if v, ok := ephemeralDiskRawMap["size_in_gb"]; ok {
+			disk.SizeInGB = v.(int)
+		}
+		if v, ok := ephemeralDiskRawMap["disk_path"]; ok && v.(string) != "" {
+			disk.Path = v.(string)
+		}
+
+		ephemeralDiskList = append(ephemeralDiskList, disk)
+	}
+	return ephemeralDiskList, nil
 }
 
 func buildInstanceOS(d map[string]interface{}) (*ccev2types.InstanceOS, error) {

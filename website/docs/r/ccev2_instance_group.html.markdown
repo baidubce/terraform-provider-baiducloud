@@ -68,7 +68,7 @@ The `spec` object supports the following:
 
 * `cluster_id` - (Required, ForceNew) Cluster ID of Instance Group
 * `instance_group_name` - (Required, ForceNew) Name of Instance Group
-* `instance_template` - (Required, ForceNew) Instance Spec of Instances in this Instance Group
+* `instance_template` - (Required) Instance Spec of Instances in this Instance Group
 * `replicas` - (Required) Number of instances in this Instance Group
 
 The `instance_template` object supports the following:
@@ -80,6 +80,7 @@ The `instance_template` object supports the following:
 * `cluster_role` - (Optional) Cluster Role of Instance, Master or Nodes. Available Value: [master, node].
 * `delete_option` - (Optional) Delete Option
 * `deploy_custom_config` - (Optional) Deploy Custom Option
+* `ehc_cluster_id` - (Optional) EHC Cluster ID for instances
 * `eip_option` - (Optional) EIP Option
 * `existed_option` - (Optional) Existed Instance Option
 * `existed` - (Optional) Is the instance existed
@@ -173,9 +174,11 @@ The `instance_resource` object supports the following:
 
 * `cds_list` - (Optional) CDS List
 * `cpu` - (Optional) CPU cores
+* `ephemeral_disk_list` - (Optional) Ephemeral Disk List for instances
 * `gpu_count` - (Optional) GPU Number
 * `gpu_type` - (Optional) GPU Type. Available Value: [V100-32, V100-16, P40, P4, K40, DLCard].
 * `local_disk_size` - (Optional) Local disk size
+* `machine_spec` - (Optional) Machine specification for instances, e.g., 'llama_7B_train/10k'
 * `mem` - (Optional) memory GB
 * `node_cpu_quota` - (Optional) Node cpu quota
 * `node_mem_quota` - (Optional) Node memory quota
@@ -188,6 +191,12 @@ The `cds_list` object supports the following:
 * `path` - (Optional) CDS path
 * `snapshot_id` - (Optional) Snap shot ID
 * `storage_type` - (Optional) Storage Type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].
+
+The `ephemeral_disk_list` object supports the following:
+
+* `size_in_gb` - (Required) Disk size in GB
+* `storage_type` - (Required) Storage Type. Available Value: [local_nvme, local_ssd].
+* `disk_path` - (Optional) Custom disk mount path for local disks
 
 The `instance_taints` object supports the following:
 
@@ -219,7 +228,6 @@ In addition to all arguments above, the following attributes are exported:
 * `nodes` - All detail info of nodes in this instance group
   * `created_at` - Instance create time
   * `instance_spec` - Instance specification
-    * `admin_password` - Admin Password
     * `bbc_option` - BBC Option
       * `raid_id` - Disk Raid ID
       * `reserve_data` - Whether reserve data
@@ -246,6 +254,7 @@ In addition to all arguments above, the following attributes are exported:
       * `kubelet_root_dir` - kubelet Data Directory
       * `post_user_script` - Script after deployment, base64 encoded
       * `pre_user_script` - Script before deployment, base64 encoded
+    * `ehc_cluster_id` - EHC Cluster ID for instances
     * `eip_option` - EIP Option
       * `eip_bandwidth` - EIP Bandwidth
       * `eip_charging_type` - EIP Charging Type. Available Value: [ByTraffic, ByBandwidth].
@@ -280,21 +289,18 @@ In addition to all arguments above, the following attributes are exported:
         * `snapshot_id` - Snap shot ID
         * `storage_type` - Storage Type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].
       * `cpu` - CPU cores
+      * `ephemeral_disk_list` - Ephemeral Disk List for instances
+        * `disk_path` - Custom disk mount path for local disks
       * `gpu_count` - GPU Number
       * `gpu_type` - GPU Type. Available Value: [V100-32, V100-16, P40, P4, K40, DLCard].
       * `local_disk_size` - Local disk size
+      * `machine_spec` - Machine specification for instances, e.g., 'llama_7B_train/10k'
       * `mem` - memory GB
       * `node_cpu_quota` - Node cpu quota
       * `node_mem_quota` - Node memory quota
       * `root_disk_size` - Root disk size
       * `root_disk_type` - Root disk type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].
-    * `instance_taints` - Taint List
-      * `effect` - Taint Effect. Available Value: [NoSchedule, PreferNoSchedule, NoExecute].
-      * `key` - Taint Key
-      * `time_added` - Taint Added Time. Format RFC3339
-      * `value` - Taint Value
     * `instance_type` - Instance Type. Available Values: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1, HPAS].
-    * `labels` - Labels List
     * `machine_type` - Machine Type. Available Values: [BCC, BBC, EBC, HPAS].
     * `master_type` - Master Type. Available Value: [managed, custom, serverless].
     * `need_eip` - Whether the instance need a EIP
