@@ -276,17 +276,19 @@ type EphemeralDiskV3 struct {
 }
 
 type CreateCdsModel struct {
-	CdsSizeInGB int         `json:"cdsSizeInGB"`
-	StorageType StorageType `json:"storageType"`
-	SnapShotId  string      `json:"snapshotId,omitempty"`
-	EncryptKey  string      `json:"encryptKey,omitempty"`
+	CdsSizeInGB        int         `json:"cdsSizeInGB"`
+	StorageType        StorageType `json:"storageType"`
+	SnapShotId         string      `json:"snapshotId,omitempty"`
+	EncryptKey         string      `json:"encryptKey,omitempty"`
+	DeleteWithInstance bool        `json:"deleteWithInstance,omitempty"`
 }
 
 type CreateCdsModelV3 struct {
-	CdsSizeInGB int           `json:"cdsSizeInGB"`
-	StorageType StorageTypeV3 `json:"storageType"`
-	SnapShotId  string        `json:"snapshotId,omitempty"`
-	EncryptKey  string        `json:"encryptKey,omitempty"`
+	CdsSizeInGB        int           `json:"cdsSizeInGB"`
+	StorageType        StorageTypeV3 `json:"storageType"`
+	SnapShotId         string        `json:"snapshotId,omitempty"`
+	EncryptKey         string        `json:"encryptKey,omitempty"`
+	DeleteWithInstance bool          `json:"deleteWithInstance,omitempty"`
 }
 
 type DiskInfo struct {
@@ -586,6 +588,8 @@ type CreateInstanceBySpecArgs struct {
 	EhcClusterId               string           `json:"ehcClusterId,omitempty"`
 	CpuThreadConfig            string           `json:"cpuThreadConfig"`
 	NumaConfig                 string           `json:"numaConfig"`
+	KeepImageLogin             bool             `json:"keepImageLogin"`
+	IsEipAutoRelatedDelete     bool             `json:"isEipAutoRelatedDelete"`
 }
 
 type CreateInstanceBySpecArgsV2 struct {
@@ -959,7 +963,8 @@ type GetInstanceDetailResult struct {
 }
 
 type AutoReleaseArgs struct {
-	ReleaseTime string `json:"releaseTime"`
+	ReleaseTime            string `json:"releaseTime"`
+	IsEipAutoRelatedDelete bool   `json:"isEipAutoRelatedDelete"`
 }
 
 type ResizeInstanceArgs struct {
@@ -985,6 +990,7 @@ type RebuildInstanceArgs struct {
 	DataPartitionType string `json:"dataPartitionType,omitempty"`
 	UserData          string `json:"userData,omitempty"`
 	CleanLastUserData *bool  `json:"cleanLastUserData"`
+	KeepImageLogin    bool   `json:"keepImageLogin"`
 }
 
 type RebuildInstanceArgsV2 struct {
@@ -999,6 +1005,7 @@ type RebuildInstanceArgsV2 struct {
 	DataPartitionType string `json:"dataPartitionType,omitempty"`
 	UserData          string `json:"userData,omitempty"`
 	CleanLastUserData *bool  `json:"cleanLastUserData"`
+	KeepImageLogin    bool   `json:"keepImageLogin"`
 }
 
 type StopInstanceArgs struct {
@@ -2090,6 +2097,7 @@ type RebuildBatchInstanceArgs struct {
 	DataPartitionType string   `json:"dataPartitionType,omitempty"`
 	UserData          string   `json:"userData,omitempty"`
 	CleanLastUserData *bool    `json:"cleanLastUserData"`
+	KeepImageLogin    bool     `json:"keepImageLogin"`
 }
 
 type RebuildBatchInstanceArgsV2 struct {

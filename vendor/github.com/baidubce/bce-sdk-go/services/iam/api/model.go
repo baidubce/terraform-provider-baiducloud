@@ -23,6 +23,7 @@ type UserModel struct {
 	Description string    `json:"description"`
 	Enabled     bool      `json:"enabled"`
 	Contact     string    `json:"contact"`
+	JoinTime    time.Time `json:"joinTime"`
 }
 
 type CreateUserArgs struct {
@@ -77,7 +78,19 @@ type LoginProfileModel struct {
 	ThirdPartyAccount string `json:"thirdPartyAccount,omitempty"`
 }
 
+type LoginProfileModelV2 struct {
+	Password          string `json:"password,omitempty"`
+	NeedResetPassword *bool  `json:"needResetPassword,omitempty"`
+	EnabledLogin      *bool  `json:"enabledLogin,omitempty"`
+	EnabledLoginMfa   *bool  `json:"enabledLoginMfa,omitempty"`
+	LoginMfaType      string `json:"loginMfaType,omitempty"`
+	ThirdPartyType    string `json:"thirdPartyType,omitempty"`
+	ThirdPartyAccount string `json:"thirdPartyAccount,omitempty"`
+}
+
 type UpdateUserLoginProfileArgs LoginProfileModel
+
+type UpdateUserLoginProfileArgsV2 LoginProfileModelV2
 
 type UpdateUserLoginProfileResult LoginProfileModel
 
@@ -141,6 +154,7 @@ type PolicyModel struct {
 	Name        string    `json:"name"`
 	Type        string    `json:"type"`
 	CreateTime  time.Time `json:"createTime"`
+	AttachTime  time.Time `json:"attachTime"`
 	Description string    `json:"description"`
 	Document    string    `json:"document"`
 }
