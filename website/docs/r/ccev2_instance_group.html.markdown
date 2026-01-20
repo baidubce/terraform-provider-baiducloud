@@ -68,7 +68,7 @@ The `spec` object supports the following:
 
 * `cluster_id` - (Required, ForceNew) Cluster ID of Instance Group
 * `instance_group_name` - (Required, ForceNew) Name of Instance Group
-* `instance_template` - (Required) Instance Spec of Instances in this Instance Group
+* `instance_template` - (Required) Instance Spec of Instances in this Instance Group 
 * `replicas` - (Required) Number of instances in this Instance Group
 
 The `instance_template` object supports the following:
@@ -168,6 +168,7 @@ The `instance_precharging_option` object supports the following:
 * `auto_renew_time_unit` - (Optional) Time unit for auto renew
 * `auto_renew_time` - (Optional) Number of time unit for auto renew
 * `auto_renew` - (Optional) Is Auto Renew
+* `purchase_time_unit` - (Optional) Time unit for purchase
 * `purchase_time` - (Optional) Time of purchase
 
 The `instance_resource` object supports the following:
@@ -281,6 +282,7 @@ In addition to all arguments above, the following attributes are exported:
       * `auto_renew_time_unit` - Time unit for auto renew
       * `auto_renew_time` - Number of time unit for auto renew
       * `auto_renew` - Is Auto Renew
+      * `purchase_time_unit` - Time unit for purchase
       * `purchase_time` - Time of purchase
     * `instance_resource` - Instance Resource Config
       * `cds_list` - CDS List

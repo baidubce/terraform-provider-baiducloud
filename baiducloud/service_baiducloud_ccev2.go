@@ -1333,6 +1333,12 @@ func resourceCCEv2InstancePrechargingOption() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
+			"purchase_time_unit": {
+				Type:        schema.TypeString,
+				Description: "Time unit for purchase",
+				Optional:    true,
+				Computed:    true,
+			},
 			"auto_renew": {
 				Type:        schema.TypeBool,
 				Description: "Is Auto Renew",
@@ -1670,6 +1676,16 @@ func convertInstanceSpecFromJsonToMap(spec *ccev2types.InstanceSpec) ([]interfac
 
 	if spec.Labels != nil {
 		specMap["labels"] = spec.Labels
+	}
+
+	// 处理预付费选项
+	if spec.InstanceChargingType == bccapi.PaymentTimingPrePaid && !reflect.DeepEqual(spec.InstancePreChargingOption, ccev2types.InstancePreChargingOption{}) {
+		specMap["instance_charging_type"] = spec.InstanceChargingType
+		option, err := convertInstancePreChargingOptionFromJsonToMap(&spec.InstancePreChargingOption)
+		if err != nil {
+			return nil, err
+		}
+		specMap["instance_precharging_option"] = option
 	}
 
 	resultSpec = append(resultSpec, specMap)
@@ -2791,6 +2807,10 @@ func buildInstancePrechargingOption(instancePreChargingOptionRawMap map[string]i
 		option.PurchaseTime = v.(int)
 	}
 
+	if v, ok := instancePreChargingOptionRawMap["purchase_time_unit"]; ok && v.(string) != "" {
+		option.PurchaseTimeUnit = v.(string)
+	}
+
 	if v, ok := instancePreChargingOptionRawMap["auto_renew"]; ok {
 		option.AutoRenew = v.(bool)
 	}
@@ -2804,6 +2824,36 @@ func buildInstancePrechargingOption(instancePreChargingOptionRawMap map[string]i
 	}
 
 	return option, nil
+}
+
+func convertInstancePreChargingOptionFromJsonToMap(option *ccev2types.InstancePreChargingOption) ([]interface{}, error) {
+	result := make([]interface{}, 0)
+	if option == nil {
+		return result, nil
+	}
+
+	optionMap := make(map[string]interface{})
+
+	if option.PurchaseTime > 0 {
+		optionMap["purchase_time"] = option.PurchaseTime
+	}
+
+	if option.PurchaseTimeUnit != "" {
+		optionMap["purchase_time_unit"] = option.PurchaseTimeUnit
+	}
+
+	optionMap["auto_renew"] = option.AutoRenew
+
+	if option.AutoRenewTimeUnit != "" {
+		optionMap["auto_renew_time_unit"] = option.AutoRenewTimeUnit
+	}
+
+	if option.AutoRenewTime > 0 {
+		optionMap["auto_renew_time"] = option.AutoRenewTime
+	}
+
+	result = append(result, optionMap)
+	return result, nil
 }
 
 func buildExistedOption(d map[string]interface{}) (*ccev2types.ExistedOption, error) {

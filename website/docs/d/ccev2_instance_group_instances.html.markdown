@@ -65,6 +65,7 @@ In addition to all arguments above, the following attributes are exported:
       * `kubelet_root_dir` - kubelet Data Directory
       * `post_user_script` - Script after deployment, base64 encoded
       * `pre_user_script` - Script before deployment, base64 encoded
+    * `ehc_cluster_id` - EHC Cluster ID for instances
     * `eip_option` - EIP Option
       * `eip_bandwidth` - EIP Bandwidth
       * `eip_charging_type` - EIP Charging Type. Available Value: [ByTraffic, ByBandwidth].
@@ -73,6 +74,7 @@ In addition to all arguments above, the following attributes are exported:
       * `existed_instance_id` - Existed Instance ID
       * `rebuild` - Whether re-install OS
     * `existed` - Is the instance existed
+    * `hpas_option` - HPAS Option
     * `image_id` - Image ID
     * `instance_charging_type` - Instance charging type. Available Value: [Prepaid, Postpaid, bidding].
     * `instance_group_id` - Instance Group ID of this Instance
@@ -90,6 +92,7 @@ In addition to all arguments above, the following attributes are exported:
       * `auto_renew_time_unit` - Time unit for auto renew
       * `auto_renew_time` - Number of time unit for auto renew
       * `auto_renew` - Is Auto Renew
+      * `purchase_time_unit` - Time unit for purchase
       * `purchase_time` - Time of purchase
     * `instance_resource` - Instance Resource Config
       * `cds_list` - CDS List
@@ -98,9 +101,12 @@ In addition to all arguments above, the following attributes are exported:
         * `snapshot_id` - Snap shot ID
         * `storage_type` - Storage Type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].
       * `cpu` - CPU cores
+      * `ephemeral_disk_list` - Ephemeral Disk List for instances
+        * `disk_path` - Custom disk mount path for local disks
       * `gpu_count` - GPU Number
       * `gpu_type` - GPU Type. Available Value: [V100-32, V100-16, P40, P4, K40, DLCard].
       * `local_disk_size` - Local disk size
+      * `machine_spec` - Machine specification for instances, e.g., 'llama_7B_train/10k'
       * `mem` - memory GB
       * `node_cpu_quota` - Node cpu quota
       * `node_mem_quota` - Node memory quota
@@ -111,9 +117,9 @@ In addition to all arguments above, the following attributes are exported:
       * `key` - Taint Key
       * `time_added` - Taint Added Time. Format RFC3339
       * `value` - Taint Value
-    * `instance_type` - Instance Type Available Value: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1].
+    * `instance_type` - Instance Type. Available Values: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1, HPAS].
     * `labels` - Labels List
-    * `machine_type` - Machine Type. Available Value: [BCC, BBC, Metal].
+    * `machine_type` - Machine Type. Available Values: [BCC, BBC, EBC, HPAS].
     * `master_type` - Master Type. Available Value: [managed, custom, serverless].
     * `need_eip` - Whether the instance need a EIP
     * `runtime_type` - Container Runtime Type. Available Value: [docker].
