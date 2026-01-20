@@ -1,4 +1,8 @@
-	## 1.22.18 (Unreleased)
+	## 1.22.19 (Unreleased)
+
+## 1.22.18 (January 20, 2026)
+ENHANCEMENTS:
+- resource/baiducloud_ccev2_instance_group: Add `purchase_time_unit` to instance_precharging_option
 
 ## 1.22.17 (January 16, 2026)
 FEATURES:
