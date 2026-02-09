@@ -1,8 +1,12 @@
-	## 1.22.19 (Unreleased)
+	## 1.22.20 (Unreleased)
+
+## 1.22.19 (February 09, 2026)
+ENHANCEMENTS:
+- resource/baiducloud_ccev2_instance_group: Allow updating `instance_resource` and `vpc_config` in `instance_template`.
 
 ## 1.22.18 (January 20, 2026)
 ENHANCEMENTS:
-- resource/baiducloud_ccev2_instance_group: Add `purchase_time_unit` to instance_precharging_option
+- resource/baiducloud_ccev2_instance_group: Add `purchase_time_unit` to instance_precharging_option.
 
 ## 1.22.17 (January 16, 2026)
 FEATURES:
