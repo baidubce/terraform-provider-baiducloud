@@ -287,10 +287,12 @@ func resourceBaiduCloudCCEv2InstanceGroupUpdate(d *schema.ResourceData, meta int
 	instanceTemplateChanged := d.HasChange("spec.0.instance_template")
 	hasConfigureChange := d.HasChange("spec.0.instance_template.0.image_id") ||
 		d.HasChange("spec.0.instance_template.0.labels") ||
-		d.HasChange("spec.0.instance_template.0.instance_taints")
+		d.HasChange("spec.0.instance_template.0.instance_taints") ||
+		d.HasChange("spec.0.instance_template.0.instance_resource") ||
+		d.HasChange("spec.0.instance_template.0.vpc_config")
 
 	if instanceTemplateChanged && !hasConfigureChange {
-		return errors.New("updating instance_template is only supported for image_id, labels and instance_taints changes")
+		return errors.New("updating instance_template only supports: image_id, labels, instance_taints, instance_resource, vpc_config")
 	}
 
 	if hasConfigureChange {

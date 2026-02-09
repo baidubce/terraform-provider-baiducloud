@@ -1463,6 +1463,28 @@ func buildUpdateInstanceGroupConfigureArgs(d *schema.ResourceData, spec *ccev2.I
 		instanceSpec.ImageID = imageID
 	}
 
+	if d.HasChange("spec.0.instance_template.0.instance_resource") {
+		if v, ok := d.Get("spec.0.instance_template.0.instance_resource").([]interface{}); ok && len(v) > 0 {
+			instanceResourceRaw := v[0].(map[string]interface{})
+			instanceResource, err := buildInstanceResource(instanceResourceRaw)
+			if err != nil {
+				return nil, fmt.Errorf("build instance resource error: %v", err)
+			}
+			instanceSpec.InstanceResource = *instanceResource
+		}
+	}
+
+	if d.HasChange("spec.0.instance_template.0.vpc_config") {
+		if v, ok := d.Get("spec.0.instance_template.0.vpc_config").([]interface{}); ok && len(v) > 0 {
+			vpcConfigRaw := v[0].(map[string]interface{})
+			vpcConfig, err := buildVPCConfig(vpcConfigRaw)
+			if err != nil {
+				return nil, fmt.Errorf("build vpc config error: %v", err)
+			}
+			instanceSpec.VPCConfig = *vpcConfig
+		}
+	}
+
 	var securityGroups []ccev2types.SecurityGroupV2
 	for _, sg := range spec.DefaultSecurityGroups {
 		securityGroups = append(securityGroups, ccev2types.SecurityGroupV2{
