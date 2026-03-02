@@ -1,4 +1,8 @@
-	## 1.22.20 (Unreleased)
+	## 1.22.21 (Unreleased)
+
+## 1.22.20 (March 02, 2026)
+ENHANCEMENTS:
+- resource/baiducloud_cds: Add support for 'elastic_ephemeral_disk' storage type.
 
 ## 1.22.19 (February 09, 2026)
 ENHANCEMENTS:
