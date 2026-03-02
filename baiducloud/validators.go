@@ -38,7 +38,7 @@ func validateHttpMethod() schema.SchemaValidateFunc {
 
 func validateStorageType() schema.SchemaValidateFunc {
 	return validation.StringInSlice([]string{
-		"enhanced_ssd_pl3", "enhanced_ssd_pl2", "enhanced_ssd_pl1", "SSD_Enhanced", "cloud_hp1", "premium_ssd", "hp1", "ssd", "hdd", "std1",
+		"enhanced_ssd_pl3", "enhanced_ssd_pl2", "enhanced_ssd_pl1", "SSD_Enhanced", "cloud_hp1", "premium_ssd", "hp1", "ssd", "hdd", "std1", "elastic_ephemeral_disk",
 	}, false)
 }
 
