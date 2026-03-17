@@ -1,4 +1,8 @@
-	## 1.22.21 (Unreleased)
+	## 1.22.22 (Unreleased)
+
+## 1.22.21 (March 17, 2026)
+ENHANCEMENTS:
+- resource/baiducloud_ccev2_instance_group: Add support for new available zones.
 
 ## 1.22.20 (March 02, 2026)
 ENHANCEMENTS:
