@@ -154,10 +154,11 @@ func resourceBaiduCloudEniAttachmentCreate(d *schema.ResourceData, meta interfac
 		client: client,
 	}
 	err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+		instanceId := d.Get("instance_id").(string)
 		raw, err := client.WithEniClient(func(eniClient *eni.Client) (interface{}, error) {
 			return nil, eniClient.AttachEniInstance(&eni.EniInstance{
 				EniId:       d.Get("eni_id").(string),
-				InstanceId:  d.Get("instance_id").(string),
+				InstanceId:  &instanceId,
 				ClientToken: buildClientToken(),
 			})
 		})
@@ -218,10 +219,11 @@ func resourceBaiduCloudEniAttachmentDelete(d *schema.ResourceData, meta interfac
 		client: client,
 	}
 	err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+		instanceId := d.Get("instance_id").(string)
 		raw, err := client.WithEniClient(func(eniClient *eni.Client) (interface{}, error) {
 			return nil, eniClient.DetachEniInstance(&eni.EniInstance{
 				EniId:       d.Get("eni_id").(string),
-				InstanceId:  d.Get("instance_id").(string),
+				InstanceId:  &instanceId,
 				ClientToken: buildClientToken(),
 			})
 		})

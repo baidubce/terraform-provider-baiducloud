@@ -201,9 +201,10 @@ func resourceBaiduCloudSubnetUpdate(d *schema.ResourceData, meta interface{}) er
 	action := "Update Subnet " + subnetId
 
 	if d.HasChange("name") || d.HasChange("description") || d.HasChange("enable_ipv6") {
+		enableIpv6 := d.Get("enable_ipv6").(bool)
 		updateSubnetArgs := &vpc.UpdateSubnetArgs{
 			Name:        d.Get("name").(string),
-			EnableIpv6:  d.Get("enable_ipv6").(bool),
+			EnableIpv6:  &enableIpv6,
 			Description: d.Get("description").(string),
 		}
 

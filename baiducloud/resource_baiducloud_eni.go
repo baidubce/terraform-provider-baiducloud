@@ -386,12 +386,14 @@ func updateNameAndDescription(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChanges("name", "description") {
 		err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+			name := d.Get("name").(string)
+			description := d.Get("description").(string)
 			raw, err := client.WithEniClient(func(eniClient *eni.Client) (interface{}, error) {
 				return nil, eniClient.UpdateEni(&eni.UpdateEniArgs{
 					EniId:       d.Id(),
 					ClientToken: buildClientToken(),
-					Name:        d.Get("name").(string),
-					Description: d.Get("description").(string),
+					Name:        &name,
+					Description: &description,
 				})
 			})
 			if err != nil {

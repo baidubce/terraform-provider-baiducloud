@@ -174,7 +174,8 @@ func resourceBaiduCloudVpcUpdate(d *schema.ResourceData, meta interface{}) error
 	updateVpcArgs := &vpc.UpdateVPCArgs{}
 	updateVpcArgs.Name = d.Get("name").(string)
 	updateVpcArgs.Description = d.Get("description").(string)
-	updateVpcArgs.EnableIpv6 = d.Get("enable_ipv6").(bool)
+	enableIpv6 := d.Get("enable_ipv6").(bool)
+	updateVpcArgs.EnableIpv6 = &enableIpv6
 
 	secondaryCidrInterfaces := d.Get("secondary_cidrs").([]interface{})
 	secondaryCidrStrings := make([]string, 0)
