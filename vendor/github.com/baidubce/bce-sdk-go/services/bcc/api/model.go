@@ -72,6 +72,7 @@ const (
 	StorageTypeLocalNVME     StorageType = "local-nvme"
 	StorageTypeEnhancedPl1   StorageType = "enhanced_ssd_pl1"
 	StorageTypeEnhancedPl2   StorageType = "enhanced_ssd_pl2"
+	ElasticEphemeralDisk     StorageType = "elastic_ephemeral_disk"
 )
 
 type StorageTypeV3 string
@@ -113,6 +114,7 @@ type InstanceModel struct {
 	Spec                   string                 `json:"spec"`
 	Description            string                 `json:"desc"`
 	Status                 InstanceStatus         `json:"status"`
+	ChargeStatus           string                 `json:"chargeStatus"`
 	PaymentTiming          string                 `json:"paymentTiming"`
 	CreationTime           string                 `json:"createTime"`
 	ExpireTime             string                 `json:"expireTime"`
@@ -281,6 +283,7 @@ type CreateCdsModel struct {
 	SnapShotId         string      `json:"snapshotId,omitempty"`
 	EncryptKey         string      `json:"encryptKey,omitempty"`
 	DeleteWithInstance bool        `json:"deleteWithInstance,omitempty"`
+	CdsExtraIo         int         `json:"cdsExtraIo,omitempty"`
 }
 
 type CreateCdsModelV3 struct {
@@ -1490,6 +1493,7 @@ type CreateCDSVolumeArgs struct {
 	ClientToken        string               `json:"-"`
 	ChargeType         string               `json:"chargeType"`
 	CdsExtraIo         int                  `json:"cdsExtraIo"`
+	ShareSnapshotId    string               `json:"shareSnapshotId"`
 	RelationTag        *bool                `json:"relationTag"`
 }
 
@@ -1561,6 +1565,7 @@ type AttachVolumeArgs struct {
 
 type ResizeCSDVolumeArgs struct {
 	NewCdsSizeInGB int         `json:"newCdsSizeInGB,omitempty"`
+	NewExtraIO     *int        `json:"newExtraIO,omitempty"`
 	NewVolumeType  StorageType `json:"newVolumeType,omitempty"`
 	ClientToken    string      `json:"-"`
 }
@@ -1727,6 +1732,15 @@ const (
 
 	// ImageTypeBBCCustom BBC 自定义
 	ImageTypeBBCCustom ImageType = "BbcCustom"
+
+	// ImageTypeEbcTotal Ebc 全部镜像
+	ImageTypeEbcTotal ImageType = "EbcTotal"
+
+	// ImageTypeEbcCustom Ebc 自定义镜像
+	ImageTypeEbcCustom ImageType = "EbcCustom"
+
+	// ImageTypeEbcSystem Ebc 系统镜像
+	ImageTypeEbcSystem ImageType = "EbcSystem"
 )
 
 type ImageStatus string
@@ -3176,6 +3190,11 @@ type UnplannedEventResponse struct {
 	ExecuteTime                                  string                    `json:"executeTime"`
 	ServerEventLogs                              []OperationRecordResponse `json:"serverEventLogs"`
 	Failures                                     []IssueResponse           `json:"failures"`
+	IssueDiskInfos                               []IssueDiskInfo           `json:"issueDiskInfos"`
+}
+
+type IssueDiskInfo struct {
+	IssueDiskSn string `json:"issueDiskSn"`
 }
 
 type DescribeUnplannedEventsResp struct {
@@ -3190,4 +3209,67 @@ type DescribeUnplannedEventsResp struct {
 type BatchOperationResp struct {
 	RequestId            string   `json:"requestId"`
 	FailedInstanceIdList []string `json:"failedInstanceIdList"`
+}
+
+type GetDiagnosticSchemasResp struct {
+	MetricSetList []MetricSet `json:"metricSetList"`
+}
+
+type MetricSet struct {
+	MetricSetId   string `json:"metricSetId"`
+	MetricSetName string `json:"metricSetName"`
+	Description   string `json:"description"`
+	SupportText   string `json:"supportText"`
+}
+
+type ListDiagnosticReq struct {
+	MaxKeys      int    `json:"maxKeys"`
+	ReportId     string `json:"reportId"`
+	InstanceType string `json:"instanceType"`
+	InstanceId   string `json:"instanceId"`
+	Status       string `json:"status"`
+	Severity     string `json:"severity"`
+}
+
+type ListDiagnosticReportResp struct {
+	IsTruncated       bool              `json:"isTruncated"`
+	Marker            string            `json:"marker"`
+	MaxKeys           int               `json:"maxKeys"`
+	NextMarker        string            `json:"nextMarker"`
+	DiagnosticReports []ExecutionRecord `json:"diagnosticReports"`
+}
+
+type ExecutionRecord struct {
+	ReportId     string  `json:"reportId"`
+	InstanceType string  `json:"instanceType"`
+	InstanceId   string  `json:"instanceId"`
+	MetricSetId  string  `json:"metricSetId"`
+	CreatedTime  string  `json:"createdTime"`
+	Status       string  `json:"status"`
+	Result       string  `json:"result"`
+	Issues       []Issue `json:"issues"`
+}
+
+type Issue struct {
+	MetricCategory string `json:"metricCategory"`
+	MetricItem     string `json:"metricItem"`
+	SeverityResult string `json:"severityResult"`
+	Advice         string `json:"advice"`
+}
+
+type CreateDiagnosticReq struct {
+	MetricSetId  string `json:"metricSetId"`
+	InstanceType string `json:"instanceType"`
+	InstanceId   string `json:"instanceId"`
+	Pid          string `json:"pid"`
+	Duration     int    `json:"duration"`
+}
+
+type CreateDiagnosticResp struct {
+	RequestId string `json:"requestId"`
+	ReportId  string `json:"reportId"`
+}
+
+type DeleteDiagnosticReportReq struct {
+	ReportIds []string `json:"reportIds"`
 }
