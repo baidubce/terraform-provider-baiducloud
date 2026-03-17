@@ -213,7 +213,7 @@ The `tag_list` object supports the following:
 
 The `vpc_config` object supports the following:
 
-* `available_zone` - (Optional) Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF].
+* `available_zone` - (Optional) Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
 * `security_group_id` - (Optional) Security Group ID
 * `security_group_type` - (Optional) Security Group type. Available Values: [normal, enterprise]. Default: `normal`
 * `vpc_id` - (Optional) VPC ID
@@ -313,7 +313,7 @@ In addition to all arguments above, the following attributes are exported:
       * `tag_key` - Tag Key
       * `tag_value` - Tag Value
     * `vpc_config` - VPC Config
-      * `available_zone` - Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF].
+      * `available_zone` - Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
       * `security_group_id` - Security Group ID
       * `vpc_id` - VPC ID
       * `vpc_subnet_cidr_ipv6` - VPC Sunbet CIDR IPv6

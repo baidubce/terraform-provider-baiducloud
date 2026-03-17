@@ -122,7 +122,7 @@ The `master_config` object supports the following:
 
 The `managed_cluster_master_option` object supports the following:
 
-* `master_vpc_subnet_zone` - (Optional) Master VPC Subnet Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF].
+* `master_vpc_subnet_zone` - (Optional) Master VPC Subnet Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
 
 The `master_specs` object supports the following:
 
@@ -255,7 +255,7 @@ The `tag_list` object supports the following:
 
 The `vpc_config` object supports the following:
 
-* `available_zone` - (Optional) Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF].
+* `available_zone` - (Optional) Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
 * `security_group_id` - (Optional) Security Group ID
 * `vpc_id` - (Optional) VPC ID
 * `vpc_subnet_cidr_ipv6` - (Optional) VPC Sunbet CIDR IPv6
@@ -360,7 +360,7 @@ In addition to all arguments above, the following attributes are exported:
       * `tag_key` - Tag Key
       * `tag_value` - Tag Value
     * `vpc_config` - VPC Config
-      * `available_zone` - Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF].
+      * `available_zone` - Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
       * `security_group_id` - Security Group ID
       * `vpc_id` - VPC ID
       * `vpc_subnet_cidr_ipv6` - VPC Sunbet CIDR IPv6
@@ -466,7 +466,7 @@ In addition to all arguments above, the following attributes are exported:
       * `tag_key` - Tag Key
       * `tag_value` - Tag Value
     * `vpc_config` - VPC Config
-      * `available_zone` - Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF].
+      * `available_zone` - Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
       * `security_group_id` - Security Group ID
       * `vpc_id` - VPC ID
       * `vpc_subnet_cidr_ipv6` - VPC Sunbet CIDR IPv6

@@ -129,7 +129,7 @@ In addition to all arguments above, the following attributes are exported:
       * `tag_key` - Tag Key
       * `tag_value` - Tag Value
     * `vpc_config` - VPC Config
-      * `available_zone` - Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF].
+      * `available_zone` - Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
       * `security_group_id` - Security Group ID
       * `vpc_id` - VPC ID
       * `vpc_subnet_cidr_ipv6` - VPC Sunbet CIDR IPv6

@@ -676,7 +676,7 @@ func resourceCCEv2MasterConfig() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"master_vpc_subnet_zone": {
 							Type:         schema.TypeString,
-							Description:  "Master VPC Subnet Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF].",
+							Description:  "Master VPC Subnet Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].",
 							Optional:     true,
 							ValidateFunc: validation.StringInSlice(AvailableZonePermitted, false),
 						},
@@ -884,7 +884,7 @@ func resourceCCEv2VPCConfig() *schema.Resource {
 			},
 			"available_zone": {
 				Type:         schema.TypeString,
-				Description:  "Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF].",
+				Description:  "Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].",
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice(AvailableZonePermitted, false),
@@ -3265,6 +3265,8 @@ var AvailableZonePermitted = []string{
 	string(ccev2types.AvailableZoneD),
 	string(ccev2types.AvailableZoneE),
 	string(ccev2types.AvailableZoneF),
+	"zoneG",
+	"zoneI",
 }
 
 var ContainerNetworkModePermitted = []string{
