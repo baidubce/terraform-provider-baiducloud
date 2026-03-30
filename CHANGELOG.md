@@ -1,4 +1,9 @@
-	## 1.22.22 (Unreleased)
+	## 1.22.23 (Unreleased)
+
+## 1.22.22 (March 30, 2026)
+ENHANCEMENTS:
+- resource/baiducloud_instance: Add parameter `ehc_cluster_id`. 
+- resource/baiducloud_cdn_domain: Add support for new origin address API with `addr`, `type`, `http_port`, `https_port` and `upstream_protocol`.
 
 ## 1.22.21 (March 17, 2026)
 ENHANCEMENTS:
