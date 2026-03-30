@@ -45,3 +45,15 @@ func FindDomainConfigByName(conn *connectivity.BaiduClient, domainName string) (
 
 	return raw.(*api.DomainConfig), nil
 }
+
+func FindOriginConfigByName(conn *connectivity.BaiduClient, domainName string) ([]api.OriginItem, error) {
+	raw, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
+		return client.GetOriginConfig(domainName)
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return raw.([]api.OriginItem), nil
+}

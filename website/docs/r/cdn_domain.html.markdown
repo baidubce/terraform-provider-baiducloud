@@ -20,34 +20,36 @@ resource "baiducloud_cdn_domain" "example" {
   domain = "example.domain.com"
 
   origin {
-    backup = false
-    host   = "example1r.domain.com"
-    peer   = "https://1.2.3.4:443"
-    weight = 20
-    isp    = "un"
+    addr              = "1.2.3.4"
+    type              = "IP"
+    backup            = false
+    host              = "example1r.domain.com"
+    weight            = 20
+    isp               = "un"
+    upstream_protocol = "https"
   }
   origin {
+    addr   = "2.3.4.5"
+    type   = "IP"
     backup = false
     host   = "example2r.domain.com"
-    peer   = "http://2.3.4.5:80"
     weight = 20
   }
   origin {
+    addr   = "3.4.5.6"
+    type   = "IP"
     backup = true
-    peer   = "http://3.4.5.6:80"
     weight = 20
   }
 
-  default_host = "example3.domain.com"
-  form         = "image"
-
+  form = "image"
 }
 ```
 
 If you want to create an DRCDN, you can refer to the following example
 ```terraform
 resource "baiducloud_cdn_domain" "default" {
-  domain = "blog.zxhome.cloud"
+  domain        = "example.domain.com"
   drcdn_enabled = true
   dsa {
     comment = "test"
@@ -69,25 +71,27 @@ resource "baiducloud_cdn_domain" "default" {
     }
   }
   origin {
+    addr   = "1.2.3.4"
+    type   = "IP"
     backup = false
-    host   = "icloud1.yuhaiwei.net"
-    peer   = "https://1.2.3.4:443"
+    host   = "example1r.domain.com"
     weight = 20
     isp    = "un"
   }
   origin {
+    addr   = "2.3.4.5"
+    type   = "IP"
     backup = false
-    host   = "icloud2.yuhaiwei.net"
-    peer   = "http://2.3.4.5:80"
+    host   = "example2r.domain.com"
     weight = 20
   }
   origin {
+    addr   = "3.4.5.6"
+    type   = "IP"
     backup = true
-    peer   = "http://3.4.5.6:80"
     weight = 20
   }
-  default_host = "icloud5.yuhaiwei.net"
-  form         = "drcdn"
+  form = "drcdn"
 }
 ```
 
@@ -101,7 +105,7 @@ resource "baiducloud_cdn_domain" "default" {
 
 ### Optional
 
-- `default_host` (String) Domain-level host. Priority is lower than origin server host(ie origin.host).
+- `default_host` (String) **Deprecated**, use `host` in each `origin` block instead. Domain-level host. Priority is lower than origin server host(ie origin.host).
 - `drcdn_enabled` (Boolean) Whether enable DRCDN, Value is true or false. When this field is true, it indicates that you wish to create a DRCDN domain and you must explicitly configure the dsa parameters.
 - `dsa` (Block List) (see [below for nested schema](#nestedblock--dsa))
 - `form` (String) Business type of the domain name. Defaults to `default`. Valid values: `image`(small image file), `download`(large file downloading), `media` (streaming media on demand), `dynamic`(dynamic and static acceleration).
@@ -119,15 +123,17 @@ resource "baiducloud_cdn_domain" "default" {
 <a id="nestedblock--origin"></a>
 ### Nested Schema for `origin`
 
-Required:
-
-- `peer` (String) Format is {protocol://}{address}{:port}. `protocol` is optional, and valid values: `http`, `https`. `address` must be ip address or domain name. IPv6 address must be in '[ipv6]' format. `port` is optional.
-
 Optional:
 
+- `addr` (String) Origin server address. Supports IPv4, IPv6 (in `[ipv6]` format), or domain name. Cannot be used together with `peer`. When set, `type`, `http_port`, `https_port`, `upstream_protocol` are available.
 - `backup` (Boolean) Whether is a backup origin server. Defaults to `false`.
 - `host` (String) The host value used when forwarding to origin server
+- `http_port` (Number) Only effective when using `addr`. HTTP origin port. Defaults to 80.
+- `https_port` (Number) Only effective when using `addr`. HTTPS origin port. Defaults to 443.
 - `isp` (String) ISP of the origin server. Valid values: `un`(China Unicom), `ct`(China Telecom), `cm`(China Mobile)
+- `peer` (String) **Deprecated**, use `addr` instead. Format is `{protocol://}{address}{:port}`, e.g. `1.2.3.4`, `http://example.com`, `1.2.3.4:8080`. Cannot be used together with `addr`.
+- `type` (String) Required when using `addr`. Origin server type. Valid values: `IP`, `DOMAIN`, `BUCKET`. When `DOMAIN`, `isp` is ignored. When `BUCKET`, `addr` must be the full bucket address and `weight`/`isp` are ignored.
+- `upstream_protocol` (String) Only effective when using `addr`. Back-to-origin protocol. Valid values: `http`, `https`, `*` (follows request protocol).
 - `weight` (Number) The origin server weight. Must be between `1` and `100`. Sum of all weights should not be greater than 100. No effect when `peer` is domain name.
 
 

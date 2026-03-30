@@ -1,11 +1,12 @@
 package cdn
 
 import (
+	"strconv"
+
 	"github.com/baidubce/bce-sdk-go/services/cdn/api"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/flex"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/hashcode"
-	"strconv"
 )
 
 //<editor-fold desc="DomainStatus">
@@ -66,6 +67,75 @@ func expandOriginPeers(tfList []interface{}) []api.OriginPeer {
 		})
 	}
 	return originPeers
+}
+
+// expandOriginPeersFromAddrs maps addr to OriginPeer format for CreateDomainWithOptions initialization.
+// The API rejects mixed origin types, so only the first entry is used here.
+// Full origin config is applied afterwards via SetOriginConfig.
+func expandOriginPeersFromAddrs(tfList []interface{}) []api.OriginPeer {
+	tfMap := tfList[0].(map[string]interface{})
+	return []api.OriginPeer{
+		{
+			Peer:   tfMap["addr"].(string),
+			Host:   tfMap["host"].(string),
+			Backup: tfMap["backup"].(bool),
+			Weight: tfMap["weight"].(int),
+			ISP:    tfMap["isp"].(string),
+		},
+	}
+}
+
+//</editor-fold>
+
+//<editor-fold desc="OriginItem">
+func flattenOriginItems(originItems []api.OriginItem) interface{} {
+	tfList := []map[string]interface{}{}
+	for _, v := range originItems {
+		tfMap := map[string]interface{}{
+			"addr":              v.Addr,
+			"type":              v.Type,
+			"http_port":         v.HttpPort,
+			"https_port":        v.HttpsPort,
+			"host":              v.Host,
+			"backup":            v.Backup,
+			"weight":            v.Weight,
+			"isp":               v.Isp,
+			"upstream_protocol": v.UpstreamProtocol,
+		}
+		tfList = append(tfList, tfMap)
+	}
+	return tfList
+}
+
+func expandOriginItems(tfList []interface{}) []api.OriginItem {
+	originItems := []api.OriginItem{}
+	for _, v := range tfList {
+		tfMap := v.(map[string]interface{})
+		item := api.OriginItem{
+			Addr:             tfMap["addr"].(string),
+			Type:             tfMap["type"].(string),
+			HttpPort:         tfMap["http_port"].(int),
+			HttpsPort:        tfMap["https_port"].(int),
+			Host:             tfMap["host"].(string),
+			Backup:           tfMap["backup"].(bool),
+			Weight:           tfMap["weight"].(int),
+			Isp:              tfMap["isp"].(string),
+			UpstreamProtocol: tfMap["upstream_protocol"].(string),
+		}
+		originItems = append(originItems, item)
+	}
+	return originItems
+}
+
+// isLegacyOrigin returns true when all origin entries use peer (no addr set), selecting the old API path.
+func isLegacyOrigin(origins []interface{}) bool {
+	for _, v := range origins {
+		m := v.(map[string]interface{})
+		if m["addr"].(string) != "" {
+			return false
+		}
+	}
+	return true
 }
 
 //</editor-fold>

@@ -2,6 +2,9 @@ package cdn
 
 import (
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/baidubce/bce-sdk-go/model"
 	"github.com/baidubce/bce-sdk-go/services/cdn"
 	"github.com/baidubce/bce-sdk-go/services/cdn/api"
@@ -9,8 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/connectivity"
 	"github.com/terraform-providers/terraform-provider-baiducloud/baiducloud/flex"
-	"log"
-	"time"
 )
 
 func ResourceDomain() *schema.Resource {
@@ -43,8 +44,30 @@ func ResourceDomain() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"peer": {
 							Type:        schema.TypeString,
-							Description: "Format is {protocol://}{address}{:port}. `protocol` is optional, and valid values: `http`, `https`. `address` must be ip address or domain name. IPv6 address must be in '[ipv6]' format. `port` is optional.",
-							Required:    true,
+							Description: "Deprecated: use `addr` instead. Format is `{protocol://}{address}{:port}`, e.g. `1.2.3.4`, `http://example.com`, `1.2.3.4:8080`. Cannot be used together with `addr`.",
+							Optional:    true,
+							Deprecated:  "Use `addr`, `type`, `http_port`, `https_port` instead.",
+						},
+						"addr": {
+							Type:        schema.TypeString,
+							Description: "Origin server address. Supports IPv4, IPv6 (in `[ipv6]` format), or domain name. Cannot be used together with `peer`. When set, `type`, `http_port`, `https_port`, `upstream_protocol` are available.",
+							Optional:    true,
+						},
+						"type": {
+							Type:         schema.TypeString,
+							Description:  "Required when using `addr`. Origin server type. Valid values: `IP`, `DOMAIN`, `BUCKET`. When `DOMAIN`, `isp` is ignored. When `BUCKET`, `addr` must be the full bucket address and `weight`/`isp` are ignored.",
+							Optional:     true,
+							ValidateFunc: validation.StringInSlice([]string{"IP", "DOMAIN", "BUCKET"}, false),
+						},
+						"http_port": {
+							Type:        schema.TypeInt,
+							Description: "Only effective when using `addr`. HTTP origin port. Defaults to 80.",
+							Optional:    true,
+						},
+						"https_port": {
+							Type:        schema.TypeInt,
+							Description: "Only effective when using `addr`. HTTPS origin port. Defaults to 443.",
+							Optional:    true,
 						},
 						"host": {
 							Type:        schema.TypeString,
@@ -69,14 +92,21 @@ func ResourceDomain() *schema.Resource {
 							Optional:     true,
 							ValidateFunc: validation.StringInSlice([]string{"un", "ct", "cm"}, false),
 						},
+						"upstream_protocol": {
+							Type:         schema.TypeString,
+							Description:  "Only effective when using `addr`. Back-to-origin protocol. Valid values: `http`, `https`, `*` (follows request protocol).",
+							Optional:     true,
+							ValidateFunc: validation.StringInSlice([]string{"http", "https", "*"}, false),
+						},
 					},
 				},
 			},
 			"default_host": {
 				Type:             schema.TypeString,
-				Description:      "Domain-level host. Priority is lower than origin server host(ie origin.host).",
+				Description:      "Deprecated: use `host` in each `origin` block instead. Domain-level host. Priority is lower than origin server host(ie origin.host).",
 				Optional:         true,
 				DiffSuppressFunc: defaultHostDiffSuppress,
+				Deprecated:       "Use `host` in each `origin` block instead.",
 			},
 			"form": {
 				Type:         schema.TypeString,
@@ -91,7 +121,7 @@ func ResourceDomain() *schema.Resource {
 					"it indicates that you wish to create a DRCDN domain and " +
 					"you must explicitly configure the dsa parameters.",
 				Optional: true,
-				Default:  "false",
+				Default:  false,
 				ForceNew: true,
 			},
 			"dsa": {
@@ -169,15 +199,57 @@ func ResourceDomain() *schema.Resource {
 			},
 			"tags": flex.TagsSchema(),
 		},
-		CustomizeDiff: dsaConstraints,
+		CustomizeDiff: resourceDomainCustomizeDiff,
 	}
 
+}
+
+func resourceDomainCustomizeDiff(diff *schema.ResourceDiff, v interface{}) error {
+	if err := dsaConstraints(diff, v); err != nil {
+		return err
+	}
+	return originPeerAddrConflict(diff)
 }
 
 func dsaConstraints(diff *schema.ResourceDiff, v interface{}) error {
 	if diff.Get("drcdn_enabled").(bool) {
 		if _, ok := diff.GetOk("dsa"); !ok {
 			return fmt.Errorf("'dsa' must be specified when 'drcdn_enabled' is true")
+		}
+	}
+	return nil
+}
+
+func originPeerAddrConflict(diff *schema.ResourceDiff) error {
+	origins := diff.Get("origin").([]interface{})
+	hasPeer, hasAddr := false, false
+
+	for i, item := range origins {
+		m := item.(map[string]interface{})
+		peer := m["peer"].(string)
+		addr := m["addr"].(string)
+
+		if peer != "" {
+			hasPeer = true
+			if m["type"].(string) != "" {
+				return fmt.Errorf("origin[%d]: `type` is only effective when using `addr`, cannot be set together with `peer`", i)
+			}
+			if m["http_port"].(int) != 0 {
+				return fmt.Errorf("origin[%d]: `http_port` is only effective when using `addr`, cannot be set together with `peer`", i)
+			}
+			if m["https_port"].(int) != 0 {
+				return fmt.Errorf("origin[%d]: `https_port` is only effective when using `addr`, cannot be set together with `peer`", i)
+			}
+			if m["upstream_protocol"].(string) != "" {
+				return fmt.Errorf("origin[%d]: `upstream_protocol` is only effective when using `addr`, cannot be set together with `peer`", i)
+			}
+		}
+		if addr != "" {
+			hasAddr = true
+		}
+		if hasPeer && hasAddr {
+			return fmt.Errorf("origin: cannot mix `peer` and `addr`, " +
+				"please use either `peer` for all entries or `addr` for all entries")
 		}
 	}
 	return nil
@@ -201,12 +273,9 @@ func resourceDomainCreate(d *schema.ResourceData, meta interface{}) error {
 			if err != nil {
 				return nil, err
 			}
-			return cdnClient.CreateDomainWithOptions(domain, input.Origin, cdn.CreateDomainWithTags(tags),
-				cdn.CreateDomainWithForm(input.Form), cdn.CreateDomainWithOriginDefaultHost(input.DefaultHost),
-				cdn.CreateDomainAsDrcdnType(dsa))
+			return cdnClient.CreateDomainWithOptions(domain, input.Origin, cdn.CreateDomainWithTags(tags), cdn.CreateDomainWithForm(input.Form), cdn.CreateDomainWithOriginDefaultHost(input.DefaultHost), cdn.CreateDomainAsDrcdnType(dsa))
 		}
-		return cdnClient.CreateDomainWithOptions(domain, input.Origin, cdn.CreateDomainWithTags(tags),
-			cdn.CreateDomainWithForm(input.Form), cdn.CreateDomainWithOriginDefaultHost(input.DefaultHost))
+		return cdnClient.CreateDomainWithOptions(domain, input.Origin, cdn.CreateDomainWithTags(tags), cdn.CreateDomainWithForm(input.Form), cdn.CreateDomainWithOriginDefaultHost(input.DefaultHost))
 	})
 
 	if err != nil {
@@ -216,6 +285,13 @@ func resourceDomainCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(domain)
 	// may have several seconds delay, wait for it
 	time.Sleep(30 * time.Second)
+
+	if !isLegacyOrigin(d.Get("origin").([]interface{})) {
+		if err := updateOrigins(d, conn, domain); err != nil {
+			return err
+		}
+	}
+
 	return resourceDomainRead(d, meta)
 }
 
@@ -232,8 +308,20 @@ func resourceDomainRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("domain", domain)
 	d.Set("form", config.Form)
-	d.Set("origin", flattenOriginPeers(config.Origin))
+	d.Set("drcdn_enabled", config.Form == "drcdn")
 	d.Set("default_host", config.DefaultHost)
+
+	origins := d.Get("origin").([]interface{})
+	if isLegacyOrigin(origins) {
+		d.Set("origin", flattenOriginPeers(config.Origin))
+	} else {
+		originItems, err := FindOriginConfigByName(conn, domain)
+		if err != nil {
+			return fmt.Errorf("error reading origin config for CDN Domain (%s): %w", domain, err)
+		}
+		d.Set("origin", flattenOriginItems(originItems))
+	}
+
 	// computed
 	d.Set("status", config.Status)
 	d.Set("cname", config.Cname)
@@ -282,9 +370,13 @@ func resourceDomainDelete(d *schema.ResourceData, meta interface{}) error {
 func buildCreateArgs(d *schema.ResourceData) *api.OriginInit {
 	input := &api.OriginInit{}
 
-	if v, ok := d.GetOk("origin"); ok {
-		input.Origin = expandOriginPeers(v.([]interface{}))
+	tfList := d.Get("origin").([]interface{})
+	if isLegacyOrigin(tfList) {
+		input.Origin = expandOriginPeers(tfList)
+	} else {
+		input.Origin = expandOriginPeersFromAddrs(tfList)
 	}
+
 	if v, ok := d.GetOk("default_host"); ok {
 		input.DefaultHost = v.(string)
 	}
@@ -297,20 +389,36 @@ func buildCreateArgs(d *schema.ResourceData) *api.OriginInit {
 }
 
 func updateOrigins(d *schema.ResourceData, conn *connectivity.BaiduClient, domain string) error {
-	if d.HasChanges("origin", "default_host") {
-		log.Printf("[DEBUG] Update CDN Domain origins(%s)", domain)
+	tfList := d.Get("origin").([]interface{})
 
-		origins := expandOriginPeers(d.Get("origin").([]interface{}))
-		defaultHost := d.Get("default_host").(string)
-		if len(defaultHost) == 0 {
-			defaultHost = domain
+	if isLegacyOrigin(tfList) {
+		if d.HasChanges("origin", "default_host") {
+			log.Printf("[DEBUG] Update CDN Domain origins(%s)", domain)
+
+			origins := expandOriginPeers(d.Get("origin").([]interface{}))
+			defaultHost := d.Get("default_host").(string)
+			if len(defaultHost) == 0 {
+				defaultHost = domain
+			}
+
+			_, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
+				return nil, client.SetDomainOrigin(domain, origins, defaultHost)
+			})
+			if err != nil {
+				return fmt.Errorf("error updating CDN Domain (%s) origins: %w", domain, err)
+			}
 		}
+	} else {
+		if d.HasChange("origin") {
+			log.Printf("[DEBUG] SetOriginConfig for CDN Domain (%s)", domain)
 
-		_, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
-			return nil, client.SetDomainOrigin(domain, origins, defaultHost)
-		})
-		if err != nil {
-			return fmt.Errorf("error updating CDN Domain (%s) origins: %w", domain, err)
+			items := expandOriginItems(tfList)
+			_, err := conn.WithCdnClient(func(client *cdn.Client) (interface{}, error) {
+				return nil, client.SetOriginConfig(domain, items)
+			})
+			if err != nil {
+				return fmt.Errorf("error setting origin config for CDN Domain (%s): %w", domain, err)
+			}
 		}
 	}
 	return nil
