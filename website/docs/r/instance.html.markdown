@@ -69,6 +69,7 @@ The following arguments are supported:
 * `delete_cds_snapshot_flag` - (Optional, ForceNew) Whether to release the cds disk snapshots, default to false. It is effective only when the related_release_flag is true.
 * `deploy_set_ids` - (Optional) Deploy set ids the instance belong to
 * `description` - (Optional) Description of the instance.
+* `ehc_cluster_id` - (Optional) EHC cluster ID. If not specified, the system will automatically select default EHC cluster. Only valid when creating with a specified instance spec (`instance_spec`).
 * `enterprise_security_groups` - (Optional) Enterprise security group ids of the instance.
 * `ephemeral_disks` - (Optional) Ephemeral disks of the instance.
 * `fpga_card` - (Optional, ForceNew) FPGA card of the instance.

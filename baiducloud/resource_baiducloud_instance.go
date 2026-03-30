@@ -419,6 +419,12 @@ func resourceBaiduCloudInstance() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
+			"ehc_cluster_id": {
+				Type:        schema.TypeString,
+				Description: "EHC cluster ID. If not specified, the system will automatically select default EHC cluster. Only valid when creating with a specified instance spec (instance_spec).",
+				Optional:    true,
+				Computed:    true,
+			},
 			"deploy_set_ids": {
 				Type:        schema.TypeSet,
 				Description: "Deploy set ids the instance belong to",
@@ -641,6 +647,7 @@ func resourceBaiduCloudInstanceRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("dedicate_host_id", response.Instance.DedicatedHostId)
 	d.Set("tags", flattenTagsToMap(response.Instance.Tags))
 	d.Set("instance_spec", response.Instance.Spec)
+	d.Set("ehc_cluster_id", response.Instance.EhcClusterId)
 
 	d.Set("payment_timing", response.Instance.PaymentTiming)
 	d.Set("auto_renew_time_unit", response.Instance.AutoRenewPeriodUnit)
@@ -1053,6 +1060,10 @@ func buildBaiduCloudInstanceBySpecArgs(d *schema.ResourceData, meta interface{})
 
 	if instanceSpec, ok := d.GetOk("instance_spec"); ok {
 		request.Spec = instanceSpec.(string)
+	}
+
+	if v, ok := d.GetOk("ehc_cluster_id"); ok {
+		request.EhcClusterId = v.(string)
 	}
 
 	billingRequest := api.Billing{
