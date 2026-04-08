@@ -14,6 +14,7 @@ Use this resource to create a CCEv2 cluster.
 ## Example Usage
 
 ```hcl
+
 resource "baiducloud_ccev2_cluster" "default_managed" {
   cluster_spec  {
     cluster_name = var.cluster_name
@@ -48,6 +49,7 @@ resource "baiducloud_ccev2_cluster" "default_managed" {
     }
   }
 }
+
 ```
 
 ## Argument Reference
@@ -55,7 +57,12 @@ resource "baiducloud_ccev2_cluster" "default_managed" {
 The following arguments are supported:
 
 * `cluster_spec` - (Required, ForceNew) Specification of the cluster
+* `api_server_cert_san` - (Optional) APIServer certificate SANs
+* `create_options` - (Optional, ForceNew) Options for cluster creation
+* `kms_encryption` - (Optional) KMS encryption configuration
 * `master_specs` - (Optional, ForceNew) Specification of master nodes cluster
+* `metadata` - (Optional, ForceNew) Metadata for cluster creation
+* `node_group_specs` - (Optional, ForceNew) Node groups created together with the cluster
 * `tags` - (Optional, ForceNew) Tags, do not support modify
 
 The `cluster_spec` object supports the following:
@@ -69,7 +76,7 @@ The `cluster_spec` object supports the following:
 * `k8s_version` - (Optional) Kubernetes Version. Available Value: [1.18.9, 1.20.8, 1.21.14, 1.22.5, 1.24.4, 1.26.9, 1.28.8, 1.30.1].
 * `master_config` - (Optional) Cluster Master Config
 * `plugins` - (Optional) Plugin List
-* `runtime_type` - (Optional) Container Runtime Type. Available Value: [docker].
+* `runtime_type` - (Optional) Container Runtime Type. Available Values: [docker, containerd].
 * `runtime_version` - (Optional) Container Runtime Version
 * `vpc_cidr_ipv6` - (Optional) VPC CIDR IPv6
 * `vpc_cidr` - (Optional) VPC CIDR
@@ -77,6 +84,7 @@ The `cluster_spec` object supports the following:
 
 The `cluster_delete_option` object supports the following:
 
+* `batch_refund_resource` - (Optional) Whether to batch refund related resources
 * `delete_cds_snapshot` - (Optional) Whether to delete CDS snapshot
 * `delete_resource` - (Optional) Whether to delete resources
 
@@ -86,6 +94,10 @@ The `container_network_config` object supports the following:
 * `cluster_ip_service_cidr` - (Optional) Cluster Service ClusterIP CIDR 
 * `cluster_pod_cidr_ipv6` - (Optional) Cluster Pod IP CIDR IPv6
 * `cluster_pod_cidr` - (Optional) Cluster Pod IP CIDR
+* `ebpf_config` - (Optional) eBPF configuration
+* `enable_cv_eni` - (Optional) Whether to enable CV ENI
+* `enable_node_local_dns` - (Optional) Whether to enable node local DNS
+* `enable_rdma` - (Optional) Whether to enable RDMA
 * `eni_security_group_id` - (Optional) ENI Security Group ID
 * `eni_vpc_subnet_ids` - (Optional) ENI VPC Subnet ID
 * `ip_version` - (Optional) IP Version. Available Value: [ipv4, ipv6, dualStack].
@@ -93,8 +105,19 @@ The `container_network_config` object supports the following:
 * `lb_service_vpc_subnet_id` - (Optional) LB Service VPC Sunnet ID
 * `max_pods_per_node` - (Optional) Max pod number in one node 
 * `mode` - (Optional) Network Mode. Available Value: [kubenet, vpc-cni, vpc-route-veth, vpc-route-ipvlan, vpc-route-auto-detect, vpc-secondary-ip-veth, vpc-secondary-ip-ipvlan, vpc-secondary-ip-auto-detect].
+* `net_device_driver` - (Optional) Network device driver
+* `network_policy_type` - (Optional) Network policy type
+* `node_local_dns_addr` - (Optional) Node local DNS address
 * `node_port_range_max` - (Optional) Node Port Service Port Range Max
 * `node_port_range_min` - (Optional) Node Port Service Port Range Min
+
+The `ebpf_config` object supports the following:
+
+* `cni_chaining_mode` - (Optional) CNI chaining mode
+* `datapath_v2_enabled` - (Optional) Whether datapath v2 is enabled
+* `enabled` - (Optional) Whether eBPF is enabled
+* `kube_proxy_replacement_mode` - (Optional) Kube proxy replacement mode
+* `service_lb_mode` - (Optional) Service LB mode
 
 The `eni_vpc_subnet_ids` object supports the following:
 
@@ -103,17 +126,35 @@ The `eni_vpc_subnet_ids` object supports the following:
 The `k8s_custom_config` object supports the following:
 
 * `admission_plugins` - (Optional) custom Admission Plugins
+* `api_audiences` - (Optional) Custom API audiences
+* `cpu_manager_policy` - (Optional) CPU manager policy
+* `custom_labels` - (Optional) Custom labels for cluster components
+* `disable_ccm` - (Optional) Whether to disable CCM
+* `disable_kubelet_read_only_port` - (Optional) Whether to disable kubelet read only port
+* `enable_cloud_node_controller` - (Optional) Whether to enable cloud node controller
+* `enable_default_plugin_deploy_by_helm` - (Optional) Whether to deploy default plugins by Helm
+* `enable_edge_hub` - (Optional) Whether to enable edge hub
+* `enable_hostname` - (Optional) Whether to enable hostname support
+* `enable_lb_service_controller` - (Optional) Whether to enable LB service controller
 * `etcd_data_path` - (Optional) etcd data directory
+* `insecure_registries` - (Optional) Custom insecure registries
 * `kube_api_burst` - (Optional) custom Kube API Burst
 * `kube_api_qps` - (Optional) custom Kube API QPS
+* `kubelet_bind_address_type` - (Optional) Kubelet bind address type
 * `master_feature_gates` - (Optional) custom master Feature Gates
 * `node_feature_gates` - (Optional) custom node Feature Gates
+* `non_masquerade_cidr` - (Optional) Non masquerade CIDR
 * `pause_image` - (Optional) custom PauseImage
 * `scheduler_predicated` - (Optional) custom Scheduler Predicates
 * `scheduler_priorities` - (Optional) custom SchedulerPriorities
+* `service_account_issuers` - (Optional) Custom service account issuers
+* `topology_manager_policy` - (Optional) Topology manager policy
+* `topology_manager_scope` - (Optional) Topology manager scope
 
 The `master_config` object supports the following:
 
+* `cluster_blb_eip` - (Optional) Cluster BLB EIP
+* `cluster_blb_id` - (Optional) Cluster BLB ID
 * `cluster_blb_vpc_subnet_id` - (Optional) Cluster BLB VPC Subnet ID
 * `cluster_ha` - (Optional) Number of master nodes. Available Value: [1, 3, 5, 2(for serverless)].
 * `exposed_public` - (Optional) Whether exposed to public network
@@ -122,7 +163,41 @@ The `master_config` object supports the following:
 
 The `managed_cluster_master_option` object supports the following:
 
+* `cluster_blb_source` - (Optional) Source of cluster BLB
+* `master_flavor` - (Optional) Master flavor
+* `master_security_group_uuid` - (Optional) Master security group UUID
+* `master_vpc_subnet_uuid` - (Optional) Master VPC subnet UUID
 * `master_vpc_subnet_zone` - (Optional) Master VPC Subnet Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
+
+The `create_options` object supports the following:
+
+* `check_default_security_groups` - (Optional) Whether to check default security groups
+* `create_security_groups` - (Optional) Security groups to be created with the cluster
+* `skip_network_check` - (Optional) Whether to skip network check when creating the cluster
+
+The `create_security_groups` object supports the following:
+
+* `network_info` - (Required) Network information used to create security groups
+* `eni` - (Optional) ENI security group type
+* `master` - (Optional) Master security group type
+* `node` - (Optional) Node security group type
+
+The `network_info` object supports the following:
+
+* `exposed_public` - (Required) Whether the cluster is exposed publicly
+* `node_port_range_max` - (Required) Node port range maximum
+* `node_port_range_min` - (Required) Node port range minimum
+* `vpc_cidr` - (Required) VPC CIDR
+* `vpc_id` - (Required) VPC ID
+* `pod_cidr_ipv6` - (Optional) Pod CIDR IPv6
+* `pod_cidr` - (Optional) Pod CIDR
+* `secondary_cidrs` - (Optional) Secondary VPC CIDRs
+* `vpc_cidr_ipv6` - (Optional) VPC CIDR IPv6
+
+The `kms_encryption` object supports the following:
+
+* `enabled` - (Optional) Whether KMS encryption is enabled
+* `kms_key_id` - (Optional) KMS key ID used by the cluster
 
 The `master_specs` object supports the following:
 
@@ -138,9 +213,11 @@ The `master_spec` object supports the following:
 * `cluster_role` - (Optional) Cluster Role of Instance, Master or Nodes. Available Value: [master, node].
 * `delete_option` - (Optional) Delete Option
 * `deploy_custom_config` - (Optional) Deploy Custom Option
+* `ehc_cluster_id` - (Optional) EHC Cluster ID for instances
 * `eip_option` - (Optional) EIP Option
 * `existed_option` - (Optional) Existed Instance Option
 * `existed` - (Optional) Is the instance existed
+* `hpas_option` - (Optional) HPAS Option
 * `image_id` - (Optional) Image ID
 * `instance_charging_type` - (Optional) Instance charging type. Available Value: [Prepaid, Postpaid, bidding].
 * `instance_group_id` - (Optional) Instance Group ID of this Instance
@@ -150,9 +227,9 @@ The `master_spec` object supports the following:
 * `instance_precharging_option` - (Optional) Instance Pre-charging Option
 * `instance_resource` - (Optional) Instance Resource Config
 * `instance_taints` - (Optional) Taint List
-* `instance_type` - (Optional) Instance Type Available Value: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1].
+* `instance_type` - (Optional) Instance Type. Available Values: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1, HPAS].
 * `labels` - (Optional) Labels List
-* `machine_type` - (Optional) Machine Type. Available Value: [BCC, BBC, Metal].
+* `machine_type` - (Optional) Machine Type. Available Values: [BCC, BBC, EBC, HPAS].
 * `master_type` - (Optional) Master Type. Available Value: [managed, custom, serverless].
 * `need_eip` - (Optional) Whether the instance need a EIP
 * `runtime_type` - (Optional) Container Runtime Type. Available Value: [docker].
@@ -204,6 +281,11 @@ The `existed_option` object supports the following:
 * `existed_instance_id` - (Optional) Existed Instance ID
 * `rebuild` - (Optional) Whether re-install OS
 
+The `hpas_option` object supports the following:
+
+* `app_performance_level` - (Required) Performance level of the application. e.g., `10k`.
+* `app_type` - (Required) Application type of the HPAS instance. e.g., `llama2_7B_train`.
+
 The `instance_os` object supports the following:
 
 * `image_name` - (Optional) Image Name
@@ -219,15 +301,18 @@ The `instance_precharging_option` object supports the following:
 * `auto_renew_time_unit` - (Optional) Time unit for auto renew
 * `auto_renew_time` - (Optional) Number of time unit for auto renew
 * `auto_renew` - (Optional) Is Auto Renew
+* `purchase_time_unit` - (Optional) Time unit for purchase
 * `purchase_time` - (Optional) Time of purchase
 
 The `instance_resource` object supports the following:
 
 * `cds_list` - (Optional) CDS List
 * `cpu` - (Optional) CPU cores
+* `ephemeral_disk_list` - (Optional) Ephemeral Disk List for instances
 * `gpu_count` - (Optional) GPU Number
 * `gpu_type` - (Optional) GPU Type. Available Value: [V100-32, V100-16, P40, P4, K40, DLCard].
 * `local_disk_size` - (Optional) Local disk size
+* `machine_spec` - (Optional) Machine specification for instances, e.g., 'llama_7B_train/10k'
 * `mem` - (Optional) memory GB
 * `node_cpu_quota` - (Optional) Node cpu quota
 * `node_mem_quota` - (Optional) Node memory quota
@@ -240,6 +325,12 @@ The `cds_list` object supports the following:
 * `path` - (Optional) CDS path
 * `snapshot_id` - (Optional) Snap shot ID
 * `storage_type` - (Optional) Storage Type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].
+
+The `ephemeral_disk_list` object supports the following:
+
+* `size_in_gb` - (Required) Disk size in GB
+* `storage_type` - (Required) Storage Type. Available Value: [local_nvme, local_ssd].
+* `disk_path` - (Optional) Custom disk mount path for local disks
 
 The `instance_taints` object supports the following:
 
@@ -257,6 +348,169 @@ The `vpc_config` object supports the following:
 
 * `available_zone` - (Optional) Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
 * `security_group_id` - (Optional) Security Group ID
+* `security_group_type` - (Optional) Security Group type. Available Values: [normal, enterprise]. Default: `normal`
+* `vpc_id` - (Optional) VPC ID
+* `vpc_subnet_cidr_ipv6` - (Optional) VPC Sunbet CIDR IPv6
+* `vpc_subnet_cidr` - (Optional) VPC Subnet CIDR
+* `vpc_subnet_id` - (Optional) VPC Subnet ID
+* `vpc_subnet_type` - (Optional) VPC Subnet type. Available Value: [BCC, BCC_NAT, BBC].
+
+The `metadata` object supports the following:
+
+* `annotations` - (Optional) Cluster metadata annotations
+* `labels` - (Optional) Cluster metadata labels
+
+The `node_group_specs` object supports the following:
+
+* `instance_group_name` - (Required) Name of node group
+* `instance_template` - (Required) Instance template of the node group
+* `replicas` - (Required) Replica count of node group
+
+The `instance_template` object supports the following:
+
+* `admin_password` - (Optional) Admin Password
+* `bbc_option` - (Optional) BBC Option
+* `cce_instance_id` - (Optional) Instance ID
+* `cluster_id` - (Optional) Cluster ID of this Instance
+* `cluster_role` - (Optional) Cluster Role of Instance, Master or Nodes. Available Value: [master, node].
+* `delete_option` - (Optional) Delete Option
+* `deploy_custom_config` - (Optional) Deploy Custom Option
+* `ehc_cluster_id` - (Optional) EHC Cluster ID for instances
+* `eip_option` - (Optional) EIP Option
+* `existed_option` - (Optional) Existed Instance Option
+* `existed` - (Optional) Is the instance existed
+* `hpas_option` - (Optional) HPAS Option
+* `image_id` - (Optional) Image ID
+* `instance_charging_type` - (Optional) Instance charging type. Available Value: [Prepaid, Postpaid, bidding].
+* `instance_group_id` - (Optional) Instance Group ID of this Instance
+* `instance_group_name` - (Optional) Name of Instance Group
+* `instance_name` - (Optional) Instance Name
+* `instance_os` - (Optional) OS Config of the instance
+* `instance_precharging_option` - (Optional) Instance Pre-charging Option
+* `instance_resource` - (Optional) Instance Resource Config
+* `instance_taints` - (Optional) Taint List
+* `instance_type` - (Optional) Instance Type. Available Values: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1, HPAS].
+* `labels` - (Optional) Labels List
+* `machine_type` - (Optional) Machine Type. Available Values: [BCC, BBC, EBC, HPAS].
+* `master_type` - (Optional) Master Type. Available Value: [managed, custom, serverless].
+* `need_eip` - (Optional) Whether the instance need a EIP
+* `runtime_type` - (Optional) Container Runtime Type. Available Value: [docker].
+* `runtime_version` - (Optional) Container Runtime Version
+* `ssh_key_id` - (Optional) SSH Key ID
+* `tag_list` - (Optional) Tag List
+* `vpc_config` - (Optional) VPC Config
+* `cce_instance_priority` - Priority of this instance.
+
+The `bbc_option` object supports the following:
+
+* `raid_id` - (Optional) Disk Raid ID
+* `reserve_data` - (Optional) Whether reserve data
+* `sys_disk_size` - (Optional) System Disk Size
+
+The `delete_option` object supports the following:
+
+* `delete_cds_snapshot` - (Optional) Whether delete CDS snapshot
+* `delete_resource` - (Optional) Whether delete resources
+* `move_out` - (Optional) Whether move out the instance
+
+The `deploy_custom_config` object supports the following:
+
+* `docker_config` - (Optional) Docker Config Info
+* `enable_cordon` - (Optional) Whether enable cordon
+* `enable_resource_reserved` - (Optional) Whether to Enable Resource Quota
+* `kube_reserved` - (Optional) Resource Quota
+* `kubelet_root_dir` - (Optional) kubelet Data Directory
+* `post_user_script` - (Optional) Script after deployment, base64 encoded
+* `pre_user_script` - (Optional) Script before deployment, base64 encoded
+
+The `docker_config` object supports the following:
+
+* `bip` - (Optional) docker0 Network Bridge Network Segment
+* `docker_data_root` - (Optional) Customized Docker Data Directory
+* `docker_log_max_file` - (Optional) docker Log Max File
+* `docker_log_max_size` - (Optional) docker Log Max Size
+* `insecure_registries` - (Optional) Customized InsecureRegistries
+* `registry_mirrors` - (Optional) Customized RegistryMirrors
+
+The `eip_option` object supports the following:
+
+* `eip_bandwidth` - (Optional) EIP Bandwidth
+* `eip_charging_type` - (Optional) EIP Charging Type. Available Value: [ByTraffic, ByBandwidth].
+* `eip_name` - (Optional) EIP Name
+
+The `existed_option` object supports the following:
+
+* `existed_instance_id` - (Optional) Existed Instance ID
+* `rebuild` - (Optional) Whether re-install OS
+
+The `hpas_option` object supports the following:
+
+* `app_performance_level` - (Required) Performance level of the application. e.g., `10k`.
+* `app_type` - (Required) Application type of the HPAS instance. e.g., `llama2_7B_train`.
+
+The `instance_os` object supports the following:
+
+* `image_name` - (Optional) Image Name
+* `image_type` - (Optional) Image type. Available Value: [Integration, System, All, Custom, Sharing, GpuBccSystem, GpuBccCustom, BbcSystem, BbcCustom].
+* `os_arch` - (Optional) OS arch
+* `os_build` - (Optional) OS Build Time
+* `os_name` - (Optional) OS name. Available Value: [CentOS, Ubuntu, Windows Server, Debian, opensuse].
+* `os_type` - (Optional) OS type. Available Value: [linux, windows].
+* `os_version` - (Optional) OS version
+
+The `instance_precharging_option` object supports the following:
+
+* `auto_renew_time_unit` - (Optional) Time unit for auto renew
+* `auto_renew_time` - (Optional) Number of time unit for auto renew
+* `auto_renew` - (Optional) Is Auto Renew
+* `purchase_time_unit` - (Optional) Time unit for purchase
+* `purchase_time` - (Optional) Time of purchase
+
+The `instance_resource` object supports the following:
+
+* `cds_list` - (Optional) CDS List
+* `cpu` - (Optional) CPU cores
+* `ephemeral_disk_list` - (Optional) Ephemeral Disk List for instances
+* `gpu_count` - (Optional) GPU Number
+* `gpu_type` - (Optional) GPU Type. Available Value: [V100-32, V100-16, P40, P4, K40, DLCard].
+* `local_disk_size` - (Optional) Local disk size
+* `machine_spec` - (Optional) Machine specification for instances, e.g., 'llama_7B_train/10k'
+* `mem` - (Optional) memory GB
+* `node_cpu_quota` - (Optional) Node cpu quota
+* `node_mem_quota` - (Optional) Node memory quota
+* `root_disk_size` - (Optional) Root disk size
+* `root_disk_type` - (Optional) Root disk type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].
+
+The `cds_list` object supports the following:
+
+* `cds_size` - (Optional) CDS Size
+* `path` - (Optional) CDS path
+* `snapshot_id` - (Optional) Snap shot ID
+* `storage_type` - (Optional) Storage Type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].
+
+The `ephemeral_disk_list` object supports the following:
+
+* `size_in_gb` - (Required) Disk size in GB
+* `storage_type` - (Required) Storage Type. Available Value: [local_nvme, local_ssd].
+* `disk_path` - (Optional) Custom disk mount path for local disks
+
+The `instance_taints` object supports the following:
+
+* `effect` - (Optional) Taint Effect. Available Value: [NoSchedule, PreferNoSchedule, NoExecute].
+* `key` - (Optional) Taint Key
+* `time_added` - (Optional) Taint Added Time. Format RFC3339
+* `value` - (Optional) Taint Value
+
+The `tag_list` object supports the following:
+
+* `tag_key` - (Optional) Tag Key
+* `tag_value` - (Optional) Tag Value
+
+The `vpc_config` object supports the following:
+
+* `available_zone` - (Optional) Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
+* `security_group_id` - (Optional) Security Group ID
+* `security_group_type` - (Optional) Security Group type. Available Values: [normal, enterprise]. Default: `normal`
 * `vpc_id` - (Optional) VPC ID
 * `vpc_subnet_cidr_ipv6` - (Optional) VPC Sunbet CIDR IPv6
 * `vpc_subnet_cidr` - (Optional) VPC Subnet CIDR
@@ -268,14 +522,19 @@ The `vpc_config` object supports the following:
 In addition to all arguments above, the following attributes are exported:
 
 * `cluster_status` - Statue of the cluster
+  * `api_server_access_success` - Whether APIServer access succeeds
   * `cluster_blb` - Cluster BLB
   * `cluster_phase` - Cluster Phase
+  * `infrastructure_ready` - Whether infrastructure is ready
+  * `k8s_plugin_deploy_success` - Whether Kubernetes plugins deploy successfully
   * `node_num` - Cluster Node Number
+  * `problem_detector_service_source_bcm` - Whether problem detector service source is BCM
+  * `upgrade_workflow_id` - Workflow ID for cluster upgrade or update
+  * `workflow_message` - Workflow message of cluster operation
 * `created_at` - Create time of the cluster
 * `masters` - Master machines of the cluster
   * `created_at` - Instance create time
   * `instance_spec` - Instance specification
-    * `admin_password` - Admin Password
     * `bbc_option` - BBC Option
       * `raid_id` - Disk Raid ID
       * `reserve_data` - Whether reserve data
@@ -302,6 +561,7 @@ In addition to all arguments above, the following attributes are exported:
       * `kubelet_root_dir` - kubelet Data Directory
       * `post_user_script` - Script after deployment, base64 encoded
       * `pre_user_script` - Script before deployment, base64 encoded
+    * `ehc_cluster_id` - EHC Cluster ID for instances
     * `eip_option` - EIP Option
       * `eip_bandwidth` - EIP Bandwidth
       * `eip_charging_type` - EIP Charging Type. Available Value: [ByTraffic, ByBandwidth].
@@ -310,6 +570,7 @@ In addition to all arguments above, the following attributes are exported:
       * `existed_instance_id` - Existed Instance ID
       * `rebuild` - Whether re-install OS
     * `existed` - Is the instance existed
+    * `hpas_option` - HPAS Option
     * `image_id` - Image ID
     * `instance_charging_type` - Instance charging type. Available Value: [Prepaid, Postpaid, bidding].
     * `instance_group_id` - Instance Group ID of this Instance
@@ -327,6 +588,7 @@ In addition to all arguments above, the following attributes are exported:
       * `auto_renew_time_unit` - Time unit for auto renew
       * `auto_renew_time` - Number of time unit for auto renew
       * `auto_renew` - Is Auto Renew
+      * `purchase_time_unit` - Time unit for purchase
       * `purchase_time` - Time of purchase
     * `instance_resource` - Instance Resource Config
       * `cds_list` - CDS List
@@ -335,22 +597,19 @@ In addition to all arguments above, the following attributes are exported:
         * `snapshot_id` - Snap shot ID
         * `storage_type` - Storage Type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].
       * `cpu` - CPU cores
+      * `ephemeral_disk_list` - Ephemeral Disk List for instances
+        * `disk_path` - Custom disk mount path for local disks
       * `gpu_count` - GPU Number
       * `gpu_type` - GPU Type. Available Value: [V100-32, V100-16, P40, P4, K40, DLCard].
       * `local_disk_size` - Local disk size
+      * `machine_spec` - Machine specification for instances, e.g., 'llama_7B_train/10k'
       * `mem` - memory GB
       * `node_cpu_quota` - Node cpu quota
       * `node_mem_quota` - Node memory quota
       * `root_disk_size` - Root disk size
       * `root_disk_type` - Root disk type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].
-    * `instance_taints` - Taint List
-      * `effect` - Taint Effect. Available Value: [NoSchedule, PreferNoSchedule, NoExecute].
-      * `key` - Taint Key
-      * `time_added` - Taint Added Time. Format RFC3339
-      * `value` - Taint Value
-    * `instance_type` - Instance Type Available Value: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1].
-    * `labels` - Labels List
-    * `machine_type` - Machine Type. Available Value: [BCC, BBC, Metal].
+    * `instance_type` - Instance Type. Available Values: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1, HPAS].
+    * `machine_type` - Machine Type. Available Values: [BCC, BBC, EBC, HPAS].
     * `master_type` - Master Type. Available Value: [managed, custom, serverless].
     * `need_eip` - Whether the instance need a EIP
     * `runtime_type` - Container Runtime Type. Available Value: [docker].
@@ -381,7 +640,6 @@ In addition to all arguments above, the following attributes are exported:
 * `nodes` - Slave machines of the cluster
   * `created_at` - Instance create time
   * `instance_spec` - Instance specification
-    * `admin_password` - Admin Password
     * `bbc_option` - BBC Option
       * `raid_id` - Disk Raid ID
       * `reserve_data` - Whether reserve data
@@ -408,6 +666,7 @@ In addition to all arguments above, the following attributes are exported:
       * `kubelet_root_dir` - kubelet Data Directory
       * `post_user_script` - Script after deployment, base64 encoded
       * `pre_user_script` - Script before deployment, base64 encoded
+    * `ehc_cluster_id` - EHC Cluster ID for instances
     * `eip_option` - EIP Option
       * `eip_bandwidth` - EIP Bandwidth
       * `eip_charging_type` - EIP Charging Type. Available Value: [ByTraffic, ByBandwidth].
@@ -416,6 +675,7 @@ In addition to all arguments above, the following attributes are exported:
       * `existed_instance_id` - Existed Instance ID
       * `rebuild` - Whether re-install OS
     * `existed` - Is the instance existed
+    * `hpas_option` - HPAS Option
     * `image_id` - Image ID
     * `instance_charging_type` - Instance charging type. Available Value: [Prepaid, Postpaid, bidding].
     * `instance_group_id` - Instance Group ID of this Instance
@@ -433,6 +693,7 @@ In addition to all arguments above, the following attributes are exported:
       * `auto_renew_time_unit` - Time unit for auto renew
       * `auto_renew_time` - Number of time unit for auto renew
       * `auto_renew` - Is Auto Renew
+      * `purchase_time_unit` - Time unit for purchase
       * `purchase_time` - Time of purchase
     * `instance_resource` - Instance Resource Config
       * `cds_list` - CDS List
@@ -441,22 +702,19 @@ In addition to all arguments above, the following attributes are exported:
         * `snapshot_id` - Snap shot ID
         * `storage_type` - Storage Type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].
       * `cpu` - CPU cores
+      * `ephemeral_disk_list` - Ephemeral Disk List for instances
+        * `disk_path` - Custom disk mount path for local disks
       * `gpu_count` - GPU Number
       * `gpu_type` - GPU Type. Available Value: [V100-32, V100-16, P40, P4, K40, DLCard].
       * `local_disk_size` - Local disk size
+      * `machine_spec` - Machine specification for instances, e.g., 'llama_7B_train/10k'
       * `mem` - memory GB
       * `node_cpu_quota` - Node cpu quota
       * `node_mem_quota` - Node memory quota
       * `root_disk_size` - Root disk size
       * `root_disk_type` - Root disk type. Available Value: [std1, hp1, cloud_hp1, local, sata, ssd, hdd].
-    * `instance_taints` - Taint List
-      * `effect` - Taint Effect. Available Value: [NoSchedule, PreferNoSchedule, NoExecute].
-      * `key` - Taint Key
-      * `time_added` - Taint Added Time. Format RFC3339
-      * `value` - Taint Value
-    * `instance_type` - Instance Type Available Value: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1].
-    * `labels` - Labels List
-    * `machine_type` - Machine Type. Available Value: [BCC, BBC, Metal].
+    * `instance_type` - Instance Type. Available Values: [N1, N2, N3, N4, N5, C1, C2, S1, G1, F1, HPAS].
+    * `machine_type` - Machine Type. Available Values: [BCC, BBC, EBC, HPAS].
     * `master_type` - Master Type. Available Value: [managed, custom, serverless].
     * `need_eip` - Whether the instance need a EIP
     * `runtime_type` - Container Runtime Type. Available Value: [docker].
@@ -484,6 +742,7 @@ In addition to all arguments above, the following attributes are exported:
       * `vpc_ip_ipv6` - VPC IPv6
       * `vpc_ip` - VPC IP
   * `updated_at` - Instance update time
+* `order_id` - Order ID returned when creating the cluster
 * `updated_at` - Update time of the cluster
 
 

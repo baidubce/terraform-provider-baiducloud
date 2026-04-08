@@ -67,7 +67,7 @@ func (s *Ccev2Service) InstanceEventStepsStateRefresh(instanceId string) resourc
 		}
 		result, _ := raw.(*ccev2.GetEventStepsResponse)
 
-		return result, result.Status, nil
+		return result, string(result.Status), nil
 	}
 }
 
@@ -204,6 +204,72 @@ func resourceCCEv2ClusterSpec() *schema.Resource {
 	}
 }
 
+func resourceCCEv2ClusterMetadata() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"labels": {
+				Type:        schema.TypeMap,
+				Description: "Cluster metadata labels",
+				Optional:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"annotations": {
+				Type:        schema.TypeMap,
+				Description: "Cluster metadata annotations",
+				Optional:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+		},
+	}
+}
+
+func resourceCCEv2ClusterKMSEncryption() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"enabled": {
+				Type:        schema.TypeBool,
+				Description: "Whether KMS encryption is enabled",
+				Optional:    true,
+				Computed:    true,
+			},
+			"kms_key_id": {
+				Type:        schema.TypeString,
+				Description: "KMS key ID used by the cluster",
+				Optional:    true,
+				Computed:    true,
+			},
+		},
+	}
+}
+
+func resourceCCEv2CreateClusterNodeGroupSpec() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"instance_group_name": {
+				Type:        schema.TypeString,
+				Description: "Name of node group",
+				Required:    true,
+			},
+			"replicas": {
+				Type:        schema.TypeInt,
+				Description: "Replica count of node group",
+				Required:    true,
+			},
+			"instance_template": {
+				Type:        schema.TypeList,
+				Description: "Instance template of the node group",
+				Required:    true,
+				MaxItems:    1,
+				Elem:        resourceCCEv2InstanceSpec(),
+			},
+		},
+	}
+}
+
 func resourceCCEv2ClusterStatus() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
@@ -222,6 +288,36 @@ func resourceCCEv2ClusterStatus() *schema.Resource {
 			"node_num": {
 				Type:        schema.TypeInt,
 				Description: "Cluster Node Number",
+				Computed:    true,
+			},
+			"infrastructure_ready": {
+				Type:        schema.TypeBool,
+				Description: "Whether infrastructure is ready",
+				Computed:    true,
+			},
+			"api_server_access_success": {
+				Type:        schema.TypeBool,
+				Description: "Whether APIServer access succeeds",
+				Computed:    true,
+			},
+			"k8s_plugin_deploy_success": {
+				Type:        schema.TypeBool,
+				Description: "Whether Kubernetes plugins deploy successfully",
+				Computed:    true,
+			},
+			"upgrade_workflow_id": {
+				Type:        schema.TypeString,
+				Description: "Workflow ID for cluster upgrade or update",
+				Computed:    true,
+			},
+			"workflow_message": {
+				Type:        schema.TypeString,
+				Description: "Workflow message of cluster operation",
+				Computed:    true,
+			},
+			"problem_detector_service_source_bcm": {
+				Type:        schema.TypeBool,
+				Description: "Whether problem detector service source is BCM",
 				Computed:    true,
 			},
 		},
@@ -578,6 +674,14 @@ func resourceCCEv2MountConfig() *schema.Resource {
 func resourceCCEv2K8SCustomConfig() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
+			"custom_labels": {
+				Type:        schema.TypeMap,
+				Description: "Custom labels for cluster components",
+				Optional:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
 			"master_feature_gates": {
 				Type:        schema.TypeMap,
 				Description: "custom master Feature Gates",
@@ -638,6 +742,94 @@ func resourceCCEv2K8SCustomConfig() *schema.Resource {
 				Description: "etcd data directory",
 				Optional:    true,
 			},
+			"enable_hostname": {
+				Type:        schema.TypeBool,
+				Description: "Whether to enable hostname support",
+				Optional:    true,
+			},
+			"enable_lb_service_controller": {
+				Type:        schema.TypeBool,
+				Description: "Whether to enable LB service controller",
+				Optional:    true,
+			},
+			"enable_cloud_node_controller": {
+				Type:        schema.TypeBool,
+				Description: "Whether to enable cloud node controller",
+				Optional:    true,
+			},
+			"disable_ccm": {
+				Type:        schema.TypeBool,
+				Description: "Whether to disable CCM",
+				Optional:    true,
+			},
+			"enable_edge_hub": {
+				Type:        schema.TypeBool,
+				Description: "Whether to enable edge hub",
+				Optional:    true,
+			},
+			"enable_default_plugin_deploy_by_helm": {
+				Type:        schema.TypeBool,
+				Description: "Whether to deploy default plugins by Helm",
+				Optional:    true,
+			},
+			"disable_kubelet_read_only_port": {
+				Type:        schema.TypeBool,
+				Description: "Whether to disable kubelet read only port",
+				Optional:    true,
+			},
+			"api_audiences": {
+				Type:        schema.TypeList,
+				Description: "Custom API audiences",
+				Optional:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"service_account_issuers": {
+				Type:        schema.TypeList,
+				Description: "Custom service account issuers",
+				Optional:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"non_masquerade_cidr": {
+				Type:        schema.TypeString,
+				Description: "Non masquerade CIDR",
+				Optional:    true,
+			},
+			"insecure_registries": {
+				Type:        schema.TypeList,
+				Description: "Custom insecure registries",
+				Optional:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"cpu_manager_policy": {
+				Type:         schema.TypeString,
+				Description:  "CPU manager policy",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(K8SCPUManagerPolicyPermitted, false),
+			},
+			"kubelet_bind_address_type": {
+				Type:         schema.TypeString,
+				Description:  "Kubelet bind address type",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(KubeletBindAddressTypePermitted, false),
+			},
+			"topology_manager_scope": {
+				Type:         schema.TypeString,
+				Description:  "Topology manager scope",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(K8STopologyManagerScopePermitted, false),
+			},
+			"topology_manager_policy": {
+				Type:         schema.TypeString,
+				Description:  "Topology manager policy",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(K8STopologyManagerPolicyPermitted, false),
+			},
 		},
 	}
 }
@@ -667,6 +859,16 @@ func resourceCCEv2MasterConfig() *schema.Resource {
 				Description: "Cluster BLB VPC Subnet ID",
 				Optional:    true,
 			},
+			"cluster_blb_id": {
+				Type:        schema.TypeString,
+				Description: "Cluster BLB ID",
+				Optional:    true,
+			},
+			"cluster_blb_eip": {
+				Type:        schema.TypeString,
+				Description: "Cluster BLB EIP",
+				Optional:    true,
+			},
 			"managed_cluster_master_option": {
 				Type:        schema.TypeList,
 				Description: "Managed cluster master option",
@@ -679,6 +881,28 @@ func resourceCCEv2MasterConfig() *schema.Resource {
 							Description:  "Master VPC Subnet Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].",
 							Optional:     true,
 							ValidateFunc: validation.StringInSlice(AvailableZonePermitted, false),
+						},
+						"master_vpc_subnet_uuid": {
+							Type:        schema.TypeString,
+							Description: "Master VPC subnet UUID",
+							Optional:    true,
+						},
+						"master_security_group_uuid": {
+							Type:        schema.TypeString,
+							Description: "Master security group UUID",
+							Optional:    true,
+						},
+						"master_flavor": {
+							Type:         schema.TypeString,
+							Description:  "Master flavor",
+							Optional:     true,
+							ValidateFunc: validation.StringInSlice(MasterFlavorPermitted, false),
+						},
+						"cluster_blb_source": {
+							Type:         schema.TypeString,
+							Description:  "Source of cluster BLB",
+							Optional:     true,
+							ValidateFunc: validation.StringInSlice(BLBSourcePermitted, false),
 						},
 					},
 				},
@@ -695,6 +919,13 @@ func resourceCCEv2ContainerNetworkConfig() *schema.Resource {
 				Description:  "Network Mode. Available Value: [kubenet, vpc-cni, vpc-route-veth, vpc-route-ipvlan, vpc-route-auto-detect, vpc-secondary-ip-veth, vpc-secondary-ip-ipvlan, vpc-secondary-ip-auto-detect].",
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice(ContainerNetworkModePermitted, false),
+			},
+			"ebpf_config": {
+				Type:        schema.TypeList,
+				Description: "eBPF configuration",
+				Optional:    true,
+				MaxItems:    1,
+				Elem:        resourceCCEv2EBPFConfig(),
 			},
 			"eni_vpc_subnet_ids": {
 				Type:        schema.TypeList,
@@ -769,6 +1000,69 @@ func resourceCCEv2ContainerNetworkConfig() *schema.Resource {
 				Description:  "KubeProxy Mode. Available Value: [iptables, ipvs].",
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice(KubeProxyModePermitted, false),
+			},
+			"network_policy_type": {
+				Type:         schema.TypeString,
+				Description:  "Network policy type",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(NetworkPolicyTypePermitted, false),
+			},
+			"enable_node_local_dns": {
+				Type:        schema.TypeBool,
+				Description: "Whether to enable node local DNS",
+				Optional:    true,
+			},
+			"node_local_dns_addr": {
+				Type:        schema.TypeString,
+				Description: "Node local DNS address",
+				Optional:    true,
+			},
+			"net_device_driver": {
+				Type:        schema.TypeString,
+				Description: "Network device driver",
+				Optional:    true,
+			},
+			"enable_rdma": {
+				Type:        schema.TypeBool,
+				Description: "Whether to enable RDMA",
+				Optional:    true,
+			},
+			"enable_cv_eni": {
+				Type:        schema.TypeBool,
+				Description: "Whether to enable CV ENI",
+				Optional:    true,
+			},
+		},
+	}
+}
+
+func resourceCCEv2EBPFConfig() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"enabled": {
+				Type:        schema.TypeBool,
+				Description: "Whether eBPF is enabled",
+				Optional:    true,
+			},
+			"datapath_v2_enabled": {
+				Type:        schema.TypeBool,
+				Description: "Whether datapath v2 is enabled",
+				Optional:    true,
+			},
+			"kube_proxy_replacement_mode": {
+				Type:        schema.TypeString,
+				Description: "Kube proxy replacement mode",
+				Optional:    true,
+			},
+			"service_lb_mode": {
+				Type:        schema.TypeString,
+				Description: "Service LB mode",
+				Optional:    true,
+			},
+			"cni_chaining_mode": {
+				Type:        schema.TypeString,
+				Description: "CNI chaining mode",
+				Optional:    true,
 			},
 		},
 	}
@@ -1220,6 +1514,123 @@ func resourceCCEv2ClusterDeleteOption() *schema.Resource {
 				Description: "Whether to delete CDS snapshot",
 				Optional:    true,
 				Computed:    true,
+			},
+			"batch_refund_resource": {
+				Type:        schema.TypeBool,
+				Description: "Whether to batch refund related resources",
+				Optional:    true,
+				Computed:    true,
+			},
+		},
+	}
+}
+
+func resourceCCEv2CreateClusterOptions() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"skip_network_check": {
+				Type:        schema.TypeBool,
+				Description: "Whether to skip network check when creating the cluster",
+				Optional:    true,
+			},
+			"check_default_security_groups": {
+				Type:        schema.TypeBool,
+				Description: "Whether to check default security groups",
+				Optional:    true,
+			},
+			"create_security_groups": {
+				Type:        schema.TypeList,
+				Description: "Security groups to be created with the cluster",
+				Optional:    true,
+				MaxItems:    1,
+				Elem:        resourceCCEv2CreateSecurityGroups(),
+			},
+		},
+	}
+}
+
+func resourceCCEv2CreateSecurityGroups() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"network_info": {
+				Type:        schema.TypeList,
+				Description: "Network information used to create security groups",
+				Required:    true,
+				MaxItems:    1,
+				Elem:        resourceCCEv2ClusterNetworkInfo(),
+			},
+			"master": {
+				Type:         schema.TypeString,
+				Description:  "Master security group type",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(SecurityGroupTypePermitted, false),
+			},
+			"node": {
+				Type:         schema.TypeString,
+				Description:  "Node security group type",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(SecurityGroupTypePermitted, false),
+			},
+			"eni": {
+				Type:         schema.TypeString,
+				Description:  "ENI security group type",
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(SecurityGroupTypePermitted, false),
+			},
+		},
+	}
+}
+
+func resourceCCEv2ClusterNetworkInfo() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"vpc_id": {
+				Type:        schema.TypeString,
+				Description: "VPC ID",
+				Required:    true,
+			},
+			"vpc_cidr": {
+				Type:        schema.TypeString,
+				Description: "VPC CIDR",
+				Required:    true,
+			},
+			"vpc_cidr_ipv6": {
+				Type:        schema.TypeString,
+				Description: "VPC CIDR IPv6",
+				Optional:    true,
+			},
+			"secondary_cidrs": {
+				Type:        schema.TypeList,
+				Description: "Secondary VPC CIDRs",
+				Optional:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"pod_cidr": {
+				Type:        schema.TypeString,
+				Description: "Pod CIDR",
+				Optional:    true,
+			},
+			"pod_cidr_ipv6": {
+				Type:        schema.TypeString,
+				Description: "Pod CIDR IPv6",
+				Optional:    true,
+			},
+			"node_port_range_min": {
+				Type:        schema.TypeInt,
+				Description: "Node port range minimum",
+				Required:    true,
+			},
+			"node_port_range_max": {
+				Type:        schema.TypeInt,
+				Description: "Node port range maximum",
+				Required:    true,
+			},
+			"exposed_public": {
+				Type:        schema.TypeBool,
+				Description: "Whether the cluster is exposed publicly",
+				Required:    true,
 			},
 		},
 	}
@@ -2159,6 +2570,16 @@ func convertClusterStatusFromJsonToTfMap(status *ccev2.ClusterStatus) ([]interfa
 	clusterStatusMap["cluster_blb"] = blbMapList
 	clusterStatusMap["cluster_phase"] = status.ClusterPhase
 	clusterStatusMap["node_num"] = status.NodeNum
+	clusterStatusMap["infrastructure_ready"] = status.InfrastructureReady
+	clusterStatusMap["api_server_access_success"] = status.APIServerAccessSuccess
+	clusterStatusMap["k8s_plugin_deploy_success"] = status.K8SPluginDeploySuccess
+	clusterStatusMap["problem_detector_service_source_bcm"] = status.ProblemDetectorServiceSourceBCM
+	if status.UpgradeWorkflowID != "" {
+		clusterStatusMap["upgrade_workflow_id"] = status.UpgradeWorkflowID
+	}
+	if status.WorkflowMessage != "" {
+		clusterStatusMap["workflow_message"] = status.WorkflowMessage
+	}
 
 	clusterStatusMapList = append(clusterStatusMapList, clusterStatusMap)
 	return clusterStatusMapList, nil
@@ -2283,6 +2704,14 @@ func buildCCEv2MasterConfig(masterConfigRawMap map[string]interface{}) (*ccev2ty
 		config.ClusterBLBVPCSubnetID = v.(string)
 	}
 
+	if v, ok := masterConfigRawMap["cluster_blb_id"]; ok && v.(string) != "" {
+		config.ClusterBLBID = v.(string)
+	}
+
+	if v, ok := masterConfigRawMap["cluster_blb_eip"]; ok && v.(string) != "" {
+		config.ClusterBLBEIP = v.(string)
+	}
+
 	if v, ok := masterConfigRawMap["managed_cluster_master_option"]; ok && len(v.([]interface{})) == 1 {
 		managedClusterMasterOptionRaw := v.([]interface{})[0].(map[string]interface{})
 		managedClusterMasterOption, err := buildManagedClusterMasterOption(managedClusterMasterOptionRaw)
@@ -2302,7 +2731,45 @@ func buildManagedClusterMasterOption(d map[string]interface{}) (*ccev2types.Mana
 	if v, ok := d["master_vpc_subnet_zone"]; ok && v.(string) != "" {
 		option.MasterVPCSubnetZone = ccev2types.AvailableZone(v.(string))
 	}
+
+	if v, ok := d["master_vpc_subnet_uuid"]; ok && v.(string) != "" {
+		option.MasterVPCSubnetUUID = v.(string)
+	}
+
+	if v, ok := d["master_security_group_uuid"]; ok && v.(string) != "" {
+		option.MasterSecurityGroupUUID = v.(string)
+	}
+
+	if v, ok := d["master_flavor"]; ok && v.(string) != "" {
+		option.MasterFlavor = ccev2types.MasterFlavor(v.(string))
+	}
+
+	if v, ok := d["cluster_blb_source"]; ok && v.(string) != "" {
+		option.ClusterBLBSource = ccev2types.BLBSource(v.(string))
+	}
 	return option, nil
+}
+
+func buildClusterMetadata(d map[string]interface{}) *ccev2.CreateClusterMetadata {
+	metadata := &ccev2.CreateClusterMetadata{}
+
+	if v, ok := d["labels"]; ok {
+		labels := make(map[string]string)
+		for key, value := range v.(map[string]interface{}) {
+			labels[key] = value.(string)
+		}
+		metadata.Labels = labels
+	}
+
+	if v, ok := d["annotations"]; ok {
+		annotations := make(map[string]string)
+		for key, value := range v.(map[string]interface{}) {
+			annotations[key] = value.(string)
+		}
+		metadata.Annotations = annotations
+	}
+
+	return metadata
 }
 
 func buildENIVPCSubnetIDs(zoneAndIDRawMapList []interface{}) (map[ccev2types.AvailableZone][]string, error) {
@@ -2332,6 +2799,11 @@ func buildCCEv2ContainerNetworkConfig(containerNetworkConfigRawMap map[string]in
 
 	if v, ok := containerNetworkConfigRawMap["mode"]; ok && v.(string) != "" {
 		config.Mode = ccev2types.ContainerNetworkMode(v.(string))
+	}
+
+	if v, ok := containerNetworkConfigRawMap["ebpf_config"]; ok && len(v.([]interface{})) == 1 {
+		ebpfConfigRaw := v.([]interface{})[0].(map[string]interface{})
+		config.EBPFConfig = buildEBPFConfig(ebpfConfigRaw)
 	}
 
 	config.ENIVPCSubnetIDs = nil
@@ -2389,7 +2861,57 @@ func buildCCEv2ContainerNetworkConfig(containerNetworkConfigRawMap map[string]in
 		config.KubeProxyMode = ccev2types.KubeProxyMode(v.(string))
 	}
 
+	if v, ok := containerNetworkConfigRawMap["network_policy_type"]; ok && v.(string) != "" {
+		config.NetworkPolicyType = ccev2types.NetworkPolicyType(v.(string))
+	}
+
+	if v, ok := containerNetworkConfigRawMap["enable_node_local_dns"]; ok {
+		config.EnableNodeLocalDNS = v.(bool)
+	}
+
+	if v, ok := containerNetworkConfigRawMap["node_local_dns_addr"]; ok && v.(string) != "" {
+		config.NodeLocalDNSAddr = v.(string)
+	}
+
+	if v, ok := containerNetworkConfigRawMap["net_device_driver"]; ok && v.(string) != "" {
+		config.NetDeviceDriver = v.(string)
+	}
+
+	if v, ok := containerNetworkConfigRawMap["enable_rdma"]; ok {
+		config.EnableRDMA = v.(bool)
+	}
+
+	if v, ok := containerNetworkConfigRawMap["enable_cv_eni"]; ok {
+		config.EnableCVEni = v.(bool)
+	}
+
 	return config, nil
+}
+
+func buildEBPFConfig(d map[string]interface{}) ccev2types.EBPFConfiguration {
+	config := ccev2types.EBPFConfiguration{}
+
+	if v, ok := d["enabled"]; ok {
+		config.Enabled = v.(bool)
+	}
+
+	if v, ok := d["datapath_v2_enabled"]; ok {
+		config.DatapathV2Enabled = v.(bool)
+	}
+
+	if v, ok := d["kube_proxy_replacement_mode"]; ok && v.(string) != "" {
+		config.KubeProxyReplacementMode = v.(string)
+	}
+
+	if v, ok := d["service_lb_mode"]; ok && v.(string) != "" {
+		config.ServiceLBMode = v.(string)
+	}
+
+	if v, ok := d["cni_chaining_mode"]; ok && v.(string) != "" {
+		config.CNIChainingMode = v.(string)
+	}
+
+	return config
 }
 
 func buildInstanceSpec(instanceSpecRawMap map[string]interface{}) (*ccev2types.InstanceSpec, error) {
@@ -2663,6 +3185,14 @@ func buildTags(tagRawMapList []interface{}) ([]ccev2types.Tag, error) {
 func buildK8SCustomConfig(k8sCustomConfigRawMap map[string]interface{}) (*ccev2types.K8SCustomConfig, error) {
 	config := &ccev2types.K8SCustomConfig{}
 
+	if v, ok := k8sCustomConfigRawMap["custom_labels"]; ok {
+		customLabels := make(map[string]string)
+		for key, value := range v.(map[string]interface{}) {
+			customLabels[key] = value.(string)
+		}
+		config.CustomLabels = customLabels
+	}
+
 	if v, ok := k8sCustomConfigRawMap["master_feature_gates"]; ok {
 		masterFeatureGates := make(map[string]bool)
 		for key, value := range v.(map[string]interface{}) {
@@ -2717,6 +3247,78 @@ func buildK8SCustomConfig(k8sCustomConfigRawMap map[string]interface{}) (*ccev2t
 
 	if v, ok := k8sCustomConfigRawMap["etcd_data_path"]; ok && v.(string) != "" {
 		config.ETCDDataPath = v.(string)
+	}
+
+	if v, ok := k8sCustomConfigRawMap["enable_hostname"]; ok {
+		config.EnableHostname = v.(bool)
+	}
+
+	if v, ok := k8sCustomConfigRawMap["enable_lb_service_controller"]; ok {
+		config.EnableLBServiceController = v.(bool)
+	}
+
+	if v, ok := k8sCustomConfigRawMap["enable_cloud_node_controller"]; ok {
+		config.EnableCloudNodeController = v.(bool)
+	}
+
+	if v, ok := k8sCustomConfigRawMap["disable_ccm"]; ok {
+		config.DisableCCM = v.(bool)
+	}
+
+	if v, ok := k8sCustomConfigRawMap["enable_edge_hub"]; ok {
+		config.EnableEdgeHub = v.(bool)
+	}
+
+	if v, ok := k8sCustomConfigRawMap["enable_default_plugin_deploy_by_helm"]; ok {
+		config.EnableDefaultPluginDeployByHelm = v.(bool)
+	}
+
+	if v, ok := k8sCustomConfigRawMap["disable_kubelet_read_only_port"]; ok {
+		config.DisableKubeletReadOnlyPort = v.(bool)
+	}
+
+	if v, ok := k8sCustomConfigRawMap["api_audiences"]; ok && v != nil {
+		apiAudiences := make([]string, 0)
+		for _, item := range v.([]interface{}) {
+			apiAudiences = append(apiAudiences, item.(string))
+		}
+		config.APIAudiences = apiAudiences
+	}
+
+	if v, ok := k8sCustomConfigRawMap["service_account_issuers"]; ok && v != nil {
+		serviceAccountIssuers := make([]string, 0)
+		for _, item := range v.([]interface{}) {
+			serviceAccountIssuers = append(serviceAccountIssuers, item.(string))
+		}
+		config.ServiceAccountIssuers = serviceAccountIssuers
+	}
+
+	if v, ok := k8sCustomConfigRawMap["non_masquerade_cidr"]; ok && v.(string) != "" {
+		config.NonMasqueradeCIDR = v.(string)
+	}
+
+	if v, ok := k8sCustomConfigRawMap["insecure_registries"]; ok && v != nil {
+		insecureRegistries := make([]string, 0)
+		for _, item := range v.([]interface{}) {
+			insecureRegistries = append(insecureRegistries, item.(string))
+		}
+		config.InsecureRegistries = insecureRegistries
+	}
+
+	if v, ok := k8sCustomConfigRawMap["cpu_manager_policy"]; ok && v.(string) != "" {
+		config.CPUManagerPolicy = ccev2types.K8SCPUManagerPolicy(v.(string))
+	}
+
+	if v, ok := k8sCustomConfigRawMap["kubelet_bind_address_type"]; ok && v.(string) != "" {
+		config.KubeletBindAddressType = ccev2types.KubeletBindAddressType(v.(string))
+	}
+
+	if v, ok := k8sCustomConfigRawMap["topology_manager_scope"]; ok && v.(string) != "" {
+		config.TopologyManagerScope = ccev2types.K8STopologyManagerScope(v.(string))
+	}
+
+	if v, ok := k8sCustomConfigRawMap["topology_manager_policy"]; ok && v.(string) != "" {
+		config.TopologyManagerPolicy = ccev2types.K8STopologyManagerPolicy(v.(string))
 	}
 
 	return config, nil
@@ -3121,6 +3723,114 @@ func buildInstanceOS(d map[string]interface{}) (*ccev2types.InstanceOS, error) {
 	return instanceOS, nil
 }
 
+func buildCreateClusterNodeGroupSpecs(nodeGroupRawList []interface{}) ([]*ccev2.InstanceGroupSpec, error) {
+	nodeGroupSpecs := make([]*ccev2.InstanceGroupSpec, 0, len(nodeGroupRawList))
+
+	for _, nodeGroupRaw := range nodeGroupRawList {
+		nodeGroupMap := nodeGroupRaw.(map[string]interface{})
+		instanceTemplateRaw := nodeGroupMap["instance_template"].([]interface{})[0].(map[string]interface{})
+		instanceSpec, err := buildInstanceSpec(instanceTemplateRaw)
+		if err != nil {
+			return nil, err
+		}
+		if instanceSpec.ClusterRole == "" {
+			instanceSpec.ClusterRole = ccev2types.ClusterRoleNode
+		}
+
+		nodeGroupSpecs = append(nodeGroupSpecs, &ccev2.InstanceGroupSpec{
+			InstanceGroupName: nodeGroupMap["instance_group_name"].(string),
+			ClusterRole:       instanceSpec.ClusterRole,
+			CleanPolicy:       ccev2.CleanPolicyDelete,
+			InstanceTemplate: ccev2.InstanceTemplate{
+				InstanceSpec: *instanceSpec,
+			},
+			Replicas: nodeGroupMap["replicas"].(int),
+		})
+	}
+
+	return nodeGroupSpecs, nil
+}
+
+func buildClusterNetworkInfo(d map[string]interface{}) ccev2.ClusterNetworkInfo {
+	info := ccev2.ClusterNetworkInfo{}
+
+	if v, ok := d["vpc_id"]; ok && v.(string) != "" {
+		info.VPCID = v.(string)
+	}
+	if v, ok := d["vpc_cidr"]; ok && v.(string) != "" {
+		info.VPCCIDR = v.(string)
+	}
+	if v, ok := d["vpc_cidr_ipv6"]; ok && v.(string) != "" {
+		info.VPCCIDRIPv6 = v.(string)
+	}
+	if v, ok := d["secondary_cidrs"]; ok && v != nil {
+		secondaryCIDRs := make([]string, 0)
+		for _, item := range v.([]interface{}) {
+			secondaryCIDRs = append(secondaryCIDRs, item.(string))
+		}
+		info.SecondaryCidrs = secondaryCIDRs
+	}
+	if v, ok := d["pod_cidr"]; ok && v.(string) != "" {
+		info.PodCIDR = v.(string)
+	}
+	if v, ok := d["pod_cidr_ipv6"]; ok && v.(string) != "" {
+		info.PodCIDRIPv6 = v.(string)
+	}
+	if v, ok := d["node_port_range_min"]; ok {
+		info.NodePortRangeMin = v.(int)
+	}
+	if v, ok := d["node_port_range_max"]; ok {
+		info.NodePortRangeMax = v.(int)
+	}
+	if v, ok := d["exposed_public"]; ok {
+		info.ExposedPublic = v.(bool)
+	}
+
+	return info
+}
+
+func buildCreateSecurityGroupType(v interface{}) *ccev2types.SecurityGroupType {
+	securityGroupType := ccev2types.SecurityGroupType(v.(string))
+	return &securityGroupType
+}
+
+func buildCreateSecurityGroups(d map[string]interface{}) *ccev2.CreateSecurityGroups {
+	config := &ccev2.CreateSecurityGroups{}
+
+	if v, ok := d["network_info"]; ok && len(v.([]interface{})) == 1 {
+		config.NetworkInfo = buildClusterNetworkInfo(v.([]interface{})[0].(map[string]interface{}))
+	}
+	if v, ok := d["master"]; ok && v.(string) != "" {
+		config.Master = buildCreateSecurityGroupType(v)
+	}
+	if v, ok := d["node"]; ok && v.(string) != "" {
+		config.Node = buildCreateSecurityGroupType(v)
+	}
+	if v, ok := d["eni"]; ok && v.(string) != "" {
+		config.ENI = buildCreateSecurityGroupType(v)
+	}
+
+	return config
+}
+
+func buildCreateClusterOptions(d map[string]interface{}) *ccev2.CreateClusterOptions {
+	options := &ccev2.CreateClusterOptions{}
+
+	if v, ok := d["skip_network_check"]; ok {
+		skipNetworkCheck := v.(bool)
+		options.SkipNetworkCheck = &skipNetworkCheck
+	}
+	if v, ok := d["check_default_security_groups"]; ok {
+		checkDefaultSecurityGroups := v.(bool)
+		options.CheckDefaultSecurityGroups = &checkDefaultSecurityGroups
+	}
+	if v, ok := d["create_security_groups"]; ok && len(v.([]interface{})) == 1 {
+		options.CreateSecurityGroups = buildCreateSecurityGroups(v.([]interface{})[0].(map[string]interface{}))
+	}
+
+	return options
+}
+
 func buildCCEv2CreateClusterArgs(d *schema.ResourceData) (*ccev2.CreateClusterArgs, error) {
 	argsRequest := &ccev2.CreateClusterRequest{}
 
@@ -3134,6 +3844,10 @@ func buildCCEv2CreateClusterArgs(d *schema.ResourceData) (*ccev2.CreateClusterAr
 		return nil, err
 	}
 	argsRequest.ClusterSpec = clusterSpec
+
+	if metadataRaw, ok := d.GetOk("metadata"); ok && len(metadataRaw.([]interface{})) == 1 {
+		argsRequest.Metadata = buildClusterMetadata(metadataRaw.([]interface{})[0].(map[string]interface{}))
+	}
 
 	masterSpecsRaw := d.Get("master_specs").([]interface{})
 	instanceSets := make([]*ccev2.InstanceSet, 0)
@@ -3155,6 +3869,37 @@ func buildCCEv2CreateClusterArgs(d *schema.ResourceData) (*ccev2.CreateClusterAr
 	}
 	argsRequest.MasterSpecs = instanceSets
 
+	if nodeGroupSpecsRaw, ok := d.GetOk("node_group_specs"); ok {
+		nodeGroupSpecs, err := buildCreateClusterNodeGroupSpecs(nodeGroupSpecsRaw.([]interface{}))
+		if err != nil {
+			log.Printf("Build CreateClusterArgs NodeGroupSpecs Fail:" + err.Error())
+			return nil, err
+		}
+		argsRequest.NodeGroupSpecs = nodeGroupSpecs
+	}
+
+	if createOptionsRaw, ok := d.GetOk("create_options"); ok && len(createOptionsRaw.([]interface{})) == 1 {
+		argsRequest.Options = *buildCreateClusterOptions(createOptionsRaw.([]interface{})[0].(map[string]interface{}))
+	}
+
+	if v, ok := d.GetOk("api_server_cert_san"); ok {
+		apiServerCertSAN := make([]string, 0)
+		for _, item := range v.([]interface{}) {
+			apiServerCertSAN = append(apiServerCertSAN, item.(string))
+		}
+		clusterSpec.K8SCustomConfig.APIServerCertSAN = apiServerCertSAN
+	}
+
+	if kmsEncryptionRaw, ok := d.GetOk("kms_encryption"); ok && len(kmsEncryptionRaw.([]interface{})) == 1 {
+		kmsEncryptionMap := kmsEncryptionRaw.([]interface{})[0].(map[string]interface{})
+		if v, exists := kmsEncryptionMap["enabled"]; exists {
+			clusterSpec.K8SCustomConfig.EnableKMSProvider = v.(bool)
+		}
+		if v, exists := kmsEncryptionMap["kms_key_id"]; exists && v.(string) != "" {
+			clusterSpec.K8SCustomConfig.KMSKeyID = v.(string)
+		}
+	}
+
 	return &ccev2.CreateClusterArgs{
 		CreateClusterRequest: argsRequest,
 	}, nil
@@ -3171,6 +3916,10 @@ func buildCCEv2DeleteClusterArgs(d *schema.ResourceData) (*ccev2.DeleteClusterAr
 
 	if v, ok := d.GetOk("cluster_spec.0.cluster_delete_option.0.delete_cds_snapshot"); ok {
 		args.DeleteCDSSnapshot = v.(bool)
+	}
+
+	if v, ok := d.GetOk("cluster_spec.0.cluster_delete_option.0.batch_refund_resource"); ok {
+		args.BatchRefundResource = v.(bool)
 	}
 
 	return args, nil
@@ -3190,6 +3939,9 @@ func tranceCCETagMapToModel(tagMaps map[string]interface{}) []ccev2types.Tag {
 func flattenCCETagsToMap(tags []ccev2types.Tag) map[string]string {
 	tagMap := make(map[string]string)
 	for _, tag := range tags {
+		if tag.TagKey == "bce:tag:createdBy" {
+			continue
+		}
 		tagMap[tag.TagKey] = tag.TagValue
 	}
 	return tagMap
@@ -3197,17 +3949,34 @@ func flattenCCETagsToMap(tags []ccev2types.Tag) map[string]string {
 
 // 判断两个tag切片是否包含相同的元素
 func slicesContainSameElementsInCCETags(a, b []ccev2types.Tag) bool {
-	if len(a) != len(b) {
+	filteredA := make([]ccev2types.Tag, 0, len(a))
+	for _, tag := range a {
+		if tag.TagKey == "bce:tag:createdBy" {
+			continue
+		}
+		filteredA = append(filteredA, tag)
+	}
+
+	filteredB := make([]ccev2types.Tag, 0, len(b))
+	for _, tag := range b {
+		if tag.TagKey == "bce:tag:createdBy" {
+			continue
+		}
+		filteredB = append(filteredB, tag)
+	}
+
+	if len(filteredA) != len(filteredB) {
 		return false
 	}
+
 	// 创建映射来存储每个 TagModel 出现的次数
 	counts := make(map[ccev2types.Tag]int)
 	// 计算第一个切片中每个元素出现的次数
-	for _, item := range a {
+	for _, item := range filteredA {
 		counts[item]++
 	}
 	// 减去第二个切片中每个元素出现的次数
-	for _, item := range b {
+	for _, item := range filteredB {
 		counts[item]--
 		if counts[item] < 0 {
 			// 如果某个元素在第二个切片中出现的次数多于第一个切片，返回 false
@@ -3225,19 +3994,33 @@ func slicesContainSameElementsInCCETags(a, b []ccev2types.Tag) bool {
 
 var ClusterTypePermitted = []string{
 	string(ccev2types.ClusterTypeNormal),
+	string(ccev2types.ClusterTypeCrossVPCENI),
+	string(ccev2types.ClusterTypeServerless),
+	string(ccev2types.ClusterTypeGPUShare),
+	string(ccev2types.ClusterTypeEdge),
+	string(ccev2types.ClusterTypeCloudEdge),
+	string(ccev2types.ClusterTypeAIHPC),
+	string(ccev2types.ClusterTypeARM),
 }
 
 var K8SVersionPermitted = []string{
-	//string(ccev2types.K8S_1_13_10),
-	//string(ccev2types.K8S_1_16_8),
+	string(ccev2types.K8S_1_14_9),
+	string(ccev2types.K8S_1_16_3),
+	string(ccev2types.K8S_1_16_8),
+	string(ccev2types.K8S_1_17_17),
 	"1.18.9",
+	string(ccev2types.K8S_1_18_9_BilibiliMixprotocols),
 	"1.20.8",
+	string(ccev2types.K8S_1_20_8_arm64),
 	"1.21.14",
 	"1.22.5",
 	"1.24.4",
 	"1.26.9",
-	"1.30.1",
 	"1.28.8",
+	"1.30.1",
+	string(ccev2types.K8S_1_31_1),
+	string(ccev2types.K8S_1_32_7),
+	string(ccev2types.K8S_1_34_2),
 }
 
 var RuntimeTypePermitted = []string{
@@ -3246,9 +4029,11 @@ var RuntimeTypePermitted = []string{
 }
 
 var MasterTypePermitted = []string{
+	string(ccev2types.MasterTypeManagedPro),
 	string(ccev2types.MasterTypeManaged),
 	string(ccev2types.MasterTypeCustom),
 	string(ccev2types.MasterTypeServerless),
+	string(ccev2types.MasterTypeContainerizedCustom),
 }
 
 var ClusterHAPermitted = []int{
@@ -3289,6 +4074,56 @@ var ContainerNetworkIPTypePermitted = []string{
 var KubeProxyModePermitted = []string{
 	string(ccev2types.KubeProxyModeIptables),
 	string(ccev2types.KubeProxyModeIPVS),
+	string(ccev2types.KubeProxyModeCilium),
+	string(ccev2types.KubeProxyModeEBPF),
+}
+
+var NetworkPolicyTypePermitted = []string{
+	string(ccev2types.NetworkPolicyTypeNone),
+	string(ccev2types.NetworkPolicyTypeFelix),
+	string(ccev2types.NetworkPolicyTypeEBPF),
+}
+
+var MasterFlavorPermitted = []string{
+	string(ccev2types.MasterFlavorL50),
+	string(ccev2types.MasterFlavorL200),
+	string(ccev2types.MasterFlavorL500),
+	string(ccev2types.MasterFlavorL1000),
+	string(ccev2types.MasterFlavorL3000),
+	string(ccev2types.MasterFlavorL5000),
+}
+
+var BLBSourcePermitted = []string{
+	string(ccev2types.BLBSourceCCE),
+	string(ccev2types.BLBSourceUser),
+}
+
+var SecurityGroupTypePermitted = []string{
+	string(ccev2types.SecurityGroupTypeNormal),
+	string(ccev2types.SecurityGroupTypeEnterprise),
+}
+
+var K8SCPUManagerPolicyPermitted = []string{
+	string(ccev2types.K8SCPUManagerPolicyNone),
+	string(ccev2types.K8SCPUManagerPolicyStatic),
+}
+
+var KubeletBindAddressTypePermitted = []string{
+	string(ccev2types.KubeletBindAddressTypeAll),
+	string(ccev2types.KubeletBindAddressTypeLocal),
+	string(ccev2types.KubeletBindAddressTypeHostIP),
+}
+
+var K8STopologyManagerScopePermitted = []string{
+	string(ccev2types.K8STopologyManagerScopePod),
+	string(ccev2types.K8STopologyManagerScopeContainer),
+}
+
+var K8STopologyManagerPolicyPermitted = []string{
+	string(ccev2types.K8STopologyManagerPolicyNone),
+	string(ccev2types.K8STopologyManagerPolicyBestEffort),
+	string(ccev2types.K8STopologyManagerPolicyRestricted),
+	string(ccev2types.K8STopologyManagerPolicySingleNumaNode),
 }
 
 var ClusterRolePermitted = []string{

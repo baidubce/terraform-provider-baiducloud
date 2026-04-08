@@ -4,6 +4,7 @@ Use this resource to create a CCEv2 cluster.
 Example Usage
 
 ```hcl
+
 resource "baiducloud_ccev2_cluster" "default_managed" {
   cluster_spec  {
     cluster_name = var.cluster_name
@@ -38,6 +39,7 @@ resource "baiducloud_ccev2_cluster" "default_managed" {
     }
   }
 }
+
 ```
 */
 package baiducloud
@@ -59,6 +61,7 @@ func resourceBaiduCloudCCEv2Cluster() *schema.Resource {
 		Create: resourceBaiduCloudCCEv2ClusterCreate,
 		Read:   resourceBaiduCloudCCEv2ClusterRead,
 		Delete: resourceBaiduCloudCCEv2ClusterDelete,
+		Update: resourceBaiduCloudCCEv2ClusterUpdate,
 
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -102,6 +105,46 @@ func resourceBaiduCloudCCEv2Cluster() *schema.Resource {
 					},
 				},
 			},
+			"metadata": {
+				Type:        schema.TypeList,
+				Description: "Metadata for cluster creation",
+				Optional:    true,
+				ForceNew:    true,
+				MaxItems:    1,
+				Elem:        resourceCCEv2ClusterMetadata(),
+			},
+			"node_group_specs": {
+				Type:        schema.TypeList,
+				Description: "Node groups created together with the cluster",
+				Optional:    true,
+				ForceNew:    true,
+				Elem:        resourceCCEv2CreateClusterNodeGroupSpec(),
+			},
+			"create_options": {
+				Type:        schema.TypeList,
+				Description: "Options for cluster creation",
+				Optional:    true,
+				ForceNew:    true,
+				MaxItems:    1,
+				Elem:        resourceCCEv2CreateClusterOptions(),
+			},
+			"api_server_cert_san": {
+				Type:        schema.TypeList,
+				Description: "APIServer certificate SANs",
+				Optional:    true,
+				Computed:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"kms_encryption": {
+				Type:        schema.TypeList,
+				Description: "KMS encryption configuration",
+				Optional:    true,
+				Computed:    true,
+				MaxItems:    1,
+				Elem:        resourceCCEv2ClusterKMSEncryption(),
+			},
 			//Status of the cluster
 			"cluster_status": {
 				Type:        schema.TypeList,
@@ -120,6 +163,11 @@ func resourceBaiduCloudCCEv2Cluster() *schema.Resource {
 				Description: "Update time of the cluster",
 				Computed:    true,
 			},
+			"order_id": {
+				Type:        schema.TypeString,
+				Description: "Order ID returned when creating the cluster",
+				Computed:    true,
+			},
 			"masters": {
 				Type:        schema.TypeList,
 				Description: "Master machines of the cluster",
@@ -132,6 +180,7 @@ func resourceBaiduCloudCCEv2Cluster() *schema.Resource {
 				Computed:    true,
 				Elem:        resourceCCEv2Instance(),
 			},
+			"tags": tagsSchema(),
 		},
 	}
 }
@@ -162,6 +211,9 @@ func resourceBaiduCloudCCEv2ClusterCreate(d *schema.ResourceData, meta interface
 			return resource.NonRetryableError(err)
 		}
 		d.SetId(response.ClusterID)
+		if response.OrderID != "" {
+			_ = d.Set("order_id", response.OrderID)
+		}
 		return nil
 	})
 	if err != nil {
@@ -235,7 +287,25 @@ func resourceBaiduCloudCCEv2ClusterRead(d *schema.ResourceData, meta interface{}
 		log.Printf("Set updated_at Error:" + err.Error())
 		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
 	}
-
+	if response.Cluster.Spec != nil {
+		if err = d.Set("api_server_cert_san", response.Cluster.Spec.K8SCustomConfig.APIServerCertSAN); err != nil {
+			log.Printf("Set api_server_cert_san Error:" + err.Error())
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
+		}
+		kmsEncryptionState := flattenCCEv2ClusterKMSEncryption(response.Cluster.Spec.K8SCustomConfig, d)
+		if err = d.Set("kms_encryption", kmsEncryptionState); err != nil {
+			log.Printf("Set kms_encryption Error:" + err.Error())
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
+		}
+	}
+	if d.HasChange("tags") {
+		if v, ok := d.GetOk("tags"); ok {
+			if !slicesContainSameElementsInCCETags(response.Cluster.Spec.Tags, tranceCCETagMapToModel(v.(map[string]interface{}))) {
+				return WrapErrorf(Error("Tags bind failed ! "), DefaultErrorMsg, "baiducloud_blb", action, BCESDKGoERROR)
+			}
+		}
+	}
+	d.Set("tags", flattenCCETagsToMap(response.Cluster.Spec.Tags))
 	//2.Get Instances of the Cluster
 	listInstancesRaw, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
 		args := &ccev2.ListInstancesByPageArgs{
@@ -288,6 +358,109 @@ func resourceBaiduCloudCCEv2ClusterRead(d *schema.ResourceData, meta interface{}
 	return nil
 }
 
+func resourceBaiduCloudCCEv2ClusterUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*connectivity.BaiduClient)
+	ccev2Service := Ccev2Service{client}
+
+	if d.HasChange("api_server_cert_san") {
+		apiServerCertSAN := make([]string, 0)
+		if v, ok := d.GetOk("api_server_cert_san"); ok {
+			for _, item := range v.([]interface{}) {
+				apiServerCertSAN = append(apiServerCertSAN, item.(string))
+			}
+		}
+
+		action := "Update CCEv2 Cluster APIServerCertSAN " + d.Id()
+		raw, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
+			return client.UpdateAPIServerCertSAN(&ccev2.UpdateAPIServerCertSANArgs{
+				ClusterID: d.Id(),
+				Request: &ccev2.UpdateAPIServerCertSANRequest{
+					ConfigureAPIServerCertSAN: ccev2.ConfigureAPIServerCertSAN{
+						ClusterID:        d.Id(),
+						APIServerCertSAN: apiServerCertSAN,
+					},
+				},
+			})
+		})
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
+		}
+		resp := raw.(*ccev2.UpdateAPIServerCertSANResponse)
+		if !resp.Success {
+			return WrapErrorf(Error("Update APIServerCertSAN failed"), DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
+		}
+		if err := waitCCEv2ClusterUpdateState(d, ccev2Service, []string{
+			string(ccev2types.ClusterPhaseRunning),
+			string(ccev2types.ClusterPhaseAPIServerCertSANUpdating),
+		}, []ccev2types.ClusterPhase{
+			ccev2types.ClusterPhaseAPIServerCertSANFailed,
+			ccev2types.ClusterPhaseDeleteFailed,
+		}); err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
+		}
+	}
+
+	if d.HasChange("kms_encryption") {
+		enabled := false
+		kmsKeyID := ""
+		if kmsEncryptionRaw, ok := d.GetOk("kms_encryption"); ok && len(kmsEncryptionRaw.([]interface{})) == 1 {
+			kmsEncryptionMap := kmsEncryptionRaw.([]interface{})[0].(map[string]interface{})
+			if v, exists := kmsEncryptionMap["enabled"]; exists {
+				enabled = v.(bool)
+			}
+			if v, exists := kmsEncryptionMap["kms_key_id"]; exists {
+				kmsKeyID = v.(string)
+			}
+		}
+
+		action := "Configure CCEv2 Cluster KMS Encryption " + d.Id()
+		updateAction := ccev2.KMSEncryptionActionDisable
+		pendingPhases := []string{
+			string(ccev2types.ClusterPhaseRunning),
+			string(ccev2types.ClusterPhaseKMSEncryptionDisabling),
+		}
+		failPhases := []ccev2types.ClusterPhase{
+			ccev2types.ClusterPhaseKMSEncryptionDisableFailed,
+			ccev2types.ClusterPhaseDeleteFailed,
+		}
+		if enabled {
+			updateAction = ccev2.KMSEncryptionActionEnable
+			pendingPhases = []string{
+				string(ccev2types.ClusterPhaseRunning),
+				string(ccev2types.ClusterPhaseKMSEncryptionEnabling),
+			}
+			failPhases = []ccev2types.ClusterPhase{
+				ccev2types.ClusterPhaseKMSEncryptionEnableFailed,
+				ccev2types.ClusterPhaseDeleteFailed,
+			}
+		}
+
+		raw, err := client.WithCCEv2Client(func(client *ccev2.Client) (interface{}, error) {
+			return client.ConfigureKMSEncryption(&ccev2.ConfigureKMSEncryptionArgs{
+				ClusterID: d.Id(),
+				Request: &ccev2.ConfigureKMSEncryptionRequest{
+					ConfigureKMSEncryption: ccev2.ConfigureKMSEncryption{
+						Action:   updateAction,
+						KMSKeyID: kmsKeyID,
+					},
+				},
+			})
+		})
+		if err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
+		}
+		resp := raw.(*ccev2.ConfigureKMSEncryptionResponse)
+		if !resp.Success {
+			return WrapErrorf(Error("Configure KMS encryption failed"), DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
+		}
+		if err := waitCCEv2ClusterUpdateState(d, ccev2Service, pendingPhases, failPhases); err != nil {
+			return WrapErrorf(err, DefaultErrorMsg, "baiducloud_ccev2_cluster", action, BCESDKGoERROR)
+		}
+	}
+
+	return resourceBaiduCloudCCEv2ClusterRead(d, meta)
+}
+
 func resourceBaiduCloudCCEv2ClusterDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*connectivity.BaiduClient)
 	ccev2Service := Ccev2Service{client}
@@ -334,4 +507,37 @@ func resourceBaiduCloudCCEv2ClusterDelete(d *schema.ResourceData, meta interface
 	}
 	time.Sleep(1 * time.Minute) //waiting for infrastructure delete before delete vpc & security group
 	return nil
+}
+
+func waitCCEv2ClusterUpdateState(d *schema.ResourceData, ccev2Service Ccev2Service, pendingPhases []string, failPhases []ccev2types.ClusterPhase) error {
+	stateConf := buildStateConf(
+		pendingPhases,
+		[]string{string(ccev2types.ClusterPhaseRunning)},
+		d.Timeout(schema.TimeoutUpdate),
+		ccev2Service.ClusterStateRefreshCCEv2(d.Id(), failPhases),
+	)
+	return resource.Retry(d.Timeout(schema.TimeoutUpdate), func() *resource.RetryError {
+		if _, err := stateConf.WaitForState(); err != nil {
+			if IsExceptedErrors(err, []string{"cce.warning.ClusterAPIServerUnavailable"}) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
+		}
+		return nil
+	})
+}
+
+func flattenCCEv2ClusterKMSEncryption(config ccev2types.K8SCustomConfig, d *schema.ResourceData) []interface{} {
+	if !config.EnableKMSProvider && config.KMSKeyID == "" {
+		if v, ok := d.GetOk("kms_encryption"); !ok || len(v.([]interface{})) == 0 {
+			return []interface{}{}
+		}
+	}
+
+	return []interface{}{
+		map[string]interface{}{
+			"enabled":    config.EnableKMSProvider,
+			"kms_key_id": config.KMSKeyID,
+		},
+	}
 }
