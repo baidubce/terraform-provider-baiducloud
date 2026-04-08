@@ -360,7 +360,7 @@ func buildBaiduCloudEtGatewayUpdateArgs(d *schema.ResourceData, meta interface{}
 	}
 
 	if v := d.Get("description").(string); v != "" {
-		request.Description = v
+		request.Description = &v
 	}
 
 	if localCidrs, ok := d.GetOk("local_cidrs"); ok {

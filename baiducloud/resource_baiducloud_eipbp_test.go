@@ -118,7 +118,7 @@ resource "baiducloud_eipbp" "default" {
   bandwidth_in_mbps = 100
   eip_group_id      = baiducloud_eipgroup.default.group_id
 }
-`, name)
+`, name, name)
 }
 
 func testAccEipbpConfigWithoutName(name string) string {
@@ -151,7 +151,7 @@ resource "baiducloud_eipbp" "default" {
   bandwidth_in_mbps = 100
   eip_group_id      = baiducloud_eipgroup.default.group_id
 }
-`, name)
+`, name, name)
 }
 
 func testAccEipBpConfigWithNameSimple(name string) string {

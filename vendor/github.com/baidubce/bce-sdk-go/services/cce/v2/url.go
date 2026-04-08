@@ -49,6 +49,8 @@ const (
 
 	REQUEST_INSTANCEGROUP_ATTACH_INSTANCE_URL = "/attachInstances"
 
+	REQUEST_INSTANCEGROUP_COMPONENT_UPGRADE_VERSIONS_URL = "/component_upgrade_versions"
+
 	REQUEST_QUOTA_URL = "/quota"
 
 	REQUEST_NODE_URL = "/node"
@@ -75,6 +77,8 @@ const (
 
 	REQUEST_SYNC_URL = "/sync"
 
+	REQUEST_WORKFLOW_URL = "/workflow"
+
 	REQUEST_RBAC_URL = "/rbac"
 
 	REMEDY_RULE_URL = "/remedyrules"
@@ -91,7 +95,9 @@ const (
 
 	REQUIREREPAIRAUTH_URL = "/requireRepairAuth"
 
-	REQUEST_FORBIDDELETE_URL = "/forbiddelete"
+	REQUEST_FORBIDDELETE_URL       = "/forbiddelete"
+	REQUEST_KMS_ENCRYPTION_URL     = "/kmsencryption"
+	REQUEST_APISERVER_CERT_SAN_URL = "/apiservercertsan"
 
 	// backup
 	BACKUP_REPO_URL          = "/backuprepositorys"
@@ -150,6 +156,14 @@ func getUpdateClusterForbidDeleteURI(clusterID string) string {
 	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_FORBIDDELETE_URL
 }
 
+func getConfigureKMSEncryptionURI(clusterID string) string {
+	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_KMS_ENCRYPTION_URL
+}
+
+func getUpdateAPIServerCertSANURI(clusterID string) string {
+	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_APISERVER_CERT_SAN_URL
+}
+
 func getClusterInstanceListURI(clusterID string) string {
 	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_INSTANCE_LIST_URL
 }
@@ -184,6 +198,10 @@ func getScaleUpInstanceGroupURI(clusterID, instanceGroupID string) string {
 
 func getScaleDownInstanceGroupURI(clusterID, instanceGroupID string) string {
 	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_INSTANCEGROUP_URL + "/" + instanceGroupID + REQUEST_INSTANCEGROUP_SCALE_DOWN_URL
+}
+
+func getInstanceGroupUpgradeComponentVersionsURI(clusterID, instanceGroupID string) string {
+	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_INSTANCEGROUP_URL + "/" + instanceGroupID + REQUEST_INSTANCEGROUP_COMPONENT_UPGRADE_VERSIONS_URL
 }
 
 func getAttachInstancesToInstanceGroupURI(clusterID string, instanceGroupID string) string {
@@ -240,6 +258,14 @@ func getTaskWithIDURI(taskType types.TaskType, taskID string) string {
 
 func getTaskListURI(taskType types.TaskType) string {
 	return URI_PREFIX + REQUEST_TASK_LIST_URL + "/" + string(taskType)
+}
+
+func getClusterWorkflowURI(clusterID string) string {
+	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_WORKFLOW_URL
+}
+
+func getClusterWorkflowWithIDURI(clusterID, workflowID string) string {
+	return URI_PREFIX + REQUEST_CLUSTER_URL + "/" + clusterID + REQUEST_WORKFLOW_URL + "/" + workflowID
 }
 
 func genGetInstanceCRDURI(clusterID, cceInstanceID string) string {
@@ -349,6 +375,22 @@ func encodeUserScriptInInstanceSet(instancesSets []*InstanceSet) error {
 	}
 	for _, instanceSet := range instancesSets {
 		encodeUserScript(&instanceSet.InstanceSpec)
+	}
+	return nil
+}
+
+func encodeUserScriptInInstanceGroupSpecs(instanceGroupSpecs []*InstanceGroupSpec) error {
+	if instanceGroupSpecs == nil {
+		return nil
+	}
+	for _, instanceGroupSpec := range instanceGroupSpecs {
+		if instanceGroupSpec == nil {
+			continue
+		}
+		encodeUserScript(&instanceGroupSpec.InstanceTemplate.InstanceSpec)
+		for i := range instanceGroupSpec.InstanceTemplates {
+			encodeUserScript(&instanceGroupSpec.InstanceTemplates[i].InstanceSpec)
+		}
 	}
 	return nil
 }

@@ -804,23 +804,19 @@ func buildBaiduCloudUpdateAppBlbListenerArgs(d *schema.ResourceData, meta interf
 	case TCP:
 		if d.HasChange("scheduler") || d.HasChange("tcp_session_timeout") {
 			return true, &appblb.UpdateAppTCPListenerArgs{
-				UpdateAppListenerArgs: appblb.UpdateAppListenerArgs{
-					TcpSessionTimeout: d.Get("tcp_session_timeout").(int),
-					ListenerPort:      uint16(d.Get("listener_port").(int)),
-					Scheduler:         d.Get("scheduler").(string),
-					ClientToken:       buildClientToken(),
-				},
+				TcpSessionTimeout: d.Get("tcp_session_timeout").(int),
+				ListenerPort:      uint16(d.Get("listener_port").(int)),
+				Scheduler:         d.Get("scheduler").(string),
+				ClientToken:       buildClientToken(),
 			}, nil
 		}
 		return false, nil, nil
 	case UDP:
 		if d.HasChange("scheduler") {
 			return true, &appblb.UpdateAppUDPListenerArgs{
-				UpdateAppListenerArgs: appblb.UpdateAppListenerArgs{
-					ListenerPort: uint16(d.Get("listener_port").(int)),
-					Scheduler:    d.Get("scheduler").(string),
-					ClientToken:  buildClientToken(),
-				},
+				ListenerPort: uint16(d.Get("listener_port").(int)),
+				Scheduler:    d.Get("scheduler").(string),
+				ClientToken:  buildClientToken(),
 			}, nil
 		}
 		return false, nil, nil

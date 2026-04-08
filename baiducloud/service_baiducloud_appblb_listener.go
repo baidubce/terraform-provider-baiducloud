@@ -156,13 +156,13 @@ func (s *APPBLBService) ListAllTCPListeners(blbId string, port int) ([]map[strin
 
 	result := make([]map[string]interface{}, 0, len(listeners))
 	for _, listener := range listeners {
-		policys, err := s.DescribePolicys(blbId, TCP, int(listener.Port))
+		policys, err := s.DescribePolicys(blbId, TCP, int(listener.ListenerPort))
 		if err != nil {
 			return nil, WrapError(err)
 		}
 
 		result = append(result, map[string]interface{}{
-			"listener_port":       listener.Port,
+			"listener_port":       listener.ListenerPort,
 			"tcp_session_timeout": listener.TcpSessionTimeout,
 			"protocol":            TCP,
 			"scheduler":           listener.Scheduler,
@@ -202,13 +202,13 @@ func (s *APPBLBService) ListAllUDPListeners(blbId string, port int) ([]map[strin
 
 	result := make([]map[string]interface{}, 0, len(listeners))
 	for _, listener := range listeners {
-		policys, err := s.DescribePolicys(blbId, UDP, int(listener.Port))
+		policys, err := s.DescribePolicys(blbId, UDP, int(listener.ListenerPort))
 		if err != nil {
 			return nil, WrapError(err)
 		}
 
 		result = append(result, map[string]interface{}{
-			"listener_port": listener.Port,
+			"listener_port": listener.ListenerPort,
 			"protocol":      UDP,
 			"scheduler":     listener.Scheduler,
 			"policys":       s.FlattenAppPolicysToMap(policys),
