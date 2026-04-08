@@ -1,5 +1,9 @@
 	## 1.22.23 (Unreleased)
 
+## 1.22.23 (April 08, 2026)
+ENHANCEMENTS:
+- resource/baiducloud_ccev2_cluster: Add parameters `api_server_cert_san`, `create_options`, `kms_encryption`, `metadata` and `node_group_specs`. Support updating `api_server_cert_san` and `kms_encryption`.
+
 ## 1.22.22 (March 30, 2026)
 ENHANCEMENTS:
 - resource/baiducloud_instance: Add parameter `ehc_cluster_id`. 
