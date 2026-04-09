@@ -1,4 +1,8 @@
-	## 1.22.23 (Unreleased)
+	## 1.22.25 (Unreleased)
+
+## 1.22.24 (April 09, 2026)
+ENHANCEMENTS:
+- Add support for `bd` (Baoding), `cd` (Chengdu), and `yq` (Yangquan) regions in BOS service.
 
 ## 1.22.23 (April 08, 2026)
 ENHANCEMENTS:
