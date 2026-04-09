@@ -72,6 +72,7 @@ const (
 	DefaultBDRegionEniEndPoint     = "bcc.bd.baidubce.com"
 	DefaultBDRegionCfsEndPoint     = "cfs.bd.baidubce.com"
 	DefaultBDRegionEipEndPoint     = "eip.bd.baidubce.com"
+	DefaultBDRegionBosEndPoint     = "bd.bcebos.com"
 	DefaultBDRegionMongoDBEndPoint = "mongodb.bd.baidubce.com"
 
 	DefaultGZRegionBccEndPoint     = "bcc.gz.baidubce.com"
@@ -137,6 +138,10 @@ const (
 	DefaultSINRegionVPNEndPoint = "bcc.sin.baidubce.com"
 	DefaultSINRegionEniEndPoint = "bcc.sin.baidubce.com"
 
+	DefaultCDRegionBosEndPoint = "cd.bcebos.com"
+
+	DefaultYQRegionBosEndPoint = "yq.bcebos.com"
+
 	DefaultCERTEndPoint      = "certificate.baidubce.com"
 	DefaultIAMEndPoint       = "iam.bj.baidubce.com"
 	DefaultCDNEndPoint       = "cdn.baidubce.com"
@@ -155,6 +160,8 @@ var (
 		RegionWuHan:     RegionFWHEndpoints,
 		RegionHongKong:  RegionHKGEndpoints,
 		RegionSingapore: RegionSINEndpoints,
+		RegionChengDu:   RegionCDEndpoints,
+		RegionYangQuan:  RegionYQEndpoints,
 	}
 
 	// Region BJ Service Endpoints
@@ -208,6 +215,7 @@ var (
 		BBCCode:       DefaultBDRegionBbcEndPoint,
 		CFSCode:       DefaultBDRegionCfsEndPoint,
 		EIPCode:       DefaultBDRegionEipEndPoint,
+		BOSCode:       DefaultBDRegionBosEndPoint,
 		ETGATEWAYCode: DefaultBDRegionBccEndPoint,
 		ETCode:        DefaultBJRegionBccEndPoint,
 		ESGCode:       DefaultBJRegionBccEndPoint,
@@ -357,6 +365,28 @@ var (
 		VPNCode: DefaultSINRegionVPNEndPoint,
 		ENICode: DefaultSINRegionEniEndPoint,
 		ESGCode: DefaultSINRegionEniEndPoint,
+	}
+
+	// Region CD (ChengDu) Service Endpoints
+	RegionCDEndpoints = map[ServiceCode]string{
+		CERTCode:      DefaultCERTEndPoint,
+		IAMCode:       DefaultIAMEndPoint,
+		CDNCode:       DefaultCDNEndPoint,
+		AbroadCDNCode: DefaultAbroadCDNEndPoint,
+		DNSCode:       DefaultDNSEndPoint,
+
+		BOSCode: DefaultCDRegionBosEndPoint,
+	}
+
+	// Region YQ (YangQuan) Service Endpoints
+	RegionYQEndpoints = map[ServiceCode]string{
+		CERTCode:      DefaultCERTEndPoint,
+		IAMCode:       DefaultIAMEndPoint,
+		CDNCode:       DefaultCDNEndPoint,
+		AbroadCDNCode: DefaultAbroadCDNEndPoint,
+		DNSCode:       DefaultDNSEndPoint,
+
+		BOSCode: DefaultYQRegionBosEndPoint,
 	}
 )
 

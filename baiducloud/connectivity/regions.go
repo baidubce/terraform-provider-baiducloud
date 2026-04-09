@@ -17,4 +17,6 @@ const (
 	RegionWuHan     = Region("fwh")
 	RegionHongKong  = Region("hkg")
 	RegionSingapore = Region("sin")
+	RegionChengDu   = Region("cd")
+	RegionYangQuan  = Region("yq")
 )
