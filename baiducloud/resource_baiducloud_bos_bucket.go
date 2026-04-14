@@ -901,9 +901,7 @@ func resourceBaiduCloudBosBucketVersioningStatusUpdate(d *schema.ResourceData, c
 		Status: d.Get("versioning_status").(string),
 	}
 	if args.Status == BOS_BUCKET_VERSIONING_NOT_ENABLED {
-		err := fmt.Errorf("versioning status should be updated to '%s' or '%s'",
-			BOS_BUCKET_VERSIONING_ENABLED, BOS_BUCKET_VERSIONING_SUSPENDED)
-		return WrapErrorf(err, DefaultErrorMsg, "baiducloud_bos_bucket", action, BCESDKGoERROR)
+		return nil
 	}
 
 	if _, err := client.WithBosClient(func(bosClient *bos.Client) (i interface{}, e error) {
