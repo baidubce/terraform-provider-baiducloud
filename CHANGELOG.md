@@ -1,4 +1,8 @@
-	## 1.22.25 (Unreleased)
+	## 1.22.26 (Unreleased)
+
+## 1.22.25 (April 14, 2026)
+ENHANCEMENTS:
+- resource/baiducloud_bos_bucket: Skip versioning status check for unsupported regions.
 
 ## 1.22.24 (April 09, 2026)
 ENHANCEMENTS:
