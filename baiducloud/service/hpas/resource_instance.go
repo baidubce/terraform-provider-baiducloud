@@ -104,7 +104,7 @@ func ResourceInstance() *schema.Resource {
 			"user_data": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "If the instance supports custom user data, you may set `user_data`.User data is transmitted unencrypted. " +
+				Description: "If the instance supports custom user data, you may set `user_data`. User data is transmitted unencrypted. " +
 					"Do not include plaintext secrets (passwords, private keys). If sensitive data is required, encrypt it, Base64-encode it, " +
 					"and have the instance decode and decrypt it after launch.",
 			},
@@ -143,7 +143,22 @@ func ResourceInstance() *schema.Resource {
 				MinItems:    1,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Description: "List of security group IDs, must be in the same VPC as the subnet",
-			}, // computed
+			},
+			"cds_volume_ids": {
+				Type:        schema.TypeSet,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "List of CDS volume IDs to attach to the instance. Only takes effect during creation.",
+			},
+			"reserved_instance": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				MaxItems: 1,
+				Description: "Configuration for simultaneously creating a reserved instance coupon when creating this instance. ",
+				Elem: schemaReservedInstanceCoupon(),
+			},
+			// computed
 			"status": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -203,6 +218,32 @@ func ResourceInstance() *schema.Resource {
 	}
 }
 
+func schemaReservedInstanceCoupon() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"name": {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Name of the reserved instance coupon.",
+			},
+			"period": {
+				Type:         schema.TypeInt,
+				Description:  "The reservation length (month). Valid values: `1`, `3`, `6`, `9`, `12`, `24`, `36`. Defaults to `1`.",
+				Optional:     true,
+				Default:      1,
+				ValidateFunc: validation.IntInSlice([]int{1, 3, 6, 9, 12, 24, 36}),
+			},
+			"auto_renew_period": {
+				Type:         schema.TypeInt,
+				Description:  "The automatic renewal time (month). Valid values: `1`, `3`, `6`, `9`, `12`, `24`, `36`.",
+				Optional:     true,
+				ValidateFunc: validation.IntInSlice([]int{1, 3, 6, 9, 12, 24, 36}),
+			},
+			"auto_renew_period_unit": flex.SchemaAutoRenewTimeUnit(),
+		},
+	}
+}
+
 func resourceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*connectivity.BaiduClient)
 
@@ -224,6 +265,13 @@ func resourceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
 	if _, err = waitInstanceAvailable(conn, d.Id()); err != nil {
 		return fmt.Errorf("error waiting HPAS Instance (%s) becoming available: %w", d.Id(), err)
 	}
+
+	if v, ok := d.GetOk("cds_volume_ids"); ok {
+		if err = attachCdsVolumes(d.Id(), flex.ExpandStringValueSet(v.(*schema.Set)), conn); err != nil {
+			return err
+		}
+	}
+
 	return resourceInstanceRead(d, meta)
 }
 
@@ -278,6 +326,16 @@ func resourceInstanceRead(d *schema.ResourceData, meta interface{}) error {
 		if err := d.Set("security_group_ids", flex.FlattenStringValueSet(detail.NicInfo[0].SecurityGroupIds)); err != nil {
 			return fmt.Errorf("error setting security_group_ids: %w", err)
 		}
+	}
+
+	var cdsVolumeIds []string
+	for _, v := range detail.VolumeInfo {
+		if v.VolumeType == "Data" {
+			cdsVolumeIds = append(cdsVolumeIds, v.VolumeId)
+		}
+	}
+	if err := d.Set("cds_volume_ids", flex.FlattenStringValueSet(cdsVolumeIds)); err != nil {
+		return fmt.Errorf("error setting cds_volume_ids: %w", err)
 	}
 
 	// computed fields
@@ -404,6 +462,26 @@ func buildCreationArgs(d *schema.ResourceData, client *hpas.Client) *api.CreateH
 
 	if v, ok := d.GetOk("user_data"); ok {
 		args.UserData = v.(string)
+	}
+
+	if v, ok := d.GetOk("reserved_instance"); ok {
+		riList := v.([]interface{})
+		if len(riList) > 0 {
+			ri := riList[0].(map[string]interface{})
+			coupon := &api.CreateCombinedCouponReq{
+				Name:                       ri["name"].(string),
+				ReservedInstancePeriodUnit: "month",
+			}
+			if v := ri["period"].(int); v > 0 {
+				coupon.ReservedInstancePeriod = v
+			}
+			if v := ri["auto_renew_period"].(int); v > 0 {
+				coupon.AutoRenew = true
+				coupon.AutoRenewPeriod = v
+				coupon.AutoRenewPeriodUnit = ri["auto_renew_period_unit"].(string)
+			}
+			args.ReservedInstance = coupon
+		}
 	}
 
 	return args
@@ -557,6 +635,19 @@ func modifyPassword(d *schema.ResourceData, conn *connectivity.BaiduClient) erro
 	})
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func attachCdsVolumes(hpasId string, volumeIds []string, conn *connectivity.BaiduClient) error {
+	_, err := conn.WithHPASClient(func(client *hpas.Client) (interface{}, error) {
+		return client.AttachHpasVolume(&api.AttachHpasVolumeReq{
+			HpasId:    hpasId,
+			VolumeIds: volumeIds,
+		})
+	})
+	if err != nil {
+		return fmt.Errorf("error attaching CDS volumes to HPAS Instance (%s): %w", hpasId, err)
 	}
 	return nil
 }

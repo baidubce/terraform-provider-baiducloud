@@ -25,7 +25,7 @@ resource "baiducloud_hpas_instance" "example" {
   internal_ip           = "192.168.1.100"
   subnet_id             = "sbn-example"
   password              = "1234@password"
-  security_group_ids = ["g-example"]
+  security_group_ids    = ["g-example"]
   tags = {
     key1 = "value1"
     key2 = "value2"
@@ -53,17 +53,19 @@ resource "baiducloud_hpas_instance" "example" {
 - `auto_renew_period` (Number) The automatic renewal time (month). Effective when `payment_timing` is `Prepaid`. Valid values: `1`~`9`, `12`, `24`, `36`. Defaults to `1`.
 - `auto_renew_period_unit` (String) Auto renew time unit, currently only supports monthly.
 - `auto_seq_suffix` (Boolean) Whether to automatically append a suffix to the application name. Defaults to `false`.
+- `cds_volume_ids` (Set of String) List of CDS volume IDs to attach to the instance. Only takes effect during creation.
 - `ehc_cluster_id` (String) EHC cluster ID. If not specified, the system will automatically select default EHC cluster.
 - `internal_ip` (String) Internal IP addresses. Must match the CIDR block of the specified subnet. Changing this value triggers a restart of the instance.
 - `keypair_id` (String) The ID of the keypair to bind to the instance.
 - `password` (String, Sensitive) Password of the instance. This value should be 8-16 characters, and letters, numbers and symbols must exist at the same time. The symbols is limited to `!@#$%^*()`. Changing this value triggers a restart of the instance.
 - `payment_timing` (String) Payment timing of billing. Valid values: `Prepaid`, `Postpaid`. Defaults to `Postpaid`.
 - `period` (Number) The reservation length (month) will pay. Effective when `payment_timing` is `Prepaid`. Valid values: `1`~`9`, `12`, `24`, `36`. Defaults to `1`.
+- `reserved_instance` (Block List, Max: 1) Configuration for simultaneously creating a reserved instance coupon when creating this instance. (see [below for nested schema](#nestedblock--reserved_instance))
 - `root_disk_size_in_gb` (Number) System disk size in GiB. Range 40–2048 GiB and must meet the image minimum.
 - `root_disk_storage_type` (String) System disk storage type when using CDS root disks. Valid values: `enhanced_ssd_pl3`, `enhanced_ssd_pl2`, `enhanced_ssd_pl1`, `premium_ssd`, `enhanced_ssd_pl0`, `hp1`.
 - `security_group_type` (String) Security group type. Valid values: `normal`, `enterprise`. Defaults to `normal`.
 - `tags` (Map of String) Tags of the resource.
-- `user_data` (String) If the instance supports custom user data, you may set `user_data`.User data is transmitted unencrypted. Do not include plaintext secrets (passwords, private keys). If sensitive data is required, encrypt it, Base64-encode it, and have the instance decode and decrypt it after launch.
+- `user_data` (String) If the instance supports custom user data, you may set `user_data`. User data is transmitted unencrypted. Do not include plaintext secrets (passwords, private keys). If sensitive data is required, encrypt it, Base64-encode it, and have the instance decode and decrypt it after launch.
 
 ### Read-Only
 
@@ -78,9 +80,24 @@ resource "baiducloud_hpas_instance" "example" {
 - `vpc_id` (String) VPC ID.
 - `vpc_name` (String) Name of the VPC.
 
+<a id="nestedblock--reserved_instance"></a>
+### Nested Schema for `reserved_instance`
+
+Required:
+
+- `name` (String) Name of the reserved instance coupon.
+
+Optional:
+
+- `auto_renew_period` (Number) The automatic renewal time (month). Valid values: `1`, `3`, `6`, `9`, `12`, `24`, `36`.
+- `auto_renew_period_unit` (String) Auto renew time unit, currently only supports monthly.
+- `period` (Number) The reservation length (month). Valid values: `1`, `3`, `6`, `9`, `12`, `24`, `36`. Defaults to `1`.
+
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 terraform import baiducloud_hpas_instance.example hpas-example

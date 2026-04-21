@@ -10,7 +10,7 @@ resource "baiducloud_hpas_instance" "example" {
   internal_ip           = "192.168.1.100"
   subnet_id             = "sbn-example"
   password              = "1234@password"
-  security_group_ids = ["g-example"]
+  security_group_ids    = ["g-example"]
   tags = {
     key1 = "value1"
     key2 = "value2"
