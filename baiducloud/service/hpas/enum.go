@@ -15,3 +15,12 @@ const (
 	InstanceStatusChangeSubnet = "ChangeSubnet"
 	InstanceStatusTemplate     = "Template"
 )
+
+const (
+	ReservedInstanceStatusCreating = "Creating"
+	ReservedInstanceStatusActive   = "Active"
+	ReservedInstanceStatusPending  = "Pending"
+	ReservedInstanceStatusExpired  = "Expired"
+	ReservedInstanceStatusDeleted  = "Deleted"
+	ReservedInstanceStatusRecharge = "Recharge"
+)

@@ -88,3 +88,51 @@ func FindInstance(conn *connectivity.BaiduClient, instanceID string) (*api.HpasR
 
 	return &instances[0], nil
 }
+
+func FindReservedInstances(conn *connectivity.BaiduClient, queryArgs api.ListReservedHpasByMakerReq) ([]api.HpasReservedResponse, error) {
+	result := []api.HpasReservedResponse{}
+	marker := ""
+	for {
+		raw, err := conn.WithHPASClient(func(client *hpas.Client) (interface{}, error) {
+			args := &api.ListReservedHpasByMakerReq{
+				ReservedHpasIds:    queryArgs.ReservedHpasIds,
+				Name:               queryArgs.Name,
+				ZoneName:           queryArgs.ZoneName,
+				ReservedHpasStatus: queryArgs.ReservedHpasStatus,
+				AppType:            queryArgs.AppType,
+				HpasId:             queryArgs.HpasId,
+				Marker:             marker,
+				MaxKeys:            100,
+			}
+			return client.DescribeReservedHpasByMaker(args)
+		})
+
+		log.Printf("[DEBUG] Read HPAS reserved instance list result: %+v", raw)
+		if err != nil {
+			return nil, fmt.Errorf("error reading HPAS reserved instance list: %w", err)
+		}
+		response := raw.(*api.ListReservedHpasByMakerResp)
+		result = append(result, response.ReservedHpasList...)
+
+		if response.IsTruncated {
+			marker = response.NextMarker
+		} else {
+			break
+		}
+	}
+	return result, nil
+}
+
+func FindReservedInstance(conn *connectivity.BaiduClient, id string) (*api.HpasReservedResponse, error) {
+	args := api.ListReservedHpasByMakerReq{
+		ReservedHpasIds: []string{id},
+	}
+	instances, err := FindReservedInstances(conn, args)
+	if err != nil {
+		return nil, err
+	}
+	if len(instances) == 0 {
+		return nil, fmt.Errorf("reserved instance %s not found", id)
+	}
+	return &instances[0], nil
+}

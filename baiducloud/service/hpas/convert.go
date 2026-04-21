@@ -64,3 +64,29 @@ func encryptPassword(d *schema.ResourceData, client *hpas.Client) string {
 
 	return encryptedPassword
 }
+
+func flattenReservedInstanceList(instances []api.HpasReservedResponse) interface{} {
+	tfList := []map[string]interface{}{}
+	for _, v := range instances {
+		tfMap := map[string]interface{}{
+			"reserved_hpas_id":      v.ReservedHpasId,
+			"name":                  v.Name,
+			"zone_name":             v.ZoneName,
+			"app_type":              v.AppType,
+			"app_performance_level": v.AppPerformanceLevel,
+			"payment_timing":        v.OfferingType,
+			"status":                v.Status,
+			"period":                v.ReservedHpasPeriod,
+			"create_time":           v.CreateTime,
+			"expire_time":           v.ExpireTime,
+			"tags":                  flex.FlattenTagModelToMap(v.Tags),
+			"hpas_id":               v.HpasId,
+			"hpas_name":             v.HpasName,
+			"deduct_instance":       v.DeductInstance,
+			"ehc_cluster_id":        v.EhcClusterId,
+			"ehc_cluster_name":      v.EhcClusterName,
+		}
+		tfList = append(tfList, tfMap)
+	}
+	return tfList
+}

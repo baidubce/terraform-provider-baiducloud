@@ -15,3 +15,13 @@ func StatusInstance(conn *connectivity.BaiduClient, instanceID string) resource.
 		return instance, instance.Status, nil
 	}
 }
+
+func StatusReservedInstance(conn *connectivity.BaiduClient, id string) resource.StateRefreshFunc {
+	return func() (interface{}, string, error) {
+		instance, err := FindReservedInstance(conn, id)
+		if err != nil {
+			return nil, "UNKNOWN", err
+		}
+		return instance, instance.Status, nil
+	}
+}

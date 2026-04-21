@@ -1,0 +1,1 @@
+terraform import baiducloud_hpas_reserved_instance.example <reserved_hpas_id>

@@ -277,6 +277,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_mongodb_instances":              mongodb.DataSourceInstances(),
 			"baiducloud_hpas_instances":                 hpas.DataSourceInstances(),
 			"baiducloud_hpas_images":                    hpas.DataSourceImages(),
+			"baiducloud_hpas_reserved_instances":        hpas.DataSourceReservedInstances(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -373,6 +374,7 @@ func Provider() terraform.ResourceProvider {
 			"baiducloud_mongodb_sharding_instance":       mongodb.ResourceShardingInstance(),
 			"baiducloud_hpas_instance":                   hpas.ResourceInstance(),
 			"baiducloud_hpas_instance_operation":         hpas.ResourceInstanceOperation(),
+			"baiducloud_hpas_reserved_instance":          hpas.ResourceReservedInstance(),
 		},
 
 		ConfigureFunc: providerConfigure,

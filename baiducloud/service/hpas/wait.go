@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	InstanceAvailableTimeout = 10 * time.Minute
+	InstanceAvailableTimeout         = 10 * time.Minute
+	ReservedInstanceAvailableTimeout = 10 * time.Minute
 )
 
 func waitInstanceAvailable(conn *connectivity.BaiduClient, instanceID string) (*api.HpasResponse, error) {
@@ -40,6 +41,22 @@ func waitInstanceStopped(conn *connectivity.BaiduClient, instanceID string) (*ap
 
 	raw, err := stateConf.WaitForState()
 	if v, ok := raw.(*api.HpasResponse); ok {
+		return v, nil
+	}
+	return nil, err
+}
+
+func waitReservedInstanceAvailable(conn *connectivity.BaiduClient, id string) (*api.HpasReservedResponse, error) {
+	stateConf := &resource.StateChangeConf{
+		Delay:   5 * time.Second,
+		Pending: []string{ReservedInstanceStatusCreating, ReservedInstanceStatusPending},
+		Target:  []string{ReservedInstanceStatusActive},
+		Refresh: StatusReservedInstance(conn, id),
+		Timeout: ReservedInstanceAvailableTimeout,
+	}
+
+	raw, err := stateConf.WaitForState()
+	if v, ok := raw.(*api.HpasReservedResponse); ok {
 		return v, nil
 	}
 	return nil, err
