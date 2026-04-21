@@ -1,4 +1,12 @@
-	## 1.22.26 (Unreleased)
+	## 1.23.1 (Unreleased)
+
+## 1.23.0 (April 21, 2026)
+FEATURES:
+- **New Resource:** `baiducloud_hpas_reserved_instance`.
+- **New Data Source:** `baiducloud_hpas_reserved_instances`.
+
+ENHANCEMENTS:
+- resource/baiducloud_hpas_instance: Add parameters `cds_volume_ids` and `reserved_instance`.
 
 ## 1.22.25 (April 14, 2026)
 ENHANCEMENTS:
