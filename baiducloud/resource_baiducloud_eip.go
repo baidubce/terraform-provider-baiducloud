@@ -67,12 +67,12 @@ func resourceBaiduCloudEip() *schema.Resource {
 			},
 			"route_type": {
 				Type:        schema.TypeString,
-				Description: "EIP route type",
+				Description: "Line type of the EIP. Valid values: `BGP` (Standard BGP) and `BGP_S` (Enhanced BGP). Defaults to `BGP`.",
 				Optional:    true,
 			},
 			"bandwidth_in_mbps": {
 				Type:        schema.TypeInt,
-				Description: "Eip bandwidth(Mbps), if payment_timing is Prepaid or billing_method is ByBandWidth, support between 1 and 200, if billing_method is ByTraffic, support between 1 and 1000",
+				Description: "Public network bandwidth of the EIP, in Mbps. For Prepaid or Postpaid (ByBandwidth) EIPs: Standard BGP (`BGP`) supports 1–500; Enhanced BGP (`BGP_S`) supports 100–5000 (represents the bandwidth cap). For Postpaid (ByTraffic) EIPs: Standard BGP (`BGP`) supports 1–200 (represents the peak traffic bandwidth).",
 				Required:    true,
 			},
 			"status": {

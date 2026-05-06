@@ -26,7 +26,7 @@ resource "baiducloud_eip" "default" {
 
 The following arguments are supported:
 
-* `bandwidth_in_mbps` - (Required) Eip bandwidth(Mbps), if payment_timing is Prepaid or billing_method is ByBandWidth, support between 1 and 200, if billing_method is ByTraffic, support between 1 and 1000
+* `bandwidth_in_mbps` - (Required) Public network bandwidth of the EIP, in Mbps. For Prepaid or Postpaid (ByBandwidth) EIPs: Standard BGP (`BGP`) supports 1–500; Enhanced BGP (`BGP_S`) supports 100–5000 (represents the bandwidth cap). For Postpaid (ByTraffic) EIPs: Standard BGP (`BGP`) supports 1–200 (represents the peak traffic bandwidth).
 * `billing_method` - (Required, ForceNew) Eip billing method, support ByTraffic or ByBandwidth
 * `payment_timing` - (Required, ForceNew) Eip payment timing, support Prepaid and Postpaid
 * `auto_renew_time_unit` - (Optional) Eip auto renew time unit, only useful when payment_timing is Prepaid, support month/year
@@ -34,7 +34,7 @@ The following arguments are supported:
 * `name` - (Optional, ForceNew) Eip name, length must be between 1 and 65 bytes
 * `reservation_length` - (Optional) Eip Prepaid billing reservation length, only useful when payment_timing is Prepaid
 * `reservation_time_unit` - (Optional) Eip Prepaid billing reservation time unit, only useful when payment_timing is Prepaid
-* `route_type` - (Optional) EIP route type
+* `route_type` - (Optional) Line type of the EIP. Valid values: `BGP` (Standard BGP) and `BGP_S` (Enhanced BGP). Defaults to `BGP`.
 * `tags` - (Optional, ForceNew) Tags, do not support modify
 
 ## Attributes Reference
