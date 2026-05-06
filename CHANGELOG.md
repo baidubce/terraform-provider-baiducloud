@@ -1,4 +1,8 @@
-	## 1.23.1 (Unreleased)
+	## 1.23.2 (Unreleased)
+
+## 1.23.1 (May 06, 2026)
+ENHANCEMENTS:
+- resource/baiducloud_eip: update documentation for `route_type` and `bandwidth_in_mbps`.
 
 ## 1.23.0 (April 21, 2026)
 FEATURES:
