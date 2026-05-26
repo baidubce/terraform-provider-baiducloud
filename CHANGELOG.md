@@ -1,4 +1,8 @@
-	## 1.23.2 (Unreleased)
+	## 1.23.3 (Unreleased)
+
+## 1.23.2 (May 26, 2026)
+ENHANCEMENTS:
+- resource/baiducloud_ccev2_cluster: restrict `container_network_config.mode` to `vpc-eni` only.
 
 ## 1.23.1 (May 06, 2026)
 ENHANCEMENTS:
