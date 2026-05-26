@@ -33,15 +33,18 @@ resource "baiducloud_ccev2_cluster" "default_managed" {
       }
     }
     container_network_config  {
-      mode = "kubenet"
+      mode = "vpc-eni"
       lb_service_vpc_subnet_id = baiducloud_subnet.defaultA.id
       node_port_range_min = 30000
       node_port_range_max = 32767
       max_pods_per_node = 64
-      cluster_pod_cidr = var.cluster_pod_cidr
       cluster_ip_service_cidr = var.cluster_ip_service_cidr
       ip_version = "ipv4"
       kube_proxy_mode = "iptables"
+      eni_vpc_subnet_ids {
+        zone_and_id = "zoneA:${baiducloud_subnet.defaultA.id}"
+      }
+      eni_security_group_id = baiducloud_security_group.default.id
     }
     cluster_delete_option {
       delete_resource = true
@@ -104,7 +107,7 @@ The `container_network_config` object supports the following:
 * `kube_proxy_mode` - (Optional) KubeProxy Mode. Available Value: [iptables, ipvs].
 * `lb_service_vpc_subnet_id` - (Optional) LB Service VPC Sunnet ID
 * `max_pods_per_node` - (Optional) Max pod number in one node 
-* `mode` - (Optional) Network Mode. Available Value: [kubenet, vpc-cni, vpc-route-veth, vpc-route-ipvlan, vpc-route-auto-detect, vpc-secondary-ip-veth, vpc-secondary-ip-ipvlan, vpc-secondary-ip-auto-detect].
+* `mode` - (Optional) Network Mode. Available Value: [vpc-eni].
 * `net_device_driver` - (Optional) Network device driver
 * `network_policy_type` - (Optional) Network policy type
 * `node_local_dns_addr` - (Optional) Node local DNS address

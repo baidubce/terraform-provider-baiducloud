@@ -916,7 +916,7 @@ func resourceCCEv2ContainerNetworkConfig() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"mode": {
 				Type:         schema.TypeString,
-				Description:  "Network Mode. Available Value: [kubenet, vpc-cni, vpc-route-veth, vpc-route-ipvlan, vpc-route-auto-detect, vpc-secondary-ip-veth, vpc-secondary-ip-ipvlan, vpc-secondary-ip-auto-detect].",
+				Description:  "Network Mode. Available Value: [vpc-eni].",
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice(ContainerNetworkModePermitted, false),
 			},
@@ -4055,14 +4055,7 @@ var AvailableZonePermitted = []string{
 }
 
 var ContainerNetworkModePermitted = []string{
-	string(ccev2types.ContainerNetworkModeKubenet),
-	string(ccev2types.ContainerNetworkModeVPCCNI),
-	string(ccev2types.ContainerNetworkModeVPCRouteVeth),
-	string(ccev2types.ContainerNetworkModeVPCRouteIPVlan),
-	string(ccev2types.ContainerNetworkModeVPCRouteAutoDetect),
-	string(ccev2types.ContainerNetworkModeVPCSecondaryIPVeth),
-	string(ccev2types.ContainerNetworkModeVPCSecondaryIPIPVlan),
-	string(ccev2types.ContainerNetworkModeVPCSecondaryIPAutoDetect),
+	"vpc-eni",
 }
 
 var ContainerNetworkIPTypePermitted = []string{
