@@ -1,4 +1,8 @@
-	## 1.23.3 (Unreleased)
+	## 1.23.4 (Unreleased)
+
+## 1.23.3 (June 09, 2026)
+ENHANCEMENTS:
+- resource/baiducloud_abroad_cdn_domain: Add parameter `form`.
 
 ## 1.23.2 (May 26, 2026)
 ENHANCEMENTS:
