@@ -73,6 +73,13 @@ func ResourceAbroadDomain() *schema.Resource {
 				Description: "Designate host to origin",
 				Optional:    true,
 			},
+			"form": {
+				Type:         schema.TypeString,
+				Description:  "Business type of the domain name. Defaults to `default`. Valid values: `default`, `dynamic`(dynamic and static acceleration).",
+				Optional:     true,
+				Default:      "default",
+				ValidateFunc: validation.StringInSlice([]string{"default", "dynamic"}, false),
+			},
 			"cname": {
 				Type: schema.TypeString,
 				Description: "The generated CNAME domain name, Users can enable acceleration for CDN domain" +
@@ -105,7 +112,11 @@ func resourceAbroadDomainCreate(d *schema.ResourceData, meta interface{}) error 
 			origin = expandOriginPeers(v.([]interface{}))
 		}
 		log.Printf("[DEBUG] Create Abroad CDN Domain: %s %+v", domain, origin)
-		return abroadCdnClient.CreateDomainWithOptions(domain, origin, abroad.CreateDomainWithTags(tags))
+		opts := []abroad.CreateDomainOption{abroad.CreateDomainWithTags(tags)}
+		if d.Get("form").(string) == "dynamic" {
+			opts = append(opts, abroad.CreateDomainWithForm(api.DynamicDomainForm))
+		}
+		return abroadCdnClient.CreateDomainWithOptions(domain, origin, opts...)
 	})
 
 	if err != nil {

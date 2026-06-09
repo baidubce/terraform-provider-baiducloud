@@ -41,6 +41,7 @@ resource "baiducloud_abroad_cdn_domain" "default" {
 ### Optional
 
 - `designate_host_to_origin` (String) Designate host to origin
+- `form` (String) Business type of the domain name. Defaults to `default`. Valid values: `default`, `dynamic` (dynamic and static acceleration).
 - `tags` (Map of String) Tags, do not support modify
 
 ### Read-Only
