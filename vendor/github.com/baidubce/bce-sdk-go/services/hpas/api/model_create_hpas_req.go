@@ -38,4 +38,15 @@ type CreateHpasReq struct {
 	RootDiskSizeInGb    int                      `json:"rootDiskSizeInGb,omitempty"`
 	RootDiskStorageType string                   `json:"rootDiskStorageType,omitempty"`
 	EnableJumboFrame    bool                     `json:"enableJumboFrame,omitempty"`
+	DataVolumes         []DataVolume             `json:"dataVolumes,omitempty"`
+}
+
+// DataVolume 数据盘配置
+type DataVolume struct {
+	VolumeType     string `json:"volumeType,omitempty"`
+	VolumeSizeInGb int    `json:"volumeSizeInGiB,omitempty"`
+	VolumeCount    int    `json:"volumeCount,omitempty"`
+	SnapshotId     string `json:"snapshotId,omitempty"`
+	EncryptKeyId   string `json:"encryptKeyId,omitempty"`
+	ExtraIops      int    `json:"extraIops,omitempty"`
 }

@@ -61,7 +61,7 @@ type RecommitEtChannelResult struct {
 	Networks            []string `json:"networks"`
 	CustomerAddress     string   `json:"customerAddress"`
 	RouteType           string   `json:"routeType"`
-	VlanId              string   `json:"vlanId"`
+	VlanId              int      `json:"vlanId"`
 	Id                  string   `json:"id"`
 	Status              string   `json:"status"`
 	EnableIpv6          uint32   `json:"enableIpv6"`
@@ -93,7 +93,7 @@ type EtChannelResult struct {
 	Ipv6BGPStatus       string   `json:"ipv6BgpStatus"`
 	CustomerAddress     string   `json:"customerAddress"`
 	RouteType           string   `json:"routeType"`
-	VlanId              string   `json:"vlanId"`
+	VlanId              int      `json:"vlanId"`
 	Id                  string   `json:"id"`
 	Status              string   `json:"status"`
 	EnableIpv6          uint32   `json:"enableIpv6"`
@@ -118,6 +118,7 @@ type CreateEtDcphyArgs struct {
 	UserPhone   string `json:"userPhone"`
 	UserEmail   string `json:"userEmail"`
 	UserIdc     string `json:"userIdc"`
+	LinkDelay   int    `json:"linkDelay,omitempty"`
 	Tags        []Tag  `json:"tags"`
 }
 
@@ -132,6 +133,7 @@ type UpdateEtDcphyArgs struct {
 	UserName    string `json:"userName,omitempty"`
 	UserPhone   string `json:"userPhone,omitempty"`
 	UserEmail   string `json:"userEmail,omitempty"`
+	LinkDelay   int    `json:"linkDelay,omitempty"`
 }
 
 type ListEtDcphyArgs struct {
