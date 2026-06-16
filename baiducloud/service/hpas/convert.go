@@ -65,6 +65,19 @@ func encryptPassword(d *schema.ResourceData, client *hpas.Client) string {
 	return encryptedPassword
 }
 
+func expandDataVolumes(list []interface{}) []api.DataVolume {
+	volumes := make([]api.DataVolume, 0, len(list))
+	for _, item := range list {
+		m := item.(map[string]interface{})
+		volumes = append(volumes, api.DataVolume{
+			VolumeType:     m["volume_type"].(string),
+			VolumeSizeInGb: m["volume_size_in_gb"].(int),
+			VolumeCount:    m["volume_count"].(int),
+		})
+	}
+	return volumes
+}
+
 func flattenReservedInstanceList(instances []api.HpasReservedResponse) interface{} {
 	tfList := []map[string]interface{}{}
 	for _, v := range instances {

@@ -53,7 +53,8 @@ resource "baiducloud_hpas_instance" "example" {
 - `auto_renew_period` (Number) The automatic renewal time (month). Effective when `payment_timing` is `Prepaid`. Valid values: `1`~`9`, `12`, `24`, `36`. Defaults to `1`.
 - `auto_renew_period_unit` (String) Auto renew time unit, currently only supports monthly.
 - `auto_seq_suffix` (Boolean) Whether to automatically append a suffix to the application name. Defaults to `false`.
-- `cds_volume_ids` (Set of String) List of CDS volume IDs to attach to the instance. Only takes effect during creation.
+- `cds_volume_ids` (Set of String) IDs of existing CDS volumes to attach. Only takes effect during creation. Can be used together with `data_volumes`.
+- `data_volumes` (Block List) New CDS data volumes to create with the instance. Only takes effect during creation; changes are ignored afterwards. Can be used together with `cds_volume_ids`. (see [below for nested schema](#nestedblock--data_volumes))
 - `ehc_cluster_id` (String) EHC cluster ID. If not specified, the system will automatically select default EHC cluster.
 - `internal_ip` (String) Internal IP addresses. Must match the CIDR block of the specified subnet. Changing this value triggers a restart of the instance.
 - `keypair_id` (String) The ID of the keypair to bind to the instance.
@@ -92,6 +93,18 @@ Optional:
 - `auto_renew_period` (Number) The automatic renewal time (month). Valid values: `1`, `3`, `6`, `9`, `12`, `24`, `36`.
 - `auto_renew_period_unit` (String) Auto renew time unit, currently only supports monthly.
 - `period` (Number) The reservation length (month). Valid values: `1`, `3`, `6`, `9`, `12`, `24`, `36`. Defaults to `1`.
+
+<a id="nestedblock--data_volumes"></a>
+### Nested Schema for `data_volumes`
+
+Required:
+
+- `volume_type` (String) Storage type of the data volume. Valid values: `enhanced_ssd_pl3`, `enhanced_ssd_pl2`, `enhanced_ssd_pl1`, `premium_ssd`, `enhanced_ssd_pl0`, `hp1`.
+- `volume_size_in_gb` (Number) Size of the data volume in GiB.
+
+Optional:
+
+- `volume_count` (Number) Number of data volumes to create with this configuration. Defaults to `1`.
 
 ## Import
 

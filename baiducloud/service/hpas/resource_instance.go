@@ -148,7 +148,35 @@ func ResourceInstance() *schema.Resource {
 				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: "List of CDS volume IDs to attach to the instance. Only takes effect during creation.",
+				Description: "IDs of existing CDS volumes to attach. Only takes effect during creation. Can be used together with `data_volumes`.",
+			},
+			"data_volumes": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Description: "New CDS data volumes to create with the instance. Only takes effect during creation; changes are ignored afterwards. Can be used together with `cds_volume_ids`.",
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return d.Id() != ""
+				},
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"volume_type": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Storage type of the data volume. Valid values: `enhanced_ssd_pl3`, `enhanced_ssd_pl2`, `enhanced_ssd_pl1`, `premium_ssd`, `enhanced_ssd_pl0`, `hp1`.",
+						},
+						"volume_size_in_gb": {
+							Type:        schema.TypeInt,
+							Required:    true,
+							Description: "Size of the data volume in GiB.",
+						},
+						"volume_count": {
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Default:     1,
+							Description: "Number of data volumes to create with this configuration. Defaults to `1`.",
+						},
+					},
+				},
 			},
 			"reserved_instance": {
 				Type:     schema.TypeList,
@@ -462,6 +490,10 @@ func buildCreationArgs(d *schema.ResourceData, client *hpas.Client) *api.CreateH
 
 	if v, ok := d.GetOk("user_data"); ok {
 		args.UserData = v.(string)
+	}
+
+	if v, ok := d.GetOk("data_volumes"); ok {
+		args.DataVolumes = expandDataVolumes(v.([]interface{}))
 	}
 
 	if v, ok := d.GetOk("reserved_instance"); ok {
