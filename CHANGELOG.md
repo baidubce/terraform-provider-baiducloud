@@ -1,4 +1,8 @@
-	## 1.23.4 (Unreleased)
+	## 1.23.5 (Unreleased)
+
+## 1.23.4 (June 16, 2026)
+ENHANCEMENTS:
+- resource/baiducloud_hpas_instance: Add parameter `data_volumes`.
 
 ## 1.23.3 (June 09, 2026)
 ENHANCEMENTS:
