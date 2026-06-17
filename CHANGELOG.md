@@ -1,4 +1,8 @@
-	## 1.23.5 (Unreleased)
+	## 1.23.6 (Unreleased)
+
+## 1.23.5 (June 17, 2026)
+ENHANCEMENTS:
+- remove zone validation in CCEv2.
 
 ## 1.23.4 (June 16, 2026)
 ENHANCEMENTS:
