@@ -170,7 +170,7 @@ The `managed_cluster_master_option` object supports the following:
 * `master_flavor` - (Optional) Master flavor
 * `master_security_group_uuid` - (Optional) Master security group UUID
 * `master_vpc_subnet_uuid` - (Optional) Master VPC subnet UUID
-* `master_vpc_subnet_zone` - (Optional) Master VPC Subnet Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
+* `master_vpc_subnet_zone` - (Optional) Master VPC Subnet Zone, e.g. zoneA, zoneB.
 
 The `create_options` object supports the following:
 
@@ -349,7 +349,7 @@ The `tag_list` object supports the following:
 
 The `vpc_config` object supports the following:
 
-* `available_zone` - (Optional) Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
+* `available_zone` - (Optional) Available Zone, e.g. zoneA, zoneB.
 * `security_group_id` - (Optional) Security Group ID
 * `security_group_type` - (Optional) Security Group type. Available Values: [normal, enterprise]. Default: `normal`
 * `vpc_id` - (Optional) VPC ID
@@ -511,7 +511,7 @@ The `tag_list` object supports the following:
 
 The `vpc_config` object supports the following:
 
-* `available_zone` - (Optional) Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
+* `available_zone` - (Optional) Available Zone, e.g. zoneA, zoneB.
 * `security_group_id` - (Optional) Security Group ID
 * `security_group_type` - (Optional) Security Group type. Available Values: [normal, enterprise]. Default: `normal`
 * `vpc_id` - (Optional) VPC ID
@@ -622,7 +622,7 @@ In addition to all arguments above, the following attributes are exported:
       * `tag_key` - Tag Key
       * `tag_value` - Tag Value
     * `vpc_config` - VPC Config
-      * `available_zone` - Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
+      * `available_zone` - Available Zone, e.g. zoneA, zoneB.
       * `security_group_id` - Security Group ID
       * `vpc_id` - VPC ID
       * `vpc_subnet_cidr_ipv6` - VPC Sunbet CIDR IPv6
@@ -727,7 +727,7 @@ In addition to all arguments above, the following attributes are exported:
       * `tag_key` - Tag Key
       * `tag_value` - Tag Value
     * `vpc_config` - VPC Config
-      * `available_zone` - Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].
+      * `available_zone` - Available Zone, e.g. zoneA, zoneB.
       * `security_group_id` - Security Group ID
       * `vpc_id` - VPC ID
       * `vpc_subnet_cidr_ipv6` - VPC Sunbet CIDR IPv6

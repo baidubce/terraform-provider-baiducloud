@@ -877,10 +877,9 @@ func resourceCCEv2MasterConfig() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"master_vpc_subnet_zone": {
-							Type:         schema.TypeString,
-							Description:  "Master VPC Subnet Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].",
-							Optional:     true,
-							ValidateFunc: validation.StringInSlice(AvailableZonePermitted, false),
+							Type:        schema.TypeString,
+							Description: "Master VPC Subnet Zone, e.g. zoneA, zoneB.",
+							Optional:    true,
 						},
 						"master_vpc_subnet_uuid": {
 							Type:        schema.TypeString,
@@ -1177,11 +1176,10 @@ func resourceCCEv2VPCConfig() *schema.Resource {
 				Computed:    true,
 			},
 			"available_zone": {
-				Type:         schema.TypeString,
-				Description:  "Available Zone. Available Value: [zoneA, zoneB, zoneC, zoneD, zoneE, zoneF, zoneG, zoneI].",
-				Optional:     true,
-				Computed:     true,
-				ValidateFunc: validation.StringInSlice(AvailableZonePermitted, false),
+				Type:        schema.TypeString,
+				Description: "Available Zone, e.g. zoneA, zoneB.",
+				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -4041,17 +4039,6 @@ var ClusterHAPermitted = []int{
 	int(ccev2types.ClusterHAMedium),
 	int(ccev2types.ClusterHAHigh),
 	int(ccev2types.ClusterHAServerless),
-}
-
-var AvailableZonePermitted = []string{
-	string(ccev2types.AvailableZoneA),
-	string(ccev2types.AvailableZoneB),
-	string(ccev2types.AvailableZoneC),
-	string(ccev2types.AvailableZoneD),
-	string(ccev2types.AvailableZoneE),
-	string(ccev2types.AvailableZoneF),
-	"zoneG",
-	"zoneI",
 }
 
 var ContainerNetworkModePermitted = []string{
