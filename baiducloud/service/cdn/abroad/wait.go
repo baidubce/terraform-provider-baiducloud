@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	CDNDomainAvailableTimeout = 10 * time.Minute
+	CDNDomainAvailableTimeout = 30 * time.Minute
 )
 
 func pendingStatus() []string {
