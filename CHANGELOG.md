@@ -1,4 +1,8 @@
-	## 1.23.6 (Unreleased)
+	## 1.23.7 (Unreleased)
+
+## 1.23.6 (August 7, 2026)
+ENHANCEMENTS:
+- resource/baiducloud_abroad_cdn_domain: Increase creation timeout to 30 minutes.
 
 ## 1.23.5 (June 17, 2026)
 ENHANCEMENTS:
